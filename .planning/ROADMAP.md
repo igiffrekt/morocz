@@ -33,9 +33,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Plus Jakarta Sans loads correctly with all required weights (400–800)
   4. A test animation renders in the browser with `MotionConfig reducedMotion="user"` active at root, and motion is disabled when the OS prefers reduced motion
   5. ESLint/Biome passes with no errors on the initial codebase
-**Plans**: TBD
+**Plans:** 2 plans
 
-Plans: None yet
+Plans:
+- [ ] 01-01-PLAN.md -- Next.js 16 + Tailwind v4 + Plus Jakarta Sans + design tokens
+- [ ] 01-02-PLAN.md -- Motion v12 animation architecture + Biome linting + deployment readiness
 
 ### Phase 2: Content Architecture
 **Goal**: All Sanity document types are defined, Studio is navigable, TypeGen types are committed, and every GROQ query is centralized — the entire data layer is ready to serve front-end components
@@ -140,7 +142,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/TBD | Not started | - |
+| 1. Foundation | 0/2 | Planned | - |
 | 2. Content Architecture | 0/TBD | Not started | - |
 | 3. Shell + Static Sections | 0/TBD | Not started | - |
 | 4. Services + Lab Tests | 0/TBD | Not started | - |

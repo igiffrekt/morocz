@@ -36,7 +36,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans:** 2 plans
 
 Plans:
-- [ ] 01-01-PLAN.md -- Next.js 16 + Tailwind v4 + Plus Jakarta Sans + design tokens
+- [x] 01-01-PLAN.md -- Next.js 15 + Tailwind v4 + Plus Jakarta Sans + design tokens *(completed 2026-02-19)*
 - [ ] 01-02-PLAN.md -- Motion v12 animation architecture + Biome linting + deployment readiness
 
 ### Phase 2: Content Architecture
@@ -142,7 +142,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/2 | Planned | - |
+| 1. Foundation | 1/2 | In progress | - |
 | 2. Content Architecture | 0/TBD | Not started | - |
 | 3. Shell + Static Sections | 0/TBD | Not started | - |
 | 4. Services + Lab Tests | 0/TBD | Not started | - |

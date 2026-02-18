@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import { plusJakartaSans } from "@/lib/fonts";
 import { MotionProvider } from "@/components/motion/MotionProvider";
+import { plusJakartaSans } from "@/lib/fonts";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Morocz Medical",
-  description: "Morocz Medical — Egészségügyi szolgáltatások Esztergomban. Foglaljon időpontot online.",
+  description:
+    "Morocz Medical — Egészségügyi szolgáltatások Esztergomban. Foglaljon időpontot online.",
 };
 
 export default function RootLayout({
@@ -16,9 +17,7 @@ export default function RootLayout({
   return (
     <html lang="hu" className={plusJakartaSans.variable}>
       <body>
-        <MotionProvider>
-          {children}
-        </MotionProvider>
+        <MotionProvider>{children}</MotionProvider>
       </body>
     </html>
   );

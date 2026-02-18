@@ -1,7 +1,7 @@
 "use client";
 
-import { motion } from "motion/react";
 import type { HTMLMotionProps } from "motion/react";
+import { motion } from "motion/react";
 import type { ReactNode } from "react";
 
 interface FadeInProps extends HTMLMotionProps<"div"> {

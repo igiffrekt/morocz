@@ -3,9 +3,7 @@ import { FadeIn } from "@/components/motion/FadeIn";
 export default function Home() {
   return (
     <main className="max-w-[88rem] mx-auto px-8 py-12 space-y-12">
-      <h1 className="text-3xl font-bold text-primary">
-        Morocz Medical — Dizájn Rendszer Teszt
-      </h1>
+      <h1 className="text-3xl font-bold text-primary">Morocz Medical — Dizájn Rendszer Teszt</h1>
 
       {/* Color Swatches */}
       <section>
@@ -56,11 +54,21 @@ export default function Home() {
       <section>
         <h2 className="text-xl font-semibold text-text-light mb-4">Plus Jakarta Sans betűsúlyok</h2>
         <div className="space-y-2">
-          <p className="font-normal text-lg text-text-light">400 — Normal súly (Egészségügyi ellátás)</p>
-          <p className="font-medium text-lg text-text-light">500 — Közepes súly (Egészségügyi ellátás)</p>
-          <p className="font-semibold text-lg text-text-light">600 — Félkövér súly (Egészségügyi ellátás)</p>
-          <p className="font-bold text-lg text-text-light">700 — Kövér súly (Egészségügyi ellátás)</p>
-          <p className="font-extrabold text-lg text-text-light">800 — Extra kövér súly (Egészségügyi ellátás)</p>
+          <p className="font-normal text-lg text-text-light">
+            400 — Normal súly (Egészségügyi ellátás)
+          </p>
+          <p className="font-medium text-lg text-text-light">
+            500 — Közepes súly (Egészségügyi ellátás)
+          </p>
+          <p className="font-semibold text-lg text-text-light">
+            600 — Félkövér súly (Egészségügyi ellátás)
+          </p>
+          <p className="font-bold text-lg text-text-light">
+            700 — Kövér súly (Egészségügyi ellátás)
+          </p>
+          <p className="font-extrabold text-lg text-text-light">
+            800 — Extra kövér súly (Egészségügyi ellátás)
+          </p>
         </div>
       </section>
 
@@ -69,7 +77,8 @@ export default function Home() {
         <h2 className="text-xl font-semibold text-text-light mb-4">Max szélesség (88rem)</h2>
         <div className="bg-secondary rounded-2xl p-6">
           <p className="text-text-light font-medium">
-            Ez a tároló a max-w-[88rem] korlátozással rendelkezik, ami a sablon 88rem max-szélessége.
+            Ez a tároló a max-w-[88rem] korlátozással rendelkezik, ami a sablon 88rem
+            max-szélessége.
           </p>
         </div>
       </section>
@@ -83,7 +92,8 @@ export default function Home() {
               Ez a doboz alulról felemelkedve jelenik meg (FadeIn, direction=&quot;up&quot;)
             </p>
             <p className="text-primary/70 text-sm">
-              Ha az operációs rendszered mozgáscsökkentési beállítása aktív, ez a doboz azonnal, animáció nélkül jelenik meg.
+              Ha az operációs rendszered mozgáscsökkentési beállítása aktív, ez a doboz azonnal,
+              animáció nélkül jelenik meg.
             </p>
           </div>
         </FadeIn>

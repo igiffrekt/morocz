@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+@theme {
+  /* Font family */
+  --font-sans: var(--font-plus-jakarta-sans), "Plus Jakarta Sans", sans-serif;
+
+  /* Colors — from template tailwind.config */
+  --color-primary: #23264F;
+  --color-secondary: #F4DCD6;
+  --color-accent: #99CEB7;
+  --color-yellow-card: #FAE988;
+  --color-green-card: #A8DABC;
+  --color-purple-card: #EABDE6;
+  --color-blue-card: #8FB8FF;
+  --color-background-light: #F2F4F8;
+  --color-surface-white: #FFFFFF;
+  --color-text-light: #1A1D2D;
+
+  /* Border radius */
+  --radius-DEFAULT: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-2xl: 2rem;
+  --radius-3xl: 2.5rem;
+
+  /* Max width */
+  --container-8xl: 88rem;
+}
+
+body {
+  @apply bg-background-light text-text-light antialiased;
+}

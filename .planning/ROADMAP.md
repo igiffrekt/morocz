@@ -12,7 +12,7 @@ This roadmap builds a beautifully animated, SEO-optimized medical practice websi
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation** - Next.js 16 + Tailwind v4 + Motion architecture, deployed to Vercel
+- [~] **Phase 1: Foundation** - Next.js 16 + Tailwind v4 + Motion architecture, deployed to Vercel *(in progress — 01-02 checkpoint pending)*
 - [ ] **Phase 2: Content Architecture** - All Sanity schemas, TypeGen, GROQ queries — data layer complete
 - [ ] **Phase 3: Shell + Static Sections** - Header, Hero, Footer, and responsive baseline
 - [ ] **Phase 4: Services + Lab Tests** - Animated category filter, lab tests section, CLS validated
@@ -37,7 +37,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 Plans:
 - [x] 01-01-PLAN.md -- Next.js 15 + Tailwind v4 + Plus Jakarta Sans + design tokens *(completed 2026-02-19)*
-- [ ] 01-02-PLAN.md -- Motion v12 animation architecture + Biome linting + deployment readiness
+- [x] 01-02-PLAN.md -- Motion v12 animation architecture + Biome linting + deployment readiness *(auto tasks complete 2026-02-19; awaiting human-verify checkpoint)*
 
 ### Phase 2: Content Architecture
 **Goal**: All Sanity document types are defined, Studio is navigable, TypeGen types are committed, and every GROQ query is centralized — the entire data layer is ready to serve front-end components

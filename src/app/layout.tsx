@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { plusJakartaSans } from "@/lib/fonts";
+import { MotionProvider } from "@/components/motion/MotionProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -15,7 +16,9 @@ export default function RootLayout({
   return (
     <html lang="hu" className={plusJakartaSans.variable}>
       <body>
-        {children}
+        <MotionProvider>
+          {children}
+        </MotionProvider>
       </body>
     </html>
   );

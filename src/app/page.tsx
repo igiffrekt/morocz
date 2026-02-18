@@ -1,3 +1,5 @@
+import { FadeIn } from "@/components/motion/FadeIn";
+
 export default function Home() {
   return (
     <main className="max-w-[88rem] mx-auto px-8 py-12 space-y-12">
@@ -70,6 +72,21 @@ export default function Home() {
             Ez a tároló a max-w-[88rem] korlátozással rendelkezik, ami a sablon 88rem max-szélessége.
           </p>
         </div>
+      </section>
+
+      {/* Animation Test */}
+      <section>
+        <h2 className="text-xl font-semibold text-text-light mb-4">Animáció teszt (Motion v12)</h2>
+        <FadeIn direction="up">
+          <div className="bg-accent rounded-2xl p-8 flex flex-col gap-3">
+            <p className="text-primary font-semibold text-lg">
+              Ez a doboz alulról felemelkedve jelenik meg (FadeIn, direction=&quot;up&quot;)
+            </p>
+            <p className="text-primary/70 text-sm">
+              Ha az operációs rendszered mozgáscsökkentési beállítása aktív, ez a doboz azonnal, animáció nélkül jelenik meg.
+            </p>
+          </div>
+        </FadeIn>
       </section>
     </main>
   );

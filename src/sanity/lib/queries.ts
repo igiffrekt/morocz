@@ -6,6 +6,11 @@ import { defineQuery } from "next-sanity";
 export const homepageQuery = defineQuery(`*[_type == "homepage" && _id == "homepage"][0]{
   heroHeadline,
   heroSubtitle,
+  heroBadges[]{
+    _key,
+    emoji,
+    text
+  },
   heroDoctorImage,
   heroCards[]{
     _key,

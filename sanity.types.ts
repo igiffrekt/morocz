@@ -93,6 +93,11 @@ export type Homepage = {
   _rev: string;
   heroHeadline?: string;
   heroSubtitle?: string;
+  heroBadges?: Array<{
+    _key: string;
+    emoji?: string;
+    text?: string;
+  }>;
   heroDoctorImage?: SanityImageObject;
   heroCards?: Array<{
     _key: string;

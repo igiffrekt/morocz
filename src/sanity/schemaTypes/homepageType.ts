@@ -21,6 +21,38 @@ export const homepageType = defineType({
       rows: 3,
     }),
     defineField({
+      name: "heroBadges",
+      title: "Hero jelvenyek",
+      type: "array",
+      description: "Statisztikak es elismeresek a hero reszben (max 3)",
+      of: [
+        {
+          type: "object",
+          fields: [
+            defineField({
+              name: "emoji",
+              title: "Emoji",
+              type: "string",
+              description: "Ikon emoji (pl. ✅, 🏥, 👨‍⚕️)",
+            }),
+            defineField({
+              name: "text",
+              title: "Szoveg",
+              type: "string",
+              validation: (rule) => rule.required(),
+            }),
+          ],
+          preview: {
+            select: {
+              title: "text",
+              subtitle: "emoji",
+            },
+          },
+        },
+      ],
+      validation: (rule) => rule.max(3),
+    }),
+    defineField({
       name: "heroDoctorImage",
       title: "Orvos kep",
       type: "image",

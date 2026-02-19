@@ -52,20 +52,20 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Services Section
 
-- [ ] **SERV-01**: Category filter tabs (horizontal scrollable pills) populated from Sanity
-- [ ] **SERV-02**: Animated card shuffle/reorder when switching filter category (layout animation)
-- [ ] **SERV-03**: Service cards displaying provider/service info from Sanity
-- [ ] **SERV-04**: Active tab visual state (dark background + emoji icon)
-- [ ] **SERV-05**: CLS score < 0.1 during filter animations
-- [ ] **SERV-06**: All service data, categories, and order editable from Sanity
+- [x] **SERV-01**: Category filter tabs (horizontal scrollable pills) populated from Sanity
+- [x] **SERV-02**: Animated card shuffle/reorder when switching filter category (layout animation)
+- [x] **SERV-03**: Service cards displaying provider/service info from Sanity
+- [x] **SERV-04**: Active tab visual state (dark background + emoji icon)
+- [x] **SERV-05**: CLS score < 0.1 during filter animations
+- [x] **SERV-06**: All service data, categories, and order editable from Sanity
 
 ### Lab Tests Section
 
-- [ ] **LAB-01**: Dark navy background section
-- [ ] **LAB-02**: Illustrated test cards with name, description, discount badge, price, and original price
-- [ ] **LAB-03**: "View All Lab Tests" link
-- [ ] **LAB-04**: Cards fade/slide in on scroll
-- [ ] **LAB-05**: All lab test data editable from Sanity (name, description, price, discount, illustration)
+- [x] **LAB-01**: Dark navy background section
+- [x] **LAB-02**: Illustrated test cards with name, description, discount badge, price, and original price
+- [x] **LAB-03**: "View All Lab Tests" link
+- [x] **LAB-04**: Cards fade/slide in on scroll
+- [x] **LAB-05**: All lab test data editable from Sanity (name, description, price, discount, illustration)
 
 ### Testimonials Section
 
@@ -206,17 +206,17 @@ Which phases cover which requirements. Verified during roadmap creation (2026-02
 | HERO-05 | Phase 3 | Complete |
 | HERO-06 | Phase 3 | Complete |
 | HERO-07 | Phase 3 | Complete |
-| SERV-01 | Phase 4 | Pending |
-| SERV-02 | Phase 4 | Pending |
-| SERV-03 | Phase 4 | Pending |
-| SERV-04 | Phase 4 | Pending |
-| SERV-05 | Phase 4 | Pending |
-| SERV-06 | Phase 4 | Pending |
-| LAB-01 | Phase 4 | Pending |
-| LAB-02 | Phase 4 | Pending |
-| LAB-03 | Phase 4 | Pending |
-| LAB-04 | Phase 4 | Pending |
-| LAB-05 | Phase 4 | Pending |
+| SERV-01 | Phase 4 | Complete |
+| SERV-02 | Phase 4 | Complete |
+| SERV-03 | Phase 4 | Complete |
+| SERV-04 | Phase 4 | Complete |
+| SERV-05 | Phase 4 | Complete |
+| SERV-06 | Phase 4 | Complete |
+| LAB-01 | Phase 4 | Complete |
+| LAB-02 | Phase 4 | Complete |
+| LAB-03 | Phase 4 | Complete |
+| LAB-04 | Phase 4 | Complete |
+| LAB-05 | Phase 4 | Complete |
 | TEST-01 | Phase 5 | Pending |
 | TEST-02 | Phase 5 | Pending |
 | TEST-03 | Phase 5 | Pending |

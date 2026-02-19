@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Patients can discover Morocz Medical's services and book an appointment through a beautifully animated, fast, SEO-optimized website where every piece of content is manageable from Sanity CMS.
-**Current focus:** Phase 3 — Shell + Static Sections
+**Current focus:** Phase 4 — Services + Lab Tests
 
 ## Current Position
 
-Phase: 3 of 8 (Shell + Static Sections)
-Plan: 4 of 4 in current phase (Plans 03-01, 03-02, 03-03, 03-04 complete — awaiting human visual verification)
-Status: Checkpoint — homepage assembly complete, awaiting visual verification at http://localhost:3001
-Last activity: 2026-02-19 — Plan 03-04 Task 1 complete (layout.tsx and page.tsx wired with Sanity data; production build passes)
+Phase: 4 of 8 (Services + Lab Tests)
+Plan: 2 of 3 in current phase (Plans 04-01, 04-02 complete)
+Status: In Progress — LabTestsSection built; ServicesSection (04-03) next
+Last activity: 2026-02-19 — Plan 04-02 complete (LabTestsSection component with pastel cards and scroll animations)
 
-Progress: [███████░░░] ~70%
+Progress: [████████░░] ~78%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 8 (01-01, 01-02, 02-01, 02-02, 02-03, 02-04, 02-05, 03-01, 03-02)
+- Total plans completed: 10 (01-01, 01-02, 02-01, 02-02, 02-03, 02-04, 02-05, 03-01..03-04, 04-01, 04-02)
 - Average duration: 9 min
-- Total execution time: ~1.1 hours
+- Total execution time: ~1.3 hours
 
 **By Phase:**
 
@@ -36,6 +36,8 @@ Progress: [███████░░░] ~70%
 - Trend: Very fast — well-specified plans execute quickly
 
 *Updated after each plan completion*
+| Phase 04-services-lab-tests P02 | 8 | 1 tasks | 1 files |
+| Phase 04-services-lab-tests P01 | 2 | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -78,6 +80,10 @@ Recent decisions affecting current work:
 - [Phase 03-shell-static-sections]: Array index key accepted for HeroHeadline letter-by-letter animation — text is static CMS content, chars never reorder; biome-ignore suppression with justification used
 - [Phase 03-shell-static-sections]: next/image required (not <img>) in all section components — biome noImgElement rule enforced project-wide for LCP optimization
 - [Phase 03-shell-static-sections]: Header logo link: bare <a href="/"> replaced with next/link <Link> to satisfy Next.js ESLint no-html-link-for-pages rule
+- [Phase 04-services-lab-tests]: Used /laborvizsgalatok as href placeholder instead of href='#' — Biome useValidAnchor rule requires real URL path
+- [Phase 04-services-lab-tests]: Lab test cards show fixed price only — no discount, no originalPrice, no 'from' prefix (locked CONTEXT.md decision)
+- [Phase 04-services-lab-tests]: layout='position' used (not layout=true) to animate card transforms only, preventing CLS during category filter switches
+- [Phase 04-services-lab-tests]: AnimatePresence mode='popLayout' used so exiting cards animate out before entering cards animate in
 
 ### Pending Todos
 
@@ -92,5 +98,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Checkpoint: Task 2 of 03-04-PLAN.md — awaiting human visual verification at http://localhost:3001
-Resume file: .planning/phases/03-shell-static-sections/03-04-SUMMARY.md
+Stopped at: Completed 04-02-PLAN.md
+Resume file: .planning/phases/04-services-lab-tests/04-02-SUMMARY.md

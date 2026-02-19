@@ -85,7 +85,7 @@ Plans:
   3. Lab test cards show name, description, discount badge, discounted price, and struck-through original price on a dark navy background
   4. A PageSpeed Insights CLS audit on the services section scores below 0.1
   5. All service data, categories, lab tests, and their order are editable from Sanity Studio
-**Plans:** 3 plans
+**Plans:** 2/3 plans executed
 
 Plans:
 - [ ] 04-01-PLAN.md -- Services filter section component (filter tabs + animated card grid)
@@ -157,7 +157,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 1. Foundation | 1/2 | In progress | - |
 | 2. Content Architecture | 5/5 | Complete   | 2026-02-19 |
 | 3. Shell + Static Sections | 4/4 | Complete   | 2026-02-19 |
-| 4. Services + Lab Tests | 0/3 | Not started | - |
+| 4. Services + Lab Tests | 2/3 | In Progress|  |
 | 5. Testimonials + Blog | 0/TBD | Not started | - |
 | 6. SEO + Structured Data | 0/TBD | Not started | - |
 | 7. Animation Polish + Performance | 0/TBD | Not started | - |

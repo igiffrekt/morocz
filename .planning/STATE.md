@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 
 ## Current Position
 
-Phase: 2 of 8 (Content Architecture)
-Plan: 4.5 of 5 in current phase (02-05 Task 1 complete, paused at checkpoint)
-Status: Checkpoint — Plan 02-05 Task 1 executed (/sanity-test page created and built), awaiting human verification of Studio navigation
-Last activity: 2026-02-19 — Plan 02-05 Task 1 executed (sanity-test page fetching siteSettings + serviceCategories via sanityFetch())
+Phase: 3 of 8 (Shell + Static Sections)
+Plan: 0 of TBD in current phase (Phase 2 fully complete)
+Status: Ready — Phase 2 complete, Phase 3 planning not yet started
+Last activity: 2026-02-19 — Plan 02-05 complete (Studio navigation verified, sanity-test page confirmed working end-to-end)
 
-Progress: [█████░░░░░] ~45%
+Progress: [█████░░░░░] ~50%
 
 ## Performance Metrics
 
@@ -28,10 +28,10 @@ Progress: [█████░░░░░] ~45%
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 2 | 35 min | 17 min |
-| 02-content-architecture | 4 | 28 min | 7 min |
+| 02-content-architecture | 5 | 38 min | 8 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-02 (20min), 02-01 (9min), 02-02 (3min), 02-03 (4min), 02-04 (12min)
+- Last 5 plans: 02-01 (9min), 02-02 (3min), 02-03 (4min), 02-04 (12min), 02-05 (10min)
 - Trend: Very fast — well-specified plans execute quickly
 
 *Updated after each plan completion*
@@ -68,6 +68,7 @@ Recent decisions affecting current work:
 - [Phase 02-content-architecture]: defineQuery() imported from next-sanity (re-exported from groq package) — standard pattern for sanity@4 + next-sanity@11
 - [Phase 02-content-architecture]: All GROQ queries dereference references inline (category->{...}) so UI components receive flat data without client-side joins
 - [Phase 02-content-architecture]: sanityFetch<T>() requires explicit generic type parameters when TypeGen overloads absent (hand-authored types) — use SiteSettings | null, ServiceCategory[] etc.
+- [Phase 02-content-architecture]: CORS origin for localhost:3000 must be added to Sanity project settings for dev server data fetching to work
 
 ### Pending Todos
 
@@ -82,5 +83,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: 02-05-PLAN.md Task 1 complete (sanity-test page committed 56d0c19), paused at checkpoint:human-verify (Task 2)
-Resume file: .planning/phases/02-content-architecture/02-05-PLAN.md (Task 2 — after human approves Studio + /sanity-test)
+Stopped at: Completed 02-05-PLAN.md — Phase 2 content-architecture fully complete
+Resume file: Begin Phase 3 (Shell + Static Sections) planning

@@ -13,7 +13,7 @@ This roadmap builds a beautifully animated, SEO-optimized medical practice websi
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [~] **Phase 1: Foundation** - Next.js 16 + Tailwind v4 + Motion architecture, deployed to Vercel *(in progress — 01-02 checkpoint pending)*
-- [ ] **Phase 2: Content Architecture** - All Sanity schemas, TypeGen, GROQ queries — data layer complete
+- [x] **Phase 2: Content Architecture** - All Sanity schemas, TypeGen, GROQ queries — data layer complete *(completed 2026-02-19)*
 - [ ] **Phase 3: Shell + Static Sections** - Header, Hero, Footer, and responsive baseline
 - [ ] **Phase 4: Services + Lab Tests** - Animated category filter, lab tests section, CLS validated
 - [ ] **Phase 5: Testimonials + Blog** - Carousel, blog listing, blog post pages with Portable Text
@@ -48,14 +48,14 @@ Plans:
   2. Every content field required by the design (hero text, service cards, lab test pricing, testimonials, blog posts, navigation links, footer columns) exists in the Studio and can be edited
   3. TypeScript compilation succeeds using the generated `sanity.types.ts` — no `any` casts needed for Sanity data
   4. A test page fetches a Sanity document using `sanityFetch()` and renders correctly, confirming the data client works
-**Plans:** 4/5 plans executed
+**Plans:** 5/5 plans complete
 
 Plans:
 - [x] 02-01-PLAN.md -- Install Sanity v5, embed Studio at /studio, create sanityFetch() wrapper *(completed 2026-02-19)*
 - [x] 02-02-PLAN.md -- Homepage, SiteSettings, ServiceCategory, Service, LabTest schemas + desk structure *(completed 2026-02-19)*
 - [x] 02-03-PLAN.md -- Testimonial, BlogPost, BlogCategory schemas *(completed 2026-02-19)*
 - [x] 02-04-PLAN.md -- TypeGen output, centralized GROQ queries, finalize desk structure *(completed 2026-02-19)*
-- [ ] 02-05-PLAN.md -- Test page + human verification of Studio and data pipeline
+- [x] 02-05-PLAN.md -- Test page + human verification of Studio and data pipeline *(completed 2026-02-19)*
 
 ### Phase 3: Shell + Static Sections
 **Goal**: A visitor can load the homepage and see a correctly styled header, hero section, and footer — all content driven from Sanity, fully responsive from 320px to 1440px+
@@ -148,7 +148,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 1/2 | In progress | - |
-| 2. Content Architecture | 4/5 | In Progress | - |
+| 2. Content Architecture | 5/5 | Complete   | 2026-02-19 |
 | 3. Shell + Static Sections | 0/TBD | Not started | - |
 | 4. Services + Lab Tests | 0/TBD | Not started | - |
 | 5. Testimonials + Blog | 0/TBD | Not started | - |

@@ -9,7 +9,8 @@
     "lint": "next lint",
     "lint:biome": "biome check .",
     "lint:biome:fix": "biome check --write .",
-    "format": "biome format --write ."
+    "format": "biome format --write .",
+    "typegen": "sanity typegen generate"
   },
   "dependencies": {
     "@sanity/image-url": "^2.0.3",

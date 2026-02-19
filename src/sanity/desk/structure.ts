@@ -37,6 +37,34 @@ export const structure: StructureResolver = (S) =>
 
       S.divider(),
 
+      // Velemenyek (Testimonials — standalone)
+      S.listItem()
+        .title("Velemenyek")
+        .schemaType("testimonial")
+        .child(S.documentTypeList("testimonial").title("Velemenyek")),
+
+      S.divider(),
+
+      // Blog group
+      S.listItem()
+        .title("Blog")
+        .child(
+          S.list()
+            .title("Blog")
+            .items([
+              S.listItem()
+                .title("Blog bejegyzesek")
+                .schemaType("blogPost")
+                .child(S.documentTypeList("blogPost").title("Blog bejegyzesek")),
+              S.listItem()
+                .title("Blog kategoriak")
+                .schemaType("blogCategory")
+                .child(S.documentTypeList("blogCategory").title("Blog kategoriak")),
+            ]),
+        ),
+
+      S.divider(),
+
       // Beallitasok (SiteSettings singleton)
       S.listItem()
         .title("Beallitasok")

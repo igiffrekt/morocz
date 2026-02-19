@@ -1,4 +1,5 @@
 import { HeroSection } from "@/components/sections/HeroSection";
+import { HeroServiceCards } from "@/components/sections/HeroServiceCards";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import { homepageQuery, siteSettingsQuery } from "@/sanity/lib/queries";
 import type { Homepage, SiteSettings } from "../../sanity.types";
@@ -22,10 +23,9 @@ export default async function Home() {
         subtitle={homepage?.heroSubtitle}
         badges={homepage?.heroBadges}
         doctorImage={homepage?.heroDoctorImage}
-        cards={homepage?.heroCards}
         phone={settings?.phone}
       />
-      {/* Future sections (Phase 4+) will be added below */}
+      <HeroServiceCards cards={homepage?.heroCards} />
     </>
   );
 }

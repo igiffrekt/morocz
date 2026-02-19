@@ -12,9 +12,10 @@ interface HeaderProps {
   clinicName?: string;
   navigationLinks?: Array<{ _key: string; label?: string; href?: string }>;
   phone?: string;
+  address?: string;
 }
 
-export function Header({ logo, clinicName, navigationLinks, phone }: HeaderProps) {
+export function Header({ logo, clinicName, navigationLinks, phone, address }: HeaderProps) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -28,108 +29,126 @@ export function Header({ logo, clinicName, navigationLinks, phone }: HeaderProps
   }, []);
 
   const logoUrl = logo ? urlFor(logo).width(140).url() : null;
+  const displayName = clinicName ?? "Morocz Medical";
 
   return (
-    <>
-      <header
-        className={[
-          "fixed top-0 left-0 right-0 z-50 bg-surface-white transition-all duration-300",
-          scrolled ? "py-3 shadow-md" : "py-5",
-        ].join(" ")}
-      >
-        <div className="max-w-[88rem] mx-auto px-6 flex items-center justify-between">
-          {/* Logo */}
-          <Link href="/" className="flex-shrink-0">
-            {logoUrl ? (
-              <Image
-                src={logoUrl}
-                alt={clinicName ?? "Morocz Medical"}
-                width={140}
-                height={48}
-                className="h-10 w-auto object-contain"
-                priority
-              />
-            ) : (
-              <span className="text-primary font-semibold text-lg">
-                {clinicName ?? "Morocz Medical"}
-              </span>
-            )}
-          </Link>
+    <header
+      className={[
+        "sticky top-0 z-50 w-full bg-surface-white rounded-3xl flex items-center justify-between transition-all duration-300",
+        scrolled ? "px-6 py-3 shadow-md" : "px-8 py-5 shadow-sm",
+      ].join(" ")}
+    >
+      {/* Left: logo + address */}
+      <div className="flex items-center gap-8">
+        <Link href="/" className="flex items-center gap-2 flex-shrink-0">
+          {logoUrl ? (
+            <Image
+              src={logoUrl}
+              alt={displayName}
+              width={140}
+              height={48}
+              className="h-10 w-auto object-contain"
+              priority
+            />
+          ) : (
+            <>
+              <svg
+                className="w-8 h-8 text-primary"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path d="M20 6h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM10 4h4v2h-4V4zm6 11h-3v3h-2v-3H8v-2h3v-3h2v3h3v2z" />
+              </svg>
+              <span className="text-2xl font-bold text-primary tracking-tight">{displayName}</span>
+            </>
+          )}
+        </Link>
 
-          {/* Desktop navigation */}
-          <nav className="hidden md:flex items-center gap-8" aria-label="Főnavigáció">
-            {navigationLinks?.map((link) => (
-              <a
-                key={link._key}
-                href={link.href ?? "#"}
-                className="text-text-light font-medium hover:text-primary transition-colors"
-              >
-                {link.label}
-              </a>
-            ))}
-          </nav>
-
-          {/* Desktop CTA */}
-          <div className="hidden md:flex items-center">
-            {phone ? (
-              <a
-                href={`tel:${phone}`}
-                className="bg-primary text-white px-6 py-2.5 rounded-xl font-semibold hover:bg-primary/90 transition-colors"
-              >
-                Foglaljon időpontot
-              </a>
-            ) : (
-              <button
-                type="button"
-                className="bg-primary text-white px-6 py-2.5 rounded-xl font-semibold hover:bg-primary/90 transition-colors"
-              >
-                Foglaljon időpontot
-              </button>
-            )}
+        {/* Address info — desktop only */}
+        {address && (
+          <div className="hidden xl:flex items-center gap-3 text-xs text-gray-500 border-l border-gray-200 pl-6 h-10">
+            <svg
+              className="w-5 h-5 text-gray-400 flex-shrink-0"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+            </svg>
+            <div>
+              <p className="font-bold text-gray-900">{address.split(",")[0]?.trim()}</p>
+              <p>{address.split(",").slice(1).join(",").trim() || address}</p>
+            </div>
           </div>
+        )}
+      </div>
 
-          {/* Mobile hamburger */}
-          <button
-            type="button"
-            onClick={() => setMobileMenuOpen((prev) => !prev)}
-            aria-expanded={mobileMenuOpen}
-            aria-label={mobileMenuOpen ? "Menü bezárása" : "Menü megnyitása"}
-            className="md:hidden flex flex-col justify-center items-center w-11 h-11 gap-1.5"
+      {/* Center: desktop nav */}
+      <nav className="hidden md:flex items-center gap-10 text-sm font-semibold text-gray-600">
+        {navigationLinks?.map((link, i) => (
+          <a
+            key={link._key}
+            href={link.href ?? "#"}
+            className={["transition-colors", i === 0 ? "text-primary" : "hover:text-primary"].join(
+              " ",
+            )}
           >
-            <span
-              className={[
-                "block w-6 h-0.5 bg-text-light transition-all duration-300",
-                mobileMenuOpen ? "translate-y-2 rotate-45" : "",
-              ].join(" ")}
-            />
-            <span
-              className={[
-                "block w-6 h-0.5 bg-text-light transition-all duration-300",
-                mobileMenuOpen ? "opacity-0" : "",
-              ].join(" ")}
-            />
-            <span
-              className={[
-                "block w-6 h-0.5 bg-text-light transition-all duration-300",
-                mobileMenuOpen ? "-translate-y-2 -rotate-45" : "",
-              ].join(" ")}
-            />
-          </button>
-        </div>
+            {link.label}
+          </a>
+        ))}
+      </nav>
 
-        {/* Mobile menu — rendered inside header so it drops down below */}
-        <div className="md:hidden">
-          <MobileMenu
-            isOpen={mobileMenuOpen}
-            navigationLinks={navigationLinks}
-            phone={phone}
-            onClose={() => setMobileMenuOpen(false)}
-          />
-        </div>
-      </header>
+      {/* Right: CTA button (desktop) */}
+      <div className="hidden md:block">
+        <a
+          href={phone ? `tel:${phone}` : "#kapcsolat"}
+          className="flex items-center gap-2 px-6 py-2.5 rounded-full border border-gray-200 hover:bg-gray-50 transition-colors text-sm font-bold text-primary"
+        >
+          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+          </svg>
+          Foglaljon időpontot
+        </a>
+      </div>
 
-      {/* Spacer to push page content below the fixed header */}
-      <div className={scrolled ? "h-16" : "h-24"} aria-hidden="true" />
-    </>
+      {/* Mobile hamburger */}
+      <button
+        type="button"
+        onClick={() => setMobileMenuOpen((prev) => !prev)}
+        aria-expanded={mobileMenuOpen}
+        aria-label={mobileMenuOpen ? "Menü bezárása" : "Menü megnyitása"}
+        className="md:hidden flex flex-col justify-center items-center w-11 h-11 gap-1.5"
+      >
+        <span
+          className={[
+            "block w-6 h-0.5 bg-text-light transition-all duration-300",
+            mobileMenuOpen ? "translate-y-2 rotate-45" : "",
+          ].join(" ")}
+        />
+        <span
+          className={[
+            "block w-6 h-0.5 bg-text-light transition-all duration-300",
+            mobileMenuOpen ? "opacity-0" : "",
+          ].join(" ")}
+        />
+        <span
+          className={[
+            "block w-6 h-0.5 bg-text-light transition-all duration-300",
+            mobileMenuOpen ? "-translate-y-2 -rotate-45" : "",
+          ].join(" ")}
+        />
+      </button>
+
+      {/* Mobile menu dropdown */}
+      <div className="md:hidden absolute top-full left-0 right-0">
+        <MobileMenu
+          isOpen={mobileMenuOpen}
+          navigationLinks={navigationLinks}
+          phone={phone}
+          onClose={() => setMobileMenuOpen(false)}
+        />
+      </div>
+    </header>
   );
 }

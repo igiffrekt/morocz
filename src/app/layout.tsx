@@ -28,23 +28,26 @@ export default async function RootLayout({
     <html lang="hu" className={plusJakartaSans.variable}>
       <body>
         <MotionProvider>
-          <Header
-            logo={settings?.logo}
-            clinicName={settings?.clinicName}
-            navigationLinks={settings?.navigationLinks}
-            phone={settings?.phone}
-          />
-          <main>{children}</main>
-          <Footer
-            logo={settings?.logo}
-            clinicName={settings?.clinicName}
-            phone={settings?.phone}
-            email={settings?.email}
-            address={settings?.address}
-            footerColumns={settings?.footerColumns}
-            socialLinks={settings?.socialLinks}
-            privacyPolicyUrl={settings?.privacyPolicyUrl}
-          />
+          <div className="max-w-[88rem] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+            <Header
+              logo={settings?.logo}
+              clinicName={settings?.clinicName}
+              navigationLinks={settings?.navigationLinks}
+              phone={settings?.phone}
+              address={settings?.address}
+            />
+            <main className="space-y-6">{children}</main>
+            <Footer
+              logo={settings?.logo}
+              clinicName={settings?.clinicName}
+              phone={settings?.phone}
+              email={settings?.email}
+              address={settings?.address}
+              footerColumns={settings?.footerColumns}
+              socialLinks={settings?.socialLinks}
+              privacyPolicyUrl={settings?.privacyPolicyUrl}
+            />
+          </div>
         </MotionProvider>
       </body>
     </html>

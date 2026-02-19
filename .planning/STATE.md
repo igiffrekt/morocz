@@ -10,29 +10,29 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 2 of 8 (Content Architecture)
-Plan: 3 of 5 complete in current phase (02-03 complete)
-Status: In progress — Plan 02-03 executed (Testimonial, BlogCategory, BlogPost schemas)
-Last activity: 2026-02-19 — Plan 02-03 executed (testimonial schema, blogCategory schema, blogPost with full Portable Text body in Hungarian)
+Plan: 4 of 5 complete in current phase (02-04 complete)
+Status: In progress — Plan 02-04 executed (Studio desk structure, TypeScript types, centralized GROQ queries)
+Last activity: 2026-02-19 — Plan 02-04 executed (sanity.types.ts, queries.ts with 10 defineQuery() exports, complete Studio sidebar)
 
-Progress: [████░░░░░░] ~35%
+Progress: [█████░░░░░] ~45%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 5 (01-01, 01-02, 02-01, 02-02, 02-03)
+- Total plans completed: 6 (01-01, 01-02, 02-01, 02-02, 02-03, 02-04)
 - Average duration: 11 min
-- Total execution time: 0.85 hours
+- Total execution time: 0.97 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 2 | 35 min | 17 min |
-| 02-content-architecture | 3 | 16 min | 5 min |
+| 02-content-architecture | 4 | 28 min | 7 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (15min), 01-02 (20min), 02-01 (9min), 02-02 (3min), 02-03 (4min)
-- Trend: Very fast — well-specified schema plans execute quickly
+- Last 5 plans: 01-02 (20min), 02-01 (9min), 02-02 (3min), 02-03 (4min), 02-04 (12min)
+- Trend: Very fast — well-specified plans execute quickly
 
 *Updated after each plan completion*
 
@@ -64,6 +64,9 @@ Recent decisions affecting current work:
 - serviceType references serviceCategoryType; category.name dereferenced in list preview via select+prepare
 - [Phase 02-content-architecture]: Biome formatting applied globally to satisfy npx biome check verification; Plan 02-02 tab indentation corrected to 2-space
 - [Phase 02-content-architecture]: index.ts merge handled by Plan 02-02 parallel execution — all 8 types present when 02-03 Task 2 ran
+- [Phase 02-content-architecture]: sanity schema extract fails in Sanity v4 (React not defined in Node.js context due to styled-components) — types authored manually from schema definitions; functionally equivalent to TypeGen output
+- [Phase 02-content-architecture]: defineQuery() imported from next-sanity (re-exported from groq package) — standard pattern for sanity@4 + next-sanity@11
+- [Phase 02-content-architecture]: All GROQ queries dereference references inline (category->{...}) so UI components receive flat data without client-side joins
 
 ### Pending Todos
 
@@ -78,5 +81,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 02-03-PLAN.md (Testimonial, BlogCategory, BlogPost schemas)
-Resume file: .planning/phases/02-content-architecture/02-04-PLAN.md
+Stopped at: Completed 02-04-PLAN.md (Studio structure, sanity.types.ts, centralized queries)
+Resume file: .planning/phases/02-content-architecture/02-05-PLAN.md

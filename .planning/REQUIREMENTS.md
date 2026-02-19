@@ -28,9 +28,9 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **CMS-07**: BlogPost document type with title, slug, category, body (Portable Text), featured image, meta description, OG image
 - [x] **CMS-08**: BlogCategory document type with name, slug, order
 - [x] **CMS-09**: ServiceCategory document type with name, emoji/icon, order
-- [ ] **CMS-10**: TypeGen output committed for compile-time type safety
+- [x] **CMS-10**: TypeGen output committed for compile-time type safety
 - [x] **CMS-11**: `sanityFetch()` wrapper with tag-based revalidation
-- [ ] **CMS-12**: All GROQ queries centralized in queries.ts with `defineQuery()`
+- [x] **CMS-12**: All GROQ queries centralized in queries.ts with `defineQuery()`
 - [x] **CMS-13**: Every list item, text, button text, image, and category order independently editable from Sanity
 
 ### Header & Navigation
@@ -191,9 +191,9 @@ Which phases cover which requirements. Verified during roadmap creation (2026-02
 | CMS-07 | Phase 2 | Complete |
 | CMS-08 | Phase 2 | Complete |
 | CMS-09 | Phase 2 | Complete |
-| CMS-10 | Phase 2 | Pending |
+| CMS-10 | Phase 2 | Complete |
 | CMS-11 | Phase 2 | Complete |
-| CMS-12 | Phase 2 | Pending |
+| CMS-12 | Phase 2 | Complete |
 | CMS-13 | Phase 2 | Complete |
 | NAV-01 | Phase 3 | Pending |
 | NAV-02 | Phase 3 | Pending |

@@ -48,13 +48,13 @@ Plans:
   2. Every content field required by the design (hero text, service cards, lab test pricing, testimonials, blog posts, navigation links, footer columns) exists in the Studio and can be edited
   3. TypeScript compilation succeeds using the generated `sanity.types.ts` — no `any` casts needed for Sanity data
   4. A test page fetches a Sanity document using `sanityFetch()` and renders correctly, confirming the data client works
-**Plans:** 3/5 plans executed
+**Plans:** 4/5 plans executed
 
 Plans:
-- [ ] 02-01-PLAN.md -- Install Sanity v5, embed Studio at /studio, create sanityFetch() wrapper
-- [ ] 02-02-PLAN.md -- Homepage, SiteSettings, ServiceCategory, Service, LabTest schemas + desk structure
-- [ ] 02-03-PLAN.md -- Testimonial, BlogPost, BlogCategory schemas
-- [ ] 02-04-PLAN.md -- TypeGen output, centralized GROQ queries, finalize desk structure
+- [x] 02-01-PLAN.md -- Install Sanity v5, embed Studio at /studio, create sanityFetch() wrapper *(completed 2026-02-19)*
+- [x] 02-02-PLAN.md -- Homepage, SiteSettings, ServiceCategory, Service, LabTest schemas + desk structure *(completed 2026-02-19)*
+- [x] 02-03-PLAN.md -- Testimonial, BlogPost, BlogCategory schemas *(completed 2026-02-19)*
+- [x] 02-04-PLAN.md -- TypeGen output, centralized GROQ queries, finalize desk structure *(completed 2026-02-19)*
 - [ ] 02-05-PLAN.md -- Test page + human verification of Studio and data pipeline
 
 ### Phase 3: Shell + Static Sections
@@ -148,7 +148,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 1/2 | In progress | - |
-| 2. Content Architecture | 3/5 | In Progress|  |
+| 2. Content Architecture | 4/5 | In Progress | - |
 | 3. Shell + Static Sections | 0/TBD | Not started | - |
 | 4. Services + Lab Tests | 0/TBD | Not started | - |
 | 5. Testimonials + Blog | 0/TBD | Not started | - |

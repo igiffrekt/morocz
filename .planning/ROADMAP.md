@@ -67,9 +67,13 @@ Plans:
   3. The footer shows the dark navy background, multi-column navigation, social icons, contact info, privacy policy link, and the large logo on pink — all from Sanity
   4. Every section renders correctly at 320px, 768px, and 1440px viewport widths with no layout breakage
   5. All visible text is in Hungarian
-**Plans**: TBD
+**Plans:** 4 plans
 
-Plans: None yet
+Plans:
+- [ ] 03-01-PLAN.md -- Sticky header with scroll-shrink, mobile hamburger dropdown menu, CTA button
+- [ ] 03-02-PLAN.md -- Footer with dark navy background, 3 CMS columns, social icons, logo-on-pink
+- [ ] 03-03-PLAN.md -- Add heroBadges schema field + Hero section components (animated headline, badges, CTA, service cards)
+- [ ] 03-04-PLAN.md -- Homepage assembly (wire layout.tsx + page.tsx with Sanity data) + visual verification
 
 ### Phase 4: Services + Lab Tests
 **Goal**: A visitor can filter services by category and watch the cards shuffle smoothly into new positions, and can browse lab test cards with pricing — CLS score stays below 0.1 during all filter interactions
@@ -149,7 +153,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 |-------|----------------|--------|-----------|
 | 1. Foundation | 1/2 | In progress | - |
 | 2. Content Architecture | 5/5 | Complete   | 2026-02-19 |
-| 3. Shell + Static Sections | 0/TBD | Not started | - |
+| 3. Shell + Static Sections | 0/4 | Planned | - |
 | 4. Services + Lab Tests | 0/TBD | Not started | - |
 | 5. Testimonials + Blog | 0/TBD | Not started | - |
 | 6. SEO + Structured Data | 0/TBD | Not started | - |

@@ -42,13 +42,13 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Hero Section
 
-- [ ] **HERO-01**: Large animated headline with staggered letter-by-letter animation
-- [ ] **HERO-02**: Doctor image with fade-in from right
-- [ ] **HERO-03**: Floating badges animating in with slight bounce
-- [ ] **HERO-04**: Subtext and descriptive paragraph
-- [ ] **HERO-05**: "Book Consultation" CTA button with arrow hover animation
-- [ ] **HERO-06**: 4 colored service cards (yellow, green, pink, blue) with staggered entrance from bottom
-- [ ] **HERO-07**: All hero content editable from Sanity (headline, subtext, badges, doctor image, card texts)
+- [x] **HERO-01**: Large animated headline with staggered letter-by-letter animation
+- [x] **HERO-02**: Doctor image with fade-in from right
+- [x] **HERO-03**: Floating badges animating in with slight bounce
+- [x] **HERO-04**: Subtext and descriptive paragraph
+- [x] **HERO-05**: "Book Consultation" CTA button with arrow hover animation
+- [x] **HERO-06**: 4 colored service cards (yellow, green, pink, blue) with staggered entrance from bottom
+- [x] **HERO-07**: All hero content editable from Sanity (headline, subtext, badges, doctor image, card texts)
 
 ### Services Section
 
@@ -199,13 +199,13 @@ Which phases cover which requirements. Verified during roadmap creation (2026-02
 | NAV-02 | Phase 3 | Complete |
 | NAV-03 | Phase 3 | Complete |
 | NAV-04 | Phase 3 | Complete |
-| HERO-01 | Phase 3 | Pending |
-| HERO-02 | Phase 3 | Pending |
-| HERO-03 | Phase 3 | Pending |
-| HERO-04 | Phase 3 | Pending |
-| HERO-05 | Phase 3 | Pending |
-| HERO-06 | Phase 3 | Pending |
-| HERO-07 | Phase 3 | Pending |
+| HERO-01 | Phase 3 | Complete |
+| HERO-02 | Phase 3 | Complete |
+| HERO-03 | Phase 3 | Complete |
+| HERO-04 | Phase 3 | Complete |
+| HERO-05 | Phase 3 | Complete |
+| HERO-06 | Phase 3 | Complete |
+| HERO-07 | Phase 3 | Complete |
 | SERV-01 | Phase 4 | Pending |
 | SERV-02 | Phase 4 | Pending |
 | SERV-03 | Phase 4 | Pending |

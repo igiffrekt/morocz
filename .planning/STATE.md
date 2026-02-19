@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 3 of 8 (Shell + Static Sections)
-Plan: 2 of TBD in current phase (Plans 03-01 and 03-02 complete)
-Status: In progress — Header, MobileMenu, Footer, SocialIcon complete, next: Hero section
-Last activity: 2026-02-19 — Plan 03-02 complete (Footer.tsx and SocialIcon.tsx built and committed)
+Plan: 3 of 4 in current phase (Plans 03-01, 03-02, 03-03 complete)
+Status: In progress — Header, MobileMenu, Footer, SocialIcon, HeroSection, HeroHeadline, HeroServiceCards complete; next: page assembly (03-04)
+Last activity: 2026-02-19 — Plan 03-03 complete (Hero components: letter-by-letter animated headline, 4-color service cards, doctor image layout)
 
-Progress: [█████░░░░░] ~52%
+Progress: [██████░░░░] ~60%
 
 ## Performance Metrics
 
@@ -29,10 +29,10 @@ Progress: [█████░░░░░] ~52%
 |-------|-------|-------|----------|
 | 01-foundation | 2 | 35 min | 17 min |
 | 02-content-architecture | 5 | 38 min | 8 min |
-| 03-shell-static-sections | 2 | 5 min | 3 min |
+| 03-shell-static-sections | 3 | 9 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-03 (4min), 02-04 (12min), 02-05 (10min), 03-01 (2min), 03-02 (3min)
+- Last 5 plans: 02-05 (10min), 03-01 (2min), 03-02 (3min), 03-03 (4min)
 - Trend: Very fast — well-specified plans execute quickly
 
 *Updated after each plan completion*
@@ -75,6 +75,8 @@ Recent decisions affecting current work:
 - [Phase 03-shell-static-sections]: Dynamic spacer div below fixed header switches height with scroll state to maintain layout continuity
 - [Phase 03-shell-static-sections]: Social icons use type-narrowing predicate filter (not non-null assertions) — satisfies Biome lint while preserving CMS-driven rendering pattern
 - [Phase 03-shell-static-sections]: Footer logo-on-pink uses min-h-[160px] contained block within the 4-column grid (not a full-width band)
+- [Phase 03-shell-static-sections]: Array index key accepted for HeroHeadline letter-by-letter animation — text is static CMS content, chars never reorder; biome-ignore suppression with justification used
+- [Phase 03-shell-static-sections]: next/image required (not <img>) in all section components — biome noImgElement rule enforced project-wide for LCP optimization
 
 ### Pending Todos
 
@@ -89,5 +91,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 03-02-PLAN.md (Footer + SocialIcon components)
-Resume file: .planning/phases/03-shell-static-sections/03-02-SUMMARY.md
+Stopped at: Completed 03-03-PLAN.md (Hero components — HeroHeadline, HeroServiceCards, HeroSection)
+Resume file: .planning/phases/03-shell-static-sections/03-03-SUMMARY.md

@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Patients can discover Morocz Medical's services and book an appointment through a beautifully animated, fast, SEO-optimized website where every piece of content is manageable from Sanity CMS.
-**Current focus:** Phase 2 — Content Architecture
+**Current focus:** Phase 3 — Shell + Static Sections
 
 ## Current Position
 
 Phase: 3 of 8 (Shell + Static Sections)
-Plan: 0 of TBD in current phase (Phase 2 fully complete)
-Status: Ready — Phase 2 complete, Phase 3 planning not yet started
-Last activity: 2026-02-19 — Plan 02-05 complete (Studio navigation verified, sanity-test page confirmed working end-to-end)
+Plan: 1 of TBD in current phase (Plan 03-01 complete)
+Status: In progress — Header + MobileMenu complete, next: hero section or footer
+Last activity: 2026-02-19 — Plan 03-01 complete (Header.tsx and MobileMenu.tsx built and committed)
 
-Progress: [█████░░░░░] ~50%
+Progress: [█████░░░░░] ~52%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6 (01-01, 01-02, 02-01, 02-02, 02-03, 02-04)
-- Average duration: 11 min
-- Total execution time: 0.97 hours
+- Total plans completed: 7 (01-01, 01-02, 02-01, 02-02, 02-03, 02-04, 02-05, 03-01)
+- Average duration: 10 min
+- Total execution time: ~1.0 hours
 
 **By Phase:**
 
@@ -29,9 +29,10 @@ Progress: [█████░░░░░] ~50%
 |-------|-------|-------|----------|
 | 01-foundation | 2 | 35 min | 17 min |
 | 02-content-architecture | 5 | 38 min | 8 min |
+| 03-shell-static-sections | 1 | 2 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-01 (9min), 02-02 (3min), 02-03 (4min), 02-04 (12min), 02-05 (10min)
+- Last 5 plans: 02-02 (3min), 02-03 (4min), 02-04 (12min), 02-05 (10min), 03-01 (2min)
 - Trend: Very fast — well-specified plans execute quickly
 
 *Updated after each plan completion*
@@ -69,6 +70,9 @@ Recent decisions affecting current work:
 - [Phase 02-content-architecture]: All GROQ queries dereference references inline (category->{...}) so UI components receive flat data without client-side joins
 - [Phase 02-content-architecture]: sanityFetch<T>() requires explicit generic type parameters when TypeGen overloads absent (hand-authored types) — use SiteSettings | null, ServiceCategory[] etc.
 - [Phase 02-content-architecture]: CORS origin for localhost:3000 must be added to Sanity project settings for dev server data fetching to work
+- [Phase 03-shell-static-sections]: CSS transitions used for scroll-shrink and hamburger animation — not Motion library (simpler, no overhead for non-motion-system interactions)
+- [Phase 03-shell-static-sections]: MobileMenu rendered inside Header element so dropdown is in document flow, pushing page content down (not an overlay)
+- [Phase 03-shell-static-sections]: Dynamic spacer div below fixed header switches height with scroll state to maintain layout continuity
 
 ### Pending Todos
 
@@ -76,12 +80,12 @@ None yet.
 
 ### Blockers/Concerns
 
-- Google Maps embed GDPR status unresolved: iframe sets cookies; safe default is a static map image with a link to Google Maps (resolve in Phase 3 planning)
+- Google Maps embed GDPR status unresolved: iframe sets cookies; safe default is a static map image with a link to Google Maps (resolved in Phase 3 CONTEXT.md — no map at all, just text address)
 - Motion v12 import path RESOLVED: confirmed 'motion/react' is correct (motion@12.34.2 installed)
 - Contact form email provider unselected (Resend is community standard for Next.js — decide in Phase 8 planning)
 
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Phase 3 context gathered
-Resume file: .planning/phases/03-shell-static-sections/03-CONTEXT.md
+Stopped at: Completed 03-01-PLAN.md (Header + MobileMenu components)
+Resume file: .planning/phases/03-shell-static-sections/03-01-SUMMARY.md

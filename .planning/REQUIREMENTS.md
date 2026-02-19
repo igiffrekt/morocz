@@ -35,10 +35,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Header & Navigation
 
-- [ ] **NAV-01**: Sticky header with logo, navigation links, and contact actions
-- [ ] **NAV-02**: Mobile responsive hamburger menu
-- [ ] **NAV-03**: Navigation items populated from Sanity siteSettings
-- [ ] **NAV-04**: All header text in Hungarian
+- [x] **NAV-01**: Sticky header with logo, navigation links, and contact actions
+- [x] **NAV-02**: Mobile responsive hamburger menu
+- [x] **NAV-03**: Navigation items populated from Sanity siteSettings
+- [x] **NAV-04**: All header text in Hungarian
 
 ### Hero Section
 
@@ -118,9 +118,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Responsive Design
 
-- [ ] **RESP-01**: All sections work from 320px to 1440px+
+- [x] **RESP-01**: All sections work from 320px to 1440px+
 - [ ] **RESP-02**: Animations degrade gracefully on mobile (simpler or disabled)
-- [ ] **RESP-03**: Touch-friendly interactive elements (filter tabs, carousel, buttons)
+- [x] **RESP-03**: Touch-friendly interactive elements (filter tabs, carousel, buttons)
 
 ### CMS Revalidation & Launch
 
@@ -195,10 +195,10 @@ Which phases cover which requirements. Verified during roadmap creation (2026-02
 | CMS-11 | Phase 2 | Complete |
 | CMS-12 | Phase 2 | Complete |
 | CMS-13 | Phase 2 | Complete |
-| NAV-01 | Phase 3 | Pending |
-| NAV-02 | Phase 3 | Pending |
-| NAV-03 | Phase 3 | Pending |
-| NAV-04 | Phase 3 | Pending |
+| NAV-01 | Phase 3 | Complete |
+| NAV-02 | Phase 3 | Complete |
+| NAV-03 | Phase 3 | Complete |
+| NAV-04 | Phase 3 | Complete |
 | HERO-01 | Phase 3 | Pending |
 | HERO-02 | Phase 3 | Pending |
 | HERO-03 | Phase 3 | Pending |
@@ -251,9 +251,9 @@ Which phases cover which requirements. Verified during roadmap creation (2026-02
 | SEO-07 | Phase 6 | Pending |
 | SEO-08 | Phase 6 | Pending |
 | SEO-09 | Phase 6 | Pending |
-| RESP-01 | Phase 3 | Pending |
+| RESP-01 | Phase 3 | Complete |
 | RESP-02 | Phase 7 | Pending |
-| RESP-03 | Phase 3 | Pending |
+| RESP-03 | Phase 3 | Complete |
 | LAUNCH-01 | Phase 8 | Pending |
 | LAUNCH-02 | Phase 8 | Pending |
 | LAUNCH-03 | Phase 8 | Pending |

@@ -83,5 +83,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 02-05-PLAN.md — Phase 2 content-architecture fully complete
-Resume file: Begin Phase 3 (Shell + Static Sections) planning
+Stopped at: Phase 3 context gathered
+Resume file: .planning/phases/03-shell-static-sections/03-CONTEXT.md

@@ -20,18 +20,18 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Content Architecture (Sanity)
 
 - [x] **CMS-01**: Sanity v5 Studio embedded at `/studio` route within Next.js app
-- [ ] **CMS-02**: Homepage singleton schema with all section content fields
-- [ ] **CMS-03**: SiteSettings singleton schema (logo, navigation, contact info, social links, footer)
-- [ ] **CMS-04**: Service document type with name, description, icon/image, category, order
-- [ ] **CMS-05**: LabTest document type with name, description, price, original price, discount, illustration
-- [ ] **CMS-06**: Testimonial document type with name, photo, text, condition/context
-- [ ] **CMS-07**: BlogPost document type with title, slug, category, body (Portable Text), featured image, meta description, OG image
-- [ ] **CMS-08**: BlogCategory document type with name, slug, order
-- [ ] **CMS-09**: ServiceCategory document type with name, emoji/icon, order
+- [x] **CMS-02**: Homepage singleton schema with all section content fields
+- [x] **CMS-03**: SiteSettings singleton schema (logo, navigation, contact info, social links, footer)
+- [x] **CMS-04**: Service document type with name, description, icon/image, category, order
+- [x] **CMS-05**: LabTest document type with name, description, price, original price, discount, illustration
+- [x] **CMS-06**: Testimonial document type with name, photo, text, condition/context
+- [x] **CMS-07**: BlogPost document type with title, slug, category, body (Portable Text), featured image, meta description, OG image
+- [x] **CMS-08**: BlogCategory document type with name, slug, order
+- [x] **CMS-09**: ServiceCategory document type with name, emoji/icon, order
 - [ ] **CMS-10**: TypeGen output committed for compile-time type safety
 - [x] **CMS-11**: `sanityFetch()` wrapper with tag-based revalidation
 - [ ] **CMS-12**: All GROQ queries centralized in queries.ts with `defineQuery()`
-- [ ] **CMS-13**: Every list item, text, button text, image, and category order independently editable from Sanity
+- [x] **CMS-13**: Every list item, text, button text, image, and category order independently editable from Sanity
 
 ### Header & Navigation
 
@@ -183,18 +183,18 @@ Which phases cover which requirements. Verified during roadmap creation (2026-02
 | FOUND-06 | Phase 1 | Pending |
 | FOUND-07 | Phase 1 | Pending |
 | CMS-01 | Phase 2 | Complete |
-| CMS-02 | Phase 2 | Pending |
-| CMS-03 | Phase 2 | Pending |
-| CMS-04 | Phase 2 | Pending |
-| CMS-05 | Phase 2 | Pending |
-| CMS-06 | Phase 2 | Pending |
-| CMS-07 | Phase 2 | Pending |
-| CMS-08 | Phase 2 | Pending |
-| CMS-09 | Phase 2 | Pending |
+| CMS-02 | Phase 2 | Complete |
+| CMS-03 | Phase 2 | Complete |
+| CMS-04 | Phase 2 | Complete |
+| CMS-05 | Phase 2 | Complete |
+| CMS-06 | Phase 2 | Complete |
+| CMS-07 | Phase 2 | Complete |
+| CMS-08 | Phase 2 | Complete |
+| CMS-09 | Phase 2 | Complete |
 | CMS-10 | Phase 2 | Pending |
 | CMS-11 | Phase 2 | Complete |
 | CMS-12 | Phase 2 | Pending |
-| CMS-13 | Phase 2 | Pending |
+| CMS-13 | Phase 2 | Complete |
 | NAV-01 | Phase 3 | Pending |
 | NAV-02 | Phase 3 | Pending |
 | NAV-03 | Phase 3 | Pending |

@@ -48,7 +48,7 @@ Plans:
   2. Every content field required by the design (hero text, service cards, lab test pricing, testimonials, blog posts, navigation links, footer columns) exists in the Studio and can be edited
   3. TypeScript compilation succeeds using the generated `sanity.types.ts` — no `any` casts needed for Sanity data
   4. A test page fetches a Sanity document using `sanityFetch()` and renders correctly, confirming the data client works
-**Plans:** 1/5 plans executed
+**Plans:** 3/5 plans executed
 
 Plans:
 - [ ] 02-01-PLAN.md -- Install Sanity v5, embed Studio at /studio, create sanityFetch() wrapper
@@ -148,7 +148,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 1/2 | In progress | - |
-| 2. Content Architecture | 1/5 | In Progress|  |
+| 2. Content Architecture | 3/5 | In Progress|  |
 | 3. Shell + Static Sections | 0/TBD | Not started | - |
 | 4. Services + Lab Tests | 0/TBD | Not started | - |
 | 5. Testimonials + Blog | 0/TBD | Not started | - |

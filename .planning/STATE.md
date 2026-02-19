@@ -10,29 +10,29 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 2 of 8 (Content Architecture)
-Plan: 1 of 5 complete in current phase (02-01 complete)
-Status: In progress — Plan 02-01 executed (Sanity CMS foundation)
-Last activity: 2026-02-19 — Plan 02-01 executed (Sanity Studio at /studio, sanityFetch wrapper, client, image helper)
+Plan: 2 of 5 complete in current phase (02-02 complete)
+Status: In progress — Plan 02-02 executed (5 Sanity schemas + Studio desk structure)
+Last activity: 2026-02-19 — Plan 02-02 executed (homepage/siteSettings singletons, serviceCategory/service/labTest schemas, custom Hungarian Studio sidebar)
 
-Progress: [██░░░░░░░░] ~20%
+Progress: [███░░░░░░░] ~25%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3 (01-01, 01-02, 02-01)
-- Average duration: 15 min
-- Total execution time: 0.72 hours
+- Total plans completed: 4 (01-01, 01-02, 02-01, 02-02)
+- Average duration: 12 min
+- Total execution time: 0.78 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 2 | 35 min | 17 min |
-| 02-content-architecture | 1 | 9 min | 9 min |
+| 02-content-architecture | 2 | 12 min | 6 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (15min), 01-02 (20min), 02-01 (9min)
-- Trend: Fast — CMS setup was quick due to well-specified plan
+- Last 5 plans: 01-01 (15min), 01-02 (20min), 02-01 (9min), 02-02 (3min)
+- Trend: Very fast — well-specified schema plans execute quickly
 
 *Updated after each plan completion*
 
@@ -58,6 +58,12 @@ Recent decisions affecting current work:
 - @sanity/vision@4.22.0 used (not v5.x) — vision@5 requires react@^19.2.2; project uses react@19.0.x
 - sanityFetch<T>() is the single data-fetching interface: tags present = on-demand revalidation; no tags = 60s ISR fallback
 - SanityImageSource imported from "@sanity/image-url" directly (no sub-path exports for types in this version)
+- Singleton pattern via fixed documentId in desk structure (no __experimental_actions needed in Sanity v4)
+- Service card colors hardcoded in code, not in schema (locked decision)
+- Desk structure co-located at src/sanity/desk/structure.ts, imported into sanity.config.ts
+- serviceType references serviceCategoryType; category.name dereferenced in list preview via select+prepare
+- [Phase 02-content-architecture]: Biome formatting applied globally to satisfy npx biome check verification; Plan 02-02 tab indentation corrected to 2-space
+- [Phase 02-content-architecture]: index.ts merge handled by Plan 02-02 parallel execution — all 8 types present when 02-03 Task 2 ran
 
 ### Pending Todos
 
@@ -72,5 +78,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 02-01-PLAN.md (Sanity CMS foundation)
-Resume file: .planning/phases/02-content-architecture/02-02-PLAN.md
+Stopped at: Completed 02-02-PLAN.md (5 Sanity schemas + Studio desk structure)
+Resume file: .planning/phases/02-content-architecture/02-03-PLAN.md

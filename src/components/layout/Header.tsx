@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { urlFor } from "@/sanity/lib/image";
 import type { SanityImageObject } from "../../../sanity.types";
@@ -38,7 +39,7 @@ export function Header({ logo, clinicName, navigationLinks, phone }: HeaderProps
       >
         <div className="max-w-[88rem] mx-auto px-6 flex items-center justify-between">
           {/* Logo */}
-          <a href="/" className="flex-shrink-0">
+          <Link href="/" className="flex-shrink-0">
             {logoUrl ? (
               <Image
                 src={logoUrl}
@@ -53,7 +54,7 @@ export function Header({ logo, clinicName, navigationLinks, phone }: HeaderProps
                 {clinicName ?? "Morocz Medical"}
               </span>
             )}
-          </a>
+          </Link>
 
           {/* Desktop navigation */}
           <nav className="hidden md:flex items-center gap-8" aria-label="Főnavigáció">

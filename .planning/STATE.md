@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 2 of 8 (Content Architecture)
-Plan: 4 of 5 complete in current phase (02-04 complete)
-Status: In progress — Plan 02-04 executed (Studio desk structure, TypeScript types, centralized GROQ queries)
-Last activity: 2026-02-19 — Plan 02-04 executed (sanity.types.ts, queries.ts with 10 defineQuery() exports, complete Studio sidebar)
+Plan: 4.5 of 5 in current phase (02-05 Task 1 complete, paused at checkpoint)
+Status: Checkpoint — Plan 02-05 Task 1 executed (/sanity-test page created and built), awaiting human verification of Studio navigation
+Last activity: 2026-02-19 — Plan 02-05 Task 1 executed (sanity-test page fetching siteSettings + serviceCategories via sanityFetch())
 
 Progress: [█████░░░░░] ~45%
 
@@ -67,6 +67,7 @@ Recent decisions affecting current work:
 - [Phase 02-content-architecture]: sanity schema extract fails in Sanity v4 (React not defined in Node.js context due to styled-components) — types authored manually from schema definitions; functionally equivalent to TypeGen output
 - [Phase 02-content-architecture]: defineQuery() imported from next-sanity (re-exported from groq package) — standard pattern for sanity@4 + next-sanity@11
 - [Phase 02-content-architecture]: All GROQ queries dereference references inline (category->{...}) so UI components receive flat data without client-side joins
+- [Phase 02-content-architecture]: sanityFetch<T>() requires explicit generic type parameters when TypeGen overloads absent (hand-authored types) — use SiteSettings | null, ServiceCategory[] etc.
 
 ### Pending Todos
 
@@ -81,5 +82,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 02-04-PLAN.md (Studio structure, sanity.types.ts, centralized queries)
-Resume file: .planning/phases/02-content-architecture/02-05-PLAN.md
+Stopped at: 02-05-PLAN.md Task 1 complete (sanity-test page committed 56d0c19), paused at checkpoint:human-verify (Task 2)
+Resume file: .planning/phases/02-content-architecture/02-05-PLAN.md (Task 2 — after human approves Studio + /sanity-test)

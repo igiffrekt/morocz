@@ -5,33 +5,34 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Patients can discover Morocz Medical's services and book an appointment through a beautifully animated, fast, SEO-optimized website where every piece of content is manageable from Sanity CMS.
-**Current focus:** Phase 1 — Foundation
+**Current focus:** Phase 2 — Content Architecture
 
 ## Current Position
 
-Phase: 1 of 8 (Foundation)
-Plan: 2 of TBD in current phase (01-02 auto tasks complete; awaiting human verification checkpoint)
-Status: In progress — checkpoint:human-verify pending
-Last activity: 2026-02-19 — Plan 01-02 executed (Motion v12 animation architecture + Biome linting)
+Phase: 2 of 8 (Content Architecture)
+Plan: 1 of 5 complete in current phase (02-01 complete)
+Status: In progress — Plan 02-01 executed (Sanity CMS foundation)
+Last activity: 2026-02-19 — Plan 02-01 executed (Sanity Studio at /studio, sanityFetch wrapper, client, image helper)
 
-Progress: [█░░░░░░░░░] ~10%
+Progress: [██░░░░░░░░] ~20%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1 (01-01 fully complete), 1 in checkpoint (01-02)
-- Average duration: 17 min
-- Total execution time: 0.58 hours
+- Total plans completed: 3 (01-01, 01-02, 02-01)
+- Average duration: 15 min
+- Total execution time: 0.72 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 2 | 35 min | 17 min |
+| 02-content-architecture | 1 | 9 min | 9 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (15min), 01-02 (20min)
-- Trend: Stable ~17min average
+- Last 5 plans: 01-01 (15min), 01-02 (20min), 02-01 (9min)
+- Trend: Fast — CMS setup was quick due to well-specified plan
 
 *Updated after each plan completion*
 
@@ -53,6 +54,10 @@ Recent decisions affecting current work:
 - Motion v12 import path is 'motion/react' (confirmed via package.json exports inspection)
 - Biome v2.4.2 CSS linting disabled — Tailwind @theme/@apply not supported by Biome CSS parser
 - Biome v2 config: organizeImports in assist block, files.includes with negation (not files.ignore)
+- Used sanity@4.22.0 + next-sanity@11.6.12 (not sanity v5 + next-sanity v12) — next-sanity@12 requires Next.js 16 which isn't used yet
+- @sanity/vision@4.22.0 used (not v5.x) — vision@5 requires react@^19.2.2; project uses react@19.0.x
+- sanityFetch<T>() is the single data-fetching interface: tags present = on-demand revalidation; no tags = 60s ISR fallback
+- SanityImageSource imported from "@sanity/image-url" directly (no sub-path exports for types in this version)
 
 ### Pending Todos
 
@@ -67,5 +72,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Phase 2 context gathered
-Resume file: .planning/phases/02-content-architecture/02-CONTEXT.md
+Stopped at: Completed 02-01-PLAN.md (Sanity CMS foundation)
+Resume file: .planning/phases/02-content-architecture/02-02-PLAN.md

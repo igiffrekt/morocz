@@ -1,7 +1,7 @@
 "use client";
 
-import Image from "next/image";
 import { motion } from "motion/react";
+import Image from "next/image";
 import { urlFor } from "@/sanity/lib/image";
 import type { SanityImageObject } from "../../../sanity.types";
 

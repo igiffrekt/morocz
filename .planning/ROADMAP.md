@@ -67,7 +67,7 @@ Plans:
   3. The footer shows the dark navy background, multi-column navigation, social icons, contact info, privacy policy link, and the large logo on pink — all from Sanity
   4. Every section renders correctly at 320px, 768px, and 1440px viewport widths with no layout breakage
   5. All visible text is in Hungarian
-**Plans:** 1/4 plans executed
+**Plans:** 2/4 plans executed
 
 Plans:
 - [ ] 03-01-PLAN.md -- Sticky header with scroll-shrink, mobile hamburger dropdown menu, CTA button
@@ -153,7 +153,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 |-------|----------------|--------|-----------|
 | 1. Foundation | 1/2 | In progress | - |
 | 2. Content Architecture | 5/5 | Complete   | 2026-02-19 |
-| 3. Shell + Static Sections | 1/4 | In Progress|  |
+| 3. Shell + Static Sections | 2/4 | In Progress|  |
 | 4. Services + Lab Tests | 0/TBD | Not started | - |
 | 5. Testimonials + Blog | 0/TBD | Not started | - |
 | 6. SEO + Structured Data | 0/TBD | Not started | - |

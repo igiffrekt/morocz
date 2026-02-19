@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 3 of 8 (Shell + Static Sections)
-Plan: 1 of TBD in current phase (Plan 03-01 complete)
-Status: In progress — Header + MobileMenu complete, next: hero section or footer
-Last activity: 2026-02-19 — Plan 03-01 complete (Header.tsx and MobileMenu.tsx built and committed)
+Plan: 2 of TBD in current phase (Plans 03-01 and 03-02 complete)
+Status: In progress — Header, MobileMenu, Footer, SocialIcon complete, next: Hero section
+Last activity: 2026-02-19 — Plan 03-02 complete (Footer.tsx and SocialIcon.tsx built and committed)
 
 Progress: [█████░░░░░] ~52%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 7 (01-01, 01-02, 02-01, 02-02, 02-03, 02-04, 02-05, 03-01)
-- Average duration: 10 min
-- Total execution time: ~1.0 hours
+- Total plans completed: 8 (01-01, 01-02, 02-01, 02-02, 02-03, 02-04, 02-05, 03-01, 03-02)
+- Average duration: 9 min
+- Total execution time: ~1.1 hours
 
 **By Phase:**
 
@@ -29,10 +29,10 @@ Progress: [█████░░░░░] ~52%
 |-------|-------|-------|----------|
 | 01-foundation | 2 | 35 min | 17 min |
 | 02-content-architecture | 5 | 38 min | 8 min |
-| 03-shell-static-sections | 1 | 2 min | 2 min |
+| 03-shell-static-sections | 2 | 5 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-02 (3min), 02-03 (4min), 02-04 (12min), 02-05 (10min), 03-01 (2min)
+- Last 5 plans: 02-03 (4min), 02-04 (12min), 02-05 (10min), 03-01 (2min), 03-02 (3min)
 - Trend: Very fast — well-specified plans execute quickly
 
 *Updated after each plan completion*
@@ -73,6 +73,8 @@ Recent decisions affecting current work:
 - [Phase 03-shell-static-sections]: CSS transitions used for scroll-shrink and hamburger animation — not Motion library (simpler, no overhead for non-motion-system interactions)
 - [Phase 03-shell-static-sections]: MobileMenu rendered inside Header element so dropdown is in document flow, pushing page content down (not an overlay)
 - [Phase 03-shell-static-sections]: Dynamic spacer div below fixed header switches height with scroll state to maintain layout continuity
+- [Phase 03-shell-static-sections]: Social icons use type-narrowing predicate filter (not non-null assertions) — satisfies Biome lint while preserving CMS-driven rendering pattern
+- [Phase 03-shell-static-sections]: Footer logo-on-pink uses min-h-[160px] contained block within the 4-column grid (not a full-width band)
 
 ### Pending Todos
 
@@ -87,5 +89,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 03-01-PLAN.md (Header + MobileMenu components)
-Resume file: .planning/phases/03-shell-static-sections/03-01-SUMMARY.md
+Stopped at: Completed 03-02-PLAN.md (Footer + SocialIcon components)
+Resume file: .planning/phases/03-shell-static-sections/03-02-SUMMARY.md

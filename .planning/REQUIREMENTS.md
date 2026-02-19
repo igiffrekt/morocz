@@ -87,12 +87,12 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Footer
 
-- [ ] **FOOT-01**: Dark navy background footer with multi-column navigation links
-- [ ] **FOOT-02**: Social media icon links (Instagram, Facebook, etc.)
-- [ ] **FOOT-03**: Large logo on pink background at footer bottom
-- [ ] **FOOT-04**: Contact info (phone, address) in footer
-- [ ] **FOOT-05**: Privacy policy link
-- [ ] **FOOT-06**: Footer content editable from Sanity
+- [x] **FOOT-01**: Dark navy background footer with multi-column navigation links
+- [x] **FOOT-02**: Social media icon links (Instagram, Facebook, etc.)
+- [x] **FOOT-03**: Large logo on pink background at footer bottom
+- [x] **FOOT-04**: Contact info (phone, address) in footer
+- [x] **FOOT-05**: Privacy policy link
+- [x] **FOOT-06**: Footer content editable from Sanity
 
 ### Animations
 
@@ -229,12 +229,12 @@ Which phases cover which requirements. Verified during roadmap creation (2026-02
 | BLOG-05 | Phase 5 | Pending |
 | BLOG-06 | Phase 5 | Pending |
 | BLOG-07 | Phase 5 | Pending |
-| FOOT-01 | Phase 3 | Pending |
-| FOOT-02 | Phase 3 | Pending |
-| FOOT-03 | Phase 3 | Pending |
-| FOOT-04 | Phase 3 | Pending |
-| FOOT-05 | Phase 3 | Pending |
-| FOOT-06 | Phase 3 | Pending |
+| FOOT-01 | Phase 3 | Complete |
+| FOOT-02 | Phase 3 | Complete |
+| FOOT-03 | Phase 3 | Complete |
+| FOOT-04 | Phase 3 | Complete |
+| FOOT-05 | Phase 3 | Complete |
+| FOOT-06 | Phase 3 | Complete |
 | ANIM-01 | Phase 7 | Pending |
 | ANIM-02 | Phase 7 | Pending |
 | ANIM-03 | Phase 7 | Pending |

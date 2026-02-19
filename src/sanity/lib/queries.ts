@@ -1,0 +1,158 @@
+import { defineQuery } from "next-sanity";
+
+// ─── Homepage ─────────────────────────────────────────────────────────────────
+// Revalidation tag: "homepage"
+
+export const homepageQuery = defineQuery(`*[_type == "homepage" && _id == "homepage"][0]{
+  heroHeadline,
+  heroSubtitle,
+  heroDoctorImage,
+  heroCards[]{
+    _key,
+    title,
+    subtitle,
+    icon
+  },
+  servicesHeadline,
+  servicesSubtitle,
+  labTestsHeadline,
+  labTestsSubtitle,
+  ctaHeadline,
+  ctaDescription
+}`);
+
+// ─── Site Settings ────────────────────────────────────────────────────────────
+// Revalidation tag: "siteSettings"
+
+export const siteSettingsQuery =
+  defineQuery(`*[_type == "siteSettings" && _id == "siteSettings"][0]{
+  logo,
+  clinicName,
+  phone,
+  email,
+  address,
+  navigationLinks[]{
+    _key,
+    label,
+    href
+  },
+  socialLinks[]{
+    _key,
+    platform,
+    url
+  },
+  footerColumns[]{
+    _key,
+    heading,
+    links[]{
+      _key,
+      label,
+      href
+    }
+  },
+  privacyPolicyUrl,
+  metaDescription
+}`);
+
+// ─── Services ─────────────────────────────────────────────────────────────────
+// Revalidation tag: "service"
+
+export const allServicesQuery = defineQuery(`*[_type == "service"] | order(order asc){
+  _id,
+  name,
+  description,
+  icon,
+  category->{_id, name, emoji},
+  order
+}`);
+
+// ─── Service Categories ───────────────────────────────────────────────────────
+// Revalidation tag: "serviceCategory"
+
+export const allServiceCategoriesQuery =
+  defineQuery(`*[_type == "serviceCategory"] | order(order asc){
+  _id,
+  name,
+  emoji,
+  order
+}`);
+
+// ─── Lab Tests ────────────────────────────────────────────────────────────────
+// Revalidation tag: "labTest"
+
+export const allLabTestsQuery = defineQuery(`*[_type == "labTest"] | order(order asc){
+  _id,
+  name,
+  description,
+  price,
+  originalPrice,
+  discount,
+  illustration,
+  order
+}`);
+
+// ─── Testimonials ─────────────────────────────────────────────────────────────
+// Revalidation tag: "testimonial"
+
+export const allTestimonialsQuery = defineQuery(`*[_type == "testimonial"] | order(order asc){
+  _id,
+  patientName,
+  photo,
+  text,
+  condition,
+  order
+}`);
+
+// ─── Blog Posts (listing) ─────────────────────────────────────────────────────
+// Revalidation tag: "blogPost"
+
+export const allBlogPostsQuery = defineQuery(`*[_type == "blogPost"] | order(publishedAt desc){
+  _id,
+  title,
+  slug,
+  category->{_id, name, slug},
+  featuredImage,
+  excerpt,
+  publishedAt
+}`);
+
+// ─── Blog Post (single by slug) ───────────────────────────────────────────────
+// Revalidation tag: "blogPost"
+
+export const blogPostBySlugQuery = defineQuery(`*[_type == "blogPost" && slug.current == $slug][0]{
+  _id,
+  title,
+  slug,
+  category->{_id, name, slug},
+  featuredImage,
+  body,
+  excerpt,
+  metaDescription,
+  ogImage,
+  publishedAt
+}`);
+
+// ─── Blog Categories ──────────────────────────────────────────────────────────
+// Revalidation tag: "blogCategory"
+
+export const allBlogCategoriesQuery = defineQuery(`*[_type == "blogCategory"] | order(order asc){
+  _id,
+  name,
+  slug,
+  order
+}`);
+
+// ─── Blog Posts by Category ───────────────────────────────────────────────────
+// Revalidation tag: "blogPost"
+
+export const blogPostsByCategoryQuery = defineQuery(
+  `*[_type == "blogPost" && category._ref == $categoryId] | order(publishedAt desc){
+  _id,
+  title,
+  slug,
+  category->{_id, name, slug},
+  featuredImage,
+  excerpt,
+  publishedAt
+}`,
+);

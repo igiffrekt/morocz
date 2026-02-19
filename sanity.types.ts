@@ -209,7 +209,7 @@ export type PortableTextSpan = {
   _type: "span";
   _key: string;
   text?: string;
-  marks?: Array<string>;
+  marks?: string[];
 };
 
 export type PortableTextMarkDefLink = {
@@ -223,8 +223,8 @@ export type PortableTextBlock = {
   _key: string;
   style?: "normal" | "h2" | "h3" | "h4" | "blockquote";
   listItem?: "bullet" | "number";
-  children?: Array<PortableTextSpan>;
-  markDefs?: Array<PortableTextMarkDefLink>;
+  children?: PortableTextSpan[];
+  markDefs?: PortableTextMarkDefLink[];
 };
 
 export type BlogPostBodyImage = SanityImageObject & {

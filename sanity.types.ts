@@ -266,3 +266,33 @@ export type AllSanitySchemaTypes =
   | Testimonial
   | BlogCategory
   | BlogPost;
+
+// ─── Query Result Types ───────────────────────────────────────────────────────
+// These types match the shape returned by GROQ queries that dereference references inline.
+
+export type ServiceQueryResult = {
+  _id: string;
+  name?: string;
+  description?: string;
+  icon?: SanityImageObject;
+  category?: { _id: string; name?: string; emoji?: string };
+  order?: number;
+};
+
+export type ServiceCategoryQueryResult = {
+  _id: string;
+  name?: string;
+  emoji?: string;
+  order?: number;
+};
+
+export type LabTestQueryResult = {
+  _id: string;
+  name?: string;
+  description?: string;
+  price?: number;
+  originalPrice?: number;
+  discount?: number;
+  illustration?: SanityImageObject;
+  order?: number;
+};

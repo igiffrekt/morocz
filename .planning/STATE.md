@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 3 of 8 (Shell + Static Sections)
-Plan: 3 of 4 in current phase (Plans 03-01, 03-02, 03-03 complete)
-Status: In progress — Header, MobileMenu, Footer, SocialIcon, HeroSection, HeroHeadline, HeroServiceCards complete; next: page assembly (03-04)
-Last activity: 2026-02-19 — Plan 03-03 complete (Hero components: letter-by-letter animated headline, 4-color service cards, doctor image layout)
+Plan: 4 of 4 in current phase (Plans 03-01, 03-02, 03-03, 03-04 complete — awaiting human visual verification)
+Status: Checkpoint — homepage assembly complete, awaiting visual verification at http://localhost:3001
+Last activity: 2026-02-19 — Plan 03-04 Task 1 complete (layout.tsx and page.tsx wired with Sanity data; production build passes)
 
-Progress: [██████░░░░] ~60%
+Progress: [███████░░░] ~70%
 
 ## Performance Metrics
 
@@ -29,10 +29,10 @@ Progress: [██████░░░░] ~60%
 |-------|-------|-------|----------|
 | 01-foundation | 2 | 35 min | 17 min |
 | 02-content-architecture | 5 | 38 min | 8 min |
-| 03-shell-static-sections | 3 | 9 min | 3 min |
+| 03-shell-static-sections | 4 | 19 min | 5 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-05 (10min), 03-01 (2min), 03-02 (3min), 03-03 (4min)
+- Last 5 plans: 02-05 (10min), 03-01 (2min), 03-02 (3min), 03-03 (4min), 03-04 (10min)
 - Trend: Very fast — well-specified plans execute quickly
 
 *Updated after each plan completion*
@@ -77,6 +77,7 @@ Recent decisions affecting current work:
 - [Phase 03-shell-static-sections]: Footer logo-on-pink uses min-h-[160px] contained block within the 4-column grid (not a full-width band)
 - [Phase 03-shell-static-sections]: Array index key accepted for HeroHeadline letter-by-letter animation — text is static CMS content, chars never reorder; biome-ignore suppression with justification used
 - [Phase 03-shell-static-sections]: next/image required (not <img>) in all section components — biome noImgElement rule enforced project-wide for LCP optimization
+- [Phase 03-shell-static-sections]: Header logo link: bare <a href="/"> replaced with next/link <Link> to satisfy Next.js ESLint no-html-link-for-pages rule
 
 ### Pending Todos
 
@@ -91,5 +92,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 03-03-PLAN.md (Hero components — HeroHeadline, HeroServiceCards, HeroSection)
-Resume file: .planning/phases/03-shell-static-sections/03-03-SUMMARY.md
+Stopped at: Checkpoint: Task 2 of 03-04-PLAN.md — awaiting human visual verification at http://localhost:3001
+Resume file: .planning/phases/03-shell-static-sections/03-04-SUMMARY.md

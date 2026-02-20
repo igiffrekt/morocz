@@ -312,6 +312,7 @@ export type BlogPostQueryResult = {
   _id: string;
   title?: string;
   slug?: Slug;
+  category?: { _id: string; name?: string };
   featuredImage?: SanityImageObject;
   excerpt?: string;
 };

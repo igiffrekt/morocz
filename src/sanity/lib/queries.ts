@@ -168,10 +168,11 @@ export const blogPostsByCategoryQuery = defineQuery(
 // Revalidation tag: "blogPost"
 
 export const latestBlogPostsQuery = defineQuery(
-  `*[_type == "blogPost"] | order(publishedAt desc)[0...3]{
+  `*[_type == "blogPost"] | order(publishedAt desc)[0...2]{
   _id,
   title,
   slug,
+  category->{_id, name},
   featuredImage,
   excerpt
 }`,

@@ -27,5 +27,5 @@
 }
 
 body {
-  @apply bg-background-light text-text-light antialiased;
+  @apply bg-white text-text-light antialiased;
 }

@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Patients can discover Morocz Medical's services and book an appointment through a beautifully animated, fast, SEO-optimized website where every piece of content is manageable from Sanity CMS.
-**Current focus:** Phase 5 in progress — data layer complete, building UI components
+**Current focus:** Phase 6 complete — all SEO, structured data, semantic HTML, and UI polish done
 
 ## Current Position
 
-Phase: 6 of 8 (SEO + Structured Data) — IN PROGRESS
-Plan: 4 of 4 in current phase (4 complete)
-Status: In progress — Plans 01-04 done; privacy policy page, cookie notice, SEO metadata (OG + meta tags), JSON-LD structured data complete
-Last activity: 2026-02-20 — Phase 6 Plan 02 complete (Open Graph meta tags wired from Sanity to all pages)
+Phase: 6 of 8 (SEO + Structured Data) — COMPLETE
+Plan: 5 of 5 in current phase (all 5 complete)
+Status: Phase 6 done — JSON-LD, OG meta, cookie notice, privacy policy page, semantic HTML, glassmorphism navbar all complete
+Last activity: 2026-02-21 — Phase 6 Plan 05 complete (semantic HTML audit + visual verification + navbar scroll behavior + LabTests slide animation)
 
-Progress: [█████████░] ~92%
+Progress: [█████████░] ~95%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 18 (01-01, 01-02, 02-01..02-05, 03-01..03-04, 04-01..04-03, 05-01, 05-02, 05-03, 05-04)
-- Average duration: 7 min
-- Total execution time: ~2.3 hours
+- Total plans completed: 23 (01-01, 01-02, 02-01..02-05, 03-01..03-04, 04-01..04-03, 05-01, 05-02, 05-03, 05-04, 06-01, 06-02, 06-03, 06-04, 06-05)
+- Average duration: 8 min
+- Total execution time: ~2.5 hours
 
 **By Phase:**
 
@@ -32,10 +32,11 @@ Progress: [█████████░] ~92%
 | 03-shell-static-sections | 4 | 19 min | 5 min |
 | 04-services-lab-tests | 3 | 22 min | 7 min |
 | 05-testimonials-blog | 4 | ~49 min | ~12 min |
+| 06-seo-structured-data | 5 | ~55 min | ~11 min |
 
 **Recent Trend:**
-- Last 5 plans: 04-03 (12min), 05-01 (8min), 05-02 (4min), 05-03 (7min), 05-04 (~30min)
-- Trend: Steady — 7-8min per pure build plan; ~30min when visual refinement is included
+- Last 5 plans: 06-01 (3min), 06-02 (11min), 06-03 (8min), 06-04 (8min), 06-05 (~25min)
+- Trend: Steady — 8-11min per pure build plan; ~25min when visual checkpoint + post-checkpoint refinements included
 
 *Updated after each plan completion*
 | Phase 05 P04 | ~30min | 2 tasks | 7 files |
@@ -43,6 +44,7 @@ Progress: [█████████░] ~92%
 | Phase 06 P04 | 8 | 2 tasks | 3 files |
 | Phase 06 P03 | 8 | 2 tasks | 3 files |
 | Phase 06-seo-structured-data P02 | 11 | 2 tasks | 3 files |
+| Phase 06-seo-structured-data P05 | ~25min | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -116,6 +118,11 @@ Recent decisions affecting current work:
 - [Phase 06]: Clinic details (address, hours, physician name) hardcoded with PLACEHOLDER comments — per CONTEXT.md, not stored in CMS
 - [Phase 06]: BlogPosting author/publisher set to Organization (Morocz Medical) — solo practice clinic is the publisher
 - [Phase 06-seo-structured-data]: layout.tsx generateMetadata fetches siteSettings independently (Next.js deduplicates); homepage uses title.absolute; blog og:type article with publishedTime; OG image cascade: ogImage > featuredImage > defaultOgImage; og:locale hu_HU on all pages
+- [Phase 06-seo-structured-data]: Three-state NavState enum (default/hidden/compact) replaces scrolled boolean — enables hide-on-scroll-down, show-compact-glassmorphism-on-scroll-up pattern
+- [Phase 06-seo-structured-data]: Compact header rendered as separate fixed <header> pill element (backdrop-blur-xl, bg-white/60) toggled via opacity/pointer-events — avoids single-element morphing complexity
+- [Phase 06-seo-structured-data]: CTA label changed to "Időpontfoglalás" with arrow icon (shorter for compact nav, consistent across both header states)
+- [Phase 06-seo-structured-data]: AnimatePresence mode='wait' with direction useRef for LabTests slide animation — direction updated synchronously before page setState to prevent stale reads
+- [Phase 06-seo-structured-data]: aria-labelledby used on all section elements pointing to section h2 id — preferred over aria-label when visible heading exists (WCAG best practice)
 
 ### Pending Todos
 
@@ -125,10 +132,10 @@ None yet.
 
 - Google Maps embed GDPR status unresolved: iframe sets cookies; safe default is a static map image with a link to Google Maps (resolved in Phase 3 CONTEXT.md — no map at all, just text address)
 - Motion v12 import path RESOLVED: confirmed 'motion/react' is correct (motion@12.34.2 installed)
-- Contact form email provider unselected (Resend is community standard for Next.js — decide in Phase 8 planning)
+- Contact form email provider unselected (Resend is community standard for Next.js — decide in Phase 7 planning)
 
 ## Session Continuity
 
-Last session: 2026-02-20
-Stopped at: Completed 06-04-PLAN.md — Privacy policy page and cookie notice complete; Phase 6 all plans done
+Last session: 2026-02-21
+Stopped at: Completed 06-05-PLAN.md — Semantic HTML audit + visual verification approved + navbar scroll behavior + LabTests slide animation; Phase 6 COMPLETE
 Resume file: .planning/phases/07-contact-form/07-01-PLAN.md

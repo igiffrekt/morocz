@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: Shell + Static Sections** - Header, Hero, Footer, and responsive baseline (completed 2026-02-19)
 - [x] **Phase 4: Services + Lab Tests** - Animated category filter, lab tests section, CLS validated *(completed 2026-02-20)*
 - [x] **Phase 5: Testimonials + Blog** - Carousel, blog listing, blog post pages with Portable Text (completed 2026-02-20)
-- [ ] **Phase 6: SEO + Structured Data** - JSON-LD schemas, meta tags, GDPR compliance
+- [x] **Phase 6: SEO + Structured Data** - JSON-LD schemas, meta tags, GDPR compliance *(completed 2026-02-21)*
 - [ ] **Phase 7: Animation Polish + Performance** - Intro sequence, scroll triggers, Core Web Vitals
 - [ ] **Phase 8: CMS Revalidation + Launch** - Webhook, edit-to-publish cycle, launch readiness
 
@@ -120,14 +120,14 @@ Plans:
   3. All pages have Open Graph `og:title`, `og:description`, and `og:image` tags populated from Sanity — visible when the URL is pasted into a social media preview tool
   4. The Hungarian-language privacy policy page is accessible at a stable URL and linked from the footer
   5. A cookie notice appears for Hungarian visitors and meets GDPR informational requirements without blocking page use
-**Plans:** 4/5 plans executed
+**Plans:** 5/5 plans complete
 
 Plans:
-- [ ] 06-01-PLAN.md -- Add SEO fields to SiteSettings/Homepage schemas + create privacyPolicy schema + update queries/types
-- [ ] 06-02-PLAN.md -- Wire meta tags and Open Graph data from Sanity into all pages
-- [ ] 06-03-PLAN.md -- Add JSON-LD structured data (MedicalClinic, LocalBusiness, Physician, BreadcrumbList, BlogPosting)
-- [ ] 06-04-PLAN.md -- Create privacy policy page + cookie notice component
-- [ ] 06-05-PLAN.md -- Semantic HTML audit + visual verification of all Phase 6 work
+- [x] 06-01-PLAN.md -- Add SEO fields to SiteSettings/Homepage schemas + create privacyPolicy schema + update queries/types
+- [x] 06-02-PLAN.md -- Wire meta tags and Open Graph data from Sanity into all pages
+- [x] 06-03-PLAN.md -- Add JSON-LD structured data (MedicalClinic, LocalBusiness, Physician, BreadcrumbList, BlogPosting)
+- [x] 06-04-PLAN.md -- Create privacy policy page + cookie notice component
+- [x] 06-05-PLAN.md -- Semantic HTML audit + visual verification of all Phase 6 work *(completed 2026-02-21)*
 
 ### Phase 7: Animation Polish + Performance
 **Goal**: Every section animates in on scroll, the intro logo typewriter plays on first load, the closing circle wipe plays on exit, and all Core Web Vitals targets are met on mobile — while users who prefer reduced motion see no animations
@@ -168,6 +168,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 3. Shell + Static Sections | 4/4 | Complete   | 2026-02-19 |
 | 4. Services + Lab Tests | 3/3 | Complete   | 2026-02-20 |
 | 5. Testimonials + Blog | 4/4 | Complete   | 2026-02-20 |
-| 6. SEO + Structured Data | 4/5 | In Progress|  |
+| 6. SEO + Structured Data | 5/5 | Complete   | 2026-02-21 |
 | 7. Animation Polish + Performance | 0/TBD | Not started | - |
 | 8. CMS Revalidation + Launch | 0/TBD | Not started | - |

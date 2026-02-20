@@ -9,19 +9,19 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 
 ## Current Position
 
-Phase: 5 of 8 (Testimonials + Blog) — IN PROGRESS
-Plan: 3 of 4 in current phase (plans 01-03 complete)
-Status: In Progress — data layer, TestimonialsSection carousel, BlogSection, and blog detail route complete; homepage wiring pending
-Last activity: 2026-02-20 — Phase 5 Plan 03 complete (BlogSection, PortableTextRenderer, RelatedPosts, /blog/[slug] SSG route)
+Phase: 5 of 8 (Testimonials + Blog) — COMPLETE
+Plan: 4 of 4 in current phase (all plans complete)
+Status: Complete — all 4 plans done; homepage fully wired with Testimonials and Blog; design refinements approved by user
+Last activity: 2026-02-20 — Phase 5 Plan 04 complete (homepage wiring + redesign of BlogSection, TestimonialsSection, LabTestsSection)
 
-Progress: [████████░░] ~85%
+Progress: [█████████░] ~90%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 17 (01-01, 01-02, 02-01..02-05, 03-01..03-04, 04-01..04-03, 05-01, 05-02, 05-03)
+- Total plans completed: 18 (01-01, 01-02, 02-01..02-05, 03-01..03-04, 04-01..04-03, 05-01, 05-02, 05-03, 05-04)
 - Average duration: 7 min
-- Total execution time: ~1.8 hours
+- Total execution time: ~2.3 hours
 
 **By Phase:**
 
@@ -31,14 +31,14 @@ Progress: [████████░░] ~85%
 | 02-content-architecture | 5 | 38 min | 8 min |
 | 03-shell-static-sections | 4 | 19 min | 5 min |
 | 04-services-lab-tests | 3 | 22 min | 7 min |
-| 05-testimonials-blog | 3 | 19 min | 6 min |
+| 05-testimonials-blog | 4 | ~49 min | ~12 min |
 
 **Recent Trend:**
-- Last 5 plans: 04-02 (8min), 04-03 (12min), 05-01 (8min), 05-02 (4min), 05-03 (7min)
-- Trend: Steady — consistent 7-8min per UI plan
+- Last 5 plans: 04-03 (12min), 05-01 (8min), 05-02 (4min), 05-03 (7min), 05-04 (~30min)
+- Trend: Steady — 7-8min per pure build plan; ~30min when visual refinement is included
 
 *Updated after each plan completion*
-| Phase 05 P04 | 2 | 1 tasks | 1 files |
+| Phase 05 P04 | ~30min | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -99,6 +99,11 @@ Recent decisions affecting current work:
 - [Phase 05-testimonials-blog]: relatedBlogPostsQuery fallback: if < 2 results, fall back to latestBlogPostsQuery, filter out current post
 - [Phase 05-testimonials-blog]: PortableTextRenderer is a server component — no 'use client' needed for pure Portable Text rendering
 - [Phase 05-testimonials-blog]: Promise.all expanded from 5 to 7 queries; testimonials and latestPosts added as parallel fetches in page.tsx
+- [Phase 05-testimonials-blog]: latestBlogPostsQuery updated to include category field — needed for redesigned BlogSection category tags
+- [Phase 05-testimonials-blog]: BlogSection redesigned to 40/60 two-card layout with accent right card (bg-accent) — user-approved during visual verification
+- [Phase 05-testimonials-blog]: TestimonialsSection redesigned to horizontal card (photo+name | separator | quote) with pill dot navigation
+- [Phase 05-testimonials-blog]: LabTestsSection converted to paginated 3x3 grid with dot navigation and drag/swipe — replaces animated category-filter
+- [Phase 05-testimonials-blog]: Page background changed to white in globals.css
 
 ### Pending Todos
 
@@ -113,5 +118,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Completed 05-03-PLAN.md (BlogSection, PortableTextRenderer, RelatedPosts, /blog/[slug] SSG route)
-Resume file: .planning/phases/05-testimonials-blog/05-03-SUMMARY.md
+Stopped at: Completed 05-04-PLAN.md (homepage wiring, BlogSection/TestimonialsSection/LabTestsSection redesigns, Phase 5 complete)
+Resume file: .planning/phases/05-testimonials-blog/05-04-SUMMARY.md

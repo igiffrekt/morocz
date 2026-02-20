@@ -63,7 +63,8 @@
       "!*.config.mjs",
       "!*.config.js",
       "!next-env.d.ts",
-      "!**/*.css"
+      "!**/*.css",
+      "!code.html"
     ]
   }
 }

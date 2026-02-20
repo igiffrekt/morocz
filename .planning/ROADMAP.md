@@ -120,7 +120,7 @@ Plans:
   3. All pages have Open Graph `og:title`, `og:description`, and `og:image` tags populated from Sanity — visible when the URL is pasted into a social media preview tool
   4. The Hungarian-language privacy policy page is accessible at a stable URL and linked from the footer
   5. A cookie notice appears for Hungarian visitors and meets GDPR informational requirements without blocking page use
-**Plans:** 3/5 plans executed
+**Plans:** 4/5 plans executed
 
 Plans:
 - [ ] 06-01-PLAN.md -- Add SEO fields to SiteSettings/Homepage schemas + create privacyPolicy schema + update queries/types
@@ -168,6 +168,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 3. Shell + Static Sections | 4/4 | Complete   | 2026-02-19 |
 | 4. Services + Lab Tests | 3/3 | Complete   | 2026-02-20 |
 | 5. Testimonials + Blog | 4/4 | Complete   | 2026-02-20 |
-| 6. SEO + Structured Data | 3/5 | In Progress|  |
+| 6. SEO + Structured Data | 4/5 | In Progress|  |
 | 7. Animation Polish + Performance | 0/TBD | Not started | - |
 | 8. CMS Revalidation + Launch | 0/TBD | Not started | - |

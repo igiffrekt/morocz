@@ -11,8 +11,8 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 
 Phase: 6 of 8 (SEO + Structured Data) — IN PROGRESS
 Plan: 4 of 4 in current phase (4 complete)
-Status: In progress — Plans 01-04 done; privacy policy page, cookie notice, SEO metadata, JSON-LD structured data complete
-Last activity: 2026-02-20 — Phase 6 Plan 04 complete (privacy policy page + cookie notice)
+Status: In progress — Plans 01-04 done; privacy policy page, cookie notice, SEO metadata (OG + meta tags), JSON-LD structured data complete
+Last activity: 2026-02-20 — Phase 6 Plan 02 complete (Open Graph meta tags wired from Sanity to all pages)
 
 Progress: [█████████░] ~92%
 
@@ -42,6 +42,7 @@ Progress: [█████████░] ~92%
 | Phase 06 P01 | 3min | 2 tasks | 7 files |
 | Phase 06 P04 | 8 | 2 tasks | 3 files |
 | Phase 06 P03 | 8 | 2 tasks | 3 files |
+| Phase 06-seo-structured-data P02 | 11 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -114,6 +115,7 @@ Recent decisions affecting current work:
 - [Phase 06]: JsonLd is a Server Component using dangerouslySetInnerHTML with biome-ignore — data is server-controlled JSON, no XSS risk
 - [Phase 06]: Clinic details (address, hours, physician name) hardcoded with PLACEHOLDER comments — per CONTEXT.md, not stored in CMS
 - [Phase 06]: BlogPosting author/publisher set to Organization (Morocz Medical) — solo practice clinic is the publisher
+- [Phase 06-seo-structured-data]: layout.tsx generateMetadata fetches siteSettings independently (Next.js deduplicates); homepage uses title.absolute; blog og:type article with publishedTime; OG image cascade: ogImage > featuredImage > defaultOgImage; og:locale hu_HU on all pages
 
 ### Pending Todos
 

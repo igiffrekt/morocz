@@ -21,20 +21,28 @@ interface LabTestsSectionProps {
 
 const pastelColors = ["bg-[#ffebe4]", "bg-[#edf8f3]", "bg-[#fdf8eb]"];
 
+function hashId(id: string): number {
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) {
+    hash = (hash * 31 + id.charCodeAt(i)) | 0;
+  }
+  return Math.abs(hash);
+}
+
 function formatPrice(price: number): string {
   return `${price.toLocaleString("hu-HU")} Ft`;
 }
 
 export function LabTestsSection({ heading, labTests }: LabTestsSectionProps) {
   return (
-    <section className="bg-primary rounded-3xl px-6 py-12 md:px-10 md:py-16">
+    <section className="bg-[#0d112f] rounded-3xl px-6 py-12 md:px-10 md:py-16">
       {heading && (
         <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-8">{heading}</h2>
       )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {labTests.map((test, index) => {
-          const colorClass = pastelColors[index % pastelColors.length];
+          const colorClass = pastelColors[hashId(test._id) % pastelColors.length];
           const delay = Math.min(index * 0.1, 0.4);
           const hasIllustration = test.illustration?.asset != null;
 

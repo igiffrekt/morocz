@@ -24,13 +24,16 @@ export function HeroSection({ headline, subtitle, badges, doctorImage, phone }: 
   const rightBadge = badges?.[1];
 
   return (
-    <section className="relative bg-primary rounded-[2.5rem] overflow-hidden text-white px-8 lg:px-16 min-h-[560px] flex flex-col justify-between">
+    <section
+      aria-labelledby="hero-cim"
+      className="relative bg-primary rounded-[2.5rem] overflow-hidden text-white px-8 lg:px-16 min-h-[560px] flex flex-col justify-between"
+    >
       {/* Subtle texture overlay */}
       <div className="absolute inset-0 opacity-10 pointer-events-none bg-[radial-gradient(circle_at_25%_25%,rgba(255,255,255,0.1)_1px,transparent_1px)] bg-[length:24px_24px]" />
 
       {/* Headline — upper area, BEHIND doctor (no z-index = below z-10 content) */}
       <div className="absolute inset-x-0 top-0 flex items-start justify-center pointer-events-none px-8 pt-8 lg:pt-12">
-        <HeroHeadline text={headline ?? "Mórocz Medical"} />
+        <HeroHeadline id="hero-cim" text={headline ?? "Mórocz Medical"} />
       </div>
 
       {/* Left badge — pink icon circle + text, no pill */}

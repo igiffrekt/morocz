@@ -34,10 +34,15 @@ export function ServicesSection({ heading, categories, services }: ServicesSecti
   const filteredServices = services.filter((service) => service.category?._id === activeCategoryId);
 
   return (
-    <section className="py-12 md:py-16">
+    <section aria-labelledby="szolgaltatasok-cim" className="py-12 md:py-16">
       <div className="max-w-8xl mx-auto px-4 md:px-8">
         {heading && (
-          <h2 className="text-3xl md:text-4xl font-extrabold text-primary mb-6">{heading}</h2>
+          <h2
+            id="szolgaltatasok-cim"
+            className="text-3xl md:text-4xl font-extrabold text-primary mb-6"
+          >
+            {heading}
+          </h2>
         )}
 
         {/* Filter tabs — horizontal scrollable pill row */}

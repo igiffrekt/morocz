@@ -56,9 +56,11 @@ export function TestimonialsSection({ heading, testimonials }: TestimonialsSecti
   }
 
   return (
-    <section className="px-4 py-12 md:py-20">
+    <section aria-labelledby="velemenyek-cim" className="px-4 py-12 md:py-20">
       {heading && (
-        <h2 className="mb-8 text-3xl font-extrabold text-primary md:text-4xl">{heading}</h2>
+        <h2 id="velemenyek-cim" className="mb-8 text-3xl font-extrabold text-primary md:text-4xl">
+          {heading}
+        </h2>
       )}
 
       <fieldset

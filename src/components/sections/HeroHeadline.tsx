@@ -4,6 +4,7 @@ import { motion } from "motion/react";
 
 interface HeroHeadlineProps {
   text: string;
+  id?: string;
 }
 
 const container = {
@@ -22,11 +23,12 @@ const child = {
   },
 };
 
-export function HeroHeadline({ text }: HeroHeadlineProps) {
+export function HeroHeadline({ text, id }: HeroHeadlineProps) {
   const characters = text.split("");
 
   return (
     <motion.h1
+      id={id}
       variants={container}
       initial="hidden"
       animate="visible"

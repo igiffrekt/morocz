@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { SanityImageObject } from "../../../sanity.types";
 import SocialIcon from "./SocialIcon";
 
@@ -37,7 +38,10 @@ export default function Footer({
   return (
     <footer className="bg-primary text-white rounded-t-[3rem] lg:rounded-[3rem] pt-20 pb-10 px-8 md:px-16 overflow-hidden relative">
       {/* Navigation columns — 3 columns as per locked decision */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-12 mb-20 relative z-10">
+      <nav
+        aria-label="Lábléc navigáció"
+        className="grid grid-cols-2 md:grid-cols-3 gap-12 mb-20 relative z-10"
+      >
         {footerColumns?.slice(0, 3).map((col) => (
           <div key={col._key}>
             {col.heading && <h4 className="font-bold mb-8 text-lg">{col.heading}</h4>}
@@ -55,7 +59,7 @@ export default function Footer({
             </ul>
           </div>
         ))}
-      </div>
+      </nav>
 
       {/* Social icons row */}
       {activeSocials.length > 0 && (
@@ -95,13 +99,12 @@ export default function Footer({
         <p>
           &copy;{new Date().getFullYear()} {displayName}. Minden jog fenntartva.
         </p>
-        {privacyPolicyUrl ? (
-          <a href={privacyPolicyUrl} className="hover:text-white transition-colors mt-2 md:mt-0">
-            Adatvédelmi irányelv
-          </a>
-        ) : (
-          <p className="mt-2 md:mt-0">Adatvédelmi irányelv</p>
-        )}
+        <Link
+          href={privacyPolicyUrl ?? "/adatkezelesi-tajekoztato"}
+          className="hover:text-white transition-colors mt-2 md:mt-0"
+        >
+          Adatvédelmi irányelv
+        </Link>
       </div>
     </footer>
   );

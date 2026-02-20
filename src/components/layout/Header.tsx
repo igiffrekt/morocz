@@ -85,7 +85,10 @@ export function Header({ logo, clinicName, navigationLinks, phone, address }: He
       </div>
 
       {/* Center: desktop nav */}
-      <nav className="hidden md:flex items-center gap-10 text-sm font-semibold text-gray-600">
+      <nav
+        aria-label="Fő navigáció"
+        className="hidden md:flex items-center gap-10 text-sm font-semibold text-gray-600"
+      >
         {navigationLinks?.map((link, i) => (
           <a
             key={link._key}

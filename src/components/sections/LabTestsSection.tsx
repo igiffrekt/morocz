@@ -52,9 +52,17 @@ export function LabTestsSection({ heading, labTests }: LabTestsSectionProps) {
   const visibleTests = labTests.slice(page * PER_PAGE, page * PER_PAGE + PER_PAGE);
 
   return (
-    <section className="bg-[#0d112f] rounded-3xl px-6 py-12 md:px-10 md:py-16">
+    <section
+      aria-labelledby="laborvizsgalatok-cim"
+      className="bg-[#0d112f] rounded-3xl px-6 py-12 md:px-10 md:py-16"
+    >
       {heading && (
-        <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-8">{heading}</h2>
+        <h2
+          id="laborvizsgalatok-cim"
+          className="text-3xl md:text-4xl font-extrabold text-white mb-8"
+        >
+          {heading}
+        </h2>
       )}
 
       <motion.div

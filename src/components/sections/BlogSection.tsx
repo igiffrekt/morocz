@@ -29,11 +29,14 @@ export function BlogSection({ heading, posts }: BlogSectionProps) {
   const rightHasImage = rightPost?.featuredImage?.asset != null;
 
   return (
-    <section id="blog" className="px-4 py-12 md:py-20">
+    <section id="blog" aria-labelledby="blog-cim" className="px-4 py-12 md:py-20">
       {/* Header row: heading left, link right */}
       <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         {heading && (
-          <h2 className="max-w-md text-3xl font-extrabold leading-tight text-primary md:text-4xl">
+          <h2
+            id="blog-cim"
+            className="max-w-md text-3xl font-extrabold leading-tight text-primary md:text-4xl"
+          >
             {heading}
           </h2>
         )}

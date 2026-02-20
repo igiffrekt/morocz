@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Footer from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { MotionProvider } from "@/components/motion/MotionProvider";
+import { CookieNotice } from "@/components/ui/CookieNotice";
 import { plusJakartaSans } from "@/lib/fonts";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import { urlFor } from "@/sanity/lib/image";
@@ -91,6 +92,7 @@ export default async function RootLayout({
               privacyPolicyUrl={settings?.privacyPolicyUrl}
             />
           </div>
+          <CookieNotice />
         </MotionProvider>
       </body>
     </html>

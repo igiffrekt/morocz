@@ -38,6 +38,7 @@ Progress: [████████░░] ~85%
 - Trend: Steady — consistent 7-8min per UI plan
 
 *Updated after each plan completion*
+| Phase 05 P04 | 2 | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -97,6 +98,7 @@ Recent decisions affecting current work:
 - [Phase 05-testimonials-blog]: BlogSection uses href='#blog' for scroll anchor (no separate /blog listing page — CONTEXT.md locked)
 - [Phase 05-testimonials-blog]: relatedBlogPostsQuery fallback: if < 2 results, fall back to latestBlogPostsQuery, filter out current post
 - [Phase 05-testimonials-blog]: PortableTextRenderer is a server component — no 'use client' needed for pure Portable Text rendering
+- [Phase 05-testimonials-blog]: Promise.all expanded from 5 to 7 queries; testimonials and latestPosts added as parallel fetches in page.tsx
 
 ### Pending Todos
 

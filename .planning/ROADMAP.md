@@ -120,9 +120,14 @@ Plans:
   3. All pages have Open Graph `og:title`, `og:description`, and `og:image` tags populated from Sanity — visible when the URL is pasted into a social media preview tool
   4. The Hungarian-language privacy policy page is accessible at a stable URL and linked from the footer
   5. A cookie notice appears for Hungarian visitors and meets GDPR informational requirements without blocking page use
-**Plans**: TBD
+**Plans:** 5 plans
 
-Plans: None yet
+Plans:
+- [ ] 06-01-PLAN.md -- Add SEO fields to SiteSettings/Homepage schemas + create privacyPolicy schema + update queries/types
+- [ ] 06-02-PLAN.md -- Wire meta tags and Open Graph data from Sanity into all pages
+- [ ] 06-03-PLAN.md -- Add JSON-LD structured data (MedicalClinic, LocalBusiness, Physician, BreadcrumbList, BlogPosting)
+- [ ] 06-04-PLAN.md -- Create privacy policy page + cookie notice component
+- [ ] 06-05-PLAN.md -- Semantic HTML audit + visual verification of all Phase 6 work
 
 ### Phase 7: Animation Polish + Performance
 **Goal**: Every section animates in on scroll, the intro logo typewriter plays on first load, the closing circle wipe plays on exit, and all Core Web Vitals targets are met on mobile — while users who prefer reduced motion see no animations

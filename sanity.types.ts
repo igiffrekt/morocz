@@ -109,6 +109,8 @@ export type Homepage = {
   servicesSubtitle?: string;
   labTestsHeadline?: string;
   labTestsSubtitle?: string;
+  testimonialsHeadline?: string;
+  blogHeadline?: string;
   ctaHeadline?: string;
   ctaDescription?: string;
 };
@@ -295,4 +297,34 @@ export type LabTestQueryResult = {
   discount?: number;
   illustration?: SanityImageObject;
   order?: number;
+};
+
+export type TestimonialQueryResult = {
+  _id: string;
+  patientName?: string;
+  photo?: SanityImageObject;
+  text?: string;
+  condition?: string;
+  order?: number;
+};
+
+export type BlogPostQueryResult = {
+  _id: string;
+  title?: string;
+  slug?: Slug;
+  featuredImage?: SanityImageObject;
+  excerpt?: string;
+};
+
+export type BlogPostDetailResult = {
+  _id: string;
+  title?: string;
+  slug?: Slug;
+  category?: { _id: string; name?: string; slug?: Slug };
+  featuredImage?: SanityImageObject;
+  body?: Array<PortableTextBlock | BlogPostBodyImage>;
+  excerpt?: string;
+  metaDescription?: string;
+  ogImage?: SanityImageObject;
+  publishedAt?: string;
 };

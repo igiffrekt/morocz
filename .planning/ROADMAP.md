@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [~] **Phase 1: Foundation** - Next.js 16 + Tailwind v4 + Motion architecture, deployed to Vercel *(in progress — 01-02 checkpoint pending)*
 - [x] **Phase 2: Content Architecture** - All Sanity schemas, TypeGen, GROQ queries — data layer complete *(completed 2026-02-19)*
 - [x] **Phase 3: Shell + Static Sections** - Header, Hero, Footer, and responsive baseline (completed 2026-02-19)
-- [ ] **Phase 4: Services + Lab Tests** - Animated category filter, lab tests section, CLS validated
+- [x] **Phase 4: Services + Lab Tests** - Animated category filter, lab tests section, CLS validated *(completed 2026-02-20)*
 - [ ] **Phase 5: Testimonials + Blog** - Carousel, blog listing, blog post pages with Portable Text
 - [ ] **Phase 6: SEO + Structured Data** - JSON-LD schemas, meta tags, GDPR compliance
 - [ ] **Phase 7: Animation Polish + Performance** - Intro sequence, scroll triggers, Core Web Vitals
@@ -85,12 +85,12 @@ Plans:
   3. Lab test cards show name, description, discount badge, discounted price, and struck-through original price on a dark navy background
   4. A PageSpeed Insights CLS audit on the services section scores below 0.1
   5. All service data, categories, lab tests, and their order are editable from Sanity Studio
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 
 Plans:
-- [ ] 04-01-PLAN.md -- Services filter section component (filter tabs + animated card grid)
-- [ ] 04-02-PLAN.md -- Lab tests section component (dark navy background + pastel cards)
-- [ ] 04-03-PLAN.md -- Page assembly (wire both sections into page.tsx + CMS seed + visual verification)
+- [x] 04-01-PLAN.md -- Services filter section component (filter tabs + animated card grid) *(completed 2026-02-19)*
+- [x] 04-02-PLAN.md -- Lab tests section component (dark navy background + pastel cards) *(completed 2026-02-19)*
+- [x] 04-03-PLAN.md -- Page assembly (wire both sections into page.tsx + CMS seed + visual verification) *(completed 2026-02-20)*
 
 ### Phase 5: Testimonials + Blog
 **Goal**: A visitor can read patient testimonials by sliding through the carousel and can browse blog posts by category — blog post detail pages render with full content and are statically generated
@@ -157,7 +157,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 1. Foundation | 1/2 | In progress | - |
 | 2. Content Architecture | 5/5 | Complete   | 2026-02-19 |
 | 3. Shell + Static Sections | 4/4 | Complete   | 2026-02-19 |
-| 4. Services + Lab Tests | 2/3 | In Progress|  |
+| 4. Services + Lab Tests | 3/3 | Complete   | 2026-02-20 |
 | 5. Testimonials + Blog | 0/TBD | Not started | - |
 | 6. SEO + Structured Data | 0/TBD | Not started | - |
 | 7. Animation Polish + Performance | 0/TBD | Not started | - |

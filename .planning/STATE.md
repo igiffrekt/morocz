@@ -41,6 +41,7 @@ Progress: [█████████░] ~92%
 | Phase 05 P04 | ~30min | 2 tasks | 7 files |
 | Phase 06 P01 | 3min | 2 tasks | 7 files |
 | Phase 06 P04 | 8 | 2 tasks | 3 files |
+| Phase 06 P03 | 8 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -110,6 +111,9 @@ Recent decisions affecting current work:
 - [Phase 06-seo-structured-data]: defaultOgImage in siteSettings is site-level fallback; ogImage in homepage allows page-specific override
 - [Phase 06-seo-structured-data]: SEO fields pattern for page schemas: metaDescription (text, rows:2) + ogImage (image) — reuse for future page types
 - [Phase 06]: CookieNotice initialized dismissed=true with useEffect localStorage check — prevents SSR hydration flash of cookie notice
+- [Phase 06]: JsonLd is a Server Component using dangerouslySetInnerHTML with biome-ignore — data is server-controlled JSON, no XSS risk
+- [Phase 06]: Clinic details (address, hours, physician name) hardcoded with PLACEHOLDER comments — per CONTEXT.md, not stored in CMS
+- [Phase 06]: BlogPosting author/publisher set to Organization (Morocz Medical) — solo practice clinic is the publisher
 
 ### Pending Todos
 

@@ -108,9 +108,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [ ] **SEO-01**: Semantic HTML throughout (proper heading hierarchy, landmarks, ARIA where needed)
 - [x] **SEO-02**: Meta tags and Open Graph tags on all pages, populated from Sanity
-- [ ] **SEO-03**: JSON-LD structured data: MedicalClinic, LocalBusiness, Physician on homepage
-- [ ] **SEO-04**: JSON-LD structured data: BreadcrumbList on blog posts
-- [ ] **SEO-05**: JSON-LD structured data: BlogPosting on each blog post
+- [x] **SEO-03**: JSON-LD structured data: MedicalClinic, LocalBusiness, Physician on homepage
+- [x] **SEO-04**: JSON-LD structured data: BreadcrumbList on blog posts
+- [x] **SEO-05**: JSON-LD structured data: BlogPosting on each blog post
 - [x] **SEO-06**: GDPR privacy policy page in Hungarian
 - [x] **SEO-07**: Cookie notice (informational, non-blocking — Vercel Analytics is cookie-free)
 - [ ] **SEO-08**: Core Web Vitals targets: LCP < 2.5s, CLS < 0.1, INP passing on mobile
@@ -244,9 +244,9 @@ Which phases cover which requirements. Verified during roadmap creation (2026-02
 | ANIM-07 | Phase 7 | Pending |
 | SEO-01 | Phase 6 | Pending |
 | SEO-02 | Phase 6 | Complete |
-| SEO-03 | Phase 6 | Pending |
-| SEO-04 | Phase 6 | Pending |
-| SEO-05 | Phase 6 | Pending |
+| SEO-03 | Phase 6 | Complete |
+| SEO-04 | Phase 6 | Complete |
+| SEO-05 | Phase 6 | Complete |
 | SEO-06 | Phase 6 | Complete |
 | SEO-07 | Phase 6 | Complete |
 | SEO-08 | Phase 6 | Pending |

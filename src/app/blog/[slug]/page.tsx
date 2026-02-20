@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PortableTextRenderer } from "@/components/blog/PortableTextRenderer";
 import { RelatedPosts } from "@/components/blog/RelatedPosts";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import { urlFor } from "@/sanity/lib/image";
 import {
@@ -11,8 +12,13 @@ import {
   blogPostBySlugQuery,
   latestBlogPostsQuery,
   relatedBlogPostsQuery,
+  siteSettingsQuery,
 } from "@/sanity/lib/queries";
-import type { BlogPostDetailResult, BlogPostQueryResult } from "../../../../sanity.types";
+import type {
+  BlogPostDetailResult,
+  BlogPostQueryResult,
+  SiteSettings,
+} from "../../../../sanity.types";
 
 // ─── Static Generation ────────────────────────────────────────────────────────
 
@@ -32,14 +38,48 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const post = await sanityFetch<BlogPostDetailResult | null>({
-    query: blogPostBySlugQuery,
-    params: { slug },
-    tags: ["blogPost"],
-  });
+  const [post, settings] = await Promise.all([
+    sanityFetch<BlogPostDetailResult | null>({
+      query: blogPostBySlugQuery,
+      params: { slug },
+      tags: ["blogPost"],
+    }),
+    sanityFetch<SiteSettings | null>({
+      query: siteSettingsQuery,
+      tags: ["siteSettings"],
+    }),
+  ]);
+
+  const title = post?.title ?? "Blog | Mórocz Medical";
+  const description = post?.metaDescription ?? post?.excerpt ?? undefined;
+
+  // OG image cascade: ogImage > featuredImage > defaultOgImage
+  const ogImageUrl =
+    post?.ogImage?.asset != null
+      ? urlFor(post.ogImage).width(1200).height(630).url()
+      : post?.featuredImage?.asset != null
+        ? urlFor(post.featuredImage).width(1200).height(630).url()
+        : settings?.defaultOgImage?.asset != null
+          ? urlFor(settings.defaultOgImage).width(1200).height(630).url()
+          : undefined;
+
   return {
-    title: post?.title ? `${post.title} | Morocz Medical Blog` : "Blog | Morocz Medical",
-    description: post?.metaDescription || post?.excerpt || undefined,
+    title,
+    description,
+    openGraph: {
+      type: "article",
+      title,
+      description,
+      locale: "hu_HU",
+      ...(post?.publishedAt ? { publishedTime: post.publishedAt } : {}),
+      ...(ogImageUrl ? { images: [{ url: ogImageUrl }] } : {}),
+    },
+    twitter: {
+      card: "summary_large_image",
+    },
+    alternates: {
+      canonical: `/blog/${slug}`,
+    },
   };
 }
 
@@ -77,6 +117,57 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   relatedPosts = relatedPosts.filter((p) => p._id !== post._id).slice(0, 3);
 
   const hasFeaturedImage = post.featuredImage?.asset != null;
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Kezdőlap",
+        item: "https://moroczmedical.hu",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Blog",
+        item: "https://moroczmedical.hu/#blog",
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: post.title,
+        item: `https://moroczmedical.hu/blog/${post.slug?.current}`,
+      },
+    ],
+  };
+
+  const blogPostingJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: post.title,
+    description: post.metaDescription ?? post.excerpt ?? undefined,
+    image: post.featuredImage?.asset
+      ? urlFor(post.featuredImage).width(1200).height(630).url()
+      : undefined,
+    datePublished: post.publishedAt ?? undefined,
+    inLanguage: "hu",
+    author: {
+      "@type": "Organization",
+      name: "Morocz Medical",
+      url: "https://moroczmedical.hu",
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "Morocz Medical",
+      url: "https://moroczmedical.hu",
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `https://moroczmedical.hu/blog/${post.slug?.current}`,
+    },
+  };
 
   return (
     <main className="max-w-3xl mx-auto px-4 py-8">
@@ -128,6 +219,8 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           <RelatedPosts posts={relatedPosts} />
         </>
       )}
+      <JsonLd data={breadcrumbJsonLd} />
+      <JsonLd data={blogPostingJsonLd} />
     </main>
   );
 }

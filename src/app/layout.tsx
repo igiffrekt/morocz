@@ -4,15 +4,58 @@ import { Header } from "@/components/layout/Header";
 import { MotionProvider } from "@/components/motion/MotionProvider";
 import { plusJakartaSans } from "@/lib/fonts";
 import { sanityFetch } from "@/sanity/lib/fetch";
+import { urlFor } from "@/sanity/lib/image";
 import { siteSettingsQuery } from "@/sanity/lib/queries";
 import type { SiteSettings } from "../../sanity.types";
 import "./globals.css";
 
-export const metadata: Metadata = {
-  title: "Mórocz Medical",
-  description:
-    "Mórocz Medical — Egészségügyi szolgáltatások Esztergomban. Foglaljon időpontot online.",
-};
+// ─── Dynamic Root Metadata ────────────────────────────────────────────────────
+
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await sanityFetch<SiteSettings | null>({
+    query: siteSettingsQuery,
+    tags: ["siteSettings"],
+  });
+
+  const siteName = settings?.siteName ?? settings?.clinicName ?? "Mórocz Medical";
+  const description =
+    settings?.metaDescription ??
+    "Mórocz Medical — Egészségügyi szolgáltatások Esztergomban. Foglaljon időpontot online.";
+
+  const ogImages =
+    settings?.defaultOgImage?.asset != null
+      ? [{ url: urlFor(settings.defaultOgImage).width(1200).height(630).url() }]
+      : undefined;
+
+  return {
+    metadataBase: new URL("https://moroczmedical.hu"),
+    title: {
+      default: siteName,
+      template: `%s | ${siteName}`,
+    },
+    description,
+    openGraph: {
+      type: "website",
+      locale: "hu_HU",
+      siteName,
+      title: siteName,
+      description,
+      ...(ogImages ? { images: ogImages } : {}),
+    },
+    twitter: {
+      card: "summary_large_image",
+    },
+    alternates: {
+      canonical: "/",
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
+  };
+}
+
+// ─── Root Layout ──────────────────────────────────────────────────────────────
 
 export default async function RootLayout({
   children,

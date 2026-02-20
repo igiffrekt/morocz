@@ -69,10 +69,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Testimonials Section
 
-- [ ] **TEST-01**: Testimonial carousel with dot navigation
-- [ ] **TEST-02**: Smooth horizontal slide between testimonials
-- [ ] **TEST-03**: Each testimonial shows name, optional photo, and review text
-- [ ] **TEST-04**: Keyboard accessible carousel navigation
+- [x] **TEST-01**: Testimonial carousel with dot navigation
+- [x] **TEST-02**: Smooth horizontal slide between testimonials
+- [x] **TEST-03**: Each testimonial shows name, optional photo, and review text
+- [x] **TEST-04**: Keyboard accessible carousel navigation
 - [x] **TEST-05**: All testimonials editable from Sanity
 
 ### Blog Section
@@ -217,10 +217,10 @@ Which phases cover which requirements. Verified during roadmap creation (2026-02
 | LAB-03 | Phase 4 | Complete |
 | LAB-04 | Phase 4 | Complete |
 | LAB-05 | Phase 4 | Complete |
-| TEST-01 | Phase 5 | Pending |
-| TEST-02 | Phase 5 | Pending |
-| TEST-03 | Phase 5 | Pending |
-| TEST-04 | Phase 5 | Pending |
+| TEST-01 | Phase 5 | Complete |
+| TEST-02 | Phase 5 | Complete |
+| TEST-03 | Phase 5 | Complete |
+| TEST-04 | Phase 5 | Complete |
 | TEST-05 | Phase 5 | Complete |
 | BLOG-01 | Phase 5 | Pending |
 | BLOG-02 | Phase 5 | Pending |

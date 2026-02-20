@@ -73,7 +73,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **TEST-02**: Smooth horizontal slide between testimonials
 - [ ] **TEST-03**: Each testimonial shows name, optional photo, and review text
 - [ ] **TEST-04**: Keyboard accessible carousel navigation
-- [ ] **TEST-05**: All testimonials editable from Sanity
+- [x] **TEST-05**: All testimonials editable from Sanity
 
 ### Blog Section
 
@@ -83,7 +83,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **BLOG-04**: Blog post detail page with Portable Text rendering
 - [ ] **BLOG-05**: Blog post slug-based routing (`/blog/[slug]`)
 - [ ] **BLOG-06**: Static generation with `generateStaticParams` for blog posts
-- [ ] **BLOG-07**: All blog content manageable from Sanity
+- [x] **BLOG-07**: All blog content manageable from Sanity
 
 ### Footer
 
@@ -221,14 +221,14 @@ Which phases cover which requirements. Verified during roadmap creation (2026-02
 | TEST-02 | Phase 5 | Pending |
 | TEST-03 | Phase 5 | Pending |
 | TEST-04 | Phase 5 | Pending |
-| TEST-05 | Phase 5 | Pending |
+| TEST-05 | Phase 5 | Complete |
 | BLOG-01 | Phase 5 | Pending |
 | BLOG-02 | Phase 5 | Pending |
 | BLOG-03 | Phase 5 | Pending |
 | BLOG-04 | Phase 5 | Pending |
 | BLOG-05 | Phase 5 | Pending |
 | BLOG-06 | Phase 5 | Pending |
-| BLOG-07 | Phase 5 | Pending |
+| BLOG-07 | Phase 5 | Complete |
 | FOOT-01 | Phase 3 | Complete |
 | FOOT-02 | Phase 3 | Complete |
 | FOOT-03 | Phase 3 | Complete |
@@ -267,4 +267,4 @@ Which phases cover which requirements. Verified during roadmap creation (2026-02
 
 ---
 *Requirements defined: 2026-02-18*
-*Last updated: 2026-02-18 — traceability verified during roadmap creation*
+*Last updated: 2026-02-20 — TEST-05 and BLOG-07 marked complete after Phase 5 Plan 01*

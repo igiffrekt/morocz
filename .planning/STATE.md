@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Patients can discover Morocz Medical's services and book an appointment through a beautifully animated, fast, SEO-optimized website where every piece of content is manageable from Sanity CMS.
-**Current focus:** Phase 4 complete — ready for Phase 5 (Testimonials + Blog)
+**Current focus:** Phase 5 in progress — data layer complete, building UI components
 
 ## Current Position
 
-Phase: 4 of 8 (Services + Lab Tests) — COMPLETE
-Plan: 3 of 3 in current phase (all plans complete)
-Status: Complete — ServicesSection, LabTestsSection, and page assembly all done
-Last activity: 2026-02-20 — Phase 4 complete (visual checkpoint approved, all sections wired to Sanity)
+Phase: 5 of 8 (Testimonials + Blog) — IN PROGRESS
+Plan: 1 of 4 in current phase (plan 01 complete)
+Status: In Progress — data layer (schema, queries, types) complete; UI components pending
+Last activity: 2026-02-20 — Phase 5 Plan 01 complete (homepage schema fields, GROQ queries, TypeScript types)
 
-Progress: [████████░░] ~82%
+Progress: [████████░░] ~85%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 14 (01-01, 01-02, 02-01..02-05, 03-01..03-04, 04-01..04-03)
+- Total plans completed: 15 (01-01, 01-02, 02-01..02-05, 03-01..03-04, 04-01..04-03, 05-01)
 - Average duration: 8 min
-- Total execution time: ~1.5 hours
+- Total execution time: ~1.6 hours
 
 **By Phase:**
 
@@ -31,9 +31,10 @@ Progress: [████████░░] ~82%
 | 02-content-architecture | 5 | 38 min | 8 min |
 | 03-shell-static-sections | 4 | 19 min | 5 min |
 | 04-services-lab-tests | 3 | 22 min | 7 min |
+| 05-testimonials-blog | 1 | 8 min | 8 min |
 
 **Recent Trend:**
-- Last 5 plans: 03-03 (4min), 03-04 (10min), 04-01 (2min), 04-02 (8min), 04-03 (12min)
+- Last 5 plans: 03-04 (10min), 04-01 (2min), 04-02 (8min), 04-03 (12min), 05-01 (8min)
 - Trend: Steady — visual verification checkpoints add time but catch issues early
 
 *Updated after each plan completion*
@@ -88,6 +89,9 @@ Recent decisions affecting current work:
 - [Phase 04-services-lab-tests]: Promise.all used for 5 parallel Sanity queries in page.tsx (homepage, settings, categories, services, labTests)
 - [Phase 04-services-lab-tests]: Design token primary color tuned to #242a5f; card palette adjusted for better visual contrast
 - [Phase 04-services-lab-tests]: Hungarian diacriticals added to all Sanity schema titles/descriptions (Kezdolap → Kezdőlap, etc.)
+- [Phase 05-testimonials-blog]: latestBlogPostsQuery projects no category field — per CONTEXT.md, no category tags on homepage blog cards
+- [Phase 05-testimonials-blog]: relatedBlogPostsQuery caller falls back to latestBlogPostsQuery when category is null (documented in code comment)
+- [Phase 05-testimonials-blog]: BlogPostDetailResult typed separately from BlogPost document type to reflect dereferenced category object shape
 
 ### Pending Todos
 
@@ -102,5 +106,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Phase 4 complete — ready for Phase 5 planning
-Resume file: .planning/phases/04-services-lab-tests/04-03-SUMMARY.md
+Stopped at: Completed 05-01-PLAN.md (data layer for testimonials + blog)
+Resume file: .planning/phases/05-testimonials-blog/05-01-SUMMARY.md

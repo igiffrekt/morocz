@@ -2,12 +2,12 @@ import { defineField, defineType } from "sanity";
 
 export const serviceCategoryType = defineType({
   name: "serviceCategory",
-  title: "Szolgaltatas kategoria",
+  title: "Szolgáltatás kategória",
   type: "document",
   fields: [
     defineField({
       name: "name",
-      title: "Kategoria neve",
+      title: "Kategória neve",
       type: "string",
       validation: (rule) => rule.required(),
     }),
@@ -15,13 +15,13 @@ export const serviceCategoryType = defineType({
       name: "emoji",
       title: "Emoji/ikon",
       type: "string",
-      description: 'Emoji karakter a szuro gombhoz, pl. "\ud83c\udfe5"',
+      description: 'Emoji karakter a szűrő gombhoz, pl. "🏥"',
     }),
     defineField({
       name: "order",
       title: "Sorrend",
       type: "number",
-      description: "Kisebb szam = elobb jelenik meg",
+      description: "Kisebb szám = előbb jelenik meg",
     }),
   ],
   preview: {

@@ -4,44 +4,44 @@ export const structure: StructureResolver = (S) =>
   S.list()
     .title("Tartalom")
     .items([
-      // Kezdolap (Homepage singleton)
+      // Kezdőlap (Homepage singleton)
       S.listItem()
-        .title("Kezdolap")
+        .title("Kezdőlap")
         .child(
-          S.document().schemaType("homepage").documentId("homepage").title("Kezdolap szerkesztese"),
+          S.document().schemaType("homepage").documentId("homepage").title("Kezdőlap szerkesztése"),
         ),
 
       S.divider(),
 
-      // Szolgaltatasok group
+      // Szolgáltatások group
       S.listItem()
-        .title("Szolgaltatasok")
+        .title("Szolgáltatások")
         .child(
           S.list()
-            .title("Szolgaltatasok")
+            .title("Szolgáltatások")
             .items([
               S.listItem()
-                .title("Szolgaltatasok")
+                .title("Szolgáltatások")
                 .schemaType("service")
-                .child(S.documentTypeList("service").title("Szolgaltatasok")),
+                .child(S.documentTypeList("service").title("Szolgáltatások")),
               S.listItem()
-                .title("Kategoriak")
+                .title("Kategóriák")
                 .schemaType("serviceCategory")
-                .child(S.documentTypeList("serviceCategory").title("Kategoriak")),
+                .child(S.documentTypeList("serviceCategory").title("Kategóriák")),
               S.listItem()
-                .title("Laborvizsgalatok")
+                .title("Laborvizsgálatok")
                 .schemaType("labTest")
-                .child(S.documentTypeList("labTest").title("Laborvizsgalatok")),
+                .child(S.documentTypeList("labTest").title("Laborvizsgálatok")),
             ]),
         ),
 
       S.divider(),
 
-      // Velemenyek (Testimonials — standalone)
+      // Vélemények (Testimonials — standalone)
       S.listItem()
-        .title("Velemenyek")
+        .title("Vélemények")
         .schemaType("testimonial")
-        .child(S.documentTypeList("testimonial").title("Velemenyek")),
+        .child(S.documentTypeList("testimonial").title("Vélemények")),
 
       S.divider(),
 
@@ -53,25 +53,25 @@ export const structure: StructureResolver = (S) =>
             .title("Blog")
             .items([
               S.listItem()
-                .title("Blog bejegyzesek")
+                .title("Blog bejegyzések")
                 .schemaType("blogPost")
-                .child(S.documentTypeList("blogPost").title("Blog bejegyzesek")),
+                .child(S.documentTypeList("blogPost").title("Blog bejegyzések")),
               S.listItem()
-                .title("Blog kategoriak")
+                .title("Blog kategóriák")
                 .schemaType("blogCategory")
-                .child(S.documentTypeList("blogCategory").title("Blog kategoriak")),
+                .child(S.documentTypeList("blogCategory").title("Blog kategóriák")),
             ]),
         ),
 
       S.divider(),
 
-      // Beallitasok (SiteSettings singleton)
+      // Beállítások (SiteSettings singleton)
       S.listItem()
-        .title("Beallitasok")
+        .title("Beállítások")
         .child(
           S.document()
             .schemaType("siteSettings")
             .documentId("siteSettings")
-            .title("Weboldal beallitasok"),
+            .title("Weboldal beállítások"),
         ),
     ]);

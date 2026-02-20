@@ -9,9 +9,9 @@ import type { SiteSettings } from "../../sanity.types";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Morocz Medical",
+  title: "Mórocz Medical",
   description:
-    "Morocz Medical — Egészségügyi szolgáltatások Esztergomban. Foglaljon időpontot online.",
+    "Mórocz Medical — Egészségügyi szolgáltatások Esztergomban. Foglaljon időpontot online.",
 };
 
 export default async function RootLayout({
@@ -28,7 +28,7 @@ export default async function RootLayout({
     <html lang="hu" className={plusJakartaSans.variable}>
       <body>
         <MotionProvider>
-          <div className="max-w-[88rem] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+          <div className="max-w-[88rem] mx-auto px-2 sm:px-3 lg:px-4 py-3 space-y-3">
             <Header
               logo={settings?.logo}
               clinicName={settings?.clinicName}
@@ -36,7 +36,7 @@ export default async function RootLayout({
               phone={settings?.phone}
               address={settings?.address}
             />
-            <main className="space-y-6">{children}</main>
+            <main className="space-y-3">{children}</main>
             <Footer
               logo={settings?.logo}
               clinicName={settings?.clinicName}

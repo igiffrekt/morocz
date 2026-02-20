@@ -2,40 +2,40 @@ import { defineField, defineType } from "sanity";
 
 export const siteSettingsType = defineType({
   name: "siteSettings",
-  title: "Beallitasok",
+  title: "Beállítások",
   type: "document",
   fields: [
     defineField({
       name: "logo",
-      title: "Logo",
+      title: "Logó",
       type: "image",
       validation: (rule) => rule.required(),
     }),
     defineField({
       name: "clinicName",
-      title: "Rendelo neve",
+      title: "Rendelő neve",
       type: "string",
       validation: (rule) => rule.required(),
     }),
     defineField({
       name: "phone",
-      title: "Telefonszam",
+      title: "Telefonszám",
       type: "string",
     }),
     defineField({
       name: "email",
-      title: "Email cim",
+      title: "Email cím",
       type: "string",
     }),
     defineField({
       name: "address",
-      title: "Cim",
+      title: "Cím",
       type: "text",
       rows: 2,
     }),
     defineField({
       name: "navigationLinks",
-      title: "Navigacios linkek",
+      title: "Navigációs linkek",
       type: "array",
       of: [
         {
@@ -65,7 +65,7 @@ export const siteSettingsType = defineType({
     }),
     defineField({
       name: "socialLinks",
-      title: "Kozossegi media linkek",
+      title: "Közösségi média linkek",
       type: "array",
       of: [
         {
@@ -102,7 +102,7 @@ export const siteSettingsType = defineType({
     }),
     defineField({
       name: "footerColumns",
-      title: "Lablec oszlopok",
+      title: "Lábléc oszlopok",
       type: "array",
       of: [
         {
@@ -110,7 +110,7 @@ export const siteSettingsType = defineType({
           fields: [
             defineField({
               name: "heading",
-              title: "Oszlop cim",
+              title: "Oszlop cím",
               type: "string",
             }),
             defineField({
@@ -152,21 +152,21 @@ export const siteSettingsType = defineType({
     }),
     defineField({
       name: "privacyPolicyUrl",
-      title: "Adatvedelmi iranyelv URL",
+      title: "Adatvédelmi irányelv URL",
       type: "string",
     }),
     defineField({
       name: "metaDescription",
-      title: "Meta leiras",
+      title: "Meta leírás",
       type: "text",
-      description: "Alapertelmezett meta leiras az oldalhoz",
+      description: "Alapértelmezett meta leírás az oldalhoz",
       rows: 3,
     }),
   ],
   preview: {
     prepare() {
       return {
-        title: "Weboldal beallitasok",
+        title: "Weboldal beállítások",
       };
     },
   },

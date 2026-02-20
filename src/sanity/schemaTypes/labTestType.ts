@@ -2,42 +2,42 @@ import { defineField, defineType } from "sanity";
 
 export const labTestType = defineType({
   name: "labTest",
-  title: "Laborvizsgalat",
+  title: "Laborvizsgálat",
   type: "document",
   fields: [
     defineField({
       name: "name",
-      title: "Vizsgalat neve",
+      title: "Vizsgálat neve",
       type: "string",
       validation: (rule) => rule.required(),
     }),
     defineField({
       name: "description",
-      title: "Leiras",
+      title: "Leírás",
       type: "text",
       rows: 3,
     }),
     defineField({
       name: "price",
-      title: "Kedvezmenyes ar (Ft)",
+      title: "Kedvezményes ár (Ft)",
       type: "number",
-      description: "Az aktualis ar forintban",
+      description: "Az aktuális ár forintban",
     }),
     defineField({
       name: "originalPrice",
-      title: "Eredeti ar (Ft)",
+      title: "Eredeti ár (Ft)",
       type: "number",
-      description: "A kedvezmeny elotti ar — athuzva jelenik meg",
+      description: "A kedvezmény előtti ár — áthúzva jelenik meg",
     }),
     defineField({
       name: "discount",
-      title: "Kedvezmeny (%)",
+      title: "Kedvezmény (%)",
       type: "number",
-      description: "Kedvezmeny szazalekban, pl. 80",
+      description: "Kedvezmény százalékban, pl. 80",
     }),
     defineField({
       name: "illustration",
-      title: "Illusztracio",
+      title: "Illusztráció",
       type: "image",
       options: {
         hotspot: true,
@@ -58,7 +58,7 @@ export const labTestType = defineType({
     prepare({ title, price, media }) {
       return {
         title,
-        subtitle: price != null ? `${price} Ft` : "Ar nincs beallitva",
+        subtitle: price != null ? `${price} Ft` : "Ár nincs beállítva",
         media,
       };
     },

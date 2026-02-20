@@ -2,24 +2,24 @@ import { defineField, defineType } from "sanity";
 
 export const serviceType = defineType({
   name: "service",
-  title: "Szolgaltatas",
+  title: "Szolgáltatás",
   type: "document",
   fields: [
     defineField({
       name: "name",
-      title: "Szolgaltatas neve",
+      title: "Szolgáltatás neve",
       type: "string",
       validation: (rule) => rule.required(),
     }),
     defineField({
       name: "description",
-      title: "Leiras",
+      title: "Leírás",
       type: "text",
       rows: 3,
     }),
     defineField({
       name: "icon",
-      title: "Ikon/kep",
+      title: "Ikon/kép",
       type: "image",
       options: {
         hotspot: true,
@@ -27,7 +27,7 @@ export const serviceType = defineType({
     }),
     defineField({
       name: "category",
-      title: "Kategoria",
+      title: "Kategória",
       type: "reference",
       to: [{ type: "serviceCategory" }],
     }),
@@ -35,7 +35,7 @@ export const serviceType = defineType({
       name: "order",
       title: "Sorrend",
       type: "number",
-      description: "Kisebb szam = elobb jelenik meg",
+      description: "Kisebb szám = előbb jelenik meg",
     }),
   ],
   preview: {
@@ -47,7 +47,7 @@ export const serviceType = defineType({
     prepare({ title, subtitle, media }) {
       return {
         title,
-        subtitle: subtitle ? `Kategoria: ${subtitle}` : "Kategoria nincs beallitva",
+        subtitle: subtitle ? `Kategória: ${subtitle}` : "Kategória nincs beállítva",
         media,
       };
     },

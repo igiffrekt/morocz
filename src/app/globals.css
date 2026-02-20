@@ -5,13 +5,13 @@
   --font-sans: var(--font-plus-jakarta-sans), "Plus Jakarta Sans", sans-serif;
 
   /* Colors — from template tailwind.config */
-  --color-primary: #23264F;
+  --color-primary: #242a5f;
   --color-secondary: #F4DCD6;
   --color-accent: #99CEB7;
-  --color-yellow-card: #FAE988;
-  --color-green-card: #A8DABC;
-  --color-purple-card: #EABDE6;
-  --color-blue-card: #8FB8FF;
+  --color-yellow-card: #efda67;
+  --color-green-card: #a3dac2;
+  --color-purple-card: #e7c1d3;
+  --color-blue-card: #91bcf5;
   --color-background-light: #F2F4F8;
   --color-surface-white: #FFFFFF;
   --color-text-light: #1A1D2D;

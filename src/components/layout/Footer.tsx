@@ -26,7 +26,7 @@ export default function Footer({
   socialLinks,
   privacyPolicyUrl,
 }: FooterProps) {
-  const displayName = clinicName ?? "Morocz Medical";
+  const displayName = clinicName ?? "Mórocz Medical";
 
   // Filter to only social links with both platform and url defined
   const activeSocials = (socialLinks ?? []).filter(

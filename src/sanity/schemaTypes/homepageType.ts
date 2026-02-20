@@ -2,29 +2,29 @@ import { defineField, defineType } from "sanity";
 
 export const homepageType = defineType({
   name: "homepage",
-  title: "Kezdolap",
+  title: "Kezdőlap",
   type: "document",
   fields: [
     // Hero section
     defineField({
       name: "heroHeadline",
-      title: "Fo cim",
+      title: "Fő cím",
       type: "string",
-      description: "A hero resz nagy cimsora",
+      description: "A hero rész nagy címsora",
       validation: (rule) => rule.required().max(100),
     }),
     defineField({
       name: "heroSubtitle",
-      title: "Alcim",
+      title: "Alcím",
       type: "text",
-      description: "A fo cim alatti leiro szoveg",
+      description: "A fő cím alatti leíró szöveg",
       rows: 3,
     }),
     defineField({
       name: "heroBadges",
-      title: "Hero jelvenyek",
+      title: "Hero jelvények",
       type: "array",
-      description: "Statisztikak es elismeresek a hero reszben (max 3)",
+      description: "Statisztikák és elismerések a hero részben (max 3)",
       of: [
         {
           type: "object",
@@ -37,7 +37,7 @@ export const homepageType = defineType({
             }),
             defineField({
               name: "text",
-              title: "Szoveg",
+              title: "Szöveg",
               type: "string",
               validation: (rule) => rule.required(),
             }),
@@ -54,7 +54,7 @@ export const homepageType = defineType({
     }),
     defineField({
       name: "heroDoctorImage",
-      title: "Orvos kep",
+      title: "Orvos kép",
       type: "image",
       options: {
         hotspot: true,
@@ -62,22 +62,22 @@ export const homepageType = defineType({
     }),
     defineField({
       name: "heroCards",
-      title: "Szolgaltatas kartyak",
+      title: "Szolgáltatás kártyák",
       type: "array",
-      description: "Maximum 4 karta a hero reszben (szinek a kodban rogzitettek)",
+      description: "Maximum 4 kártya a hero részben (színek a kódban rögzítettek)",
       of: [
         {
           type: "object",
           fields: [
             defineField({
               name: "title",
-              title: "Cim",
+              title: "Cím",
               type: "string",
               validation: (rule) => rule.required(),
             }),
             defineField({
               name: "subtitle",
-              title: "Alcim",
+              title: "Alcím",
               type: "string",
             }),
             defineField({
@@ -101,12 +101,12 @@ export const homepageType = defineType({
     // Services highlight section
     defineField({
       name: "servicesHeadline",
-      title: "Szolgaltatasok cim",
+      title: "Szolgáltatások cím",
       type: "string",
     }),
     defineField({
       name: "servicesSubtitle",
-      title: "Szolgaltatasok leiras",
+      title: "Szolgáltatások leírás",
       type: "text",
       rows: 3,
     }),
@@ -114,12 +114,12 @@ export const homepageType = defineType({
     // Lab tests highlight section
     defineField({
       name: "labTestsHeadline",
-      title: "Laborvizsgalatok cim",
+      title: "Laborvizsgálatok cím",
       type: "string",
     }),
     defineField({
       name: "labTestsSubtitle",
-      title: "Laborvizsgalatok leiras",
+      title: "Laborvizsgálatok leírás",
       type: "text",
       rows: 3,
     }),
@@ -127,12 +127,12 @@ export const homepageType = defineType({
     // CTA section
     defineField({
       name: "ctaHeadline",
-      title: "CTA cim",
+      title: "CTA cím",
       type: "string",
     }),
     defineField({
       name: "ctaDescription",
-      title: "CTA leiras",
+      title: "CTA leírás",
       type: "text",
       rows: 3,
     }),
@@ -140,7 +140,7 @@ export const homepageType = defineType({
   preview: {
     prepare() {
       return {
-        title: "Kezdolap",
+        title: "Kezdőlap",
       };
     },
   },

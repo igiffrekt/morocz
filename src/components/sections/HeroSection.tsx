@@ -20,96 +20,70 @@ export function HeroSection({ headline, subtitle, badges, doctorImage, phone }: 
     ? urlFor(doctorImage).width(600).height(700).fit("crop").url()
     : null;
 
-  // Split badges into left and right groups for floating positioning
-  const leftBadges = badges?.slice(0, 1) ?? [];
-  const rightBadges = badges?.slice(1, 2) ?? [];
+  const leftBadge = badges?.[0];
+  const rightBadge = badges?.[1];
 
   return (
-    <section className="relative bg-primary rounded-[2rem] overflow-hidden text-white pt-16 px-8 lg:px-16 min-h-[560px] flex flex-col justify-between">
+    <section className="relative bg-primary rounded-[2.5rem] overflow-hidden text-white px-8 lg:px-16 min-h-[560px] flex flex-col justify-between">
       {/* Subtle texture overlay */}
       <div className="absolute inset-0 opacity-10 pointer-events-none bg-[radial-gradient(circle_at_25%_25%,rgba(255,255,255,0.1)_1px,transparent_1px)] bg-[length:24px_24px]" />
 
-      {/* Top: massive centered headline */}
-      <div className="relative z-10 w-full text-center mb-4">
-        <HeroHeadline text={headline ?? "Egészség"} />
+      {/* Headline — upper area, BEHIND doctor (no z-index = below z-10 content) */}
+      <div className="absolute inset-x-0 top-0 flex items-start justify-center pointer-events-none px-8 pt-8 lg:pt-12">
+        <HeroHeadline text={headline ?? "Mórocz Medical"} />
       </div>
 
-      {/* Floating badges — left side */}
-      {leftBadges.map((badge) => (
+      {/* Left badge — pink icon circle + text, no pill */}
+      {leftBadge && (
         <motion.div
-          key={badge._key}
           initial={{ opacity: 0, x: -30 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, delay: 0.8, type: "spring", bounce: 0.3 }}
-          className="absolute top-48 left-[10%] hidden lg:flex items-center gap-3 bg-white/10 backdrop-blur-md px-5 py-3 rounded-full border border-white/10 shadow-lg"
+          className="absolute bottom-[38%] left-[12%] xl:left-[18%] hidden lg:flex items-center gap-3 z-10"
         >
-          {badge.emoji && (
-            <div className="bg-secondary/20 p-1.5 rounded-full">
-              <span className="text-pink-200">{badge.emoji}</span>
+          {leftBadge.emoji && (
+            <div className="bg-purple-card w-10 h-10 rounded-full flex items-center justify-center">
+              <span className="text-lg">{leftBadge.emoji}</span>
             </div>
           )}
-          <span className="text-sm font-medium">{badge.text}</span>
+          <span className="text-lg font-light text-white">{leftBadge.text}</span>
         </motion.div>
-      ))}
+      )}
 
-      {/* Floating badges — right side */}
-      {rightBadges.map((badge) => (
+      {/* Right badge — green icon circle + text, no pill */}
+      {rightBadge && (
         <motion.div
-          key={badge._key}
           initial={{ opacity: 0, x: 30 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, delay: 1.0, type: "spring", bounce: 0.3 }}
-          className="absolute top-48 right-[10%] hidden lg:flex items-center gap-3 bg-white/10 backdrop-blur-md px-5 py-3 rounded-full border border-white/10 shadow-lg"
+          className="absolute bottom-[38%] right-[12%] xl:right-[18%] hidden lg:flex items-center gap-3 z-10"
         >
-          {badge.emoji && (
-            <div className="bg-accent/20 p-1.5 rounded-full">
-              <span className="text-green-200">{badge.emoji}</span>
+          {rightBadge.emoji && (
+            <div className="bg-green-card w-10 h-10 rounded-full flex items-center justify-center">
+              <span className="text-lg">{rightBadge.emoji}</span>
             </div>
           )}
-          <span className="text-sm font-medium">{badge.text}</span>
+          <span className="text-lg font-light text-white">{rightBadge.text}</span>
         </motion.div>
-      ))}
-
-      {/* Any extra badges (3rd+) float further down */}
-      {badges?.slice(2).map((badge, i) => (
-        <motion.div
-          key={badge._key}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 1.2 + i * 0.2 }}
-          className="absolute hidden lg:flex items-center gap-3 bg-white/10 backdrop-blur-md px-5 py-3 rounded-full border border-white/10 shadow-lg"
-          style={{
-            top: `${320 + i * 60}px`,
-            left: i % 2 === 0 ? "8%" : undefined,
-            right: i % 2 === 1 ? "8%" : undefined,
-          }}
-        >
-          {badge.emoji && (
-            <div className="bg-white/20 p-1.5 rounded-full">
-              <span>{badge.emoji}</span>
-            </div>
-          )}
-          <span className="text-sm font-medium">{badge.text}</span>
-        </motion.div>
-      ))}
+      )}
 
       {/* Bottom layout: 3-column flex — description | doctor image | CTA */}
       <div className="w-full flex flex-col md:flex-row items-end justify-between relative z-10 mt-auto">
         {/* Bottom-left: description text */}
         <FadeIn direction="up" delay={0.6}>
-          <div className="md:w-full mb-16 text-sm text-gray-300 font-medium max-w-xs leading-relaxed hidden md:block">
+          <div className="md:w-full mb-16 text-base text-gray-300 font-semibold max-w-xs leading-relaxed hidden md:block uppercase tracking-wide">
             {subtitle ??
-              "Professzionális egészségügyi szolgáltatások, személyre szabott kezelési tervek és gondoskodó orvosi ellátás."}
+              "MODERN NŐGYÓGYÁSZATI ELLÁTÁS ESZTERGOMBAN. FOGLALJON IDŐPONTOT PERCEK ALATT!"}
           </div>
         </FadeIn>
 
-        {/* Bottom-center: doctor image */}
+        {/* Bottom-center: doctor image — in FRONT of headline */}
         <div className="md:w-1/3 flex justify-center relative">
           <FadeIn direction="up" delay={0.4}>
             {doctorImageUrl ? (
               <Image
                 src={doctorImageUrl}
-                alt="Dr. Morocz"
+                alt="Dr. Mórocz"
                 className="h-96 md:h-[480px] object-cover object-top drop-shadow-2xl"
                 width={400}
                 height={480}
@@ -127,12 +101,12 @@ export function HeroSection({ headline, subtitle, badges, doctorImage, phone }: 
           <div className="md:w-full flex justify-end mb-16 w-full md:w-auto">
             <a
               href={phone ? `tel:${phone}` : "#kapcsolat"}
-              className="group flex items-center gap-4 bg-secondary text-primary pl-8 pr-2 py-2 rounded-full font-bold text-sm hover:scale-105 transition-transform shadow-lg shadow-secondary/20"
+              className="group relative inline-flex items-center"
             >
-              Foglaljon időpontot
-              <span className="w-10 h-10 flex items-center justify-center bg-primary text-white rounded-full group-hover:bg-primary/90 transition-colors">
+              {/* Left circle — hidden by default, scales in on hover */}
+              <span className="absolute left-0 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-[#e1bbcd] text-primary rounded-full scale-0 group-hover:scale-100 transition-transform duration-500 ease-[cubic-bezier(0.25,0.46,0.45,0.94)]">
                 <svg
-                  className="w-4 h-4"
+                  className="w-5 h-5"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -141,8 +115,29 @@ export function HeroSection({ headline, subtitle, badges, doctorImage, phone }: 
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17 8l4 4m0 0l-4 4m4-4H3"
+                    strokeWidth={2.5}
+                    d="M5 12h14m0 0l-5-5m5 5l-5 5"
+                  />
+                </svg>
+              </span>
+              {/* Pill — slides right on hover */}
+              <span className="inline-flex items-center h-12 rounded-full bg-[#e1bbcd] text-primary px-7 font-bold text-sm whitespace-nowrap transition-transform duration-500 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] group-hover:translate-x-12">
+                Foglaljon időpontot
+              </span>
+              {/* Right circle — scales out to 0 on hover */}
+              <span className="w-12 h-12 flex items-center justify-center bg-[#e1bbcd] text-primary rounded-full shrink-0 transition-transform duration-500 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] group-hover:scale-0">
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2.5}
+                    d="M5 12h14m0 0l-5-5m5 5l-5 5"
                   />
                 </svg>
               </span>

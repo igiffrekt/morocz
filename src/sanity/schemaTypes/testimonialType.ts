@@ -2,37 +2,37 @@ import { defineField, defineType } from "sanity";
 
 export const testimonialType = defineType({
   name: "testimonial",
-  title: "Velemenyek",
+  title: "Vélemények",
   type: "document",
   fields: [
     defineField({
       name: "patientName",
-      title: "Paciens neve",
+      title: "Páciens neve",
       type: "string",
       validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: "photo",
-      title: "Fenykep",
+      title: "Fénykép",
       type: "image",
-      description: "A paciens fotoja (opcionalis)",
+      description: "A páciens fotója (opcionális)",
       options: {
         hotspot: true,
       },
     }),
     defineField({
       name: "text",
-      title: "Velemenye",
+      title: "Véleménye",
       type: "text",
       rows: 4,
-      description: "A paciens velemenye, tapasztalata",
+      description: "A páciens véleménye, tapasztalata",
       validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: "condition",
-      title: "Kontextus/allapot",
+      title: "Kontextus/állapot",
       type: "string",
-      description: 'Milyen problemaban segitettunk, pl. "Cukorbetegseg kezeles"',
+      description: 'Milyen problémában segítettünk, pl. "Cukorbetegség kezelés"',
     }),
     defineField({
       name: "order",

@@ -29,12 +29,12 @@ export function Header({ logo, clinicName, navigationLinks, phone, address }: He
   }, []);
 
   const logoUrl = logo ? urlFor(logo).width(140).url() : null;
-  const displayName = clinicName ?? "Morocz Medical";
+  const displayName = clinicName ?? "Mórocz Medical";
 
   return (
     <header
       className={[
-        "sticky top-0 z-50 w-full bg-surface-white rounded-3xl flex items-center justify-between transition-all duration-300",
+        "sticky top-0 z-50 w-full bg-background-light rounded-3xl flex items-center justify-between transition-all duration-300",
         scrolled ? "px-6 py-3 shadow-md" : "px-8 py-5 shadow-sm",
       ].join(" ")}
     >
@@ -103,7 +103,7 @@ export function Header({ logo, clinicName, navigationLinks, phone, address }: He
       <div className="hidden md:block">
         <a
           href={phone ? `tel:${phone}` : "#kapcsolat"}
-          className="flex items-center gap-2 px-6 py-2.5 rounded-full border border-gray-200 hover:bg-gray-50 transition-colors text-sm font-bold text-primary"
+          className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#a3dac2] hover:bg-[#8fcdb3] transition-colors text-sm font-bold text-primary"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
             <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />

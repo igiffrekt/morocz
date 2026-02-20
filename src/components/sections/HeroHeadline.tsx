@@ -30,7 +30,7 @@ export function HeroHeadline({ text }: HeroHeadlineProps) {
       variants={container}
       initial="hidden"
       animate="visible"
-      className="text-6xl md:text-8xl lg:text-[10rem] font-extrabold tracking-tighter text-white/95 leading-none text-center"
+      className="text-5xl md:text-8xl lg:text-[8rem] xl:text-[10rem] font-extrabold tracking-tighter text-[#dae8fe] leading-none text-center whitespace-nowrap"
     >
       {characters.map((char, index) => (
         // biome-ignore lint/suspicious/noArrayIndexKey: letter-by-letter animation requires stable position keys

@@ -22,6 +22,8 @@ export const homepageQuery = defineQuery(`*[_type == "homepage" && _id == "homep
   servicesSubtitle,
   labTestsHeadline,
   labTestsSubtitle,
+  testimonialsHeadline,
+  blogHeadline,
   ctaHeadline,
   ctaDescription
 }`);
@@ -159,5 +161,32 @@ export const blogPostsByCategoryQuery = defineQuery(
   featuredImage,
   excerpt,
   publishedAt
+}`,
+);
+
+// ─── Latest Blog Posts (homepage section) ─────────────────────────────────────
+// Revalidation tag: "blogPost"
+
+export const latestBlogPostsQuery = defineQuery(
+  `*[_type == "blogPost"] | order(publishedAt desc)[0...3]{
+  _id,
+  title,
+  slug,
+  featuredImage,
+  excerpt
+}`,
+);
+
+// ─── Related Blog Posts (blog post detail page) ───────────────────────────────
+// Revalidation tag: "blogPost"
+// If category is null, the caller should fall back to latestBlogPostsQuery.
+
+export const relatedBlogPostsQuery = defineQuery(
+  `*[_type == "blogPost" && category._ref == $categoryId && _id != $currentPostId] | order(publishedAt desc)[0...3]{
+  _id,
+  title,
+  slug,
+  featuredImage,
+  excerpt
 }`,
 );

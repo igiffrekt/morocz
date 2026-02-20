@@ -124,6 +124,20 @@ export const homepageType = defineType({
       rows: 3,
     }),
 
+    // Testimonials section
+    defineField({
+      name: "testimonialsHeadline",
+      title: "Vélemények cím",
+      type: "string",
+    }),
+
+    // Blog section
+    defineField({
+      name: "blogHeadline",
+      title: "Blog cím",
+      type: "string",
+    }),
+
     // CTA section
     defineField({
       name: "ctaHeadline",

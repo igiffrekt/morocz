@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 6 of 8 (SEO + Structured Data) — IN PROGRESS
-Plan: 1 of 4 in current phase (1 complete)
-Status: In progress — Plan 01 done; Sanity SEO data layer ready (siteSettings + homepage SEO fields, privacyPolicy singleton, updated queries and types)
-Last activity: 2026-02-20 — Phase 6 Plan 01 complete (SEO CMS data layer: schemas, queries, types)
+Plan: 4 of 4 in current phase (4 complete)
+Status: In progress — Plans 01-04 done; privacy policy page, cookie notice, SEO metadata, JSON-LD structured data complete
+Last activity: 2026-02-20 — Phase 6 Plan 04 complete (privacy policy page + cookie notice)
 
 Progress: [█████████░] ~92%
 
@@ -40,6 +40,7 @@ Progress: [█████████░] ~92%
 *Updated after each plan completion*
 | Phase 05 P04 | ~30min | 2 tasks | 7 files |
 | Phase 06 P01 | 3min | 2 tasks | 7 files |
+| Phase 06 P04 | 8 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -108,6 +109,7 @@ Recent decisions affecting current work:
 - [Phase 06-seo-structured-data]: privacyPolicy body field uses identical Portable Text config as blogPostType — consistent content editing experience
 - [Phase 06-seo-structured-data]: defaultOgImage in siteSettings is site-level fallback; ogImage in homepage allows page-specific override
 - [Phase 06-seo-structured-data]: SEO fields pattern for page schemas: metaDescription (text, rows:2) + ogImage (image) — reuse for future page types
+- [Phase 06]: CookieNotice initialized dismissed=true with useEffect localStorage check — prevents SSR hydration flash of cookie notice
 
 ### Pending Todos
 
@@ -122,5 +124,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Completed 06-01-PLAN.md — Phase 6 Plan 01 done; SEO Sanity data layer ready
-Resume file: .planning/phases/06-seo-structured-data/06-02-PLAN.md
+Stopped at: Completed 06-04-PLAN.md — Privacy policy page and cookie notice complete; Phase 6 all plans done
+Resume file: .planning/phases/07-contact-form/07-01-PLAN.md

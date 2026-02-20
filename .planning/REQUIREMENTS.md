@@ -112,7 +112,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **SEO-04**: JSON-LD structured data: BreadcrumbList on blog posts
 - [ ] **SEO-05**: JSON-LD structured data: BlogPosting on each blog post
 - [x] **SEO-06**: GDPR privacy policy page in Hungarian
-- [ ] **SEO-07**: Cookie notice (informational, non-blocking — Vercel Analytics is cookie-free)
+- [x] **SEO-07**: Cookie notice (informational, non-blocking — Vercel Analytics is cookie-free)
 - [ ] **SEO-08**: Core Web Vitals targets: LCP < 2.5s, CLS < 0.1, INP passing on mobile
 - [x] **SEO-09**: All content and meta in Hungarian language
 
@@ -248,7 +248,7 @@ Which phases cover which requirements. Verified during roadmap creation (2026-02
 | SEO-04 | Phase 6 | Pending |
 | SEO-05 | Phase 6 | Pending |
 | SEO-06 | Phase 6 | Complete |
-| SEO-07 | Phase 6 | Pending |
+| SEO-07 | Phase 6 | Complete |
 | SEO-08 | Phase 6 | Pending |
 | SEO-09 | Phase 6 | Complete |
 | RESP-01 | Phase 3 | Complete |

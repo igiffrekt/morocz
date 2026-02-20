@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 
 ## Current Position
 
-Phase: 5 of 8 (Testimonials + Blog) — COMPLETE
-Plan: 4 of 4 in current phase (all plans complete)
-Status: Complete — all 4 plans done; homepage fully wired with Testimonials and Blog; design refinements approved by user
-Last activity: 2026-02-20 — Phase 5 Plan 04 complete (homepage wiring + redesign of BlogSection, TestimonialsSection, LabTestsSection)
+Phase: 6 of 8 (SEO + Structured Data) — IN PROGRESS
+Plan: 1 of 4 in current phase (1 complete)
+Status: In progress — Plan 01 done; Sanity SEO data layer ready (siteSettings + homepage SEO fields, privacyPolicy singleton, updated queries and types)
+Last activity: 2026-02-20 — Phase 6 Plan 01 complete (SEO CMS data layer: schemas, queries, types)
 
-Progress: [█████████░] ~90%
+Progress: [█████████░] ~92%
 
 ## Performance Metrics
 
@@ -39,6 +39,7 @@ Progress: [█████████░] ~90%
 
 *Updated after each plan completion*
 | Phase 05 P04 | ~30min | 2 tasks | 7 files |
+| Phase 06 P01 | 3min | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -104,6 +105,9 @@ Recent decisions affecting current work:
 - [Phase 05-testimonials-blog]: TestimonialsSection redesigned to horizontal card (photo+name | separator | quote) with pill dot navigation
 - [Phase 05-testimonials-blog]: LabTestsSection converted to paginated 3x3 grid with dot navigation and drag/swipe — replaces animated category-filter
 - [Phase 05-testimonials-blog]: Page background changed to white in globals.css
+- [Phase 06-seo-structured-data]: privacyPolicy body field uses identical Portable Text config as blogPostType — consistent content editing experience
+- [Phase 06-seo-structured-data]: defaultOgImage in siteSettings is site-level fallback; ogImage in homepage allows page-specific override
+- [Phase 06-seo-structured-data]: SEO fields pattern for page schemas: metaDescription (text, rows:2) + ogImage (image) — reuse for future page types
 
 ### Pending Todos
 
@@ -118,5 +122,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Phase 6 context gathered — ready for planning
-Resume file: .planning/phases/06-seo-structured-data/06-CONTEXT.md
+Stopped at: Completed 06-01-PLAN.md — Phase 6 Plan 01 done; SEO Sanity data layer ready
+Resume file: .planning/phases/06-seo-structured-data/06-02-PLAN.md

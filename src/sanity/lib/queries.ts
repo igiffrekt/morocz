@@ -25,7 +25,9 @@ export const homepageQuery = defineQuery(`*[_type == "homepage" && _id == "homep
   testimonialsHeadline,
   blogHeadline,
   ctaHeadline,
-  ctaDescription
+  ctaDescription,
+  metaDescription,
+  ogImage
 }`);
 
 // ─── Site Settings ────────────────────────────────────────────────────────────
@@ -58,7 +60,9 @@ export const siteSettingsQuery =
     }
   },
   privacyPolicyUrl,
-  metaDescription
+  metaDescription,
+  siteName,
+  defaultOgImage
 }`);
 
 // ─── Services ─────────────────────────────────────────────────────────────────
@@ -189,5 +193,16 @@ export const relatedBlogPostsQuery = defineQuery(
   slug,
   featuredImage,
   excerpt
+}`,
+);
+
+// ─── Privacy Policy ───────────────────────────────────────────────────────────
+// Revalidation tag: "privacyPolicy"
+
+export const privacyPolicyQuery = defineQuery(
+  `*[_type == "privacyPolicy" && _id == "privacyPolicy"][0]{
+  title,
+  body,
+  lastUpdated
 }`,
 );

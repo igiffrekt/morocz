@@ -113,6 +113,8 @@ export type Homepage = {
   blogHeadline?: string;
   ctaHeadline?: string;
   ctaDescription?: string;
+  metaDescription?: string;
+  ogImage?: SanityImageObject;
 };
 
 export type SiteSettings = {
@@ -147,6 +149,8 @@ export type SiteSettings = {
   }>;
   privacyPolicyUrl?: string;
   metaDescription?: string;
+  siteName?: string;
+  defaultOgImage?: SanityImageObject;
 };
 
 export type ServiceCategory = {
@@ -257,6 +261,14 @@ export type BlogPost = {
   publishedAt?: string;
 };
 
+export type PrivacyPolicy = {
+  _type: "privacyPolicy";
+  _id: string;
+  title?: string;
+  body?: Array<PortableTextBlock | BlogPostBodyImage>;
+  lastUpdated?: string;
+};
+
 // ─── All Document Types Union ─────────────────────────────────────────────────
 
 export type AllSanitySchemaTypes =
@@ -267,7 +279,8 @@ export type AllSanitySchemaTypes =
   | LabTest
   | Testimonial
   | BlogCategory
-  | BlogPost;
+  | BlogPost
+  | PrivacyPolicy;
 
 // ─── Query Result Types ───────────────────────────────────────────────────────
 // These types match the shape returned by GROQ queries that dereference references inline.

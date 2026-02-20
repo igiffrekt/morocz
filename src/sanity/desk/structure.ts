@@ -65,6 +65,18 @@ export const structure: StructureResolver = (S) =>
 
       S.divider(),
 
+      // Adatkezelési tájékoztató (privacyPolicy singleton)
+      S.listItem()
+        .title("Adatkezelési tájékoztató")
+        .child(
+          S.document()
+            .schemaType("privacyPolicy")
+            .documentId("privacyPolicy")
+            .title("Adatkezelési tájékoztató szerkesztése"),
+        ),
+
+      S.divider(),
+
       // Beállítások (SiteSettings singleton)
       S.listItem()
         .title("Beállítások")

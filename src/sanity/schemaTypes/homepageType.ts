@@ -150,6 +150,21 @@ export const homepageType = defineType({
       type: "text",
       rows: 3,
     }),
+
+    // SEO fields
+    defineField({
+      name: "metaDescription",
+      title: "Meta leírás",
+      type: "text",
+      rows: 2,
+      description: "Kezdőlap SEO leírása keresőmotorokhoz",
+    }),
+    defineField({
+      name: "ogImage",
+      title: "OG kép",
+      type: "image",
+      description: "Közösségi média megosztáshoz használt kép a kezdőlapon",
+    }),
   ],
   preview: {
     prepare() {

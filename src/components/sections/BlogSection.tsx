@@ -139,9 +139,20 @@ export function BlogSection({ heading, posts }: BlogSectionProps) {
                   <span className="relative inline-flex w-fit items-center">
                     {/* Left circle — hidden, scales in on hover */}
                     <span className="absolute left-0 top-1/2 flex h-12 w-12 -translate-y-1/2 scale-0 items-center justify-center rounded-full bg-white text-primary transition-transform duration-500 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] group-hover:scale-100">
-                      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <svg
+                        className="h-5 w-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                      >
                         <title>Nyíl jobbra</title>
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 12h14m0 0l-5-5m5 5l-5 5" />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2.5}
+                          d="M5 12h14m0 0l-5-5m5 5l-5 5"
+                        />
                       </svg>
                     </span>
                     {/* Pill — slides right on hover */}
@@ -150,9 +161,20 @@ export function BlogSection({ heading, posts }: BlogSectionProps) {
                     </span>
                     {/* Right circle — scales out on hover */}
                     <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white text-primary transition-transform duration-500 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] group-hover:scale-0">
-                      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <svg
+                        className="h-5 w-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                      >
                         <title>Nyíl jobbra</title>
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 12h14m0 0l-5-5m5 5l-5 5" />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2.5}
+                          d="M5 12h14m0 0l-5-5m5 5l-5 5"
+                        />
                       </svg>
                     </span>
                   </span>

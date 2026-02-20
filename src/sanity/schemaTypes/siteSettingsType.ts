@@ -162,6 +162,18 @@ export const siteSettingsType = defineType({
       description: "Alapértelmezett meta leírás az oldalhoz",
       rows: 3,
     }),
+    defineField({
+      name: "siteName",
+      title: "Weboldal neve",
+      type: "string",
+      description: "Megjelenik az Open Graph címkékben",
+    }),
+    defineField({
+      name: "defaultOgImage",
+      title: "Alapértelmezett OG kép",
+      type: "image",
+      description: "Közösségi média megosztáshoz használt alapértelmezett kép",
+    }),
   ],
   preview: {
     prepare() {

@@ -77,12 +77,12 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Blog Section
 
-- [ ] **BLOG-01**: Blog listing with category filter tabs
-- [ ] **BLOG-02**: Blog cards with featured image, category tag, title, and excerpt
-- [ ] **BLOG-03**: "Read All Blogs" link
-- [ ] **BLOG-04**: Blog post detail page with Portable Text rendering
-- [ ] **BLOG-05**: Blog post slug-based routing (`/blog/[slug]`)
-- [ ] **BLOG-06**: Static generation with `generateStaticParams` for blog posts
+- [x] **BLOG-01**: Blog listing with category filter tabs
+- [x] **BLOG-02**: Blog cards with featured image, category tag, title, and excerpt
+- [x] **BLOG-03**: "Read All Blogs" link
+- [x] **BLOG-04**: Blog post detail page with Portable Text rendering
+- [x] **BLOG-05**: Blog post slug-based routing (`/blog/[slug]`)
+- [x] **BLOG-06**: Static generation with `generateStaticParams` for blog posts
 - [x] **BLOG-07**: All blog content manageable from Sanity
 
 ### Footer
@@ -222,12 +222,12 @@ Which phases cover which requirements. Verified during roadmap creation (2026-02
 | TEST-03 | Phase 5 | Complete |
 | TEST-04 | Phase 5 | Complete |
 | TEST-05 | Phase 5 | Complete |
-| BLOG-01 | Phase 5 | Pending |
-| BLOG-02 | Phase 5 | Pending |
-| BLOG-03 | Phase 5 | Pending |
-| BLOG-04 | Phase 5 | Pending |
-| BLOG-05 | Phase 5 | Pending |
-| BLOG-06 | Phase 5 | Pending |
+| BLOG-01 | Phase 5 | Complete |
+| BLOG-02 | Phase 5 | Complete |
+| BLOG-03 | Phase 5 | Complete |
+| BLOG-04 | Phase 5 | Complete |
+| BLOG-05 | Phase 5 | Complete |
+| BLOG-06 | Phase 5 | Complete |
 | BLOG-07 | Phase 5 | Complete |
 | FOOT-01 | Phase 3 | Complete |
 | FOOT-02 | Phase 3 | Complete |

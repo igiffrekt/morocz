@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 5 of 8 (Testimonials + Blog) — IN PROGRESS
-Plan: 2 of 4 in current phase (plans 01-02 complete)
-Status: In Progress — data layer complete, TestimonialsSection carousel built; BlogSection and blog detail page pending
-Last activity: 2026-02-20 — Phase 5 Plan 02 complete (TestimonialsSection carousel with fade, dots, swipe, keyboard a11y)
+Plan: 3 of 4 in current phase (plans 01-03 complete)
+Status: In Progress — data layer, TestimonialsSection carousel, BlogSection, and blog detail route complete; homepage wiring pending
+Last activity: 2026-02-20 — Phase 5 Plan 03 complete (BlogSection, PortableTextRenderer, RelatedPosts, /blog/[slug] SSG route)
 
 Progress: [████████░░] ~85%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 16 (01-01, 01-02, 02-01..02-05, 03-01..03-04, 04-01..04-03, 05-01, 05-02)
-- Average duration: 8 min
-- Total execution time: ~1.7 hours
+- Total plans completed: 17 (01-01, 01-02, 02-01..02-05, 03-01..03-04, 04-01..04-03, 05-01, 05-02, 05-03)
+- Average duration: 7 min
+- Total execution time: ~1.8 hours
 
 **By Phase:**
 
@@ -31,11 +31,11 @@ Progress: [████████░░] ~85%
 | 02-content-architecture | 5 | 38 min | 8 min |
 | 03-shell-static-sections | 4 | 19 min | 5 min |
 | 04-services-lab-tests | 3 | 22 min | 7 min |
-| 05-testimonials-blog | 2 | 12 min | 6 min |
+| 05-testimonials-blog | 3 | 19 min | 6 min |
 
 **Recent Trend:**
-- Last 5 plans: 04-01 (2min), 04-02 (8min), 04-03 (12min), 05-01 (8min), 05-02 (4min)
-- Trend: Steady — visual verification checkpoints add time but catch issues early
+- Last 5 plans: 04-02 (8min), 04-03 (12min), 05-01 (8min), 05-02 (4min), 05-03 (7min)
+- Trend: Steady — consistent 7-8min per UI plan
 
 *Updated after each plan completion*
 
@@ -94,6 +94,9 @@ Recent decisions affecting current work:
 - [Phase 05-testimonials-blog]: BlogPostDetailResult typed separately from BlogPost document type to reflect dereferenced category object shape
 - [Phase 05-testimonials-blog]: fieldset used as carousel keyboard container — Biome useSemanticElements requires semantic element for role='group'
 - [Phase 05-testimonials-blog]: bg-accent (#99CEB7 teal/green) used for TestimonialsSection background — matches existing design token
+- [Phase 05-testimonials-blog]: BlogSection uses href='#blog' for scroll anchor (no separate /blog listing page — CONTEXT.md locked)
+- [Phase 05-testimonials-blog]: relatedBlogPostsQuery fallback: if < 2 results, fall back to latestBlogPostsQuery, filter out current post
+- [Phase 05-testimonials-blog]: PortableTextRenderer is a server component — no 'use client' needed for pure Portable Text rendering
 
 ### Pending Todos
 
@@ -108,5 +111,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Completed 05-02-PLAN.md (TestimonialsSection carousel component)
-Resume file: .planning/phases/05-testimonials-blog/05-02-SUMMARY.md
+Stopped at: Completed 05-03-PLAN.md (BlogSection, PortableTextRenderer, RelatedPosts, /blog/[slug] SSG route)
+Resume file: .planning/phases/05-testimonials-blog/05-03-SUMMARY.md

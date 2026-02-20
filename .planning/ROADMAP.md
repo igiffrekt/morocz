@@ -102,9 +102,13 @@ Plans:
   3. The blog listing shows cards with featured image, category tag, title, and excerpt, and clicking a category tab filters to matching posts
   4. A blog post detail page at `/blog/[slug]` renders full Portable Text content including any rich text formatting
   5. Blog post pages are statically generated at build time — no 404s for posts that exist in Sanity
-**Plans**: TBD
+**Plans:** 4 plans
 
-Plans: None yet
+Plans:
+- [ ] 05-01-PLAN.md -- Homepage schema fields + GROQ queries + TypeScript types for testimonials and blog
+- [ ] 05-02-PLAN.md -- TestimonialsSection carousel (fade, dots, swipe, keyboard a11y)
+- [ ] 05-03-PLAN.md -- BlogSection homepage cards + blog detail page with Portable Text + static generation
+- [ ] 05-04-PLAN.md -- Page assembly (wire sections into page.tsx) + visual verification
 
 ### Phase 6: SEO + Structured Data
 **Goal**: Every page has correct meta tags and Open Graph data from Sanity, the homepage and blog posts have valid JSON-LD structured data passing Google's Rich Results Test, and the site is GDPR-compliant for Hungarian visitors
@@ -158,7 +162,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 2. Content Architecture | 5/5 | Complete   | 2026-02-19 |
 | 3. Shell + Static Sections | 4/4 | Complete   | 2026-02-19 |
 | 4. Services + Lab Tests | 3/3 | Complete   | 2026-02-20 |
-| 5. Testimonials + Blog | 0/TBD | Not started | - |
+| 5. Testimonials + Blog | 0/4 | Not started | - |
 | 6. SEO + Structured Data | 0/TBD | Not started | - |
 | 7. Animation Polish + Performance | 0/TBD | Not started | - |
 | 8. CMS Revalidation + Launch | 0/TBD | Not started | - |

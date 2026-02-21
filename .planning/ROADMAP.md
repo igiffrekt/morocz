@@ -155,9 +155,12 @@ Plans:
   2. Sending an invalid or unauthenticated request to `/api/revalidate` returns a non-200 response (webhook HMAC validation works)
   3. Contact phone/email CTAs route correctly to the user's device dialer or email client — no form data is stored anywhere
   4. Draft mode previews are only accessible with the correct Sanity preview secret
-**Plans**: TBD
+**Plans:** 3 plans
 
-Plans: None yet
+Plans:
+- [ ] 08-01-PLAN.md -- Webhook revalidation endpoint with HMAC validation + phone CTA confirmation dialog
+- [ ] 08-02-PLAN.md -- Draft mode preview with secret validation + branded 404 page
+- [ ] 08-03-PLAN.md -- GA4 analytics with cookie consent + end-to-end editorial workflow verification
 
 ## Progress
 

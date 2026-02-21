@@ -8,30 +8,41 @@ A single-practice medical website for Morocz Medical in Esztergom, Hungary. A mo
 
 Patients can discover Morocz Medical's services and book an appointment through a beautifully animated, fast, SEO-optimized website where every piece of content is manageable from Sanity CMS.
 
+## Current State
+
+**v1.0 shipped 2026-02-21** — Full medical practice website live with:
+- Next.js 15 + Tailwind v4 + Sanity v4 CMS + Motion v12 animations
+- 8 Sanity document schemas, embedded Studio at /studio, 10+ centralized GROQ queries
+- Animated homepage: hero with typewriter headline, services filter, lab tests grid, testimonials carousel, blog section
+- Complete SEO: JSON-LD (MedicalClinic, Physician, BlogPosting, BreadcrumbList), Open Graph, GDPR cookie notice, privacy policy
+- Launch infrastructure: HMAC webhook revalidation, draft mode preview, GA4 with consent gate, branded 404
+
+See `.planning/MILESTONES.md` for full details and stats.
+
 ## Requirements
 
-### Validated
+### Validated (v1.0)
 
-(None yet — ship to validate)
+- [x] Hero section with animated headline, doctor image, floating badges, and CTA
+- [x] 4 colored service cards (yellow, green, pink, blue) with staggered entrance animations
+- [x] Services section with category filter tabs and animated card shuffle/reorder
+- [x] Lab tests section on dark background with illustrated cards, discounts, and pricing
+- [x] Patient testimonials carousel with dot navigation
+- [x] Blog section with categorized article cards
+- [x] Footer with navigation links, social icons, and contact info
+- [x] Intro animation: logo typewriter effect on dark background, fade-up transition to content
+- [x] Circle wipe page transitions on internal navigation
+- [x] Scroll-triggered section entrance animations throughout
+- [x] Button hover animations (arrow icon slide, background transitions)
+- [x] Sanity CMS: every text, image, list item, button text, category order independently editable
+- [x] Hungarian language only — all content in Hungarian
+- [x] SEO optimization: semantic HTML, meta tags, structured data, performance
+- [x] Responsive design across all breakpoints
+- [x] Header with logo, navigation, and contact/login actions
 
 ### Active
 
-- [ ] Hero section with animated headline, doctor image, floating badges, and CTA
-- [ ] 4 colored service cards (yellow, green, pink, blue) with staggered entrance animations
-- [ ] Services section with category filter tabs and animated card shuffle/reorder
-- [ ] Lab tests section on dark background with illustrated cards, discounts, and pricing
-- [ ] Patient testimonials carousel with dot navigation
-- [ ] Blog section with categorized article cards
-- [ ] Footer with navigation links, social icons, and large logo on pink background
-- [ ] Intro animation: logo typewriter effect on dark background, fade-up transition to content
-- [ ] Closing animation: circle wipe shrinking to center dot on pink background
-- [ ] Scroll-triggered section entrance animations throughout
-- [ ] Button hover animations (arrow icon slide, background transitions)
-- [ ] Sanity CMS: every text, image, list item, button text, category order independently editable
-- [ ] Hungarian language only — all content in Hungarian
-- [ ] SEO optimization: semantic HTML, meta tags, structured data, performance
-- [ ] Responsive design across all breakpoints
-- [ ] Header with logo, navigation, and contact/login actions
+(None — next milestone requirements TBD)
 
 ### Out of Scope
 
@@ -50,113 +61,55 @@ Patients can discover Morocz Medical's services and book an appointment through 
 
 ### Design Reference
 
-A complete HTML/CSS design template exists at `home_design/code.html` with a full-page screenshot at `home_design/screen.png`. This is a MediCare template that will be adapted for Morocz Medical.
+A complete HTML/CSS design template exists at `home_design/code.html` with a full-page screenshot at `home_design/screen.png`. This is a MediCare template adapted for Morocz Medical.
 
-**Design system from template:**
+**Design system (implemented):**
 - Colors: primary `#23264F` (dark navy), secondary `#F4DCD6` (light pink), accent `#99CEB7` (green)
 - Card colors: yellow `#FAE988`, green `#A8DABC`, purple `#EABDE6`, blue `#8FB8FF`
-- Background: `#F2F4F8` (light gray)
+- Background: white (changed from template `#F2F4F8`)
 - Font: Plus Jakarta Sans (weights 400-800)
 - Border radius: 1rem default, up to 2.5rem for large cards
 - Max content width: 88rem
 
-### Animation Reference
+### Tech Stack (locked)
 
-A detailed frame-by-frame animation reference exists in `animations/` (~260 PNG frames from frame00081 to frame01411). These frames document every animation pattern to implement:
-
-**Intro sequence:**
-- Logo typewriter: Letters appear one by one on dark navy `#23264F` background
-- Logo fades up and scales out
-- Page scroll-up transition: content rises from below, pink background revealed first, then hero content
-
-**Hero section animations:**
-- "Healthcare" headline: staggered letter-by-letter animation (large serif-style text)
-- Doctor image: fade in from right
-- Floating badges ("Reduce HbA1c", "No more medications"): float in with slight bounce
-- 4 service cards: staggered entrance from bottom — yellow first, then green, pink, blue
-- "Book Consultation" button hover: arrow icon circle slides/expands right on hover
-
-**Services filter section:**
-- Category filter tabs: horizontal scrollable pills with active state (dark bg + emoji icon)
-- Tab switching: cards perform layout shuffle animation — cards slide horizontally and reorder positions with smooth transitions
-- Continuous horizontal carousel behavior within the filtered results
-
-**Lab tests section:**
-- Dark navy background section transition
-- Illustrated cards with discount badges (80%) and pricing with strikethrough original
-- Cards fade/slide in on scroll
-
-**Testimonials section:**
-- Carousel with dot navigation
-- Smooth horizontal slide between testimonials
-
-**Blog section:**
-- Cards with category tags appear on scroll
-- "READ ALL BLOGS" link
-
-**Footer:**
-- Dark navy background, 4-column navigation layout
-- Large logo on pink `#F4DCD6` background at bottom
-
-**Closing animation:**
-- Circle wipe/mask: page shrinks into a circle in center
-- Circle contracts to small white dot
-- Pink background remains as final state
-
-**Global interaction patterns:**
-- All sections have scroll-triggered entrance animations
-- Button hover: arrow icons animate, background color transitions
-- "Add to" / CTA buttons: highlight state on hover
-- Smooth, refined timing — nothing jarring
-
-### Sections to Build (in page order)
-
-1. **Header** — Logo, navigation links, search, location selector
-2. **Hero** — Large headline, subtext, doctor image, floating badges, CTA button, 4 service cards
-3. **Services (filter section)** — Category filter tabs, service/provider cards with shuffle animation
-4. **Lab Tests** — Dark background, illustrated test cards with pricing
-5. **Testimonials** — Patient review carousel
-6. **Blog** — Article cards with categories
-7. **Footer** — Navigation columns, social links, large logo
-
-### Sections Removed from Template
-
-- Podcast card (yellow feature grid)
-- Live Event card (green feature grid)
-- Statistics counters (Years Experience, Happy Customers)
-- Google rating banner
-- "Today's best deals" product section
-- App download section
-- "Your health is our Top priority" banner
+- **Framework:** Next.js 15.5.12 (App Router)
+- **Styling:** Tailwind CSS v4 (CSS-first, @theme tokens in globals.css)
+- **CMS:** Sanity v4.22.0 + next-sanity v11.6.12
+- **Animations:** Motion v12 (import from 'motion/react')
+- **Linting:** Biome v2.4.2 (CSS linting disabled for Tailwind compatibility)
+- **Deployment:** Vercel
 
 ### Team Approach
 
 The user wants a collaborative development team mindset:
 - Frontend developer, backend/CMS developer, UI/UX expert, code quality reviewer, SEO specialist, tester, and optimizer
 - Team members should challenge each other, debate approaches, and strive for the best possible product
-- This translates to rigorous code review, SEO audits, performance optimization, and accessibility checks throughout development
 
 ## Constraints
 
 - **Tech Stack**: Next.js (App Router) + Tailwind CSS + Sanity CMS — decided, non-negotiable
 - **Language**: Hungarian only — all UI text, content, and meta tags in Hungarian
-- **Animation Library**: Framer Motion (inferred from animation complexity requirements)
+- **Animation Library**: Motion v12 (import from 'motion/react')
 - **CMS Granularity**: Fixed page layout, but every list item, text, button text, image, and category order must be independently editable in Sanity
-- **Design Fidelity**: Must closely match the provided HTML template design system (colors, fonts, spacing, border radius)
+- **Design Fidelity**: Must closely match the provided HTML template design system
 - **SEO**: Must achieve excellent SEO scores — semantic HTML, meta tags, structured data, Core Web Vitals optimization
-- **Code Quality**: Production-grade code with proper typing, testing, and optimization
+- **Code Quality**: Production-grade code with proper typing and optimization
 
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Next.js + Tailwind + Sanity | User's explicit choice; modern, well-supported stack | -- Pending |
-| Hungarian only | Single-market practice, no internationalization needed | -- Pending |
-| No dark mode | Practice doesn't need it, reduces scope | -- Pending |
-| Appointment booking separate | Complex feature, will be integrated later | -- Pending |
-| Remove podcast/events/stats/deals/app sections | Not relevant for a medical practice site | -- Pending |
-| Framer Motion for animations | Complex animation requirements (typewriter, staggered, layout shuffle, circle wipe) need a robust animation library | -- Pending |
-| Sanity modular schema | Every content piece independently editable — maximum CMS flexibility | -- Pending |
+| Next.js 15 + Tailwind v4 + Sanity v4 | User's explicit choice; modern stack | v1.0 Validated |
+| Hungarian only | Single-market practice | v1.0 Validated |
+| No dark mode | Practice doesn't need it | v1.0 Validated |
+| Appointment booking separate | Complex feature for later | Deferred |
+| Remove podcast/events/stats/deals/app sections | Not relevant for medical practice | v1.0 Validated |
+| Motion v12 for animations | Complex animation requirements need robust library | v1.0 Validated |
+| Sanity modular schema | Every content piece independently editable | v1.0 Validated |
+| No separate blog listing page | Homepage shows 2 latest posts; deliberate scope decision | v1.0 Accepted |
+| Service card colors hardcoded | Not CMS-editable; locked in Phase 4 | v1.0 Validated |
+| Server Component data fetching | All Sanity fetches in page.tsx/layout.tsx, never in section components | v1.0 Validated |
 
 ---
-*Last updated: 2026-02-18 after initialization*
+*Last updated: 2026-02-21 after v1.0 milestone completion*

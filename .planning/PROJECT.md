@@ -40,13 +40,21 @@ See `.planning/MILESTONES.md` for full details and stats.
 - [x] Responsive design across all breakpoints
 - [x] Header with logo, navigation, and contact/login actions
 
-### Active
+### Active (v2.0)
 
-(None — next milestone requirements TBD)
+- [ ] Patient authentication: Google OAuth + email/password registration and login
+- [ ] Online booking calendar at dedicated /idopontfoglalas page
+- [ ] Doctor defines weekly schedule + blocked dates in Sanity Studio; slots auto-generated
+- [ ] Patient picks service → date → time from available slots
+- [ ] Instant booking with email confirmation and pre-appointment reminder
+- [ ] Patient self-service: cancel or reschedule via logged-in account
+- [ ] Bookings stored as Sanity documents
+- [ ] Admin dashboard with proper email/password login (calendar view, today's appointments, patient details)
+- [ ] Minimal patient data collection: name, email, phone
 
 ### Out of Scope
 
-- Appointment booking system — will be built separately as a standalone feature later
+- Appointment booking system — ~~will be built separately~~ **moved to Active (v2.0)**
 - Dark mode — not needed for this practice
 - Multi-language support — Hungarian only
 - Mobile app — web only
@@ -55,7 +63,7 @@ See `.planning/MILESTONES.md` for full details and stats.
 - App download section — removed from design
 - Product deals/shop section — removed from design (medical practice, not e-commerce)
 - Real-time chat — not needed for v1
-- User authentication/accounts — not needed for public-facing site
+- User authentication/accounts — ~~not needed for public-facing site~~ **moved to Active (v2.0, patient auth for booking)**
 
 ## Context
 
@@ -103,7 +111,7 @@ The user wants a collaborative development team mindset:
 | Next.js 15 + Tailwind v4 + Sanity v4 | User's explicit choice; modern stack | v1.0 Validated |
 | Hungarian only | Single-market practice | v1.0 Validated |
 | No dark mode | Practice doesn't need it | v1.0 Validated |
-| Appointment booking separate | Complex feature for later | Deferred |
+| Appointment booking separate | Complex feature for later | v2.0 Active |
 | Remove podcast/events/stats/deals/app sections | Not relevant for medical practice | v1.0 Validated |
 | Motion v12 for animations | Complex animation requirements need robust library | v1.0 Validated |
 | Sanity modular schema | Every content piece independently editable | v1.0 Validated |
@@ -111,5 +119,17 @@ The user wants a collaborative development team mindset:
 | Service card colors hardcoded | Not CMS-editable; locked in Phase 4 | v1.0 Validated |
 | Server Component data fetching | All Sanity fetches in page.tsx/layout.tsx, never in section components | v1.0 Validated |
 
+## Current Milestone: v2.0 Booking Module
+
+**Goal:** Patients can self-book appointments online — pick a service, choose an available slot, get instant confirmation, and manage their bookings through their account.
+
+**Target features:**
+- Patient auth (Google OAuth + email/password)
+- Online calendar with service-linked time slots
+- Doctor schedule management in Sanity Studio
+- Email confirmation and reminders
+- Patient self-service (cancel/reschedule)
+- Admin dashboard with login (calendar, daily view, patient details)
+
 ---
-*Last updated: 2026-02-21 after v1.0 milestone completion*
+*Last updated: 2026-02-21 after v2.0 milestone start*

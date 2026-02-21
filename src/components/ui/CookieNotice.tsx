@@ -16,6 +16,7 @@ export function CookieNotice() {
 
   function handleDismiss() {
     localStorage.setItem("cookie-notice-dismissed", "true");
+    window.dispatchEvent(new Event("cookie-consent-granted"));
     setDismissed(true);
   }
 

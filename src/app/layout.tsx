@@ -5,6 +5,7 @@ import { IntroOverlay } from "@/components/motion/IntroOverlay";
 import { MotionProvider } from "@/components/motion/MotionProvider";
 import { CookieNotice } from "@/components/ui/CookieNotice";
 import { DraftModeIndicator } from "@/components/ui/DraftModeIndicator";
+import { GoogleAnalytics } from "@/components/ui/GoogleAnalytics";
 import { plusJakartaSans } from "@/lib/fonts";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import { urlFor } from "@/sanity/lib/image";
@@ -96,6 +97,9 @@ export default async function RootLayout({
           <CookieNotice />
         </MotionProvider>
         <DraftModeIndicator />
+        {process.env.NEXT_PUBLIC_GA_ID && (
+          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+        )}
       </body>
     </html>
   );

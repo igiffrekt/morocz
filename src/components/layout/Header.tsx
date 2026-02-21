@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { PhoneCallDialog } from "@/components/ui/PhoneCallDialog";
 import { MobileMenu } from "./MobileMenu";
 
 interface HeaderProps {
@@ -17,6 +18,7 @@ type NavState = "default" | "hidden" | "compact";
 export function Header({ clinicName, navigationLinks, phone, address }: HeaderProps) {
   const [navState, setNavState] = useState<NavState>("default");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [phoneDialogOpen, setPhoneDialogOpen] = useState(false);
   const lastScrollY = useRef(0);
   const ticking = useRef(false);
 
@@ -116,8 +118,9 @@ export function Header({ clinicName, navigationLinks, phone, address }: HeaderPr
 
         {/* Right: CTA button (desktop) */}
         <div className="hidden md:block">
-          <a
-            href={phone ? `tel:${phone}` : "#kapcsolat"}
+          <button
+            type="button"
+            onClick={() => setPhoneDialogOpen(true)}
             className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#a3dac2] hover:bg-[#8fcdb3] transition-colors text-sm font-bold text-primary"
           >
             Időpontfoglalás
@@ -133,7 +136,7 @@ export function Header({ clinicName, navigationLinks, phone, address }: HeaderPr
             >
               <path d="M5 12h14M12 5l7 7-7 7" />
             </svg>
-          </a>
+          </button>
         </div>
 
         {/* Mobile hamburger */}
@@ -171,6 +174,7 @@ export function Header({ clinicName, navigationLinks, phone, address }: HeaderPr
             navigationLinks={navigationLinks}
             phone={phone}
             onClose={() => setMobileMenuOpen(false)}
+            onPhoneClick={() => setPhoneDialogOpen(true)}
           />
         </div>
       </header>
@@ -217,8 +221,9 @@ export function Header({ clinicName, navigationLinks, phone, address }: HeaderPr
 
         {/* Right: CTA */}
         <div className="hidden md:block">
-          <a
-            href={phone ? `tel:${phone}` : "#kapcsolat"}
+          <button
+            type="button"
+            onClick={() => setPhoneDialogOpen(true)}
             className="flex items-center gap-2 px-5 py-2 rounded-full bg-[#a3dac2] hover:bg-[#8fcdb3] transition-colors text-sm font-bold text-primary"
           >
             Időpontfoglalás
@@ -234,7 +239,7 @@ export function Header({ clinicName, navigationLinks, phone, address }: HeaderPr
             >
               <path d="M5 12h14M12 5l7 7-7 7" />
             </svg>
-          </a>
+          </button>
         </div>
 
         {/* Mobile hamburger */}
@@ -272,9 +277,19 @@ export function Header({ clinicName, navigationLinks, phone, address }: HeaderPr
             navigationLinks={navigationLinks}
             phone={phone}
             onClose={() => setMobileMenuOpen(false)}
+            onPhoneClick={() => setPhoneDialogOpen(true)}
           />
         </div>
       </header>
+
+      {/* Phone confirmation dialog — shared by both header variants */}
+      {phone && (
+        <PhoneCallDialog
+          phone={phone}
+          isOpen={phoneDialogOpen}
+          onClose={() => setPhoneDialogOpen(false)}
+        />
+      )}
     </div>
   );
 }

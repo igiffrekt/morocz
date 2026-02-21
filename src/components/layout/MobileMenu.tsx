@@ -5,9 +5,21 @@ interface MobileMenuProps {
   navigationLinks?: Array<{ _key: string; label?: string; href?: string }>;
   phone?: string;
   onClose?: () => void;
+  onPhoneClick?: () => void;
 }
 
-export function MobileMenu({ isOpen, navigationLinks, phone, onClose }: MobileMenuProps) {
+export function MobileMenu({
+  isOpen,
+  navigationLinks,
+  phone,
+  onClose,
+  onPhoneClick,
+}: MobileMenuProps) {
+  const handlePhoneClick = () => {
+    onClose?.();
+    onPhoneClick?.();
+  };
+
   return (
     <div
       className="overflow-hidden transition-[max-height] duration-300 ease-in-out bg-surface-white rounded-b-3xl shadow-lg"
@@ -27,13 +39,24 @@ export function MobileMenu({ isOpen, navigationLinks, phone, onClose }: MobileMe
         ))}
 
         <div className="mt-4">
-          <a
-            href={phone ? `tel:${phone}` : "#kapcsolat"}
-            onClick={onClose}
-            className="flex items-center justify-center gap-2 w-full px-6 py-3 rounded-full border border-gray-200 hover:bg-gray-50 transition-colors text-sm font-bold text-primary min-h-[44px]"
-          >
-            Foglaljon időpontot
-          </a>
+          {onPhoneClick ? (
+            <button
+              type="button"
+              onClick={handlePhoneClick}
+              disabled={!phone}
+              className="flex items-center justify-center gap-2 w-full px-6 py-3 rounded-full border border-gray-200 hover:bg-gray-50 transition-colors text-sm font-bold text-primary min-h-[44px] disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Foglaljon időpontot
+            </button>
+          ) : (
+            <a
+              href={phone ? `tel:${phone}` : "#kapcsolat"}
+              onClick={onClose}
+              className="flex items-center justify-center gap-2 w-full px-6 py-3 rounded-full border border-gray-200 hover:bg-gray-50 transition-colors text-sm font-bold text-primary min-h-[44px]"
+            >
+              Foglaljon időpontot
+            </a>
+          )}
         </div>
       </nav>
     </div>

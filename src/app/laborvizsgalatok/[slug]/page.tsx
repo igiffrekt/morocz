@@ -83,19 +83,19 @@ export default async function LabTestPage({ params }: { params: Promise<{ slug: 
         "@type": "ListItem",
         position: 1,
         name: "Kezdőlap",
-        item: "https://moroczmedical.hu",
+        item: "https://drmoroczangela.hu",
       },
       {
         "@type": "ListItem",
         position: 2,
         name: "Laborvizsgálatok",
-        item: "https://moroczmedical.hu/#laborvizsgalatok",
+        item: "https://drmoroczangela.hu/#laborvizsgalatok",
       },
       {
         "@type": "ListItem",
         position: 3,
         name: test.name,
-        item: `https://moroczmedical.hu/laborvizsgalatok/${test.slug?.current}`,
+        item: `https://drmoroczangela.hu/laborvizsgalatok/${test.slug?.current}`,
       },
     ],
   };

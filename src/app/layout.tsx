@@ -29,7 +29,7 @@ export async function generateMetadata(): Promise<Metadata> {
       : undefined;
 
   return {
-    metadataBase: new URL("https://moroczmedical.hu"),
+    metadataBase: new URL("https://drmoroczangela.hu"),
     title: {
       default: siteName,
       template: `%s | ${siteName}`,

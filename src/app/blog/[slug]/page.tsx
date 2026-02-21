@@ -126,19 +126,19 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         "@type": "ListItem",
         position: 1,
         name: "Kezdőlap",
-        item: "https://moroczmedical.hu",
+        item: "https://drmoroczangela.hu",
       },
       {
         "@type": "ListItem",
         position: 2,
         name: "Blog",
-        item: "https://moroczmedical.hu/#blog",
+        item: "https://drmoroczangela.hu/#blog",
       },
       {
         "@type": "ListItem",
         position: 3,
         name: post.title,
-        item: `https://moroczmedical.hu/blog/${post.slug?.current}`,
+        item: `https://drmoroczangela.hu/blog/${post.slug?.current}`,
       },
     ],
   };
@@ -156,16 +156,16 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     author: {
       "@type": "Organization",
       name: "Morocz Medical",
-      url: "https://moroczmedical.hu",
+      url: "https://drmoroczangela.hu",
     },
     publisher: {
       "@type": "Organization",
       name: "Morocz Medical",
-      url: "https://moroczmedical.hu",
+      url: "https://drmoroczangela.hu",
     },
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `https://moroczmedical.hu/blog/${post.slug?.current}`,
+      "@id": `https://drmoroczangela.hu/blog/${post.slug?.current}`,
     },
   };
 

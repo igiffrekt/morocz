@@ -57,6 +57,8 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     description,
     openGraph: {
+      type: "website",
+      locale: "hu_HU",
       title: siteName,
       description,
       url: "/",
@@ -93,54 +95,61 @@ export default async function Home() {
     "@graph": [
       {
         "@type": ["MedicalClinic", "LocalBusiness"],
-        "@id": "https://moroczmedical.hu/#clinic",
-        name: "Morocz Medical",
-        description: settings?.metaDescription ?? "Egészségügyi szolgáltatások Esztergomban",
-        url: "https://moroczmedical.hu",
-        telephone: settings?.phone ?? "",
+        "@id": "https://drmoroczangela.hu/#clinic",
+        name: "Dr. Mórocz Angéla Nőgyógyászati Rendelő",
+        description:
+          "Szülészet, nőgyógyászati vizsgálatok és várandósgondozás Esztergomban.",
+        url: "https://drmoroczangela.hu",
+        telephone: settings?.phone ?? "+36 70 639 5239",
         email: settings?.email ?? "",
         address: {
           "@type": "PostalAddress",
-          // PLACEHOLDER: User will provide exact street address
-          streetAddress: "",
+          streetAddress: "Martsa Alajos utca 6/c.",
           addressLocality: "Esztergom",
           addressRegion: "Komárom-Esztergom",
-          // PLACEHOLDER: User will provide postal code
-          postalCode: "",
+          postalCode: "2500",
           addressCountry: "HU",
         },
         geo: {
           "@type": "GeoCoordinates",
-          // PLACEHOLDER: User will verify or provide exact GPS coordinates
-          latitude: 47.7933,
-          longitude: 18.7404,
+          latitude: 47.8007963,
+          longitude: 18.7430918,
         },
         openingHoursSpecification: [
-          // PLACEHOLDER: User will provide actual opening hours per day
           {
             "@type": "OpeningHoursSpecification",
-            dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-            opens: "08:00",
-            closes: "16:00",
+            dayOfWeek: "Monday",
+            opens: "12:00",
+            closes: "15:00",
+          },
+          {
+            "@type": "OpeningHoursSpecification",
+            dayOfWeek: "Tuesday",
+            opens: "11:00",
+            closes: "14:00",
+          },
+          {
+            "@type": "OpeningHoursSpecification",
+            dayOfWeek: "Thursday",
+            opens: "13:20",
+            closes: "17:00",
           },
         ],
         image: settings?.defaultOgImage?.asset
           ? urlFor(settings.defaultOgImage).width(1200).height(630).url()
           : undefined,
         priceRange: "$$",
-        medicalSpecialty: "GeneralPractice",
+        medicalSpecialty: "Gynecology",
         inLanguage: "hu",
       },
       {
         "@type": "Physician",
-        "@id": "https://moroczmedical.hu/#physician",
-        // PLACEHOLDER: User will provide Dr. Morocz's full name and credentials
-        name: "Dr. Morocz",
-        // PLACEHOLDER: User will provide exact job title in Hungarian
-        jobTitle: "Orvos",
-        medicalSpecialty: "GeneralPractice",
-        worksFor: { "@id": "https://moroczmedical.hu/#clinic" },
-        url: "https://moroczmedical.hu",
+        "@id": "https://drmoroczangela.hu/#physician",
+        name: "Dr. Mórocz Angéla",
+        jobTitle: "Nőgyógyász szakorvos",
+        medicalSpecialty: "Gynecology",
+        worksFor: { "@id": "https://drmoroczangela.hu/#clinic" },
+        url: "https://drmoroczangela.hu",
         inLanguage: "hu",
       },
     ],

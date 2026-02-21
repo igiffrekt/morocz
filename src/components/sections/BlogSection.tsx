@@ -2,7 +2,7 @@
 
 import { motion } from "motion/react";
 import Image from "next/image";
-import Link from "next/link";
+import { CircleWipeLink } from "@/components/motion/CircleWipeLink";
 import { FadeIn } from "@/components/motion/FadeIn";
 import { urlFor } from "@/sanity/lib/image";
 import type { BlogPostQueryResult } from "../../../sanity.types";
@@ -77,7 +77,7 @@ export function BlogSection({ heading, posts }: BlogSectionProps) {
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
           >
-            <Link
+            <CircleWipeLink
               href={`/blog/${leftPost.slug?.current}`}
               className="group flex h-full flex-col rounded-3xl bg-[#edf0f5] p-10 transition-shadow hover:shadow-md"
             >
@@ -117,7 +117,7 @@ export function BlogSection({ heading, posts }: BlogSectionProps) {
               <h3 className="mt-auto pt-4 text-xl font-extrabold leading-snug text-primary transition-colors group-hover:text-primary/80 md:text-2xl">
                 {leftPost.title}
               </h3>
-            </Link>
+            </CircleWipeLink>
           </motion.div>
         )}
 
@@ -129,7 +129,7 @@ export function BlogSection({ heading, posts }: BlogSectionProps) {
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.5, ease: "easeOut", delay: 0.15 }}
           >
-            <Link
+            <CircleWipeLink
               href={`/blog/${rightPost.slug?.current}`}
               className="group relative flex h-full flex-col overflow-hidden rounded-3xl bg-accent p-12 transition-shadow hover:shadow-md md:flex-row md:gap-6"
             >
@@ -221,7 +221,7 @@ export function BlogSection({ heading, posts }: BlogSectionProps) {
                   )}
                 </div>
               </div>
-            </Link>
+            </CircleWipeLink>
           </motion.div>
         )}
       </div>

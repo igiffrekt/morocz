@@ -1,5 +1,5 @@
 import Image from "next/image";
-import Link from "next/link";
+import { CircleWipeLink } from "@/components/motion/CircleWipeLink";
 import { urlFor } from "@/sanity/lib/image";
 import type { BlogPostQueryResult } from "../../../sanity.types";
 
@@ -37,11 +37,11 @@ export function RelatedPosts({ posts }: RelatedPostsProps) {
               </div>
 
               <div className="flex flex-col gap-2 p-5 flex-1">
-                <Link href={`/blog/${post.slug?.current}`}>
+                <CircleWipeLink href={`/blog/${post.slug?.current}`}>
                   <h3 className="text-base font-bold text-primary hover:text-primary/80 transition-colors duration-200">
                     {post.title}
                   </h3>
-                </Link>
+                </CircleWipeLink>
 
                 {post.excerpt && (
                   <p className="text-sm text-gray-600 line-clamp-3">{post.excerpt}</p>

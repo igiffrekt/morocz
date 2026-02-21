@@ -23,7 +23,7 @@ const cardDecorations = [
 const container = {
   hidden: {},
   visible: {
-    transition: { staggerChildren: 0.1, delayChildren: 0.6 },
+    transition: { staggerChildren: 0.08 },
   },
 };
 
@@ -45,7 +45,8 @@ export function HeroServiceCards({ cards }: HeroServiceCardsProps) {
     <motion.section
       variants={container}
       initial="hidden"
-      animate="visible"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.2 }}
       className="grid grid-cols-2 lg:grid-cols-4 gap-3"
     >
       {cards.map((card, index) => {

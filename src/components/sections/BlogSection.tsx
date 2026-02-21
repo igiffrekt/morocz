@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
+import { FadeIn } from "@/components/motion/FadeIn";
 import { urlFor } from "@/sanity/lib/image";
 import type { BlogPostQueryResult } from "../../../sanity.types";
 
@@ -31,38 +32,40 @@ export function BlogSection({ heading, posts }: BlogSectionProps) {
   return (
     <section id="blog" aria-labelledby="blog-cim" className="px-4 py-12 md:py-20">
       {/* Header row: heading left, link right */}
-      <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-        {heading && (
-          <h2
-            id="blog-cim"
-            className="max-w-md text-3xl font-extrabold leading-tight text-primary md:text-4xl"
+      <FadeIn viewport>
+        <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+          {heading && (
+            <h2
+              id="blog-cim"
+              className="max-w-md text-3xl font-extrabold leading-tight text-primary md:text-4xl"
+            >
+              {heading}
+            </h2>
+          )}
+          <a
+            href="#blog"
+            className="group inline-flex shrink-0 items-center gap-2 text-sm font-bold uppercase tracking-wide text-primary transition-colors hover:text-primary/70"
           >
-            {heading}
-          </h2>
-        )}
-        <a
-          href="#blog"
-          className="group inline-flex shrink-0 items-center gap-2 text-sm font-bold uppercase tracking-wide text-primary transition-colors hover:text-primary/70"
-        >
-          Összes blog
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="transition-transform group-hover:translate-x-0.5"
-            aria-hidden="true"
-          >
-            <title>Nyíl jobbra</title>
-            <path d="m9 18 6-6-6-6" />
-          </svg>
-        </a>
-      </div>
+            Összes blog
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="transition-transform group-hover:translate-x-0.5"
+              aria-hidden="true"
+            >
+              <title>Nyíl jobbra</title>
+              <path d="m9 18 6-6-6-6" />
+            </svg>
+          </a>
+        </div>
+      </FadeIn>
 
       {/* Cards grid — 30/70 split on desktop */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-[2fr_3fr]">
@@ -71,7 +74,7 @@ export function BlogSection({ heading, posts }: BlogSectionProps) {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
           >
             <Link
@@ -123,8 +126,8 @@ export function BlogSection({ heading, posts }: BlogSectionProps) {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.5, ease: "easeOut", delay: 0.15 }}
           >
             <Link
               href={`/blog/${rightPost.slug?.current}`}

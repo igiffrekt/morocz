@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Patients can discover Morocz Medical's services and book an appointment through a beautifully animated, fast, SEO-optimized website where every piece of content is manageable from Sanity CMS.
-**Current focus:** Phase 8 context gathered — ready for planning
+**Current focus:** Phase 8 complete — all plans executed, site launch-ready
 
 ## Current Position
 
-Phase: 8 of 8 (CMS Revalidation + Launch)
-Plan: 1 of 4 complete (08-01: webhook revalidation + phone CTA dialog done)
-Status: Phase 8 in progress — Plan 01 complete
-Last activity: 2026-02-21 — Phase 8 Plan 01 complete (webhook revalidation endpoint + PhoneCallDialog)
+Phase: 8 of 8 (CMS Revalidation + Launch) — COMPLETE
+Plan: 3 of 3 complete (08-03: GA4 analytics + end-to-end verification done)
+Status: Phase 8 complete — all launch requirements verified
+Last activity: 2026-02-21 — Phase 8 Plan 03 complete (GA4 consent-gated analytics + human-verified editorial workflow)
 
-Progress: [██████████] ~87% (Phase 8 in progress — 1/4 plans done)
+Progress: [██████████] 100% (All 8 phases complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 23 (01-01, 01-02, 02-01..02-05, 03-01..03-04, 04-01..04-03, 05-01, 05-02, 05-03, 05-04, 06-01, 06-02, 06-03, 06-04, 06-05)
+- Total plans completed: 26 (01-01..01-02, 02-01..02-05, 03-01..03-04, 04-01..04-03, 05-01..05-04, 06-01..06-05, 07-01..07-03, 08-01..08-03)
 - Average duration: 8 min
-- Total execution time: ~2.5 hours
+- Total execution time: ~3.5 hours
 
 **By Phase:**
 
@@ -50,7 +50,7 @@ Progress: [██████████] ~87% (Phase 8 in progress — 1/4 pla
 | Phase 07-animation-polish-performance P03 | 45 | 3 tasks | 7 files |
 | Phase 08-cms-revalidation-launch P01 | 5 | 2 tasks | 6 files |
 | Phase 08-cms-revalidation-launch P02 | 9 | 2 tasks | 7 files |
-| Phase 08 P03 | 8 | 1 tasks | 4 files |
+| Phase 08-cms-revalidation-launch P03 | 15 | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -147,6 +147,8 @@ Recent decisions affecting current work:
 - [Phase 08-cms-revalidation-launch]: DraftModeIndicator placed outside MotionProvider in layout — fixed-position overlay independent of motion/animation context
 - [Phase 08-cms-revalidation-launch]: GA scripts injected via DOM createElement (not next/script) to allow dynamic load after consent event
 - [Phase 08-cms-revalidation-launch]: GoogleAnalytics component placed outside MotionProvider — analytics infrastructure independent of motion context
+- [Phase 08-cms-revalidation-launch]: PhoneCallDialog text "Valóban hívni szeretné a Mórocz Medical rendelőt?" — clearer Hungarian confirmation phrasing verified by user during end-to-end testing
+- [Phase 08-cms-revalidation-launch]: DraftModeIndicator "Kilépés" uses anchor tag (not next/link) — Next.js Link intercepts as client-side route, preventing route handler execution; anchor forces full HTTP request
 
 ### Pending Todos
 
@@ -161,5 +163,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Completed Phase 8 Plan 01 — webhook revalidation + phone CTA dialog
-Resume file: .planning/phases/08-cms-revalidation-launch/08-02-PLAN.md
+Stopped at: Completed Phase 8 Plan 03 — GA4 analytics + end-to-end editorial workflow verified. All 8 phases complete. Site is launch-ready.
+Resume file: N/A — project complete

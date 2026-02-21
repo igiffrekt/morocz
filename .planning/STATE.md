@@ -5,7 +5,7 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Patients can discover Morocz Medical's services and book an appointment through a beautifully animated, fast, SEO-optimized website where every piece of content is manageable from Sanity CMS.
-**Current focus:** Phase 7 COMPLETE — proceeding to Phase 8 (Launch Readiness)
+**Current focus:** Phase 8 context gathered — ready for planning
 
 ## Current Position
 
@@ -149,5 +149,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Completed 07-03-PLAN.md — Phase 7 all plans complete, ready for Phase 8
-Resume file: .planning/phases/08-launch-readiness/ (next phase)
+Stopped at: Phase 8 context gathered — ready for planning
+Resume file: .planning/phases/08-cms-revalidation-launch/08-CONTEXT.md

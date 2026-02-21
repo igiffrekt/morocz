@@ -96,13 +96,13 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Animations
 
-- [ ] **ANIM-01**: Intro animation: logo typewriter effect on dark navy background
-- [ ] **ANIM-02**: Intro transition: logo fades up, page scroll-up revealing content
+- [x] **ANIM-01**: Intro animation: logo typewriter effect on dark navy background
+- [x] **ANIM-02**: Intro transition: logo fades up, page scroll-up revealing content
 - [ ] **ANIM-03**: Scroll-triggered section entrance animations (fade-in, slide-up) on all major sections
 - [ ] **ANIM-04**: Staggered entrance animations for card groups (max 0.08s per item)
 - [ ] **ANIM-05**: Button hover animations: arrow icon slide/expand, background transitions
-- [ ] **ANIM-06**: Closing circle wipe animation shrinking to center dot on pink background
-- [ ] **ANIM-07**: `useReducedMotion` respected — all animations disabled for users who prefer reduced motion
+- [x] **ANIM-06**: Closing circle wipe animation shrinking to center dot on pink background
+- [x] **ANIM-07**: `useReducedMotion` respected — all animations disabled for users who prefer reduced motion
 
 ### SEO & Compliance
 
@@ -235,13 +235,13 @@ Which phases cover which requirements. Verified during roadmap creation (2026-02
 | FOOT-04 | Phase 3 | Complete |
 | FOOT-05 | Phase 3 | Complete |
 | FOOT-06 | Phase 3 | Complete |
-| ANIM-01 | Phase 7 | Pending |
-| ANIM-02 | Phase 7 | Pending |
+| ANIM-01 | Phase 7 | Complete |
+| ANIM-02 | Phase 7 | Complete |
 | ANIM-03 | Phase 7 | Pending |
 | ANIM-04 | Phase 7 | Pending |
 | ANIM-05 | Phase 7 | Pending |
-| ANIM-06 | Phase 7 | Pending |
-| ANIM-07 | Phase 7 | Pending |
+| ANIM-06 | Phase 7 | Complete |
+| ANIM-07 | Phase 7 | Complete |
 | SEO-01 | Phase 6 | Complete |
 | SEO-02 | Phase 6 | Complete |
 | SEO-03 | Phase 6 | Complete |

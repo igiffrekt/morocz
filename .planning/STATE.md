@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Patients can discover Morocz Medical's services and book an appointment through a beautifully animated, fast, SEO-optimized website where every piece of content is manageable from Sanity CMS.
-**Current focus:** Phase 6 complete — all SEO, structured data, semantic HTML, and UI polish done
+**Current focus:** Phase 7 in progress — Animation Polish + Performance
 
 ## Current Position
 
-Phase: 6 of 8 (SEO + Structured Data) — COMPLETE
-Plan: 5 of 5 in current phase (all 5 complete)
-Status: Phase 6 done — JSON-LD, OG meta, cookie notice, privacy policy page, semantic HTML, glassmorphism navbar all complete
-Last activity: 2026-02-21 — Phase 6 Plan 05 complete (semantic HTML audit + visual verification + navbar scroll behavior + LabTests slide animation)
+Phase: 7 of 8 (Animation Polish + Performance) — IN PROGRESS
+Plan: 2 of 3 complete (07-01 not yet executed, 07-02 complete)
+Status: Phase 7 in progress — IntroOverlay typewriter + CircleWipeLink page transitions complete
+Last activity: 2026-02-21 — Phase 7 Plan 02 complete (IntroOverlay + CircleWipeLink animations)
 
-Progress: [█████████░] ~95%
+Progress: [█████████░] ~97%
 
 ## Performance Metrics
 
@@ -45,6 +45,7 @@ Progress: [█████████░] ~95%
 | Phase 06 P03 | 8 | 2 tasks | 3 files |
 | Phase 06-seo-structured-data P02 | 11 | 2 tasks | 3 files |
 | Phase 06-seo-structured-data P05 | ~25min | 2 tasks | 9 files |
+| Phase 07-animation-polish-performance P02 | 4 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -123,6 +124,9 @@ Recent decisions affecting current work:
 - [Phase 06-seo-structured-data]: CTA label changed to "Időpontfoglalás" with arrow icon (shorter for compact nav, consistent across both header states)
 - [Phase 06-seo-structured-data]: AnimatePresence mode='wait' with direction useRef for LabTests slide animation — direction updated synchronously before page setState to prevent stale reads
 - [Phase 06-seo-structured-data]: aria-labelledby used on all section elements pointing to section h2 id — preferred over aria-label when visible heading exists (WCAG best practice)
+- [Phase 07-animation-polish-performance]: IntroOverlay uses phase state machine driven by onAnimationComplete callbacks (not setTimeout) for animation sequencing
+- [Phase 07-animation-polish-performance]: CircleWipeLink shouldWipe() heuristic: only /blog/ and /laborvizsgalatok/ prefixes trigger circle wipe animation
+- [Phase 07-animation-polish-performance]: CHARACTERS pre-indexed as {pos,char}[] to avoid noArrayIndexKey Biome lint without suppression comments
 
 ### Pending Todos
 
@@ -137,5 +141,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Completed 06-05-PLAN.md — Semantic HTML audit + visual verification approved + navbar scroll behavior + LabTests slide animation; Phase 6 COMPLETE
+Stopped at: Completed 07-02-PLAN.md — IntroOverlay typewriter overlay + CircleWipeLink page transitions; Phase 7 Plan 02 complete
 Resume file: .planning/phases/07-contact-form/07-01-PLAN.md

@@ -4,6 +4,7 @@ import { Header } from "@/components/layout/Header";
 import { IntroOverlay } from "@/components/motion/IntroOverlay";
 import { MotionProvider } from "@/components/motion/MotionProvider";
 import { CookieNotice } from "@/components/ui/CookieNotice";
+import { DraftModeIndicator } from "@/components/ui/DraftModeIndicator";
 import { plusJakartaSans } from "@/lib/fonts";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import { urlFor } from "@/sanity/lib/image";
@@ -94,6 +95,7 @@ export default async function RootLayout({
           </div>
           <CookieNotice />
         </MotionProvider>
+        <DraftModeIndicator />
       </body>
     </html>
   );

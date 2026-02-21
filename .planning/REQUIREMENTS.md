@@ -97,44 +97,44 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | — | Pending |
-| AUTH-02 | — | Pending |
-| AUTH-03 | — | Pending |
-| AUTH-04 | — | Pending |
-| AUTH-05 | — | Pending |
-| SCHED-01 | — | Pending |
-| SCHED-02 | — | Pending |
-| SCHED-03 | — | Pending |
-| SCHED-04 | — | Pending |
-| BOOK-01 | — | Pending |
-| BOOK-02 | — | Pending |
-| BOOK-03 | — | Pending |
-| BOOK-04 | — | Pending |
-| BOOK-05 | — | Pending |
-| BOOK-06 | — | Pending |
-| BOOK-07 | — | Pending |
-| NOTIF-01 | — | Pending |
-| NOTIF-02 | — | Pending |
-| NOTIF-03 | — | Pending |
-| ACCT-01 | — | Pending |
-| ACCT-02 | — | Pending |
-| ACCT-03 | — | Pending |
-| ADMIN-01 | — | Pending |
-| ADMIN-02 | — | Pending |
-| ADMIN-03 | — | Pending |
-| ADMIN-04 | — | Pending |
-| GDPR-01 | — | Pending |
-| GDPR-02 | — | Pending |
-| GDPR-03 | — | Pending |
-| UX-01 | — | Pending |
-| UX-02 | — | Pending |
-| UX-03 | — | Pending |
+| AUTH-01 | Phase 10 | Pending |
+| AUTH-02 | Phase 10 | Pending |
+| AUTH-03 | Phase 10 | Pending |
+| AUTH-04 | Phase 10 | Pending |
+| AUTH-05 | Phase 10 | Pending |
+| SCHED-01 | Phase 9 | Pending |
+| SCHED-02 | Phase 9 | Pending |
+| SCHED-03 | Phase 9 | Pending |
+| SCHED-04 | Phase 9 | Pending |
+| BOOK-01 | Phase 11 | Pending |
+| BOOK-02 | Phase 11 | Pending |
+| BOOK-03 | Phase 11 | Pending |
+| BOOK-04 | Phase 11 | Pending |
+| BOOK-05 | Phase 11 | Pending |
+| BOOK-06 | Phase 11 | Pending |
+| BOOK-07 | Phase 11 | Pending |
+| NOTIF-01 | Phase 11 | Pending |
+| NOTIF-02 | Phase 14 | Pending |
+| NOTIF-03 | Phase 12 | Pending |
+| ACCT-01 | Phase 12 | Pending |
+| ACCT-02 | Phase 12 | Pending |
+| ACCT-03 | Phase 12 | Pending |
+| ADMIN-01 | Phase 13 | Pending |
+| ADMIN-02 | Phase 13 | Pending |
+| ADMIN-03 | Phase 13 | Pending |
+| ADMIN-04 | Phase 13 | Pending |
+| GDPR-01 | Phase 9 | Pending |
+| GDPR-02 | Phase 9 | Pending |
+| GDPR-03 | Phase 9 | Pending |
+| UX-01 | Phase 11 | Pending |
+| UX-02 | Phase 11 | Pending |
+| UX-03 | Phase 11 | Pending |
 
 **Coverage:**
 - v2.0 requirements: 32 total
-- Mapped to phases: 0
-- Unmapped: 32
+- Mapped to phases: 32
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-21*
-*Last updated: 2026-02-21 after initial definition*
+*Last updated: 2026-02-22 after roadmap creation — all 32 requirements mapped to phases 9-14*

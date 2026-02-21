@@ -155,7 +155,7 @@ Plans:
   2. Sending an invalid or unauthenticated request to `/api/revalidate` returns a non-200 response (webhook HMAC validation works)
   3. Contact phone/email CTAs route correctly to the user's device dialer or email client — no form data is stored anywhere
   4. Draft mode previews are only accessible with the correct Sanity preview secret
-**Plans:** 3 plans
+**Plans:** 1/3 plans executed
 
 Plans:
 - [ ] 08-01-PLAN.md -- Webhook revalidation endpoint with HMAC validation + phone CTA confirmation dialog
@@ -176,4 +176,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 5. Testimonials + Blog | 4/4 | Complete   | 2026-02-20 |
 | 6. SEO + Structured Data | 5/5 | Complete   | 2026-02-21 |
 | 7. Animation Polish + Performance | 3/3 | Complete   | 2026-02-21 |
-| 8. CMS Revalidation + Launch | 0/TBD | Not started | - |
+| 8. CMS Revalidation + Launch | 1/3 | In Progress|  |

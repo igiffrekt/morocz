@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 
 ## Current Position
 
-Phase: 7 of 8 (Animation Polish + Performance) — COMPLETE
-Plan: 3 of 3 complete (07-01: scroll animations, 07-02: IntroOverlay + CircleWipeLink, 07-03: integration + verification all done)
-Status: Phase 7 ALL PLANS COMPLETE — full animation stack verified by user (7 visual tests passed)
-Last activity: 2026-02-21 — Phase 7 Plan 03 complete (CircleWipeLink integration + user-approved visual verification)
+Phase: 8 of 8 (CMS Revalidation + Launch)
+Plan: 1 of 4 complete (08-01: webhook revalidation + phone CTA dialog done)
+Status: Phase 8 in progress — Plan 01 complete
+Last activity: 2026-02-21 — Phase 8 Plan 01 complete (webhook revalidation endpoint + PhoneCallDialog)
 
-Progress: [██████████] ~100% (Phase 7 complete)
+Progress: [██████████] ~87% (Phase 8 in progress — 1/4 plans done)
 
 ## Performance Metrics
 
@@ -48,6 +48,7 @@ Progress: [██████████] ~100% (Phase 7 complete)
 | Phase 07-animation-polish-performance P02 | 4 | 2 tasks | 3 files |
 | Phase 07-animation-polish-performance P01 | 8 | 2 tasks | 8 files |
 | Phase 07-animation-polish-performance P03 | 45 | 3 tasks | 7 files |
+| Phase 08-cms-revalidation-launch P01 | 5 | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -135,6 +136,11 @@ Recent decisions affecting current work:
 - [Phase 07-animation-polish-performance]: CircleWipeLink triggers on ALL internal paths when pathname === '/' — homepage navigation uses circle wipe for all internal links, not just /blog/ and /laborvizsgalatok/ prefixes
 - [Phase 07-animation-polish-performance]: IntroOverlay SSR-safe via null return during server render — direct import is correct, no next/dynamic ssr:false wrapper needed
 - [Phase 07-animation-polish-performance]: Repeat-visit overlay returns null immediately — no fade animation, no overlay rendered at all on subsequent visits
+- [Phase 08-cms-revalidation-launch]: SANITY_REVALIDATE_SECRET is server-only (no NEXT_PUBLIC_ prefix) — webhook secret must not be exposed to client
+- [Phase 08-cms-revalidation-launch]: timingSafeEqual used for HMAC comparison to prevent timing attacks — both Buffers validated to equal length before comparison
+- [Phase 08-cms-revalidation-launch]: Unrecognized Sanity _types return 200 (not 4xx) — Sanity sends internal document types; don't fail on unknown types
+- [Phase 08-cms-revalidation-launch]: Backdrop in PhoneCallDialog implemented as <button> to satisfy Biome noStaticElementInteractions a11y rule
+- [Phase 08-cms-revalidation-launch]: MobileMenu onPhoneClick callback from Header — dialog state lives in Header, shared across both header variants
 
 ### Pending Todos
 
@@ -149,5 +155,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Phase 8 context gathered — ready for planning
-Resume file: .planning/phases/08-cms-revalidation-launch/08-CONTEXT.md
+Stopped at: Completed Phase 8 Plan 01 — webhook revalidation + phone CTA dialog
+Resume file: .planning/phases/08-cms-revalidation-launch/08-02-PLAN.md

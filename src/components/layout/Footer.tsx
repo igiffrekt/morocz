@@ -1,9 +1,8 @@
+import Image from "next/image";
 import Link from "next/link";
-import type { SanityImageObject } from "../../../sanity.types";
 import SocialIcon from "./SocialIcon";
 
 interface FooterProps {
-  logo?: SanityImageObject;
   clinicName?: string;
   phone?: string;
   email?: string;
@@ -61,41 +60,31 @@ export default function Footer({
         ))}
       </nav>
 
-      {/* Social icons row */}
-      {activeSocials.length > 0 && (
-        <div className="flex items-center justify-center md:justify-end gap-4 mb-16 relative z-10">
-          {activeSocials.map((social) => (
-            <SocialIcon
-              key={social._key}
-              platform={social.platform}
-              url={social.url}
-              className="w-12 h-12 rounded-full bg-[#2A2D40] border border-white/10 flex items-center justify-center text-white hover:bg-white hover:text-primary transition-all duration-300"
-            />
-          ))}
-        </div>
-      )}
-
-      {/* HUGE pink banner with logo text */}
-      <div className="bg-secondary rounded-[2.5rem] py-16 md:py-24 flex justify-center items-center relative overflow-hidden mb-12">
-        <div className="flex items-center gap-6 relative z-10">
-          <svg
-            className="w-16 h-16 md:w-24 md:h-24 text-primary"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            aria-hidden="true"
-          >
-            <path d="M20 6h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM10 4h4v2h-4V4zm6 11h-3v3h-2v-3H8v-2h3v-3h2v3h3v2z" />
-          </svg>
-          <span className="text-6xl md:text-[7rem] font-extrabold text-primary tracking-tighter">
-            {displayName}
-          </span>
-        </div>
-        {/* Subtle texture in banner */}
-        <div className="absolute inset-0 opacity-5 bg-[radial-gradient(circle_at_25%_25%,rgba(0,0,0,0.05)_1px,transparent_1px)] bg-[length:24px_24px]" />
+      {/* Logo + Social icons row */}
+      <div className="flex items-center justify-between mb-12 relative z-10">
+        <Image
+          src="/mm-logo-web.svg"
+          alt={displayName}
+          width={530}
+          height={130}
+          className="h-10 md:h-14 w-auto object-contain"
+        />
+        {activeSocials.length > 0 && (
+          <div className="flex items-center gap-4">
+            {activeSocials.map((social) => (
+              <SocialIcon
+                key={social._key}
+                platform={social.platform}
+                url={social.url}
+                className="w-12 h-12 rounded-full bg-[#2A2D40] border border-white/10 flex items-center justify-center text-white hover:bg-white hover:text-primary transition-all duration-300"
+              />
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Copyright line */}
-      <div className="flex flex-col md:flex-row justify-between items-center text-xs text-gray-500 pt-8 border-t border-white/10 font-medium">
+      <div className="flex flex-col md:flex-row justify-between items-center text-sm text-white/60 pt-8 border-t border-white/15">
         <p>
           &copy;{new Date().getFullYear()} {displayName}. Minden jog fenntartva.
         </p>
@@ -103,7 +92,7 @@ export default function Footer({
           href={privacyPolicyUrl ?? "/adatkezelesi-tajekoztato"}
           className="hover:text-white transition-colors mt-2 md:mt-0"
         >
-          Adatvédelmi irányelv
+          Adatkezelési tájékoztató
         </Link>
       </div>
     </footer>

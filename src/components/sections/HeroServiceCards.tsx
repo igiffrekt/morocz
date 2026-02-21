@@ -14,10 +14,10 @@ interface HeroServiceCardsProps {
 
 const cardColors = ["bg-yellow-card", "bg-green-card", "bg-purple-card", "bg-blue-card"];
 const cardDecorations = [
-  { emoji: "\uD83E\uDE7A", rotation: "rotate-12", colorClass: "text-yellow-900/10" },
-  { emoji: "\uD83D\uDD2C", rotation: "", colorClass: "text-green-900/10" },
-  { emoji: "\uD83D\uDC8A", rotation: "-rotate-12", colorClass: "text-purple-900/10" },
-  { emoji: "\uD83E\uDDEA", rotation: "", colorClass: "text-blue-900/10" },
+  { emoji: "\u2640\uFE0F", rotation: "rotate-12", colorClass: "text-yellow-900/10" },
+  { emoji: "\uD83D\uDC76", rotation: "", colorClass: "text-green-900/10" },
+  { emoji: "\uD83E\uDD30", rotation: "-rotate-12", colorClass: "text-purple-900/10" },
+  { emoji: "\uD83D\uDC8A", rotation: "", colorClass: "text-blue-900/10" },
 ];
 
 const container = {

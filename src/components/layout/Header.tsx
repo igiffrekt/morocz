@@ -3,12 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { urlFor } from "@/sanity/lib/image";
-import type { SanityImageObject } from "../../../sanity.types";
 import { MobileMenu } from "./MobileMenu";
 
 interface HeaderProps {
-  logo?: SanityImageObject;
   clinicName?: string;
   navigationLinks?: Array<{ _key: string; label?: string; href?: string }>;
   phone?: string;
@@ -17,7 +14,7 @@ interface HeaderProps {
 
 type NavState = "default" | "hidden" | "compact";
 
-export function Header({ logo, clinicName, navigationLinks, phone, address }: HeaderProps) {
+export function Header({ clinicName, navigationLinks, phone, address }: HeaderProps) {
   const [navState, setNavState] = useState<NavState>("default");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const lastScrollY = useRef(0);
@@ -50,8 +47,6 @@ export function Header({ logo, clinicName, navigationLinks, phone, address }: He
     return () => window.removeEventListener("scroll", handleScroll);
   }, [handleScroll]);
 
-  const logoUrl = logo ? urlFor(logo).width(140).url() : null;
-  const iconLogoUrl = logo ? urlFor(logo).width(48).url() : null;
   const displayName = clinicName ?? "Mórocz Medical";
 
   const isCompact = navState === "compact";
@@ -70,34 +65,18 @@ export function Header({ logo, clinicName, navigationLinks, phone, address }: He
       >
         {/* Left: logo + address */}
         <div className="flex items-center gap-8">
-          <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-            {logoUrl ? (
-              <Image
-                src={logoUrl}
-                alt={displayName}
-                width={140}
-                height={48}
-                className="h-10 w-auto object-contain"
-                priority
-              />
-            ) : (
-              <>
-                <svg
-                  className="w-8 h-8 text-primary"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  aria-hidden="true"
-                >
-                  <path d="M20 6h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM10 4h4v2h-4V4zm6 11h-3v3h-2v-3H8v-2h3v-3h2v3h3v2z" />
-                </svg>
-                <span className="text-2xl font-bold text-primary tracking-tight">
-                  {displayName}
-                </span>
-              </>
-            )}
+          <Link href="/" className="flex items-center flex-shrink-0">
+            <Image
+              src="/mm-logo-web.svg"
+              alt={displayName}
+              width={200}
+              height={48}
+              className="h-10 w-auto object-contain"
+              priority
+            />
           </Link>
 
-          {/* Address info — desktop only */}
+          {/* Address + phone — desktop only */}
           {address && (
             <div className="hidden xl:flex items-center gap-3 text-xs text-gray-500 border-l border-gray-200 pl-6 h-10">
               <svg
@@ -109,8 +88,8 @@ export function Header({ logo, clinicName, navigationLinks, phone, address }: He
                 <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
               </svg>
               <div>
-                <p className="font-bold text-gray-900">{address.split(",")[0]?.trim()}</p>
-                <p>{address.split(",").slice(1).join(",").trim() || address}</p>
+                <p className="font-bold text-gray-900">{address.replace(/\n/g, " ")}</p>
+                {phone && <p>{phone}</p>}
               </div>
             </div>
           )}
@@ -208,24 +187,13 @@ export function Header({ logo, clinicName, navigationLinks, phone, address }: He
       >
         {/* Left: icon logo only */}
         <Link href="/" className="flex items-center flex-shrink-0">
-          {iconLogoUrl ? (
-            <Image
-              src={iconLogoUrl}
-              alt={displayName}
-              width={48}
-              height={48}
-              className="h-8 w-auto object-contain"
-            />
-          ) : (
-            <svg
-              className="w-7 h-7 text-primary"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              aria-hidden="true"
-            >
-              <path d="M20 6h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM10 4h4v2h-4V4zm6 11h-3v3h-2v-3H8v-2h3v-3h2v3h3v2z" />
-            </svg>
-          )}
+          <Image
+            src="/mm-logo-square.svg"
+            alt={displayName}
+            width={48}
+            height={48}
+            className="h-8 w-8 object-contain"
+          />
         </Link>
 
         {/* Center: nav links */}

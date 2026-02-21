@@ -72,6 +72,7 @@ export const allServicesQuery = defineQuery(`*[_type == "service"] | order(order
   _id,
   name,
   description,
+  price,
   icon,
   category->{_id, name, emoji},
   order
@@ -94,11 +95,28 @@ export const allServiceCategoriesQuery =
 export const allLabTestsQuery = defineQuery(`*[_type == "labTest"] | order(order asc){
   _id,
   name,
+  slug,
   description,
   price,
   originalPrice,
   discount,
   illustration,
+  order
+}`);
+
+// ─── Lab Test (single by slug) ───────────────────────────────────────────────
+// Revalidation tag: "labTest"
+
+export const labTestBySlugQuery = defineQuery(`*[_type == "labTest" && slug.current == $slug][0]{
+  _id,
+  name,
+  slug,
+  description,
+  price,
+  originalPrice,
+  discount,
+  illustration,
+  body,
   order
 }`);
 

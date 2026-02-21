@@ -1,4 +1,4 @@
-import { defineField, defineType } from "sanity";
+import { defineArrayMember, defineField, defineType } from "sanity";
 
 export const labTestType = defineType({
   name: "labTest",
@@ -9,6 +9,13 @@ export const labTestType = defineType({
       name: "name",
       title: "Vizsgálat neve",
       type: "string",
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: "slug",
+      title: "URL slug",
+      type: "slug",
+      options: { source: "name", maxLength: 96 },
       validation: (rule) => rule.required(),
     }),
     defineField({
@@ -42,6 +49,40 @@ export const labTestType = defineType({
       options: {
         hotspot: true,
       },
+    }),
+    defineField({
+      name: "body",
+      title: "Részletes leírás",
+      type: "array",
+      of: [
+        defineArrayMember({
+          type: "block",
+          styles: [
+            { title: "Normal", value: "normal" },
+            { title: "H2", value: "h2" },
+            { title: "H3", value: "h3" },
+            { title: "H4", value: "h4" },
+          ],
+          lists: [
+            { title: "Bullet", value: "bullet" },
+            { title: "Number", value: "number" },
+          ],
+          marks: {
+            decorators: [
+              { title: "Bold", value: "strong" },
+              { title: "Italic", value: "em" },
+            ],
+            annotations: [
+              {
+                name: "link",
+                type: "object",
+                title: "Link",
+                fields: [{ name: "href", type: "url", title: "URL" }],
+              },
+            ],
+          },
+        }),
+      ],
     }),
     defineField({
       name: "order",

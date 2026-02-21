@@ -74,7 +74,6 @@ export default async function RootLayout({
         <MotionProvider>
           <div className="max-w-[88rem] mx-auto px-2 sm:px-3 lg:px-4 py-3 space-y-3">
             <Header
-              logo={settings?.logo}
               clinicName={settings?.clinicName}
               navigationLinks={settings?.navigationLinks}
               phone={settings?.phone}
@@ -82,7 +81,6 @@ export default async function RootLayout({
             />
             <main className="space-y-3">{children}</main>
             <Footer
-              logo={settings?.logo}
               clinicName={settings?.clinicName}
               phone={settings?.phone}
               email={settings?.email}

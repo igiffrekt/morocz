@@ -2,13 +2,15 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
+import Link from "next/link";
 import { useRef, useState } from "react";
 import { urlFor } from "@/sanity/lib/image";
-import type { SanityImageObject } from "../../../sanity.types";
+import type { SanityImageObject, Slug } from "../../../sanity.types";
 
 interface LabTestData {
   _id: string;
   name?: string;
+  slug?: Slug;
   description?: string;
   price?: number;
   illustration?: SanityImageObject;
@@ -94,11 +96,13 @@ export function LabTestsSection({ heading, labTests }: LabTestsSectionProps) {
               {visibleTests.map((test) => {
                 const colorClass = pastelColors[hashId(test._id) % pastelColors.length];
                 const hasIllustration = test.illustration?.asset != null;
+                const href = test.slug?.current
+                  ? `/laborvizsgalatok/${test.slug.current}`
+                  : undefined;
 
-                return (
+                const card = (
                   <div
-                    key={test._id}
-                    className={`${colorClass} rounded-2xl p-6 flex flex-col gap-3 min-h-[160px] relative overflow-hidden`}
+                    className={`${colorClass} rounded-2xl p-6 flex flex-col gap-3 min-h-[160px] relative overflow-hidden transition-shadow duration-200 ${href ? "hover:shadow-lg" : ""}`}
                   >
                     {hasIllustration && test.illustration && (
                       <div className="absolute top-4 right-4 opacity-60">
@@ -124,6 +128,14 @@ export function LabTestsSection({ heading, labTests }: LabTestsSectionProps) {
                       </p>
                     )}
                   </div>
+                );
+
+                return href ? (
+                  <Link key={test._id} href={href}>
+                    {card}
+                  </Link>
+                ) : (
+                  <div key={test._id}>{card}</div>
                 );
               })}
             </div>

@@ -172,6 +172,7 @@ export type Service = {
   _rev: string;
   name?: string;
   description?: string;
+  price?: number;
   icon?: SanityImageObject;
   category?: SanityReference<ServiceCategory>;
   order?: number;
@@ -184,11 +185,13 @@ export type LabTest = {
   _updatedAt: string;
   _rev: string;
   name?: string;
+  slug?: Slug;
   description?: string;
   price?: number;
   originalPrice?: number;
   discount?: number;
   illustration?: SanityImageObject;
+  body?: PortableTextBlock[];
   order?: number;
 };
 
@@ -289,6 +292,7 @@ export type ServiceQueryResult = {
   _id: string;
   name?: string;
   description?: string;
+  price?: number;
   icon?: SanityImageObject;
   category?: { _id: string; name?: string; emoji?: string };
   order?: number;
@@ -304,11 +308,25 @@ export type ServiceCategoryQueryResult = {
 export type LabTestQueryResult = {
   _id: string;
   name?: string;
+  slug?: Slug;
   description?: string;
   price?: number;
   originalPrice?: number;
   discount?: number;
   illustration?: SanityImageObject;
+  order?: number;
+};
+
+export type LabTestDetailResult = {
+  _id: string;
+  name?: string;
+  slug?: Slug;
+  description?: string;
+  price?: number;
+  originalPrice?: number;
+  discount?: number;
+  illustration?: SanityImageObject;
+  body?: PortableTextBlock[];
   order?: number;
 };
 

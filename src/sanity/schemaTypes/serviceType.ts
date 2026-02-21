@@ -18,6 +18,12 @@ export const serviceType = defineType({
       rows: 3,
     }),
     defineField({
+      name: "price",
+      title: "Ár (Ft)",
+      type: "number",
+      description: "Szolgáltatás ára forintban",
+    }),
+    defineField({
       name: "icon",
       title: "Ikon/kép",
       type: "image",

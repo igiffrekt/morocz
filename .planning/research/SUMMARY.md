@@ -1,277 +1,229 @@
 # Project Research Summary
 
-**Project:** Morocz Medical — Single-Practice Medical Website
-**Domain:** Healthcare / Medical Practice Website (Hungarian, Esztergom)
-**Researched:** 2026-02-18
-**Confidence:** HIGH
+**Project:** Morocz Medical — v2.0 Booking Module
+**Domain:** Patient appointment booking module added to an existing Next.js 15 + Sanity v4 medical practice website (Hungarian, single-doctor private practice, Esztergom)
+**Researched:** 2026-02-22
+**Confidence:** MEDIUM-HIGH
 
 ## Executive Summary
 
-Morocz Medical is a single-doctor medical practice website targeting patients in Esztergom, Hungary. Research across all four domains confirms this is a well-understood product category with clear, established implementation patterns. The recommended approach is Next.js 16 with App Router (static generation + ISR), Sanity CMS for full editorial independence, and Motion (formerly Framer Motion) for premium scroll-triggered animations. This stack is well-documented, has a clean deployment path on Vercel, and is the current industry standard for content-driven sites that require non-technical editor control.
+The Morocz Medical v2.0 booking module is a well-defined problem: a low-to-medium complexity patient self-service booking system integrated into an existing Next.js 15 App Router + Sanity v4 site. The recommended approach is to build entirely within the existing stack, adding Auth.js v5 (next-auth@beta) with JWT sessions, react-day-picker for the calendar UI, and Resend for transactional email. The module has six distinct components — Sanity data schemas, patient authentication, a booking calendar flow, patient account pages, an admin dashboard, and an email notification system — each with clear build-order dependencies: schemas must exist before auth, auth before any protected page, and the booking document schema before emails or the admin dashboard can be built.
 
-The key architectural decision is the strict Server/Client component boundary: all data fetching happens in Server Components (page.tsx, layout.tsx), section components are pure presentation, and only interactive or animated pieces cross into client territory via thin wrapper components. This keeps the JS bundle minimal, preserves SEO benefits of server rendering, and makes Core Web Vitals targets achievable. The Sanity CMS is the foundation dependency — every content section depends on it, so schema design must be completed before any front-end work begins.
+The most significant architectural decision is how to model slot availability in Sanity. Sanity is eventually consistent in its GROQ search store, which means checking availability via a GROQ query immediately before writing a booking document is inherently racy and will produce double bookings under concurrent load. The correct approach is to use Sanity's `ifRevisionID` optimistic locking on per-slot status documents rather than a query-based availability check. This decision must be made in Phase 1 and cannot be retrofitted — it affects the schema design, the booking Server Action pattern, and the conflict error UX. Everything downstream depends on getting the data model right from the start.
 
-The primary risk is animation complexity versus page performance. The animated services card-shuffle filter is the signature feature of the site, and it is the most technically demanding interaction. Framer Motion's `AnimatePresence` for inter-page transitions is a documented dead end in the App Router — that approach must be ruled out at project setup. The secondary risk is GDPR compliance: Hungary is an EU jurisdiction with active enforcement, and cookie consent and form data routing must be handled correctly from day one. Both risks have clear, established mitigations documented in research.
-
----
+The secondary risk cluster is security and GDPR compliance. Because the system processes patient contact data (names, emails, phone numbers), a Data Processing Agreement with Sanity must be signed and a Data Protection Impact Assessment completed before the first patient record is written. Auth.js v5's mandatory split-config pattern (edge-safe `auth.config.ts` for middleware, full `auth.ts` for Node.js contexts) is a known breaking point that must be established in Phase 2 before any route protection is added. The Sanity write token must never appear in a `NEXT_PUBLIC_*` environment variable. All of these are binary failures — one mistake means expensive recovery, not an incremental fix.
 
 ## Key Findings
 
 ### Recommended Stack
 
-The stack is fully decided with high confidence. Next.js 16 with App Router and TypeScript 5.8 is the foundation. Tailwind CSS v4 handles styling via a CSS-first `@theme {}` config (no `tailwind.config.js`). Sanity v5 with `next-sanity` v12 provides the CMS layer, embedded at `/studio` within the same Next.js app. Motion v12 (the `motion` npm package, formerly Framer Motion) handles all animation. Vercel is the hosting target.
+The existing stack (Next.js 15.2, React 19, Tailwind v4, Sanity v4, Motion v12, Vercel) is locked. New additions are minimal and deliberate. Auth.js v5 is the only auth library with first-class Next.js 15 App Router support, handling both Google OAuth and email/password Credentials in one config with JWT sessions (no database adapter required). `bcryptjs` (pure JS) is chosen over native `bcrypt` because it runs in all Vercel runtimes including Edge. `react-day-picker v9` is the correct calendar component — headless, Tailwind-compatible, ships with a Hungarian locale, and is React 19 compatible. Resend handles transactional email via HTTP API (Vercel blocks outbound SMTP). Vercel Cron Jobs handle reminder scheduling for this volume; Inngest is documented as the upgrade path if scheduling complexity grows. Zod 3 (`^3.24`) is used for form validation — Zod 4 is ESM-only and causes interop issues with Sanity v4's CommonJS internals.
 
 **Core technologies:**
-- **Next.js 16:** Full-stack React framework with App Router — mandatory for Async Request APIs (params/cookies must be awaited); Turbopack is now the default build system
-- **Tailwind CSS v4:** CSS-first utility styling — requires `@tailwindcss/postcss` PostCSS plugin, not the old `tailwindcss` plugin; `@import "tailwindcss"` replaces `@tailwind` directives
-- **Sanity v5 + next-sanity v12:** Headless CMS embedded in-app — `sanityFetch()` with `useCdn: false`, tag-based ISR revalidation via webhook, and TypeGen for compile-time type safety
-- **Motion v12:** Animation library — import from `motion/react` in client components or `motion/react-client` in server components; `MotionConfig reducedMotion="user"` is mandatory at root
-- **schema-dts:** Type-safe JSON-LD structured data — prevents invalid medical schema (MedicalClinic, LocalBusiness, Physician) that silently breaks rich results
+- `next-auth@beta` (Auth.js v5): Patient and admin authentication — only auth library with first-class Next.js 15 App Router + Edge middleware support; JWT sessions, no database adapter required
+- `bcryptjs ^2.4.3`: Password hashing — pure JS, works in all Vercel runtimes including Edge; native `bcrypt` crashes in middleware
+- `react-day-picker ^9.13.2`: Booking calendar UI — headless/unstyled (Tailwind-compatible), built-in Hungarian locale (`hu`), React 19 compatible, date-fns bundled
+- `resend ^4.x` + `@react-email/components ^1.0.8`: Email sending — HTTP API (not SMTP), free tier 3,000 emails/month, React email templates; Nodemailer is blocked by Vercel
+- `zod ^3.24`: Form and Server Action validation — Zod 3 is CJS+ESM compatible; Zod 4 breaks Sanity v4 builds
+- Vercel Cron Jobs: Reminder email scheduling — zero dependency, sufficient for single-practice volume (<50 bookings/day)
 
-**Critical version notes:** Node 20.9+ required (Next.js 16 dropped Node 18). `next lint` is removed — use ESLint CLI directly. `serverRuntimeConfig` and `publicRuntimeConfig` are removed — use `NEXT_PUBLIC_` env vars.
+**What not to use:** `next-auth-sanity` (archived September 2025, no v5 support), Sanity database session adapter, `NEXT_PUBLIC_SANITY_WRITE_TOKEN`, Nodemailer with SMTP, FullCalendar, Prisma/PostgreSQL, `react-email` in production code (dev-only preview tool).
 
-See [STACK.md](.planning/research/STACK.md) for full version compatibility matrix and installation commands.
+See `.planning/research/STACK.md` for full version compatibility matrix, installation commands, and alternatives considered.
 
 ### Expected Features
 
-The feature landscape is clearly defined. The site must outperform the local Esztergom competition (typically outdated static HTML or WordPress with no CMS control, no schema markup, and no animations) while staying within a focused v1 scope. Online booking is explicitly deferred to v2 as a separate system.
+The full feature dependency graph is documented in `.planning/research/FEATURES.md`. The dependency chain is critical: Doctor Schedule (Sanity) → Slot Generation → Calendar UI → Booking Creation → Confirmation Email / Account Page / Admin Dashboard. The schedule schema is the foundation of the entire system; nothing else can be built without it.
 
-**Must have (table stakes) — launch blockers:**
-- Hero section with value proposition, location, specialty, and phone CTA
-- About the doctor — photo, credentials, philosophy (trust is the primary conversion factor)
-- Services overview (4 summary cards) + detailed section with animated category filter
-- Lab tests section — CMS-editable, dedicated (differentiator locally)
-- Patient testimonials carousel — minimum 4, with names and context
-- Contact section — phone, address, opening hours, Google Maps embed
-- Blog with category filter — minimum 3 posts at launch
-- Privacy policy page — GDPR mandatory in Hungary/EU
-- SEO foundations — meta tags, Open Graph, JSON-LD schema (MedicalClinic, LocalBusiness, Physician)
-- Full mobile responsiveness — 60%+ of medical traffic is mobile
-- Sanity CMS for every content element
+**Must have (table stakes — required for v2.0 launch):**
+- Doctor schedule schema in Sanity (weekday availability, slot duration, buffer time, blocked dates) — foundation dependency
+- Slot generation — server-side pure function, schedule rules minus existing bookings
+- Date picker + time slot grid — react-day-picker with Hungarian locale
+- Service selection linked to slot duration (different services take different amounts of time)
+- Patient auth — Google OAuth + email/password registration/login (Auth.js v5)
+- Booking creation — Sanity document with patient data, service, datetime, status
+- Booking confirmation email — immediate, on booking creation via Resend
+- Patient account page (`/fiokom`) — upcoming appointments, cancellation (with 24h window enforcement)
+- Pre-appointment reminder email — 24h before, via Vercel Cron with `reminderSent` flag
+- Admin dashboard (`/admin`) — today's appointments, week view, patient details, manual cancellation
+- Admin auth — separate credentials-only login (role in JWT, set from `ADMIN_EMAIL` env var)
+- Double-booking prevention — `ifRevisionID` optimistic locking at booking creation
 
-**Should have (competitive differentiators):**
-- Animated card-shuffle service filter — signature interaction; distinguishes from every local competitor
-- Scroll-triggered entrance animations — premium feel; `useInView` with `once: true`, `whileInView` at 20% viewport
-- Full structured data suite — BreadcrumbList, BlogPosting, Service — most local competitors have zero
-- `MotionConfig reducedMotion="user"` — accessibility requirement for a medical audience
+**Should have (add after v2.0 validation):**
+- Reschedule flow — cancel old + create new atomically (Sanity transaction); high complexity, deferred
+- Buffer time configuration in Sanity Studio — add if doctor reports running late between appointments
+- Animated booking step transitions — Motion v12 already installed; add once core flow is stable
 
-**Defer (v2+):**
-- Online appointment booking — requires backend, calendar sync, GDPR-compliant storage, ÁSZF compliance
-- English language support — only if cross-border Slovak patient base materializes (Esztergom is on the border)
-- Patient portal / lab results — entirely separate product; medical data compliance scope
+**Defer to v3+:**
+- SMS reminders — requires paid gateway, GDPR consent for SMS, carrier complexity
+- Waitlist / cancellation notification queue — complex for marginal gain at this volume
+- Payment / deposit at booking — Barion or Stripe, Hungarian tax receipts (bizonylat), refund flows
+- Google Calendar / iCal sync — explicitly excluded from v2.0
 
-**Explicit anti-features (never build):** Dark mode (per spec), video hero backgrounds (performance cost), social media feed embeds (API fragility + load time), real-time chat (medical liability).
-
-See [FEATURES.md](.planning/research/FEATURES.md) for full prioritization matrix and competitor analysis.
+**Anti-features (explicitly excluded):** Real-time WebSocket slot availability, multi-doctor scheduling, patient medical history in booking, EHR/EMR integration, recurring appointments, online prescription requests.
 
 ### Architecture Approach
 
-The architecture follows a strict three-tier pattern: Sanity Content Lake as the data source, Next.js Server Components for data fetching and presentation, and thin Client Component wrappers for animation and interactivity only. All Sanity queries live in `src/sanity/lib/queries.ts` wrapped with `defineQuery()` for TypeGen inference. Pages fetch data at the top and pass typed props down — section components never call Sanity directly. The services animated filter is the one complex interaction: all service data is fetched server-side and passed to the `ServiceFilterBar` client component; filtering is pure client-side JavaScript with no re-fetching.
+The booking module is entirely additive — nothing in the existing codebase is deleted, and only two files are modified (the Sanity schema index and the revalidation webhook). The architecture is built around four route areas: the existing public routes (unchanged), the new `/idopontfoglalas` booking flow (public, requires auth only at confirmation step), the `/fiokom` patient account area (auth-gated), and the `(admin)` route group with its own layout (role-gated, completely separate shell from the public site). Auth.js v5 uses a mandatory split-config pattern: `auth.config.ts` for the Edge-safe middleware and `auth.ts` for the full Node.js instance. Slot availability is served by a `GET /api/booking/availability` Route Handler (not a Server Action — Server Actions are POST-only and cannot be polled). All mutations go through Server Actions with session verification inside each action, not just in middleware.
 
 **Major components:**
-1. **Sanity Studio** (embedded at `/studio`) — editor for all content; singleton schemas for homepage and siteSettings, document types for services, labTests, testimonials, blogPosts
-2. **`app/layout.tsx`** — server component; fetches siteSettings once; renders Header and Footer
-3. **`app/page.tsx`** — server component; fetches homepage singleton; orchestrates all section components
-4. **`src/components/sections/`** — server components receiving typed props; no Sanity API calls
-5. **`src/components/ui/motion/`** — thin `'use client'` wrappers (MotionDiv, MotionSection, AnimatePresenceWrapper); only these files import from `motion/react`
-6. **`ServiceFilterBar`** — client component; holds filter state; uses AnimatePresence + layout prop for card shuffle
-7. **`app/api/revalidate/route.ts`** — webhook handler; validates HMAC; calls `revalidateTag('sanity')`
+1. **Sanity schemas** (`bookingType`, `doctorScheduleType`) — data contracts for the entire module; one singleton schedule document (template rules) + one booking document per appointment; individual time slots are generated as a pure function, NOT stored as Sanity documents
+2. **Auth layer** (`auth.config.ts`, `auth.ts`, `middleware.ts`) — mandatory split-config pattern; JWT sessions (no adapter); patient and admin roles distinguished via `role` field in JWT; admin role assigned only when email matches `ADMIN_EMAIL` env var
+3. **Slot generation** (`lib/booking/slots.ts`) — pure TypeScript function; takes schedule rules + existing bookings for a date → returns available time slots; testable in isolation with no Sanity dependency
+4. **Booking Server Actions** (`lib/actions/booking.actions.ts`) — `createBooking`, `cancelBooking`; all session-verified; `ifRevisionID` locking on per-slot Sanity document at write time; confirmation email sent synchronously within the action
+5. **BookingCalendar client component** — multi-step flow (service → date → time → confirm); polls `GET /api/booking/availability` for live slot state; all availability queries use `{ next: { revalidate: 0 } }` — never cached via ISR
+6. **Admin dashboard** (`(admin)/layout.tsx` + `admin/page.tsx`) — separate route group with its own layout shell (no public Header/Footer); role check in layout AND every page Server Component independently
+7. **Email system** (`lib/email.ts`) — Resend HTTP API; confirmation sent synchronously in `createBooking` Server Action; reminders via Vercel Cron daily job querying bookings in next 24-25h window, with `reminderSent` flag to prevent duplicates
 
-**Build order:** Sanity schemas → TypeGen → data client/fetch/queries → layout → page.tsx → section components → motion wrappers → interactive client components → intro animation → webhook revalidation.
-
-See [ARCHITECTURE.md](.planning/research/ARCHITECTURE.md) for full project structure, code examples, and data flow diagrams.
+See `.planning/research/ARCHITECTURE.md` for full project structure, code examples, and data flow diagrams.
 
 ### Critical Pitfalls
 
-Research identified 7 pitfalls, of which 5 must be addressed in the foundation phase before any feature work begins. The remaining 2 are phase-specific.
+Twelve pitfalls are documented in `.planning/research/PITFALLS.md`. The five that are CRITICAL must all be addressed before the first patient interaction:
 
-1. **AnimatePresence inter-page transitions are broken in App Router** — Next.js unmounts the previous page before exit animations complete; this is an unresolved structural mismatch (GitHub #49279 still open). Prevention: use enter-only animations per page via `template.js`; use `AnimatePresence` only locally within client components (services filter, modal, carousel). Establish this decision in foundation phase.
+1. **Sanity eventual consistency — the double-booking trap** — GROQ queries for availability are eventually consistent. Two concurrent requests can both read "slot available" and both create a booking document, resulting in a real double-booked appointment. Prevention: model each time slot as a Sanity document with a `status` field; use `client.patch(slotId).set({ status: 'booked' }).ifRevisionID(slotRev).commit()` at booking creation; return HTTP 409 with Hungarian error message if slot taken. This is a Phase 1 schema decision — it cannot be retrofitted.
 
-2. **`"use client"` placed on section or layout components floods the JS bundle** — once a parent is marked client, all its imports become client code, losing SSR benefits entirely. Prevention: `"use client"` only on leaf animation wrappers; all providers accept children and isolate client scope. Measure with `next build` bundle analysis; gate First Load JS at < 100kb per page.
+2. **GDPR compliance before first patient record** — Sign the Sanity Data Processing Agreement in Sanity account settings and complete a DPIA before any booking document is written. Build a patient erasure API (GROQ + batch delete). Store only name, email, phone — never health information. Set the Sanity dataset to private. Protect `/studio` with admin auth middleware.
 
-3. **Layout animation (card shuffle) causing CLS failures** — Framer Motion's `layout` prop uses GPU-accelerated FLIP transforms which should not cause CLS, but only when using `layout="position"` (not `layout={true}`), animating only `transform`/`opacity`, and adding `layoutScroll` to scrollable ancestors. Run PageSpeed Insights CLS audit before marking services filter complete.
+3. **Auth.js v5 split-config for Edge middleware** — All auth in a single `auth.ts` crashes middleware on Vercel Edge runtime. `auth.config.ts` must be Edge-safe (no adapter, no database calls, no heavy imports); `middleware.ts` imports only `authConfig`. This error appears on Vercel but not in local development — easy to miss and expensive to debug.
 
-4. **Sanity CDN serving stale content after edits** — two independent caches (Sanity CDN + Next.js data cache) can get out of sync. Prevention: `useCdn: false` on the server-side Sanity client; add 500ms delay in webhook handler before `revalidateTag()`; test full edit-to-publish cycle before launch.
+4. **Middleware-only route protection (CVE-2025-29927)** — Middleware is a UX redirect, not a security gate. Every protected Server Component and every Server Action must call `await auth()` and verify session independently. Admin routes must verify `session.user.role === "admin"` in the layout AND each page.
 
-5. **`prefers-reduced-motion` ignored — accessibility violation in medical context** — medical audiences have higher rates of motion sensitivity. Prevention: add `<MotionConfig reducedMotion="user">` in root providers.tsx at foundation phase; one line prevents all downstream violations.
+5. **Sanity write token in client bundle** — Any env var with `NEXT_PUBLIC_` prefix is compiled into the browser JavaScript bundle. The Sanity write token must be `SANITY_WRITE_TOKEN` (no `NEXT_PUBLIC_` prefix), imported only in files with `"use server"` directive. One mistake exposes write access to all Sanity content.
 
-6. **Sanity schema over-engineering or rigidity** (content architecture phase) — resist building a page-builder schema; aim for 5-8 document types maximum; keep the Studio editor navigable for a non-technical editor.
-
-7. **Medical schema markup overreach** (SEO phase) — Google does not support `MedicalCondition`, `MedicalTherapy`, or `Symptom` types for rich results. Focus only on `MedicalClinic`, `LocalBusiness`, `BreadcrumbList`, and `BlogPosting`.
-
-See [PITFALLS.md](.planning/research/PITFALLS.md) for full pitfall documentation including recovery strategies and the "looks done but isn't" checklist.
-
----
+Additional HIGH severity pitfalls: ISR cache on booking availability (must use `revalidate: 0`), Nodemailer SMTP blocked by Vercel (use Resend), plaintext password storage (must use bcryptjs with cost factor 12+), no `reminderSent` flag on bookings (causes duplicate reminder emails on every cron run), no rate limiting on booking and auth endpoints.
 
 ## Implications for Roadmap
 
-Based on the dependency graph from FEATURES.md, the build order from ARCHITECTURE.md, and the phase-to-pitfall mapping from PITFALLS.md, the following phase structure is recommended. The ordering is driven by hard dependencies (Sanity schema before any front-end, motion architecture before any animation), not arbitrary sequencing.
+The feature dependency graph and pitfall prevention requirements define a clear 6-phase structure. The ordering is driven by hard dependencies, not preference — phases cannot be reordered without creating blockers.
 
-### Phase 1: Foundation + Project Setup
+### Phase 1: Data Foundation and GDPR Architecture
 
-**Rationale:** Next.js 16 breaking changes (async params, no `next lint`, Turbopack default), Tailwind v4 breaking changes (PostCSS plugin, CSS import syntax), and Motion's client/server boundary architecture must all be established before any feature development begins. Getting these wrong late is expensive. Pitfalls 1, 2, and 5 are all foundation-phase risks.
+**Rationale:** The Sanity schemas are the data contracts for the entire system. Nothing else can be built until the `doctorSchedule` and `booking` document types exist and TypeScript types are generated from them. More critically, the GDPR obligations (DPA, DPIA) must be satisfied before any patient data can enter the system — this is a legal prerequisite, not a technical nicety. The slot model decision (per-slot documents with `ifRevisionID`) is a Phase 1 architectural commitment that cannot be changed without a full data migration.
 
-**Delivers:** Working Next.js 16 + Tailwind v4 project on Vercel with correct configuration; Motion animation architecture established; `MotionConfig reducedMotion="user"` in place; client/server boundary documented; ESLint / Biome configured.
+**Delivers:** Sanity schemas (`doctorSchedule` singleton, `booking` document); slot status document design; GROQ queries for schedule and bookings; Sanity write client (`writeClient.ts`, server-only with `import 'server-only'`); revalidation webhook updated for new types; GDPR DPA signed in Sanity account; DPIA documented; doctor populates initial schedule in Studio.
 
-**Addresses:** Mobile responsive baseline, HTTPS (via Vercel), correct PostCSS config, font setup (Plus Jakarta Sans via `next/font`)
+**Addresses:** Doctor schedule definition (weekday availability, slot duration, break times, blocked dates), booking document structure, service-linked duration (add `appointmentDurationMinutes` to existing service schema).
 
-**Avoids:**
-- AnimatePresence inter-page transition trap (decision made before any animation work)
-- `"use client"` bundle flooding (architecture established before any component is built)
-- `prefers-reduced-motion` omission (MotionConfig set at root, one time)
+**Avoids:** Sanity eventual consistency / double-booking (per-slot document model committed before any booking code is written); GDPR violation before first patient record; write token exposure (write client established as server-only from day one).
 
-### Phase 2: Content Architecture (Sanity)
+### Phase 2: Authentication
 
-**Rationale:** Sanity is the foundation dependency — every content-bearing section (hero, services, lab tests, testimonials, blog, contact info) requires Sanity schemas. Building front-end before schemas are locked causes rework. The content architecture must be validated with a non-technical editor walkthrough before front-end build begins. TypeGen must be run once to make all subsequent component work type-safe.
+**Rationale:** Auth gates all patient and admin routes. The split-config pattern must be established correctly here — retrofitting it later means touching every file that imports from auth. Role separation (patient vs. admin) must be codified before any role-gated routes exist. Password hashing pattern must be established before the first patient account can be created.
 
-**Delivers:** All Sanity document types defined and registered (homepage singleton, siteSettings singleton, service, labTest, testimonial, blogPost); Studio desk structure with singleton enforcement; TypeGen output committed (`sanity.types.ts`); `sanityFetch()` wrapper and all GROQ queries in `queries.ts`; Hungarian slug normalization configured.
+**Delivers:** `auth.config.ts` (Edge-safe provider config: Google OAuth + Credentials, role callbacks), `auth.ts` (full JWT instance), `middleware.ts` (route protection for `/fiokom` and `/admin`), Auth.js API route handler, login page (`/bejelentkezes`), patient registration with bcryptjs password hashing (cost factor 12), Header updated with "Bejelentkezés" / "Fiókom" links.
 
-**Addresses:** Every content section (all P1 features depend on this), CMS-editable content requirement
+**Uses:** `next-auth@beta`, `bcryptjs`, `zod@^3.24` for Credentials form validation.
 
-**Avoids:**
-- Schema over-engineering / rigidity (5-8 document types max; content inventory reviewed before schema written)
-- Hungarian slug URL breakage (slug normalization in Sanity slug field config)
+**Avoids:** Auth.js v5 Edge split-config runtime crash; middleware-only protection (CVE-2025-29927 pattern); admin/patient role mixing (role set in JWT callback from `ADMIN_EMAIL` env var only); plaintext password storage.
 
-### Phase 3: Shell + Core Static Sections
+### Phase 3: Booking Core — Slot Generation, Calendar UI, Booking Creation
 
-**Rationale:** With schemas and the data access layer in place, the layout shell and static sections can be built in parallel. These sections have no interactive complexity — they are server components receiving typed Sanity props. Header and footer depend on siteSettings (already defined). Hero and About are the highest-priority trust elements.
+**Rationale:** This is the heart of the module. With schemas (Phase 1) and auth (Phase 2) in place, the full booking flow can be built end-to-end: slot generation logic, the availability Route Handler, the multi-step calendar UI, and the booking Server Action. Confirmation email is included here because it fires synchronously inside the same Server Action that creates the booking — separating them would require a more complex event system and is unnecessary at this volume.
 
-**Delivers:** `app/layout.tsx` (Header + Footer with siteSettings data); Homepage hero section; About the doctor section; Contact section with Google Maps embed; Footer with privacy policy link; Privacy policy page.
+**Delivers:** `lib/booking/slots.ts` (pure slot generation function, unit-tested in isolation), `GET /api/booking/availability` Route Handler (with `revalidate: 0`), `createBooking` Server Action (session verification + `ifRevisionID` locking + confirmation email), `BookingCalendar` multi-step client component (service → date → time → confirm), `/idopontfoglalas` page, `lib/email.ts` (Resend integration), booking confirmation email template in Hungarian.
 
-**Addresses:** Hero + contact info (P1), About the doctor (P1), Contact section (P1), Privacy policy (P1 legal), Footer (table stakes)
+**Uses:** `react-day-picker` with `hu` locale, `resend`, `@react-email/components`.
 
-**Avoids:**
-- Fetching Sanity data inside section components (anti-pattern; all fetching stays in page.tsx / layout.tsx)
-- Sanity CDN stale content (useCdn: false confirmed in client config)
+**Avoids:** ISR cache on availability data (`revalidate: 0` on all availability queries); Nodemailer SMTP (Resend from the start); double-booking (`ifRevisionID` in Server Action, 409 response with Hungarian error); Server Actions for read operations (Route Handler for GET availability).
 
-### Phase 4: Services + Animated Filter
+### Phase 4: Patient Account
 
-**Rationale:** The animated service card-shuffle filter is the most technically demanding feature and the site's signature interaction. It must be built after the Sanity services schema is stable (Phase 2) and after the motion architecture is established (Phase 1). CLS audit is mandatory before this phase is marked complete. The 4-card overview and the detailed filterable section are built together since they share the services data model.
+**Rationale:** After booking creation works, the patient needs to manage their appointments. This phase depends on auth (Phase 2) and booking documents (Phase 3). The 24-hour cancellation window must be enforced server-side in the `cancelBooking` action. Cancellation email is included here.
 
-**Delivers:** Services overview section (4 summary cards); Services detailed section with AnimatePresence + layout="position" card shuffle; Category filter buttons; CLS audit passing (< 0.1).
+**Delivers:** `/fiokom` patient dashboard (upcoming and past bookings via GROQ filtered by session email), `/fiokom/foglalas/[id]` booking detail with cancel action, `cancelBooking` Server Action (24h window enforcement, Sanity mutation, cancellation email via Resend).
 
-**Addresses:** Services section (P1), animated category filter (P1 signature feature), Lab tests section (P1)
+**Avoids:** Auth check only in middleware (each page Server Component verifies session independently); ISR on patient booking list (`revalidate: 0` for patient's bookings).
 
-**Avoids:**
-- Layout animation CLS (use `layout="position"`, animate only transform/opacity, add `layoutScroll`, run PageSpeed audit before marking done)
+### Phase 5: Admin Dashboard
 
-### Phase 5: Testimonials + Blog
+**Rationale:** The admin dashboard depends on booking documents (Phase 3) and role-based auth (Phase 2). It must be isolated in its own `(admin)` route group with a separate layout shell — this prevents the public site's layout (siteSettings fetch, Header, Footer, Motion animations, GA4) from loading unnecessarily on admin pages.
 
-**Rationale:** Testimonials and blog are both Sanity-dependent (schemas defined in Phase 2) and both involve interactive client components (carousel, category filter). They are grouped together as they share implementation patterns. Blog posts require SEO per-post (OG image, meta description) which is built alongside.
+**Delivers:** `(admin)/layout.tsx` (admin shell, role guard — redirects non-admin to `/bejelentkezes`), `/admin` page (today's appointments chronological list + week calendar view, always fresh data with `revalidate: 0`), `/admin/foglalas/[id]` booking detail with manual cancellation capability and admin-triggered cancellation email.
 
-**Delivers:** Testimonials carousel with keyboard navigation and ARIA roles; minimum 4 testimonials in Sanity; Blog listing with category filter; Blog post detail page (`blog/[slug]/page.tsx`) with `generateStaticParams`; Open Graph meta per blog post.
+**Avoids:** Admin dashboard sharing the public root layout (anti-pattern); role check only in layout (each page Server Component also checks `session.user.role === "admin"`); admin accessible to patients by URL navigation.
 
-**Addresses:** Testimonials (P1), blog with categories (P1), Open Graph per post (P2)
+### Phase 6: Reminder Emails and Cron
 
-**Avoids:**
-- Carousel keyboard navigation omission (ARIA `role="region"`, keyboard handler, or Motion+ Carousel)
-- `@portabletext/react` vs outdated `react-portable-text` — use the correct package
+**Rationale:** Reminder emails are functionally independent of all patient-facing features — they only require confirmed booking documents. They are placed last because Vercel Cron jobs can only be tested in production (they do not run in `next dev`). The `reminderSent` field added to the booking schema is a non-breaking addition.
 
-### Phase 6: SEO + Structured Data
+**Delivers:** `reminderSent: boolean` field added to `booking` Sanity schema, Vercel Cron job (`GET /api/cron/reminders` Route Handler secured with `CRON_SECRET`), `vercel.json` cron entry (daily at 08:00 Europe/Budapest), reminder email template in Hungarian, GROQ query for bookings in next 24-25h window where `!reminderSent`, `reminderSent: true` patch after sending.
 
-**Rationale:** Structured data is built after pages are structurally stable to avoid rework. The JSON-LD schema types are well-known (MedicalClinic, LocalBusiness, Physician, BreadcrumbList, BlogPosting) and their implementation is straightforward via `schema-dts` typed objects. This phase also covers cookie consent (GDPR) and Vercel Analytics setup.
-
-**Delivers:** JSON-LD `<script>` tags on homepage (MedicalClinic, LocalBusiness, Physician); BreadcrumbList on blog posts; BlogPosting schema per post; Google Rich Results Test validation passing; GDPR cookie notice (informational, not blocking — Vercel Analytics is cookie-free); sitewide Open Graph meta from Sanity seoFields object.
-
-**Addresses:** SEO foundations (P1), structured data (differentiator), GDPR compliance (P1 legal), Core Web Vitals validation
-
-**Avoids:**
-- Medical schema overreach (only Google-supported types: MedicalClinic, LocalBusiness, BreadcrumbList, BlogPosting, Service)
-- GDPR consent omission (verified in incognito before launch — no tracking without consent)
-- JSON-LD XSS vulnerability (escape `<` as `\u003c` in JSON.stringify — Next.js does not do this automatically)
-
-### Phase 7: Animation Polish + Performance
-
-**Rationale:** Scroll-triggered entrance animations and the intro sequence are pure polish — they add to the premium feel but do not affect content correctness. Building them last means all sections are structurally complete, making it straightforward to add motion wrappers without disrupting layout. Core Web Vitals audit closes out this phase.
-
-**Delivers:** Scroll-triggered entrance animations on all major sections (MotionDiv/MotionSection wrappers with `whileInView`, `once: true`, `viewport: { amount: 0.2 }`); Intro animation / circle wipe transition; Stagger animation sequences (max 0.08s per item, max 0.6s total); LCP < 2.5s, CLS < 0.1, FID/INP passing on mobile; `priority` prop confirmed on hero image.
-
-**Addresses:** Entrance animations (P2), intro animation, Core Web Vitals targets
-
-**Avoids:**
-- Animations firing too early on slow connections (`once: true`, viewport threshold)
-- Excessive stagger delay (cap at 0.08s/item)
-- LCP failure (hero image `priority` prop confirmed)
-
-### Phase 8: CMS Revalidation + Launch Readiness
-
-**Rationale:** The webhook revalidation route can only be fully tested after the deployment target (Vercel) is confirmed and the Sanity webhook is configured in the Sanity dashboard. This is wired up last because it requires live infrastructure, not local development. Full edit-to-publish cycle test is the launch gate.
-
-**Delivers:** `/api/revalidate` webhook route (HMAC validation via `parseBody`, `revalidateTag('sanity')`); Sanity webhook configured in dashboard pointing to production URL; Full edit-to-publish cycle tested (< 30 seconds); `useCdn: false` confirmed in production server client; Contact form routing to email only (not stored in Sanity); Draft mode security verified.
-
-**Addresses:** Content freshness, editorial workflow, security checklist items
-
-**Avoids:**
-- Stale content after edits (useCdn: false + 500ms delay in webhook handler)
-- Contact form data in Sanity (route to SMTP/Resend only — no health-adjacent data in database)
-- Sanity write token in public env vars (server-only, never NEXT_PUBLIC_*)
+**Avoids:** Duplicate reminders on each cron run (`reminderSent` flag prevents re-sending); unauthenticated cron endpoint (`CRON_SECRET` header verification); incorrect cron granularity assumptions (daily on Vercel free tier, hourly on Pro — document which plan is in use).
 
 ### Phase Ordering Rationale
 
-- **Phases 1-2 before everything:** Tailwind v4 config errors and Sanity schema rework are both high-cost to fix retroactively. The foundation and content architecture phases eliminate the two most expensive categories of rework.
-- **Phase 4 after Phase 1 + 2:** The animated services filter requires both the motion architecture (Phase 1) and the services schema (Phase 2) to be stable. Building it third would require building on unstable foundations.
-- **SEO after structure:** JSON-LD schema on a page that changes structure later requires rework. Phase 6 after Phases 3-5 means schema is written once against a stable page.
-- **Animation polish last:** Motion wrappers are the easiest layer to add to existing components. Doing them last means no animation rework when section HTML structure changes.
-- **Webhook last:** Requires live Vercel infrastructure; cannot be fully tested in local development.
+- Phase 1 before everything: Sanity schema TypeGen output is the type foundation all subsequent TypeScript code depends on. GDPR DPA must precede any patient data write — no exceptions.
+- Phase 2 before Phases 3-5: Auth is the security foundation. All protected routes require `await auth()` inside them — you cannot build the routes before auth exists.
+- Phase 3 before Phases 4-5: The booking document must exist before the patient account or admin dashboard can display anything meaningful.
+- Phases 4 and 5 are independent after Phase 3: Patient account and admin dashboard share no dependencies on each other; they can be built in either order or simultaneously.
+- Phase 6 last: Cron jobs require production deployment to test. All other features should be verified locally before addressing the one component that requires Vercel infrastructure.
 
 ### Research Flags
 
-Phases likely needing `/gsd:research-phase` during planning:
-- **Phase 4 (Services + Animated Filter):** The card-shuffle animation with CLS compliance is the most technically novel part of the project. Worth a focused research spike on `layout="position"` with `AnimatePresence` in production, CLS measurement methodology, and the `layoutScroll` requirement.
-- **Phase 6 (SEO + Structured Data):** Hungarian local SEO signals (Google Business Profile entity matching, `areaServed` for cross-border patients from Slovakia) may warrant a focused spike on local SEO for Hungarian medical practices.
+Phases likely needing deeper research during planning:
 
-Phases with standard, well-documented patterns (skip research-phase):
-- **Phase 1 (Foundation):** All Next.js 16 and Tailwind v4 breaking changes are documented in official docs. No surprises expected.
-- **Phase 2 (Sanity):** Singleton pattern, TypeGen, and fetch wrapper are official Sanity patterns with code examples in docs.
-- **Phase 3 (Static Sections):** Standard Next.js Server Component + Sanity props pattern. No novel decisions.
-- **Phase 5 (Testimonials + Blog):** Carousel and blog are well-trodden patterns; `@portabletext/react` is official.
-- **Phase 8 (Revalidation + Launch):** Webhook pattern is fully documented in `next-sanity` official GitHub.
+- **Phase 1:** The tension between the ARCHITECTURE.md recommendation (slots as a pure function, no slot documents) and the PITFALLS.md recommendation (per-slot status documents for `ifRevisionID` locking) needs to be resolved with a concrete implementation design before the schema is finalized. The recommended resolution: per-slot documents exist for the locking transaction, but the list of possible slots for a given day is computed as a pure function — slot documents are created on-demand when a slot is selected, not pre-generated for all future dates. This hybrid needs a design spike.
+- **Phase 2:** Auth.js v5 is still in beta (`5.0.0-beta.25+`). The exact Google OAuth callback URL configuration, session type augmentation TypeScript pattern, and `AUTH_*` env var naming (replaces `NEXTAUTH_*`) should be verified against the live `authjs.dev` docs at implementation time. Better Auth (`better-auth` package, which has native Sanity adapter support) should be noted as a documented fallback if Auth.js v5 beta stability causes problems.
+- **Phase 6:** Vercel Cron free-tier (daily) vs. Pro (hourly) limits should be confirmed at implementation time. If the practice is on Vercel Pro, hourly crons give ±1h reminder accuracy. If free tier, accuracy is ±24h — which may be acceptable for a "24 hours before" reminder but is a business decision that should be explicit.
 
----
+Phases with standard, well-documented patterns (can skip research-phase):
+
+- **Phase 3 (slot generation):** A pure function computing available slots from schedule rules is a well-understood algorithm. Iterate over the day's hours, subtract break windows, subtract existing bookings. No novel integration.
+- **Phase 4 (patient account):** Standard protected Server Component with GROQ filtered by session email. Documented cancellation patterns.
+- **Phase 5 (admin dashboard):** Standard route group pattern with role-based layout guard. Fully documented in Next.js official docs and ARCHITECTURE.md.
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | All core technologies verified against official docs and current npm releases (2026-02-18). Next.js 16, Tailwind v4, Sanity v5, next-sanity v12, Motion v12 all confirmed stable. Version compatibility matrix verified. |
-| Features | HIGH | Table stakes confirmed by multiple healthcare web design authority sources. Differentiators validated against competitor analysis of Hungarian local medical sites. Anti-features grounded in documented complexity and scope concerns. |
-| Architecture | HIGH | Core patterns (sanityFetch, defineQuery, TypeGen, singleton schema, thin client wrappers) verified against next-sanity official GitHub and Sanity official docs. Data flow and build order are unambiguous. |
-| Pitfalls | MEDIUM-HIGH | Critical pitfalls (AnimatePresence App Router breakage, bundle flooding, CLS) are verified against official docs and confirmed GitHub issues. GDPR specifics for Hungary rely on MEDIUM-confidence sources. |
+| Stack | MEDIUM-HIGH | Core libraries verified via npm and official docs. Auth.js v5 is beta — callback signatures and env var naming may shift before stable release. Zod v3 vs v4 compatibility confirmed against Sanity v4 build system. |
+| Features | HIGH | Table stakes verified against multiple scheduling platforms (Jane App, Acuity, Cliniko) and medical practice UX studies. GDPR requirements verified against EU guidance and Hungarian law (Act XLVII of 1997 on health data processing). |
+| Architecture | HIGH for patterns / MEDIUM for Auth.js specifics | Split-config pattern confirmed in Auth.js v5 official migration guide. Slot-generation-as-pure-function is a widely-used pattern. Some Auth.js v5 beta callback type signatures may shift before stable release. |
+| Pitfalls | MEDIUM-HIGH | Critical pitfalls verified against official sources: Sanity transaction docs (ifRevisionID), CVE-2025-29927 disclosure (multiple corroborating sources), Vercel SMTP KB. GDPR pitfalls confirmed via NAIH enforcement data and EU healthcare GDPR guidance. |
 
-**Overall confidence:** HIGH
+**Overall confidence:** MEDIUM-HIGH
 
 ### Gaps to Address
 
-- **Contact form implementation:** Research did not specify the email delivery service (Resend, SendGrid, SMTP). The decision is clear (server action → email only, not Sanity), but the specific provider needs selection during Phase 8 planning. Resend is the current Next.js community standard for transactional email.
-- **Google Maps embed GDPR status:** Google Maps iframes set cookies. Research flagged this as a concern but did not resolve whether a static map image (no cookies) or a consent-gated embed is required under Hungarian NAIH interpretation. Needs a quick legal check or safe default (static image with link to Google Maps).
-- **Motion v12 `motion/react-client` import in production:** Research notes MEDIUM confidence on the `motion/react-client` import for Server Components (page was JS-rendered during research). This import path should be verified against the official Motion docs or npm package exports at implementation time.
-- **Tailwind v4 and any component library compatibility:** Research flagged that shadcn/ui may not support Tailwind v4. Since the project likely uses no external component library, this is a non-issue — but confirm before starting Phase 1 if any UI component library is considered.
-
----
+- **Slot document model vs. computed availability:** ARCHITECTURE.md recommends computing slots as a pure function (no slot documents stored in Sanity). PITFALLS.md requires per-slot documents for `ifRevisionID` optimistic locking. These are in tension. The recommended resolution — per-slot documents created on-demand at booking confirmation time, not pre-generated — needs to be explicitly designed in Phase 1 before any booking code is written.
+- **Auth.js v5 beta stability:** The exact API surface (callback signatures, session type augmentation, AUTH_ env var names) should be spot-checked against the live authjs.dev docs at the start of Phase 2. Better Auth should be evaluated and documented as the confirmed fallback before Phase 2 begins.
+- **Sanity dataset privacy:** Confirm the Morocz Sanity dataset is set to "private" (not "public") before Phase 1 schema work begins. If currently public, any GROQ query from the browser can enumerate all documents — this must be verified before any patient document type is added.
+- **Resend domain verification:** SPF, DKIM, and DMARC DNS records must be configured for the sending domain before Phase 3 email testing. This is a DNS infrastructure task that should be scheduled during Phase 3, not discovered at email go-live.
+- **Sanity Studio auth protection:** The Studio at `/studio` must be protected by admin auth middleware before any patient booking documents exist in the system. This is a Phase 1/Phase 2 boundary task that must not be deferred.
 
 ## Sources
 
 ### Primary (HIGH confidence)
-- Next.js 16 official docs (upgrading guide, fonts, JSON-LD, App Router) — https://nextjs.org/docs
-- Tailwind CSS v4 official install guide and compatibility docs — https://tailwindcss.com/docs
-- next-sanity v12 official GitHub (sanityFetch, defineQuery, parseBody, webhook pattern) — https://github.com/sanity-io/next-sanity
-- Sanity official docs (TypeGen, singleton pattern, schema types, embedding Studio) — https://www.sanity.io/docs
-- Motion (Framer Motion) official docs (accessibility, installation, layout animations) — https://motion.dev/docs
-- Schema.org Health and Medical Types official specification — https://schema.org/docs/meddocs.html
-- Tebra / The Intake medical website must-haves checklist — https://www.tebra.com/theintake
+- Auth.js v5 official migration guide — https://authjs.dev/getting-started/migrating-to-v5 — edge split-config, JWT strategy, AUTH_ env vars
+- Auth.js v5 edge compatibility guide — https://authjs.dev/guides/edge-compatibility
+- CVE-2025-29927 — https://www.offsec.com/blog/cve-2025-29927/ — middleware-only auth bypass, defense-in-depth requirement
+- Sanity Transactions official docs — https://www.sanity.io/docs/content-lake/transactions — ifRevisionID optimistic locking, eventual consistency in GROQ-based mutations
+- Sanity Security and GDPR — https://www.sanity.io/security — DPA available, customer is data controller
+- Vercel SMTP restrictions KB — https://vercel.com/kb/guide/sending-emails-from-an-application-on-vercel — SMTP blocked, Resend recommended
+- Vercel Cron Jobs — https://vercel.com/docs/cron-jobs — daily limit (free tier), hourly (Pro)
+- react-day-picker v9 React 19 compatibility — https://github.com/gpbl/react-day-picker/issues/2665
+- react-day-picker Hungarian locale — https://daypicker.dev/localization/changing-locale
+- Resend pricing / free tier — https://resend.com/pricing (3,000 emails/month)
+- React Email 5.0 React 19 support — https://resend.com/blog/react-email-5
+- Next.js route groups — https://nextjs.org/docs/app/api-reference/file-conventions/route-groups
+- Next.js Server Actions vs Route Handlers — https://nextjs.org/docs/app/building-your-application/data-fetching/server-actions-and-mutations
 
 ### Secondary (MEDIUM confidence)
-- Sanity + Next.js ISR revalidation (buildwithmatija.com) — consistent with official docs
-- Framer Motion / Next.js server component split (hemantasundaray.com) — pattern verified against motion docs
-- Sanity webhook on-demand ISR (victoreke.com) — verified against official Sanity docs
-- Hungarian GDPR enforcement (Chambers Data Protection Guide 2025)
-- Medical schema markup Google support limits (AmpiRe) — verified against Google Search Gallery
-- Healthcare website accessibility deadline May 2026 (Carenetic Digital) — confirmed by HHS
-- Core Web Vitals optimization Next.js 2025 (Makers Den)
+- GDPR for healthcare — sprinto.com, gdprlocal.com — DPIA requirement, Article 6(1)(b) legal basis for appointment bookings
+- Hungary GDPR enforcement (NAIH) — cms.law — healthcare sector focus, right-to-erasure enforcement in 2025
+- Act XLVII of 1997 on Hungarian health data processing — cms.law expert guide
+- Acuity Scheduling — double-booking prevention, cancellation policy best practices, buffer time standard
+- Jane App — service-linked slot duration, buffer time between appointments (standard medical scheduling features)
+- Zod 3 vs 4 ESM compatibility — zod.dev/v4, npm package registry
+- bcryptjs edge runtime safety — github.com/vercel/next.js/issues/69002
+- Auth.js v5 Credentials + Next.js 15 practitioner guide — codevoweb.com
+- Europe/Budapest DST schedule — timeanddate.com (UTC+1 CET winter, UTC+2 CEST summer; transitions last Sunday March/October)
 
-### Tertiary (LOW confidence)
-- Healthcare web design trends 2025 (Framerbite) — design inspiration only, not used for decisions
+### Tertiary (LOW confidence — validate at implementation)
+- Better Auth as fallback to Auth.js v5 — community reports of native Sanity adapter support; verify directly at implementation time if Auth.js v5 beta causes problems
+- Inngest as Vercel Cron upgrade path — npm package page, free tier 50k executions/month; not needed for v2.0 but documented as upgrade path
 
 ---
-*Research completed: 2026-02-18*
+*Research completed: 2026-02-22*
 *Ready for roadmap: yes*

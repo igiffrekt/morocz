@@ -1,367 +1,713 @@
 # Architecture Research
 
-**Domain:** Single-practice medical website (Next.js App Router + Sanity CMS + Framer Motion)
-**Researched:** 2026-02-18
-**Confidence:** HIGH (verified against next-sanity official GitHub, Sanity official docs, Next.js official docs)
+**Domain:** Booking module integration — Next.js 15 App Router + Sanity v4 + Auth.js v5
+**Researched:** 2026-02-21
+**Confidence:** HIGH for patterns / MEDIUM for some third-party adapter specifics
 
 ---
 
 ## Standard Architecture
 
-### System Overview
+### System Overview — v2.0 Booking Module Added to Existing Site
 
 ```
-┌──────────────────────────────────────────────────────────────────┐
-│                     SANITY STUDIO (embedded)                      │
-│  /studio/[[...index]]/page.tsx  →  Sanity Studio v3              │
-│  Schemas: homepage | services | labTests | testimonials | blog |  │
-│           siteSettings                                            │
-└──────────────────────┬───────────────────────────────────────────┘
-                       │ Content Lake (Sanity API / CDN)
-                       │ GROQ queries via sanityFetch()
-                       ▼
-┌──────────────────────────────────────────────────────────────────┐
-│                   NEXT.JS APP ROUTER (src/app/)                   │
-├──────────────────────────────────────────────────────────────────┤
-│  layout.tsx  [Server Component]                                   │
-│    ├── fetches: siteSettings singleton (nav, footer copy)        │
-│    ├── renders: <Header> (server, receives settings as props)    │
-│    └── renders: <Footer> (server, receives settings as props)    │
-│                                                                   │
-│  page.tsx    [Server Component — homepage]                        │
-│    ├── fetches: homepage singleton (all sections in one query)   │
-│    ├── renders: <HeroSection>                                    │
-│    ├── renders: <ServicesSection>                                │
-│    ├── renders: <LabTestsSection>                                │
-│    ├── renders: <TestimonialsSection>                            │
-│    └── renders: <BlogSection>                                    │
-│                                                                   │
-│  blog/[slug]/page.tsx  [Server Component — blog posts]           │
-│    └── fetches: individual post by slug                          │
-├──────────────────────────────────────────────────────────────────┤
-│                   CLIENT COMPONENTS (animations)                  │
-│  src/components/ui/                                               │
-│    ├── MotionDiv, MotionSection  — thin 'use client' wrappers    │
-│    ├── ServiceFilterBar          — filter state + layout shuffle │
-│    ├── TestimonialsCarousel      — carousel state                │
-│    └── IntroAnimation            — intro sequence, circle wipe  │
-└──────────────────────────────────────────────────────────────────┘
-                       │
-                       ▼ Webhook → revalidateTag('sanity')
-┌──────────────────────────────────────────────────────────────────┐
-│                   CACHE LAYER (Next.js)                           │
-│  Static generation at build time                                  │
-│  On-demand revalidation via Sanity GROQ webhook                  │
-│  Tag: 'sanity' covers all content, 'homepage' for fine-grained  │
-└──────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                        SANITY STUDIO (embedded /studio)                       │
+│  Existing schemas: homepage | services | labTests | testimonials | blog |     │
+│  NEW schemas:      doctorSchedule | booking | patient (user data)            │
+│  Admin views:      Booking calendar view (custom Studio tool or desk)        │
+└────────────────────────────────┬─────────────────────────────────────────────┘
+                                 │ Content Lake (Sanity HTTP API — write via SDK)
+                                 │ GROQ queries via sanityFetch() — READ
+                                 │ Sanity client mutations — WRITE (bookings)
+                                 ▼
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                     NEXT.JS APP ROUTER (src/app/)                             │
+├──────────────────────────────────────────────────────────────────────────────┤
+│  EXISTING (unchanged)                                                         │
+│  ├── layout.tsx                    — siteSettings fetch, Header + Footer     │
+│  ├── page.tsx                      — homepage sections                       │
+│  ├── blog/[slug]/page.tsx          — blog post detail                        │
+│  └── api/revalidate/route.ts       — HMAC webhook revalidation               │
+├──────────────────────────────────────────────────────────────────────────────┤
+│  NEW: Public booking flow  (route group: (public))                           │
+│  ├── idopontfoglalas/page.tsx      — booking calendar page (Server Component)│
+│  ├── idopontfoglalas/megerosites/  — booking confirmation page               │
+│  └── (auth flow wired into existing layout)                                  │
+├──────────────────────────────────────────────────────────────────────────────┤
+│  NEW: Patient account  (route group: (patient))                              │
+│  ├── fiokom/page.tsx               — patient dashboard: upcoming bookings    │
+│  └── fiokom/foglalas/[id]/page.tsx — booking detail / cancel / reschedule   │
+├──────────────────────────────────────────────────────────────────────────────┤
+│  NEW: Admin dashboard  (route group: (admin), separate layout)               │
+│  ├── (admin)/layout.tsx            — admin shell, no Header/Footer, auth guard│
+│  ├── admin/page.tsx                — today's appointments + calendar view    │
+│  └── admin/foglalas/[id]/page.tsx  — patient detail, status management      │
+├──────────────────────────────────────────────────────────────────────────────┤
+│  NEW: API routes                                                              │
+│  ├── api/auth/[...nextauth]/route.ts — Auth.js v5 handler                   │
+│  └── api/booking/availability/route.ts — slot availability (for polling)    │
+├──────────────────────────────────────────────────────────────────────────────┤
+│  NEW: Server Actions (src/lib/actions/)                                      │
+│  ├── booking.actions.ts            — createBooking, cancelBooking, reschedule│
+│  └── auth.actions.ts               — signIn, signOut wrappers if needed      │
+├──────────────────────────────────────────────────────────────────────────────┤
+│  NEW: Auth layer                                                              │
+│  ├── auth.config.ts                — providers (Google, Credentials), callbacks│
+│  ├── auth.ts                       — full Auth.js instance + Sanity adapter  │
+│  └── middleware.ts                 — JWT session check, route protection     │
+└──────────────────────────────────────────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                         EXTERNAL SERVICES                                     │
+│  Resend (email)          — booking confirmation, reminder emails             │
+│  Google OAuth            — patient login via Google account                  │
+│  Vercel (deployment)     — no changes needed, same project                  │
+└──────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ### Component Responsibilities
 
-| Component | Responsibility | Typical Implementation |
-|-----------|----------------|------------------------|
-| `app/layout.tsx` | Shell HTML, global meta, Header + Footer | Server Component; fetches siteSettings singleton once |
-| `app/page.tsx` | Homepage orchestration | Server Component; fetches full homepage document |
-| `app/blog/[slug]/page.tsx` | Individual blog post | Server Component; dynamic route |
-| `app/studio/[[...index]]/page.tsx` | Embedded Sanity Studio | Sanity's `NextStudio` component |
-| `app/api/revalidate/route.ts` | Webhook handler | Validates HMAC, calls `revalidateTag` |
-| `src/sanity/lib/client.ts` | Sanity client config | `createClient()` with CDN off (use Next.js cache) |
-| `src/sanity/lib/queries.ts` | All GROQ queries | `defineQuery()` wrapped — enables TypeGen inference |
-| `src/sanity/lib/fetch.ts` | `sanityFetch` wrapper | Adds default tags, revalidation config |
-| `src/sanity/schemas/` | Content models | One file per document/object type |
-| `src/components/sections/` | Page section components | Server Components receiving Sanity data as props |
-| `src/components/ui/` | Animated, interactive pieces | Client Components with `'use client'` |
+| Component | Responsibility | Implementation |
+|-----------|----------------|----------------|
+| `auth.config.ts` | Auth providers + callbacks (edge-safe) | Google OAuth + Credentials; no adapter import |
+| `auth.ts` | Full Auth.js instance with Sanity adapter | Imports auth.config + adds adapter + JWT strategy |
+| `middleware.ts` | Route protection | Imports auth.config only (edge-safe); redirects unauthenticated users |
+| `(admin)/layout.tsx` | Admin shell + role check | Server Component; calls `auth()`, checks role = 'admin', redirect otherwise |
+| `idopontfoglalas/page.tsx` | Booking calendar page | Server Component; fetches schedule + availability from Sanity |
+| `fiokom/page.tsx` | Patient account | Server Component; calls `auth()`, fetches patient's bookings from Sanity |
+| `lib/actions/booking.actions.ts` | Create/cancel/reschedule bookings | Server Actions; auth check + Sanity mutation + Resend email |
+| `api/booking/availability/route.ts` | Live slot availability | Route Handler; called by client for real-time slot checks |
+| `sanity/schemaTypes/bookingType.ts` | Booking document | Sanity schema for appointments |
+| `sanity/schemaTypes/doctorScheduleType.ts` | Weekly schedule + blocked dates | Sanity schema for availability configuration |
 
 ---
 
-## Recommended Project Structure
+## Integration: Patient Auth
+
+### Decision: Auth.js v5 (next-auth@5) with JWT strategy
+
+Auth.js v5 is the correct choice for Next.js 15 App Router. Use JWT session strategy — not database sessions — because:
+
+1. The Sanity adapter (`next-auth-sanity`) was archived September 2025 and does not support Auth.js v5.
+2. A custom Sanity adapter is the path forward but adds implementation risk.
+3. JWT sessions require no adapter, work on Vercel Edge, and are sufficient for a single-practice site with low auth volume.
+4. Patient user data (name, email, phone) can be stored as a Sanity `patient` document on first booking — decoupled from Auth.js session management.
+
+**Session location:** JWT in an HTTP-only cookie. Available everywhere via `auth()`.
+
+### Auth Configuration Split (required for middleware edge-compatibility)
 
 ```
-morocz/
-├── src/
-│   ├── app/
-│   │   ├── layout.tsx              # Root layout — Header + Footer, siteSettings fetch
-│   │   ├── page.tsx                # Homepage — fetches homepage singleton
-│   │   ├── blog/
-│   │   │   └── [slug]/
-│   │   │       └── page.tsx        # Blog post detail page
-│   │   ├── studio/
-│   │   │   └── [[...index]]/
-│   │   │       └── page.tsx        # Embedded Sanity Studio
-│   │   └── api/
-│   │       └── revalidate/
-│   │           └── route.ts        # Sanity webhook → revalidateTag
+auth.config.ts        — providers + callbacks; NO adapter import; used in middleware
+auth.ts               — imports auth.config; adds session strategy: 'jwt'; exports auth, handlers, signIn, signOut
+middleware.ts         — imports from auth.config only; runs on Vercel Edge runtime
+app/api/auth/[...nextauth]/route.ts — exports { GET, POST } from auth.ts handlers
+```
+
+**Pattern:**
+```typescript
+// auth.config.ts — edge-safe, no adapter
+import type { NextAuthConfig } from 'next-auth'
+import Google from 'next-auth/providers/google'
+import Credentials from 'next-auth/providers/credentials'
+
+export const authConfig: NextAuthConfig = {
+  providers: [
+    Google,
+    Credentials({
+      credentials: { email: {}, password: {} },
+      async authorize(credentials) {
+        // Verify against Sanity patient document
+        // Return user object or null
+      },
+    }),
+  ],
+  callbacks: {
+    authorized({ auth, request: { nextUrl } }) {
+      const isLoggedIn = !!auth?.user
+      const isOnPatientArea = nextUrl.pathname.startsWith('/fiokom')
+      const isOnAdminArea = nextUrl.pathname.startsWith('/admin')
+      if (isOnPatientArea) return isLoggedIn
+      if (isOnAdminArea) return auth?.user?.role === 'admin'
+      return true
+    },
+    jwt({ token, user }) {
+      if (user) token.role = user.role // persist role in JWT
+      return token
+    },
+    session({ session, token }) {
+      session.user.role = token.role as string
+      return session
+    },
+  },
+  pages: {
+    signIn: '/bejelentkezes',
+  },
+}
+```
+
+```typescript
+// auth.ts — full instance, NOT used in middleware
+import NextAuth from 'next-auth'
+import { authConfig } from './auth.config'
+
+export const { auth, handlers, signIn, signOut } = NextAuth({
+  ...authConfig,
+  session: { strategy: 'jwt' },
+})
+```
+
+```typescript
+// middleware.ts
+import NextAuth from 'next-auth'
+import { authConfig } from '@/auth.config'
+
+export const { auth: middleware } = NextAuth(authConfig)
+
+export const config = {
+  matcher: ['/fiokom/:path*', '/admin/:path*'],
+}
+```
+
+### Where Sessions Are Read
+
+| Context | How to access session |
+|---------|----------------------|
+| Server Component | `const session = await auth()` |
+| Server Action | `const session = await auth()` |
+| Route Handler | `const session = await auth()` |
+| Middleware | Via `authorized` callback in auth.config.ts |
+| Client Component | `useSession()` from `next-auth/react` (wrap in `<SessionProvider>`) |
+
+### Patient User Data in Sanity
+
+Auth.js JWT stores: `id`, `email`, `name`, `image`, `role`. On first booking, create or upsert a `patient` Sanity document keyed by email. This keeps auth decoupled from CMS — auth handles identity, Sanity handles medical/booking data.
+
+---
+
+## Integration: Booking Calendar
+
+### Route: `/idopontfoglalas`
+
+This is a new standalone page inside the existing public layout (Header + Footer visible). The URL `/idopontfoglalas` (Hungarian for "appointment booking") is entered directly in the App Router without a route group.
+
+**Data flow for the booking page:**
+
+```
+Patient visits /idopontfoglalas
+    ↓
+idopontfoglalas/page.tsx  [Server Component]
+    ├── sanityFetch({ query: doctorScheduleQuery })    — weekly hours + blocked dates
+    ├── sanityFetch({ query: allServicesQuery })        — services patient can book
+    └── renders <BookingCalendar> (Client Component 'use client')
+            ↓ receives: schedule, services as props (no Sanity calls from client)
+            ├── Step 1: patient picks service
+            ├── Step 2: patient picks date (calendar, blocked dates from props)
+            ├── Step 3: patient picks time slot
+            │         ↓ fetch('/api/booking/availability?date=YYYY-MM-DD')
+            │         — real-time check: which slots already booked
+            └── Step 4: patient confirms (form submit → Server Action)
+```
+
+**Why a Route Handler for availability, not a Server Action:**
+Server Actions use POST only. Slot availability is a read (GET), must be pollable without form submission, and needs to refresh periodically while the patient deliberates. Route Handler at `GET /api/booking/availability` is correct here.
+
+---
+
+## Integration: Booking Server Actions
+
+### Decision: Server Actions for all mutations
+
+Creating, canceling, and rescheduling a booking are mutations within the Next.js app, called from Client Components. Server Actions are the right choice:
+- No separate API endpoint needed
+- Built-in CSRF protection
+- Direct access to session via `auth()`
+- Automatic cache revalidation with `revalidatePath` / `revalidateTag`
+
+```typescript
+// src/lib/actions/booking.actions.ts
+'use server'
+
+import { auth } from '@/auth'
+import { sanityWriteClient } from '@/sanity/lib/client'
+import { sendConfirmationEmail } from '@/lib/email'
+import { revalidateTag } from 'next/cache'
+
+export async function createBooking(formData: FormData) {
+  const session = await auth()
+  if (!session?.user) throw new Error('Bejelentkezés szükséges')
+
+  const serviceId = formData.get('serviceId') as string
+  const date = formData.get('date') as string
+  const time = formData.get('time') as string
+
+  // 1. Check slot still available (guard against race condition)
+  const existingBooking = await checkSlotAvailability(date, time)
+  if (!existingBooking.available) {
+    return { error: 'Ez az időpont már foglalt. Kérjük, válasszon másikat.' }
+  }
+
+  // 2. Create booking document in Sanity
+  const booking = await sanityWriteClient.create({
+    _type: 'booking',
+    patient: { email: session.user.email, name: session.user.name },
+    service: { _type: 'reference', _ref: serviceId },
+    date,
+    time,
+    status: 'confirmed',
+    createdAt: new Date().toISOString(),
+  })
+
+  // 3. Send confirmation email
+  await sendConfirmationEmail({
+    to: session.user.email!,
+    patientName: session.user.name!,
+    date,
+    time,
+  })
+
+  revalidateTag('booking')
+  return { success: true, bookingId: booking._id }
+}
+```
+
+**Note on double-booking:** Sanity does not support database-level row locking. The protection strategy is:
+1. Check availability in the Server Action before writing (read → validate → write)
+2. Store a composite key field (`dateTime: "2026-03-15T10:00"`) on the booking document
+3. Use Sanity's `ifRevisionID` optimistic locking on the slot document if using a slot-based model
+4. At this scale (single practice, low concurrency), the read-then-write pattern with immediate status check is sufficient
+
+---
+
+## Sanity Schema: Availability Modeling
+
+### Recommended Schema Design
+
+Three new document types cover the booking domain:
+
+**1. `doctorSchedule` (singleton document)**
+
+Defines the weekly repeating schedule and one-off blocked dates. The doctor edits this in Studio.
+
+```typescript
+// Conceptual schema — actual file: src/sanity/schemaTypes/doctorScheduleType.ts
+{
+  name: 'doctorSchedule',
+  type: 'document',
+  fields: [
+    {
+      name: 'weeklySlots',
+      type: 'array',
+      of: [{
+        type: 'object',
+        fields: [
+          { name: 'dayOfWeek', type: 'number' },        // 1=Monday, 7=Sunday
+          { name: 'startTime', type: 'string' },        // "09:00"
+          { name: 'endTime', type: 'string' },          // "17:00"
+          { name: 'slotDurationMinutes', type: 'number' }, // 30
+          { name: 'breakStart', type: 'string' },       // "12:00" optional
+          { name: 'breakEnd', type: 'string' },         // "13:00" optional
+        ]
+      }]
+    },
+    {
+      name: 'blockedDates',
+      type: 'array',
+      of: [{
+        type: 'object',
+        fields: [
+          { name: 'date', type: 'date' },                // "2026-08-20"
+          { name: 'reason', type: 'string' },            // "Szabadság"
+        ]
+      }]
+    },
+    {
+      name: 'bookingWindowDays',
+      type: 'number',
+      // How far in advance patients can book (e.g., 60 days)
+    }
+  ]
+}
+```
+
+**2. `booking` (many documents, one per appointment)**
+
+```typescript
+// Conceptual schema — actual file: src/sanity/schemaTypes/bookingType.ts
+{
+  name: 'booking',
+  type: 'document',
+  fields: [
+    { name: 'patientName', type: 'string' },
+    { name: 'patientEmail', type: 'string' },
+    { name: 'patientPhone', type: 'string' },
+    { name: 'service', type: 'reference', to: [{ type: 'service' }] },
+    { name: 'date', type: 'date' },                     // "2026-03-15"
+    { name: 'time', type: 'string' },                   // "10:00"
+    { name: 'dateTime', type: 'string' },               // "2026-03-15T10:00" — composite key for conflict detection
+    { name: 'status', type: 'string' },                 // 'confirmed' | 'cancelled' | 'completed'
+    { name: 'notes', type: 'text' },                    // optional patient note
+    { name: 'createdAt', type: 'datetime' },
+    { name: 'cancelledAt', type: 'datetime' },
+    { name: 'authUserId', type: 'string' },             // Auth.js user identifier
+  ]
+}
+```
+
+**3. Slot generation strategy: compute in code, not Sanity**
+
+Do NOT store individual time slots as Sanity documents. That would create hundreds of documents per week. Instead:
+- `doctorSchedule` defines the rules (weekly template + blocked dates)
+- The booking calendar page fetches the schedule + existing bookings for a date range
+- Slot generation is a pure function that takes schedule rules + booked slots → available slots
+
+```typescript
+// src/lib/booking/slots.ts
+export function generateAvailableSlots(
+  schedule: DoctorSchedule,
+  existingBookings: Booking[],
+  date: string, // "YYYY-MM-DD"
+): TimeSlot[] {
+  // 1. Find the weeklySlot for this day of week
+  // 2. Generate all slots between startTime and endTime, skipping break
+  // 3. Filter out slots that have a matching booking with status !== 'cancelled'
+  // 4. Return available slots
+}
+```
+
+---
+
+## Integration: Email Sending
+
+### Decision: Resend via Server Action (inline, not background job)
+
+For a single-practice site with low booking volume, send email synchronously inside the Server Action after the booking is created. No background job infrastructure (Inngest, QStash) needed at this scale.
+
+```typescript
+// src/lib/email.ts
+import { Resend } from 'resend'
+
+const resend = new Resend(process.env.RESEND_API_KEY)
+
+export async function sendConfirmationEmail(params: {
+  to: string
+  patientName: string
+  date: string
+  time: string
+  serviceName: string
+}) {
+  await resend.emails.send({
+    from: 'Mórocz Medical <idopont@drmoroczangela.hu>',
+    to: params.to,
+    subject: 'Időpont-visszaigazolás — Mórocz Medical',
+    // Use React Email component or plain HTML
+    html: buildConfirmationEmailHtml(params),
+  })
+}
+```
+
+**Reminder emails:** At this scale, send reminders as a separate Vercel Cron job (one function, runs daily, queries upcoming bookings from Sanity and sends reminders for tomorrow's appointments). Do not require real-time event triggers.
+
+---
+
+## Integration: Admin Dashboard
+
+### Decision: Route group `(admin)` with its own layout
+
+The admin dashboard needs:
+- No public Header/Footer (different shell entirely)
+- Separate authentication check (role = 'admin')
+- Different visual design (data-dense, not patient-facing)
+
+Route groups make this clean without polluting the URL:
+
+```
+src/app/
+├── layout.tsx                    — public root layout (Header + Footer)
+├── (admin)/
+│   ├── layout.tsx                — admin root layout (admin shell, role guard)
+│   └── admin/
+│       ├── page.tsx              — today's appointments + calendar
+│       └── foglalas/[id]/
+│           └── page.tsx          — booking detail
+```
+
+The URL is `/admin/...` — the route group `(admin)` is invisible in URLs.
+
+**Admin layout pattern:**
+```typescript
+// src/app/(admin)/layout.tsx
+import { auth } from '@/auth'
+import { redirect } from 'next/navigation'
+
+export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  const session = await auth()
+
+  if (!session?.user || session.user.role !== 'admin') {
+    redirect('/bejelentkezes?callbackUrl=/admin')
+  }
+
+  return (
+    <div className="admin-shell">
+      <AdminSidebar />
+      <main>{children}</main>
+    </div>
+  )
+}
+```
+
+**Admin login:** The admin uses the same Auth.js login page (`/bejelentkezes`) but with the `Credentials` provider (email + password). The admin user document in Sanity has `role: 'admin'` — the JWT callback reads this and stores it in the token. Middleware and the admin layout both check this role.
+
+There is no separate admin auth system — one auth stack, role-based access control.
+
+---
+
+## Recommended Project Structure (additions only)
+
+```
+src/
+├── app/
+│   ├── (admin)/                      # NEW — route group, invisible in URL
+│   │   ├── layout.tsx                # Admin shell + role guard
+│   │   └── admin/
+│   │       ├── page.tsx              # Today's appointments
+│   │       └── foglalas/[id]/
+│   │           └── page.tsx          # Booking detail / manage
 │   │
-│   ├── components/
-│   │   ├── sections/               # Page-level section components (Server)
-│   │   │   ├── HeroSection.tsx
-│   │   │   ├── ServicesSection.tsx
-│   │   │   ├── LabTestsSection.tsx
-│   │   │   ├── TestimonialsSection.tsx
-│   │   │   ├── BlogSection.tsx
-│   │   │   ├── Header.tsx
-│   │   │   └── Footer.tsx
-│   │   └── ui/                     # Reusable UI + animated pieces (mix)
-│   │       ├── motion/             # All Framer Motion wrappers (Client)
-│   │       │   ├── MotionDiv.tsx
-│   │       │   ├── MotionSection.tsx
-│   │       │   └── AnimatePresenceWrapper.tsx
-│   │       ├── ServiceFilterBar.tsx   # 'use client' — filter state
-│   │       ├── ServiceCard.tsx        # Server (static) or Client (animated)
-│   │       ├── TestimonialsCarousel.tsx  # 'use client' — carousel state
-│   │       ├── IntroAnimation.tsx        # 'use client' — intro sequence
-│   │       └── CircleWipeTransition.tsx  # 'use client'
+│   ├── idopontfoglalas/              # NEW — public booking page
+│   │   └── page.tsx
 │   │
-│   ├── sanity/
-│   │   ├── lib/
-│   │   │   ├── client.ts           # createClient() — useCdn: false, use Next.js cache
-│   │   │   ├── fetch.ts            # sanityFetch() wrapper with default tags
-│   │   │   ├── queries.ts          # All GROQ queries (defineQuery wrapped)
-│   │   │   └── image.ts            # urlForImage() helper
-│   │   ├── schemas/
-│   │   │   ├── index.ts            # Schema registry — imports all types
-│   │   │   ├── documents/
-│   │   │   │   ├── homepage.ts     # Singleton — homepage sections array
-│   │   │   │   ├── siteSettings.ts # Singleton — nav, contact, footer copy
-│   │   │   │   ├── service.ts      # Service document type
-│   │   │   │   ├── labTest.ts      # Lab test document type
-│   │   │   │   ├── testimonial.ts  # Testimonial document type
-│   │   │   │   └── blogPost.ts     # Blog post document type
-│   │   │   └── objects/
-│   │   │       ├── seoFields.ts    # Reusable SEO fieldset
-│   │   │       ├── ctaButton.ts    # Reusable CTA button object
-│   │   │       └── heroFields.ts   # Hero section fields object
-│   │   ├── structure.ts            # Studio desk structure (singleton enforcement)
-│   │   ├── sanity.config.ts        # Studio config
-│   │   └── sanity.types.ts         # GENERATED — do not edit manually
+│   ├── fiokom/                       # NEW — patient account area
+│   │   ├── page.tsx                  # Upcoming / past bookings
+│   │   └── foglalas/[id]/
+│   │       └── page.tsx              # Cancel / reschedule
 │   │
-│   └── lib/
-│       ├── metadata.ts             # generateMetadata helpers, JSON-LD builders
-│       └── utils.ts                # cn(), formatDate(), etc.
+│   ├── bejelentkezes/                # NEW — login page
+│   │   └── page.tsx
+│   │
+│   └── api/
+│       ├── auth/
+│       │   └── [...nextauth]/
+│       │       └── route.ts          # Auth.js handler
+│       └── booking/
+│           └── availability/
+│               └── route.ts          # GET — slot availability for date
 │
-├── public/
-│   └── fonts/                      # Plus Jakarta Sans (self-hosted)
-├── sanity.cli.ts                   # TypeGen config
-├── next.config.ts
-├── tailwind.config.ts
-└── tsconfig.json
+├── auth.config.ts                    # NEW — edge-safe provider config
+├── auth.ts                           # NEW — full Auth.js instance
+├── middleware.ts                     # NEW — route protection
+│
+├── components/
+│   └── booking/                      # NEW — booking UI components
+│       ├── BookingCalendar.tsx        # 'use client' — multi-step booking flow
+│       ├── ServicePicker.tsx          # 'use client' — service selection step
+│       ├── DatePicker.tsx             # 'use client' — calendar date selection
+│       ├── TimePicker.tsx             # 'use client' — time slot grid
+│       ├── BookingConfirmDialog.tsx   # 'use client' — confirm modal
+│       └── PatientBookingList.tsx     # 'use client' — patient's bookings list
+│
+├── sanity/
+│   └── schemaTypes/
+│       ├── bookingType.ts            # NEW — appointment document
+│       ├── doctorScheduleType.ts     # NEW — weekly schedule + blocked dates
+│       └── patientType.ts            # NEW — patient profile (optional)
+│
+└── lib/
+    ├── actions/
+    │   ├── booking.actions.ts        # NEW — Server Actions: create, cancel, reschedule
+    │   └── auth.actions.ts           # NEW — signIn/signOut wrappers if needed
+    ├── booking/
+    │   └── slots.ts                  # NEW — slot generation pure function
+    └── email.ts                      # NEW — Resend email helpers
 ```
-
-### Structure Rationale
-
-- **`src/sanity/`:** All Sanity concerns in one place — client, queries, schemas, generated types. Nothing Sanity-related leaks into components.
-- **`src/components/sections/`:** One file per page section. Server Components by default — they receive typed props from page.tsx and call no Sanity APIs themselves (data flows down, not sideways).
-- **`src/components/ui/`:** Reusable primitives. The `motion/` sub-folder isolates all Framer Motion wrappers that require `'use client'`. Keeps the Server/Client boundary explicit.
-- **`src/lib/`:** Project-level utilities that are not Sanity-specific (metadata builders, class helpers).
-- **Studio embedded at `/studio`:** Single repo, single deploy. No separate Studio project needed for a single-practice site.
 
 ---
 
 ## Architectural Patterns
 
-### Pattern 1: Singleton Document for Homepage
+### Pattern 1: JWT Auth with Split Config for Edge Middleware
 
-**What:** The homepage is stored as a single Sanity document with a fixed `_id: 'homepage'`. It contains all section content as nested fields/arrays, not as separate document references.
+**What:** Auth.js v5 requires splitting configuration into `auth.config.ts` (edge-safe, no adapter, used in middleware) and `auth.ts` (full instance with any heavy dependencies, used everywhere else). The session is a signed JWT stored in an HTTP-only cookie — no database session table needed.
 
-**When to use:** Any page that exists exactly once and is directly managed by the client. Homepage, About, Contact.
+**When to use:** Whenever middleware runs auth checks and the project uses an adapter or ORM that is not edge-compatible. This is the recommended pattern in Auth.js v5 docs for Vercel deployments.
 
-**Trade-offs:** Simple to query (one fetch, all data). Slightly harder to reorder sections dynamically, but for a fixed-structure homepage that is a non-issue.
+**Trade-offs:** Slightly more files than a single `auth.ts` approach. Worth it to avoid the "adapter not compatible with edge" error that breaks middleware deployment.
 
-**Example:**
-```typescript
-// src/sanity/schemas/documents/homepage.ts
-import { defineType, defineField } from 'sanity'
+**Example:** See "Integration: Patient Auth" section above.
 
-export const homepageSchema = defineType({
-  name: 'homepage',
-  title: 'Homepage',
-  type: 'document',
-  fields: [
-    defineField({ name: 'hero', type: 'heroFields' }),
-    defineField({ name: 'servicesHeading', type: 'string' }),
-    defineField({ name: 'labTestsHeading', type: 'string' }),
-    defineField({ name: 'testimonials', type: 'array', of: [{ type: 'reference', to: [{ type: 'testimonial' }] }] }),
-    defineField({ name: 'blogSection', type: 'object', fields: [
-      defineField({ name: 'heading', type: 'string' }),
-      defineField({ name: 'subheading', type: 'string' }),
-    ]}),
-    defineField({ name: 'seo', type: 'seoFields' }),
-  ],
-})
-```
+### Pattern 2: Sanity as Source of Truth for Schedule, Not Slots
 
-```typescript
-// src/sanity/structure.ts — enforce singleton (only one document)
-import { StructureBuilder } from 'sanity/structure'
+**What:** Only the schedule rules (weekly template, blocked dates) live in Sanity. Individual time slots are generated on-demand in a pure TypeScript function. Booked slots are Sanity `booking` documents queried by date range.
 
-export const structure = (S: StructureBuilder) =>
-  S.list().items([
-    S.listItem().title('Homepage').child(
-      S.document().schemaType('homepage').documentId('homepage')
-    ),
-    S.listItem().title('Site Settings').child(
-      S.document().schemaType('siteSettings').documentId('siteSettings')
-    ),
-    S.divider(),
-    ...S.documentTypeListItems().filter(
-      (item) => !['homepage', 'siteSettings'].includes(item.getId()!)
-    ),
-  ])
-```
+**When to use:** Any calendar booking system where storing every possible slot would create an unwieldy number of documents.
 
-### Pattern 2: Fetch at the Top, Pass Down as Props
+**Trade-offs:** Slot generation logic must be correct and well-tested. The upside is the admin only manages the schedule template — not individual slots — which is a far better CMS editing experience.
 
-**What:** Server Components at the page/layout level fetch all required data, then pass typed props down to section components. Section components are pure presentation — no Sanity calls inside them.
+### Pattern 3: Server Action Mutations + Route Handler for Live Reads
 
-**When to use:** Always for this project. Avoids waterfall fetching and keeps sections testable in isolation.
+**What:** All state-changing operations (create booking, cancel, reschedule) use Server Actions. The single live-read operation (checking which slots are still available while the patient is choosing) uses a Route Handler (`GET /api/booking/availability`) because Server Actions are POST-only and not suitable for polled reads.
 
-**Trade-offs:** Slightly more prop-passing verbosity. Massive gain in testability and predictability. Next.js deduplicates identical `fetch()` calls automatically so there is no waste when layout and page both need siteSettings.
+**When to use:** This hybrid is the correct default. Server Actions for mutations (form submissions, data writes). Route Handlers for read-only endpoints that need to be called repeatedly, cached, or accessed outside of form context.
 
-**Example:**
-```typescript
-// src/app/page.tsx
-import { sanityFetch } from '@/sanity/lib/fetch'
-import { HOMEPAGE_QUERY } from '@/sanity/lib/queries'
-import { HeroSection } from '@/components/sections/HeroSection'
-import { ServicesSection } from '@/components/sections/ServicesSection'
+### Pattern 4: Route Group for Admin Isolation
 
-export default async function HomePage() {
-  const homepage = await sanityFetch({ query: HOMEPAGE_QUERY })
+**What:** `(admin)` route group with its own `layout.tsx` gives the admin dashboard a completely different shell (no public Header/Footer) without affecting URLs. The role check lives in the layout — a single, authoritative gate for all admin routes.
 
-  return (
-    <main>
-      <HeroSection data={homepage.hero} />
-      <ServicesSection heading={homepage.servicesHeading} />
-    </main>
-  )
-}
-```
-
-### Pattern 3: Server/Client Split for Animations
-
-**What:** Data-fetching components stay Server Components. Animation wrappers in `src/components/ui/motion/` are thin `'use client'` wrappers around Framer Motion primitives. Server sections wrap their content in these motion primitives for animation.
-
-**When to use:** Any time you need scroll-triggered animations or interactive state alongside server-rendered content.
-
-**Trade-offs:** Requires a wrapper file per HTML element type (div, section, h1, etc.) but keeps the bundle minimal — only animation code ships to the client, not the data-fetching logic.
-
-**Example:**
-```typescript
-// src/components/ui/motion/MotionDiv.tsx
-'use client'
-import { motion, HTMLMotionProps } from 'framer-motion'
-
-export function MotionDiv(props: HTMLMotionProps<'div'>) {
-  return <motion.div {...props} />
-}
-
-// Usage in a Server Component section:
-// import { MotionDiv } from '@/components/ui/motion/MotionDiv'
-// <MotionDiv initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-//   {/* server-rendered children */}
-// </MotionDiv>
-```
-
-### Pattern 4: Tag-Based Cache Revalidation
-
-**What:** All `sanityFetch()` calls are tagged with `'sanity'` by default. A webhook route at `/api/revalidate` calls `revalidateTag('sanity')` when content changes in Sanity Studio.
-
-**When to use:** Always — this is the standard pattern for Sanity + Next.js static content with near-instant editorial updates.
-
-**Trade-offs:** Requires Sanity webhook configuration in the dashboard. One-time setup. For this single-practice site there is almost no editorial traffic, so simple global tag revalidation is sufficient over fine-grained per-document tags.
-
-**Example:**
-```typescript
-// src/app/api/revalidate/route.ts
-import { revalidateTag } from 'next/cache'
-import { type NextRequest, NextResponse } from 'next/server'
-import { parseBody } from 'next-sanity/webhook'
-
-export async function POST(req: NextRequest) {
-  try {
-    const { isValidSignature, body } = await parseBody<{ _type: string }>(
-      req,
-      process.env.SANITY_REVALIDATE_SECRET
-    )
-    if (!isValidSignature) {
-      return new NextResponse('Invalid signature', { status: 401 })
-    }
-    revalidateTag('sanity')
-    return NextResponse.json({ revalidated: true, now: Date.now() })
-  } catch (err) {
-    return new NextResponse((err as Error).message, { status: 500 })
-  }
-}
-```
+**When to use:** Any time a portion of the app needs fundamentally different chrome and access rules from the public site. Do not use the public root layout for admin — it fetches site settings, shows the marketing nav, and is wrong for admin UX.
 
 ---
 
 ## Data Flow
 
-### Request Flow (Page Load)
+### Booking Creation Flow
 
 ```
-User visits morocz.hu
-    ↓
-Next.js Edge / CDN checks cache
-    ↓ (cache miss or first load)
-app/layout.tsx  [Server Component]
-    ├── sanityFetch({ query: SITE_SETTINGS_QUERY, tags: ['sanity', 'siteSettings'] })
-    │       → Sanity Content Lake → siteSettings document
-    │       → passes { nav, phone, address, footerCopy } to <Header> and <Footer>
-    └── renders children
-              ↓
-app/page.tsx  [Server Component]
-    ├── sanityFetch({ query: HOMEPAGE_QUERY, tags: ['sanity', 'homepage'] })
-    │       → Sanity Content Lake → homepage singleton with all section data
-    └── renders section components with data as props:
-              <HeroSection data={homepage.hero} />
-              <ServicesSection heading={...} />   → ServicesSection queries services separately
-              <LabTestsSection heading={...} />   → LabTestsSection queries labTests separately
-              <TestimonialsSection refs={...} />  → resolved inline via GROQ expand
-              <BlogSection heading={...} />       → BlogSection queries recent posts separately
-    ↓
-HTML returned to browser (fully rendered, no client data fetching)
-    ↓
-React hydration — Client Components activate:
-    IntroAnimation    → plays intro sequence
-    MotionDiv wrappers → IntersectionObserver triggers scroll animations
-    ServiceFilterBar  → filter state, layout shuffle animation
-    TestimonialsCarousel → carousel drag/swipe
+Patient fills booking form (Client Component)
+    ↓ clicks "Foglalás megerősítése"
+createBooking(formData) [Server Action]
+    ├── await auth()                        → verify patient is logged in
+    ├── checkSlotAvailability(date, time)   → GROQ query: existing bookings for this dateTime
+    │       ↓ slot already taken?
+    │       return { error: '...' }         → show error to patient, no write
+    │       ↓ slot available?
+    ├── sanityWriteClient.create(booking)   → write booking to Sanity Content Lake
+    ├── sendConfirmationEmail(...)          → Resend API call
+    ├── revalidateTag('booking')            → invalidate patient dashboard cache
+    └── return { success: true, bookingId }
+            ↓
+Client Component receives result
+    → redirect to /fiokom (patient dashboard) or show success message
 ```
 
-### Editorial Update Flow
+### Slot Availability Flow (live check during booking)
 
 ```
-Editor updates content in Sanity Studio (/studio)
+Patient selects a date in BookingCalendar (Client Component)
     ↓
-Sanity Content Lake updates
+fetch('/api/booking/availability?date=2026-03-15')
     ↓
-Sanity fires GROQ webhook → POST /api/revalidate
-    ↓
-Route handler validates HMAC signature
-    ↓
-revalidateTag('sanity') purges all cached pages
-    ↓
-Next.js regenerates pages on next request
-    ↓
-Updated content live within seconds
+GET /api/booking/availability/route.ts  [Route Handler]
+    ├── parse date param
+    ├── sanityFetch(doctorScheduleQuery)   — get schedule rules (cached 60s)
+    ├── sanityFetch(bookingsForDateQuery)  — get existing bookings for this date (no-cache)
+    ├── generateAvailableSlots(schedule, bookings, date)  — pure function
+    └── return JSON: [{ time: '09:00', available: true }, ...]
+            ↓
+Client Component renders available/unavailable time slots
 ```
 
-### Services Filter Data Flow (Client-Side)
+### Admin Dashboard Flow
 
 ```
-ServicesSection (Server Component)
-    ↓ fetches all services with categories from Sanity
-    ↓ passes { services, categories } to:
-ServiceFilterBar (Client Component — 'use client')
-    ├── holds: selectedCategory state (useState)
-    ├── renders: category filter buttons
-    ├── renders: filtered ServiceCard grid
-    └── on filter change:
-            → Framer Motion AnimatePresence handles layout shuffle
-            → No Sanity re-fetch — all data already in props
+Admin visits /admin
+    ↓
+(admin)/layout.tsx  [Server Component]
+    ├── await auth()
+    ├── role !== 'admin' → redirect('/bejelentkezes')
+    └── render admin shell
+            ↓
+admin/page.tsx  [Server Component]
+    ├── sanityFetch(todaysBookingsQuery, { revalidate: 0 }) — always fresh
+    ├── sanityFetch(doctorScheduleQuery, tags: ['doctorSchedule'])
+    └── render <AdminCalendarView> + <TodayAppointmentsList>
 ```
+
+### Patient Account Flow
+
+```
+Patient visits /fiokom
+    ↓
+middleware.ts checks JWT cookie
+    ├── no session → redirect('/bejelentkezes?callbackUrl=/fiokom')
+    └── session valid → allow
+            ↓
+fiokom/page.tsx  [Server Component]
+    ├── await auth()                        — get session
+    ├── sanityFetch(patientBookingsQuery, { params: { email: session.user.email } })
+    └── render <PatientBookingList> with upcoming + past bookings
+```
+
+---
+
+## Existing Code: What Changes vs What Stays
+
+### Unchanged
+
+| File | Status |
+|------|--------|
+| `src/app/layout.tsx` | Unchanged — public layout stays as is |
+| `src/app/page.tsx` | Unchanged |
+| `src/app/blog/[slug]/page.tsx` | Unchanged |
+| `src/sanity/lib/fetch.ts` | Unchanged — sanityFetch works for reads |
+| `src/sanity/lib/queries.ts` | Append-only — new queries added, none modified |
+| `src/sanity/lib/client.ts` | Minor addition: export a write client with API token |
+| `src/app/api/revalidate/route.ts` | Add new type mappings: `booking`, `doctorSchedule` |
+| `src/sanity/schemaTypes/index.ts` | Add new schema imports |
+| `src/components/layout/Header.tsx` | Add "Bejelentkezés" / "Fiókom" nav item (minor) |
+
+### New Files (all additive, nothing deleted)
+
+| File | Purpose |
+|------|---------|
+| `auth.config.ts` | Edge-safe auth config |
+| `auth.ts` | Full Auth.js instance |
+| `middleware.ts` | Route protection |
+| `src/app/(admin)/layout.tsx` | Admin shell |
+| `src/app/(admin)/admin/page.tsx` | Admin dashboard |
+| `src/app/idopontfoglalas/page.tsx` | Booking calendar page |
+| `src/app/fiokom/page.tsx` | Patient account |
+| `src/app/bejelentkezes/page.tsx` | Login page |
+| `src/app/api/auth/[...nextauth]/route.ts` | Auth.js API handler |
+| `src/app/api/booking/availability/route.ts` | Slot availability endpoint |
+| `src/lib/actions/booking.actions.ts` | Booking Server Actions |
+| `src/lib/booking/slots.ts` | Slot generation logic |
+| `src/lib/email.ts` | Resend email helpers |
+| `src/components/booking/*.tsx` | Booking UI components |
+| `src/sanity/schemaTypes/bookingType.ts` | Booking schema |
+| `src/sanity/schemaTypes/doctorScheduleType.ts` | Schedule schema |
+
+---
+
+## Build Order (considering hard dependencies)
+
+The booking module has clear dependency chains. Build in this order to avoid blockers:
+
+**Phase 1: Foundation (no user-facing output yet)**
+1. New Sanity schemas: `doctorSchedule`, `booking` — establishes data contracts
+2. Run `sanity typegen generate` — all subsequent TS work is type-safe
+3. Add `GROQ queries` for schedule and bookings to `queries.ts`
+4. Export Sanity write client from `client.ts` — needed by Server Actions
+5. Update `api/revalidate/route.ts` with new document type mappings
+
+**Phase 2: Auth (blocks all protected pages)**
+6. `auth.config.ts` — Google provider + Credentials provider + callbacks
+7. `auth.ts` — full Auth.js instance, JWT strategy
+8. `middleware.ts` — route protection for `/fiokom` and `/admin`
+9. `app/api/auth/[...nextauth]/route.ts` — Auth.js API route
+10. `app/bejelentkezes/page.tsx` — login page (sign in form)
+11. Header update — "Bejelentkezés" link
+
+**Phase 3: Core booking (depends on auth + schemas)**
+12. `lib/booking/slots.ts` — slot generation pure function (testable in isolation)
+13. `api/booking/availability/route.ts` — slot availability endpoint
+14. `lib/email.ts` — Resend email helpers
+15. `lib/actions/booking.actions.ts` — createBooking, cancelBooking Server Actions
+16. `components/booking/BookingCalendar.tsx` — multi-step booking UI (Client Component)
+17. `app/idopontfoglalas/page.tsx` — booking page (fetches schedule, renders BookingCalendar)
+
+**Phase 4: Patient account (depends on auth + booking)**
+18. `app/fiokom/page.tsx` — patient dashboard
+19. `app/fiokom/foglalas/[id]/page.tsx` — booking detail + cancel
+
+**Phase 5: Admin dashboard (depends on auth + booking data)**
+20. `app/(admin)/layout.tsx` — admin shell + role guard
+21. `app/(admin)/admin/page.tsx` — admin calendar/today view
+22. Admin booking management UI
+
+**Phase 6: Reminder emails (can be added later, independent)**
+23. Vercel Cron function — daily reminder emails
 
 ---
 
@@ -369,50 +715,50 @@ ServiceFilterBar (Client Component — 'use client')
 
 | Scale | Architecture Adjustments |
 |-------|--------------------------|
-| 0-1k users | Current architecture is optimal. Static generation + CDN edge caching handles this trivially. |
-| 1k-100k users | Add Sanity CDN for image delivery. Consider `next/image` with remote patterns pointing to `cdn.sanity.io`. Already supported. |
-| 100k+ users | This is a single-practice site; this scale is not a realistic concern. If it were: consider ISR per-route instead of global tag revalidation. |
+| 0-100 bookings/month | Current architecture handles this trivially. Single practice, one doctor. |
+| 100-1k bookings/month | Add indexing on `dateTime` composite field. Monitor Sanity API usage (free tier: 500k requests/month). |
+| 1k+ bookings/month | This is not realistic for a single-practice clinic. If it were: move to a proper relational DB (Postgres) for booking data; keep Sanity for CMS content only. |
 
 ### Scaling Priorities
 
-1. **First bottleneck — images:** Sanity's image CDN with `@sanity/image-url` and `next/image` handles this. Set `quality: 85`, `format: 'webp'`. Implement early.
-2. **Second bottleneck — Sanity API rate limits:** Not a concern for editorial traffic (one practice, one editor). Free tier handles it. If blog gets public search: cache aggressively.
+1. **First concern — double-booking at peak times:** Read-then-write pattern in Server Actions is safe for this practice's volume. Implement `dateTime` composite field uniqueness check. For higher volume, use Sanity's `ifRevisionID` optimistic locking on a slot document.
+2. **Second concern — Sanity write API costs:** Bookings use the write API (mutations), which counts against the plan. At a single practice's volume (maybe 20 bookings/day), this is negligible on the free/growth tier.
 
 ---
 
 ## Anti-Patterns
 
-### Anti-Pattern 1: Fetching Sanity Data Inside Section Components
+### Anti-Pattern 1: Storing Every Possible Time Slot as a Sanity Document
 
-**What people do:** Put `await sanityFetch()` calls inside `<ServicesSection>` or `<HeroSection>` directly.
+**What people do:** Create a `timeSlot` document type with a document per slot (09:00, 09:30, 10:00 ... for each day). Mark as `available: true/false`.
 
-**Why it's wrong:** Creates multiple parallel Sanity fetches per page, makes query locations unpredictable, and breaks the ability to reason about what data a page needs at a glance. Also makes testing sections harder since they need a Sanity client mock.
+**Why it's wrong:** 30-minute slots, 5 days/week, 8 hours/day = 80 slots/week = 4,160/year. Plus Sanity document limits and query overhead. The editor experience for "blocking Christmas week" becomes painful. Schema changes break all slot documents.
 
-**Do this instead:** Fetch everything in `page.tsx` (or `layout.tsx` for global data), pass typed props to sections. Next.js deduplicates identical fetch calls automatically, so there is no performance penalty for fetching siteSettings in both layout and page.
+**Do this instead:** Store schedule rules (template) in one `doctorSchedule` document. Generate slots as a pure function at query time. Store only actual bookings as documents.
 
-### Anti-Pattern 2: Using `'use client'` on Section Components
+### Anti-Pattern 2: Using the Database Session Strategy with Sanity
 
-**What people do:** Add `'use client'` to section components just to use Framer Motion, which turns the entire section subtree into a client bundle.
+**What people do:** Configure Auth.js with `session: { strategy: 'database' }` and the `next-auth-sanity` adapter, expecting Sanity to store sessions.
 
-**Why it's wrong:** Loses server-side rendering for the section — all markup must be generated client-side, hurting SEO and Time to First Paint. Increases bundle size unnecessarily.
+**Why it's wrong:** The `next-auth-sanity` package was archived in September 2025 with no v5 support. Database sessions require an adapter that can run outside edge runtime, which means middleware cannot use it without the config split — adding complexity. Sessions stored in Sanity add write API calls on every request.
 
-**Do this instead:** Keep sections as Server Components. Use thin motion wrapper components from `src/components/ui/motion/` that are individually marked `'use client'`. Server-rendered HTML is preserved; only the animation JS is client-side.
+**Do this instead:** Use JWT sessions (`strategy: 'jwt'`). No adapter needed for auth itself. Patient profile data lives separately in Sanity `patient` or `booking` documents, not in Auth.js session tables.
 
-### Anti-Pattern 3: Storing All Data in a Single Flat Homepage Schema
+### Anti-Pattern 3: Admin Dashboard Sharing the Public Root Layout
 
-**What people do:** Put every piece of content as top-level fields on the homepage document (e.g., `service1Title`, `service1Description`, `service2Title`, ...).
+**What people do:** Put the admin at `/admin` without a route group, inheriting the public root layout with `sanityFetch` for site settings, Header, Footer, CookieNotice, GA4, MotionProvider.
 
-**Why it's wrong:** Forces schema changes to add services. Cannot reorder without code changes. CMS editor experience is terrible — a flat wall of fields.
+**Why it's wrong:** Admin gets the patient-facing chrome (hero nav, marketing footer), the layout calls `sanityFetch(siteSettingsQuery)` on every admin page load unnecessarily, and animations fire on dashboard pages. Conceptually wrong — admin is an internal tool, not a public page.
 
-**Do this instead:** Use separate `service` document type. Homepage references services via `array of references`. Services section fetches `*[_type == "service"] | order(order asc)`. Adding a new service requires only CMS, no code.
+**Do this instead:** Route group `(admin)` with its own `layout.tsx`. Admin layout has its own HTML structure: sidebar, data tables, no animations. Public layout unchanged and unaware of admin.
 
-### Anti-Pattern 4: Skipping TypeGen
+### Anti-Pattern 4: Fetching Slot Availability Inside a Server Action for Display
 
-**What people do:** Write GROQ queries and cast results with `as SomeType` or use `any`.
+**What people do:** Create a Server Action to "get available slots" and call it from a Client Component to show the time picker.
 
-**Why it's wrong:** Schema changes in Sanity break TypeScript silently. Component props become incorrect without compile-time errors.
+**Why it's wrong:** Server Actions use POST requests and are designed for mutations. They cannot be called with GET semantics, cannot be cached by the browser, and are awkward to call reactively as the user browses dates. Using them for reads bypasses Next.js fetch caching.
 
-**Do this instead:** Use `defineQuery()` from `next-sanity`, run `sanity typegen generate` in the dev workflow (or as a pre-build step). Commit `sanity.types.ts`. TypeScript catches schema/component mismatches at compile time.
+**Do this instead:** Route Handler (`GET /api/booking/availability?date=...`) for the live availability read. Server Actions exclusively for mutations (create, cancel, reschedule).
 
 ---
 
@@ -422,54 +768,42 @@ ServiceFilterBar (Client Component — 'use client')
 
 | Service | Integration Pattern | Notes |
 |---------|---------------------|-------|
-| Sanity Content Lake | `sanityFetch()` in Server Components | `useCdn: false` — rely on Next.js cache, not Sanity CDN |
-| Sanity CDN (images) | `@sanity/image-url` + `next/image` | Configure remote patterns in `next.config.ts` |
-| Sanity Studio | Embedded at `/studio` via `NextStudio` | Same repo, same deploy — no separate Studio URL needed |
-| Sanity Webhooks | POST `/api/revalidate` | HMAC validation via `parseBody` from `next-sanity/webhook` |
-| Google Fonts | Self-host via `next/font/google` | Avoids external request — GDPR-friendly, performance-neutral |
-| Vercel (deployment) | Zero-config | Next.js static export or server deploy; ISR supported natively |
+| Auth.js v5 (next-auth@5) | `auth()` in Server Components + Server Actions; `useSession()` in Client Components | JWT strategy; no adapter needed |
+| Google OAuth | Via Auth.js Google provider | Configure in Google Cloud Console; `AUTH_GOOGLE_ID` + `AUTH_GOOGLE_SECRET` env vars |
+| Sanity Content Lake (read) | Existing `sanityFetch()` wrapper — unchanged | Add new queries to `queries.ts` |
+| Sanity Content Lake (write) | New write client: `createClient({ token: process.env.SANITY_API_WRITE_TOKEN })` | Write token needs `editor` or `developer` role in Sanity project settings |
+| Resend | `resend.emails.send()` inside Server Actions and Cron | Verify sending domain in Resend dashboard; `RESEND_API_KEY` env var |
+| Vercel Cron | `vercel.json` cron config + `app/api/cron/reminders/route.ts` | For daily reminder emails; use `CRON_SECRET` env var to secure the endpoint |
 
 ### Internal Boundaries
 
 | Boundary | Communication | Notes |
 |----------|---------------|-------|
-| Sanity schemas → GROQ queries | Schema field names referenced in queries | TypeGen generates types from this relationship — keep in sync |
-| page.tsx → section components | Typed props (generated Sanity types) | No Sanity API calls cross this boundary downward |
-| sections → motion wrappers | Children + motion props | Motion wrappers are generic; sections provide content as children |
-| ServiceFilterBar → ServiceCard | Array prop of filtered services | All filtering is client-side JS on pre-fetched data array |
-| layout.tsx → Header/Footer | siteSettings props | Fetched once in layout, never re-fetched in children |
-
----
-
-## Build Order Implications
-
-Build in this dependency order to avoid blockers:
-
-1. **Sanity schema + Studio** — establishes the data contract everything else depends on
-2. **TypeGen setup** — run once after schemas are defined; all subsequent component work is type-safe
-3. **Client + fetch wrapper + queries** — data access layer; needed before any page can render real content
-4. **Layout (Header + Footer)** — needed before any page component is built
-5. **Homepage page.tsx** — orchestrates sections; build after sections are known
-6. **Section components (server)** — `HeroSection`, `ServicesSection`, etc.; pure display, easily parallelized
-7. **Motion wrappers** — wrap sections after sections work in static state
-8. **Interactive client components** — `ServiceFilterBar`, `TestimonialsCarousel` — build last since they depend on section structure
-9. **Intro animation + circle wipe** — final polish; entirely independent of data layer
-10. **Webhook revalidation route** — wire up after deployment target is confirmed
+| Auth layer → booking pages | `auth()` session object | Session carries `email`, `name`, `role` — all that's needed |
+| Booking page → slot availability | REST: `GET /api/booking/availability` | Client Component fetches; Route Handler queries Sanity + runs slot generator |
+| Booking form → Sanity | Server Action → Sanity write client | Server Action reads session, validates, writes, sends email |
+| Admin layout → admin pages | Role check in layout protects subtree | No per-page role check needed if layout gate is correct |
+| `doctorSchedule` Sanity doc → slot generator | TypeScript function call | Schedule document queried server-side; slots generated in `lib/booking/slots.ts` |
+| Sanity schemas → revalidation | Add `booking` + `doctorSchedule` to `typeToTags` in `/api/revalidate/route.ts` | Ensures admin dashboard refreshes when bookings change in Studio |
 
 ---
 
 ## Sources
 
-- next-sanity official GitHub (verified architecture patterns, sanityFetch, defineQuery, parseBody): https://github.com/sanity-io/next-sanity — HIGH confidence
-- Sanity official docs, singleton document pattern: https://www.sanity.io/answers/using-singletons-for-the-homepage-in-next-js-with-sanity — HIGH confidence
-- Sanity official docs, schema design: https://www.halo-lab.com/blog/creating-schema-in-sanity (verified against https://www.sanity.io/docs/studio/schema-types) — MEDIUM confidence
-- Next.js official docs, JSON-LD structured data: https://nextjs.org/docs/app/guides/json-ld — HIGH confidence
-- Sanity + Next.js ISR revalidation: https://www.buildwithmatija.com/blog/how-to-keep-sanity-powered-blog-static-nextjs-15 — MEDIUM confidence (consistent with official Sanity docs)
-- Framer Motion / Next.js server component split: https://www.hemantasundaray.com/blog/use-framer-motion-with-nextjs-server-components — MEDIUM confidence (pattern consistent with motion package docs)
-- Singleton data in layout.tsx: https://www.sanity.io/answers/best-way-to-access-sanity-cms-data-in-a-next-js-app-using-react-context-or-fetch-query-in-route-layout-file- — HIGH confidence
-- Sanity TypeGen: https://www.sanity.io/docs/apis-and-sdks/sanity-typegen — HIGH confidence
+- Auth.js v5 migration guide — edge compatibility, split config, JWT strategy (HIGH confidence): https://authjs.dev/getting-started/migrating-to-v5
+- Auth.js edge compatibility documentation (HIGH confidence): https://authjs.dev/guides/edge-compatibility
+- next-auth-sanity GitHub archived September 2025, v1.5.3 last update August 2023 (verified): https://github.com/fedeya/next-auth-sanity
+- Custom Sanity Auth.js adapter article (MEDIUM confidence): https://medium.com/@stanykhay29/how-to-create-and-integrate-a-custom-auth-js-database-adapter-compatible-with-sanity-cms-a63a7b4ad316
+- Next.js Server Actions vs Route Handlers (HIGH confidence — official Next.js docs): https://nextjs.org/docs/app/building-your-application/data-fetching/server-actions-and-mutations
+- makerkit.dev Server Actions vs Route Handlers comparison (MEDIUM confidence): https://makerkit.dev/blog/tutorials/server-actions-vs-route-handlers
+- Sanity transactions + ifRevisionID optimistic locking (HIGH confidence — official Sanity docs): https://www.sanity.io/docs/transactions
+- Double-booking problem, optimistic locking patterns (MEDIUM confidence): https://itnext.io/solving-double-booking-at-scale-system-design-patterns-from-top-tech-companies-4c5a3311d8ea
+- Resend Next.js integration (HIGH confidence — official Resend docs): https://resend.com/docs/send-with-nextjs
+- Next.js route groups for separate layouts (HIGH confidence — official Next.js docs): https://nextjs.org/docs/app/api-reference/file-conventions/route-groups
+- Role-based access control in Next.js App Router middleware (MEDIUM confidence): https://www.jigz.dev/blogs/how-to-use-middleware-for-role-based-access-control-in-next-js-15-app-router
+- Medical appointment booking data model (MEDIUM confidence): https://www.red-gate.com/blog/the-doctor-will-see-you-soon-a-data-model-for-a-medical-appointment-booking-app
 
 ---
 
-*Architecture research for: Morocz Medical — Next.js App Router + Sanity CMS medical practice website*
-*Researched: 2026-02-18*
+*Architecture research for: Morocz Medical v2.0 — Booking module integration into Next.js 15 App Router + Sanity v4*
+*Researched: 2026-02-21*

@@ -73,7 +73,7 @@ completed: 2026-02-21
 
 Each task was committed atomically:
 
-1. **Task 1: Draft mode routes, indicator, sanityFetch CDN bypass** - `4bf9e1c` (feat)
+1. **Task 1: Draft mode routes, indicator, sanityFetch CDN bypass** - `05c6323` (feat)
 2. **Task 2: Branded 404 page in Hungarian** - `4338809` (feat)
 
 ## Files Created/Modified
@@ -103,7 +103,7 @@ Each task was committed atomically:
 - **Fix:** Wrapped the `draftMode()` call in a try-catch block in `sanityFetch`. Build-time calls (outside request scope) throw an error — caught and treated as `isDraft=false`.
 - **Files modified:** `src/sanity/lib/fetch.ts`
 - **Verification:** `npm run build` now succeeds with all routes compiled.
-- **Committed in:** `4bf9e1c` (Task 1 commit)
+- **Committed in:** `05c6323` (Task 1 commit)
 
 **2. [Rule 1 - Formatting] Fixed biome formatting errors in new files**
 
@@ -111,7 +111,7 @@ Each task was committed atomically:
 - **Issue:** `NextResponse.json()` call had multi-line args style that biome wanted single-line; import order in fetch.ts needed reordering.
 - **Fix:** Applied biome-compliant formatting to all new files.
 - **Files modified:** `src/app/api/draft/route.ts`, `src/sanity/lib/fetch.ts`
-- **Committed in:** `4bf9e1c` (Task 1 commit)
+- **Committed in:** `05c6323` (Task 1 commit)
 
 ---
 
@@ -152,5 +152,5 @@ Share `SANITY_PREVIEW_SECRET` with editors. Preview URL pattern: `/api/draft?sec
 - FOUND: src/app/api/disable-draft/route.ts
 - FOUND: src/components/ui/DraftModeIndicator.tsx
 - FOUND: src/app/not-found.tsx
-- FOUND: commit 4bf9e1c (Task 1)
+- FOUND: commit 05c6323 (Task 1)
 - FOUND: commit 4338809 (Task 2)

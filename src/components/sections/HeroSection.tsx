@@ -90,6 +90,7 @@ export function HeroSection({ headline, subtitle, badges, doctorImage, phone }: 
                 className="h-96 md:h-[480px] object-cover object-top drop-shadow-2xl"
                 width={400}
                 height={480}
+                priority
               />
             ) : (
               <div className="h-96 md:h-[480px] w-64 bg-white/5 rounded-t-3xl flex items-center justify-center text-white/30 text-sm">

@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
@@ -16,15 +16,7 @@ const CHARACTERS: { pos: number; char: string }[] = DOCTOR_NAME.split("").map((c
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type Phase =
-  | "icon-fade"
-  | "typewriter"
-  | "slide-up"
-  | "repeat-show"
-  | "repeat-fade"
-  | "reduced-show"
-  | "reduced-fade"
-  | "done";
+type Phase = "icon-fade" | "typewriter" | "slide-up" | "reduced-show" | "reduced-fade" | "done";
 
 // ─── IntroOverlay ─────────────────────────────────────────────────────────────
 
@@ -38,10 +30,14 @@ export function IntroOverlay() {
   useEffect(() => {
     const hasSeen = sessionStorage.getItem(SESSION_KEY) === "1";
 
+    // Repeat visit: skip overlay entirely — return null immediately
+    if (hasSeen) {
+      setPhase("done");
+      return;
+    }
+
     if (prefersReducedMotion) {
       setPhase("reduced-show");
-    } else if (hasSeen) {
-      setPhase("repeat-show");
     } else {
       setPhase("icon-fade");
     }
@@ -53,7 +49,7 @@ export function IntroOverlay() {
     setPhase("done");
   };
 
-  // Fade-out complete for repeat / reduced
+  // Fade-out complete for reduced motion
   const handleFadeComplete = () => {
     setPhase("done");
   };
@@ -71,7 +67,7 @@ export function IntroOverlay() {
   // ── Reduced motion: logo + name immediately, quick fade ───────────────────
   if (phase === "reduced-show" || phase === "reduced-fade") {
     return (
-      <AnimatePresence>
+      <>
         {phase === "reduced-show" && (
           <motion.div
             key="reduced"
@@ -100,41 +96,7 @@ export function IntroOverlay() {
             <IntroContent showText />
           </motion.div>
         )}
-      </AnimatePresence>
-    );
-  }
-
-  // ── Repeat visit: show briefly then fade ──────────────────────────────────
-  if (phase === "repeat-show" || phase === "repeat-fade") {
-    return (
-      <AnimatePresence>
-        {phase === "repeat-show" && (
-          <motion.div
-            key="repeat"
-            className="fixed inset-0 z-50 flex items-center justify-center bg-[#23264F]"
-            initial={{ opacity: 1 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0 }}
-            onAnimationComplete={() => {
-              setTimeout(() => setPhase("repeat-fade"), 300);
-            }}
-          >
-            <IntroContent showText />
-          </motion.div>
-        )}
-        {phase === "repeat-fade" && (
-          <motion.div
-            key="repeat-fade"
-            className="fixed inset-0 z-50 flex items-center justify-center bg-[#23264F]"
-            initial={{ opacity: 1 }}
-            animate={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-            onAnimationComplete={handleFadeComplete}
-          >
-            <IntroContent showText />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      </>
     );
   }
 
@@ -148,7 +110,7 @@ export function IntroOverlay() {
         style={{ pointerEvents: pointerEventsNone ? "none" : "auto" }}
       >
         <motion.div
-          className="flex items-center gap-4"
+          className="flex items-center gap-6"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3, ease: "easeOut" }}
@@ -167,10 +129,10 @@ export function IntroOverlay() {
         className="fixed inset-0 z-50 flex items-center justify-center bg-[#23264F]"
         style={{ pointerEvents: pointerEventsNone ? "none" : "auto" }}
       >
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col items-center gap-6 sm:flex-row sm:gap-8">
           <IntroIcon />
           <motion.span
-            className="text-white font-bold text-2xl font-[var(--font-plus-jakarta-sans)]"
+            className="text-white font-bold text-4xl sm:text-5xl font-[var(--font-plus-jakarta-sans)] text-center sm:text-left"
             aria-label={DOCTOR_NAME}
             initial="hidden"
             animate="visible"
@@ -226,16 +188,23 @@ export function IntroOverlay() {
 
 function IntroIcon() {
   return (
-    <Image src="/mm-logo-square.svg" alt="Mórocz Medical logó" width={48} height={48} priority />
+    <Image
+      src="/mm-logo-square.svg"
+      alt="Mórocz Medical logó"
+      width={100}
+      height={100}
+      priority
+      className="w-20 h-20 sm:w-24 sm:h-24"
+    />
   );
 }
 
 function IntroContent({ showText }: { showText: boolean }) {
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex flex-col items-center gap-6 sm:flex-row sm:gap-8">
       <IntroIcon />
       {showText && (
-        <span className="text-white font-bold text-2xl font-[var(--font-plus-jakarta-sans)]">
+        <span className="text-white font-bold text-4xl sm:text-5xl font-[var(--font-plus-jakarta-sans)] text-center sm:text-left">
           {DOCTOR_NAME}
         </span>
       )}

@@ -2,7 +2,7 @@
 
 import { motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { type MouseEvent, useState } from "react";
 import { createPortal } from "react-dom";
 
@@ -18,23 +18,34 @@ interface CircleWipeLinkProps {
 
 /**
  * Returns true if the href should trigger a circle wipe transition.
- * Only internal content links: blog posts and lab test detail pages.
+ *
+ * Triggers when:
+ *   - current page is the homepage (pathname === "/")
+ *   - href is an internal path (starts with "/")
+ *   - href is NOT an anchor link (does not start with "#")
+ *
+ * Excluded: anchor links (#section), external links, tel:, mailto:
  */
-function shouldWipe(href: string): boolean {
-  return href.startsWith("/blog/") || href.startsWith("/laborvizsgalatok/");
+function shouldWipe(href: string, currentPathname: string): boolean {
+  // Must be on the homepage
+  if (currentPathname !== "/") return false;
+  // Must be an internal path (not anchor, not external, not tel:/mailto:)
+  if (!href.startsWith("/")) return false;
+  return true;
 }
 
 // ─── CircleWipeLink ───────────────────────────────────────────────────────────
 
 export function CircleWipeLink({ href, children, className }: CircleWipeLinkProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const prefersReducedMotion = useReducedMotion();
 
   const [isWiping, setIsWiping] = useState(false);
 
   const handleClick = (e: MouseEvent<HTMLAnchorElement>) => {
-    if (!shouldWipe(href)) {
-      // Non-content links — let Next.js Link handle it normally
+    if (!shouldWipe(href, pathname)) {
+      // Non-homepage or non-internal links — let Next.js Link handle it normally
       return;
     }
 

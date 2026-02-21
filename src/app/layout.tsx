@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Footer from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
-import { IntroOverlayLoader } from "@/components/motion/IntroOverlayLoader";
+import { IntroOverlay } from "@/components/motion/IntroOverlay";
 import { MotionProvider } from "@/components/motion/MotionProvider";
 import { CookieNotice } from "@/components/ui/CookieNotice";
 import { plusJakartaSans } from "@/lib/fonts";
@@ -73,9 +73,7 @@ export default async function RootLayout({
     <html lang="hu" className={plusJakartaSans.variable}>
       <body>
         <MotionProvider>
-          {/* IntroOverlayLoader uses next/dynamic with ssr:false to load the
-              animation code in a deferred chunk — keeps initial JS bundle small */}
-          <IntroOverlayLoader />
+          <IntroOverlay />
           <div className="max-w-[88rem] mx-auto px-2 sm:px-3 lg:px-4 py-3 space-y-3">
             <Header
               clinicName={settings?.clinicName}

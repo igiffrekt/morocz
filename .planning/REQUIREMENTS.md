@@ -100,7 +100,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **ANIM-02**: Intro transition: logo fades up, page scroll-up revealing content
 - [x] **ANIM-03**: Scroll-triggered section entrance animations (fade-in, slide-up) on all major sections
 - [x] **ANIM-04**: Staggered entrance animations for card groups (max 0.08s per item)
-- [ ] **ANIM-05**: Button hover animations: arrow icon slide/expand, background transitions
+- [x] **ANIM-05**: Button hover animations: arrow icon slide/expand, background transitions
 - [x] **ANIM-06**: Closing circle wipe animation shrinking to center dot on pink background
 - [x] **ANIM-07**: `useReducedMotion` respected — all animations disabled for users who prefer reduced motion
 
@@ -239,7 +239,7 @@ Which phases cover which requirements. Verified during roadmap creation (2026-02
 | ANIM-02 | Phase 7 | Complete |
 | ANIM-03 | Phase 7 | Complete |
 | ANIM-04 | Phase 7 | Complete |
-| ANIM-05 | Phase 7 | Pending |
+| ANIM-05 | Phase 7 | Complete |
 | ANIM-06 | Phase 7 | Complete |
 | ANIM-07 | Phase 7 | Complete |
 | SEO-01 | Phase 6 | Complete |

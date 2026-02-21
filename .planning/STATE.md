@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Patients can discover Morocz Medical's services and book an appointment through a beautifully animated, fast, SEO-optimized website where every piece of content is manageable from Sanity CMS.
-**Current focus:** Phase 7 in progress — Animation Polish + Performance
+**Current focus:** Phase 7 COMPLETE — proceeding to Phase 8 (Launch Readiness)
 
 ## Current Position
 
-Phase: 7 of 8 (Animation Polish + Performance) — IN PROGRESS
-Plan: 3 of 3 complete (07-01: scroll animations, 07-02: IntroOverlay + CircleWipeLink all done)
-Status: Phase 7 plans 01+02 all complete — scroll-triggered section animations, IntroOverlay typewriter, CircleWipe transitions done
-Last activity: 2026-02-21 — Phase 7 Plan 01 complete (scroll-triggered section entrance animations)
+Phase: 7 of 8 (Animation Polish + Performance) — COMPLETE
+Plan: 3 of 3 complete (07-01: scroll animations, 07-02: IntroOverlay + CircleWipeLink, 07-03: integration + verification all done)
+Status: Phase 7 ALL PLANS COMPLETE — full animation stack verified by user (7 visual tests passed)
+Last activity: 2026-02-21 — Phase 7 Plan 03 complete (CircleWipeLink integration + user-approved visual verification)
 
-Progress: [█████████░] ~97%
+Progress: [██████████] ~100% (Phase 7 complete)
 
 ## Performance Metrics
 
@@ -47,6 +47,7 @@ Progress: [█████████░] ~97%
 | Phase 06-seo-structured-data P05 | ~25min | 2 tasks | 9 files |
 | Phase 07-animation-polish-performance P02 | 4 | 2 tasks | 3 files |
 | Phase 07-animation-polish-performance P01 | 8 | 2 tasks | 8 files |
+| Phase 07-animation-polish-performance P03 | 45 | 3 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -131,6 +132,9 @@ Recent decisions affecting current work:
 - [Phase 07-01]: FadeIn uses Omit<HTMLMotionProps<div>, viewport> to avoid type conflict with motion built-in viewport prop
 - [Phase 07-01]: HeroServiceCards stagger reduced 0.1->0.08s, delayChildren removed for scroll-triggered animation
 - [Phase 07-01]: Footer converted from Server Component to Client Component to support FadeIn animation wrapper
+- [Phase 07-animation-polish-performance]: CircleWipeLink triggers on ALL internal paths when pathname === '/' — homepage navigation uses circle wipe for all internal links, not just /blog/ and /laborvizsgalatok/ prefixes
+- [Phase 07-animation-polish-performance]: IntroOverlay SSR-safe via null return during server render — direct import is correct, no next/dynamic ssr:false wrapper needed
+- [Phase 07-animation-polish-performance]: Repeat-visit overlay returns null immediately — no fade animation, no overlay rendered at all on subsequent visits
 
 ### Pending Todos
 
@@ -145,5 +149,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: 07-03 Task 1 complete (CircleWipeLink wired into BlogSection + RelatedPosts) — paused at Task 2 checkpoint for human visual verification
-Resume file: .planning/phases/07-animation-polish-performance/07-03-PLAN.md
+Stopped at: Completed 07-03-PLAN.md — Phase 7 all plans complete, ready for Phase 8
+Resume file: .planning/phases/08-launch-readiness/ (next phase)

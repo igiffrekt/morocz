@@ -18,7 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 4: Services + Lab Tests** - Animated category filter, lab tests section, CLS validated *(completed 2026-02-20)*
 - [x] **Phase 5: Testimonials + Blog** - Carousel, blog listing, blog post pages with Portable Text (completed 2026-02-20)
 - [x] **Phase 6: SEO + Structured Data** - JSON-LD schemas, meta tags, GDPR compliance *(completed 2026-02-21)*
-- [ ] **Phase 7: Animation Polish + Performance** - Intro sequence, scroll triggers, Core Web Vitals
+- [x] **Phase 7: Animation Polish + Performance** - Intro sequence, scroll triggers, Core Web Vitals (completed 2026-02-21)
 - [ ] **Phase 8: CMS Revalidation + Launch** - Webhook, edit-to-publish cycle, launch readiness
 
 ## Phase Details
@@ -139,7 +139,7 @@ Plans:
   3. Button hover states show the arrow icon slide/expand animation matching the design reference
   4. A PageSpeed Insights mobile audit shows LCP < 2.5s, CLS < 0.1, and INP in the passing range
   5. When OS reduced-motion preference is enabled, the page loads with no animations and all content is immediately visible
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 
 Plans:
 - [ ] 07-01-PLAN.md -- Scroll-triggered section entrance animations + staggered card entrances
@@ -172,5 +172,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 4. Services + Lab Tests | 3/3 | Complete   | 2026-02-20 |
 | 5. Testimonials + Blog | 4/4 | Complete   | 2026-02-20 |
 | 6. SEO + Structured Data | 5/5 | Complete   | 2026-02-21 |
-| 7. Animation Polish + Performance | 2/3 | In Progress|  |
+| 7. Animation Polish + Performance | 3/3 | Complete   | 2026-02-21 |
 | 8. CMS Revalidation + Launch | 0/TBD | Not started | - |

@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 7 of 8 (Animation Polish + Performance) — IN PROGRESS
-Plan: 2 of 3 complete (07-01 not yet executed, 07-02 complete)
-Status: Phase 7 in progress — IntroOverlay typewriter + CircleWipeLink page transitions complete
-Last activity: 2026-02-21 — Phase 7 Plan 02 complete (IntroOverlay + CircleWipeLink animations)
+Plan: 3 of 3 complete (07-01: scroll animations, 07-02: IntroOverlay + CircleWipeLink all done)
+Status: Phase 7 plans 01+02 all complete — scroll-triggered section animations, IntroOverlay typewriter, CircleWipe transitions done
+Last activity: 2026-02-21 — Phase 7 Plan 01 complete (scroll-triggered section entrance animations)
 
 Progress: [█████████░] ~97%
 
@@ -46,6 +46,7 @@ Progress: [█████████░] ~97%
 | Phase 06-seo-structured-data P02 | 11 | 2 tasks | 3 files |
 | Phase 06-seo-structured-data P05 | ~25min | 2 tasks | 9 files |
 | Phase 07-animation-polish-performance P02 | 4 | 2 tasks | 3 files |
+| Phase 07-animation-polish-performance P01 | 8 | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -127,6 +128,9 @@ Recent decisions affecting current work:
 - [Phase 07-animation-polish-performance]: IntroOverlay uses phase state machine driven by onAnimationComplete callbacks (not setTimeout) for animation sequencing
 - [Phase 07-animation-polish-performance]: CircleWipeLink shouldWipe() heuristic: only /blog/ and /laborvizsgalatok/ prefixes trigger circle wipe animation
 - [Phase 07-animation-polish-performance]: CHARACTERS pre-indexed as {pos,char}[] to avoid noArrayIndexKey Biome lint without suppression comments
+- [Phase 07-01]: FadeIn uses Omit<HTMLMotionProps<div>, viewport> to avoid type conflict with motion built-in viewport prop
+- [Phase 07-01]: HeroServiceCards stagger reduced 0.1->0.08s, delayChildren removed for scroll-triggered animation
+- [Phase 07-01]: Footer converted from Server Component to Client Component to support FadeIn animation wrapper
 
 ### Pending Todos
 
@@ -141,5 +145,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Completed 07-02-PLAN.md — IntroOverlay typewriter overlay + CircleWipeLink page transitions; Phase 7 Plan 02 complete
+Stopped at: Completed 07-01-PLAN.md — Scroll-triggered whileInView animations on all sections; FadeIn/StaggerChildren viewport prop added
 Resume file: .planning/phases/07-contact-form/07-01-PLAN.md

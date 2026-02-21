@@ -98,8 +98,8 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **ANIM-01**: Intro animation: logo typewriter effect on dark navy background
 - [x] **ANIM-02**: Intro transition: logo fades up, page scroll-up revealing content
-- [ ] **ANIM-03**: Scroll-triggered section entrance animations (fade-in, slide-up) on all major sections
-- [ ] **ANIM-04**: Staggered entrance animations for card groups (max 0.08s per item)
+- [x] **ANIM-03**: Scroll-triggered section entrance animations (fade-in, slide-up) on all major sections
+- [x] **ANIM-04**: Staggered entrance animations for card groups (max 0.08s per item)
 - [ ] **ANIM-05**: Button hover animations: arrow icon slide/expand, background transitions
 - [x] **ANIM-06**: Closing circle wipe animation shrinking to center dot on pink background
 - [x] **ANIM-07**: `useReducedMotion` respected — all animations disabled for users who prefer reduced motion
@@ -119,7 +119,7 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Responsive Design
 
 - [x] **RESP-01**: All sections work from 320px to 1440px+
-- [ ] **RESP-02**: Animations degrade gracefully on mobile (simpler or disabled)
+- [x] **RESP-02**: Animations degrade gracefully on mobile (simpler or disabled)
 - [x] **RESP-03**: Touch-friendly interactive elements (filter tabs, carousel, buttons)
 
 ### CMS Revalidation & Launch
@@ -237,8 +237,8 @@ Which phases cover which requirements. Verified during roadmap creation (2026-02
 | FOOT-06 | Phase 3 | Complete |
 | ANIM-01 | Phase 7 | Complete |
 | ANIM-02 | Phase 7 | Complete |
-| ANIM-03 | Phase 7 | Pending |
-| ANIM-04 | Phase 7 | Pending |
+| ANIM-03 | Phase 7 | Complete |
+| ANIM-04 | Phase 7 | Complete |
 | ANIM-05 | Phase 7 | Pending |
 | ANIM-06 | Phase 7 | Complete |
 | ANIM-07 | Phase 7 | Complete |
@@ -252,7 +252,7 @@ Which phases cover which requirements. Verified during roadmap creation (2026-02
 | SEO-08 | Phase 6 | Complete |
 | SEO-09 | Phase 6 | Complete |
 | RESP-01 | Phase 3 | Complete |
-| RESP-02 | Phase 7 | Pending |
+| RESP-02 | Phase 7 | Complete |
 | RESP-03 | Phase 3 | Complete |
 | LAUNCH-01 | Phase 8 | Pending |
 | LAUNCH-02 | Phase 8 | Pending |

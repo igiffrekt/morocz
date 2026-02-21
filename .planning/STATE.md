@@ -49,6 +49,7 @@ Progress: [██████████] ~87% (Phase 8 in progress — 1/4 pla
 | Phase 07-animation-polish-performance P01 | 8 | 2 tasks | 8 files |
 | Phase 07-animation-polish-performance P03 | 45 | 3 tasks | 7 files |
 | Phase 08-cms-revalidation-launch P01 | 5 | 2 tasks | 6 files |
+| Phase 08-cms-revalidation-launch P02 | 9 | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -141,6 +142,8 @@ Recent decisions affecting current work:
 - [Phase 08-cms-revalidation-launch]: Unrecognized Sanity _types return 200 (not 4xx) — Sanity sends internal document types; don't fail on unknown types
 - [Phase 08-cms-revalidation-launch]: Backdrop in PhoneCallDialog implemented as <button> to satisfy Biome noStaticElementInteractions a11y rule
 - [Phase 08-cms-revalidation-launch]: MobileMenu onPhoneClick callback from Header — dialog state lives in Header, shared across both header variants
+- [Phase 08-cms-revalidation-launch]: draftMode() in sanityFetch wrapped in try-catch — Next.js throws outside request scope during generateStaticParams at build time; fallback isDraft=false is correct behavior
+- [Phase 08-cms-revalidation-launch]: DraftModeIndicator placed outside MotionProvider in layout — fixed-position overlay independent of motion/animation context
 
 ### Pending Todos
 

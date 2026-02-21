@@ -60,7 +60,7 @@ export function PhoneCallDialog({ phone, isOpen, onClose }: PhoneCallDialogProps
 
         {/* Heading */}
         <h2 id="phone-dialog-title" className="text-lg font-bold text-primary text-center mb-2">
-          Hívja Dr. Mórocz Angelát?
+          Valóban hívni szeretné a Mórocz Medical rendelőt?
         </h2>
 
         {/* Phone number */}

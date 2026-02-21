@@ -50,6 +50,7 @@ Progress: [██████████] ~87% (Phase 8 in progress — 1/4 pla
 | Phase 07-animation-polish-performance P03 | 45 | 3 tasks | 7 files |
 | Phase 08-cms-revalidation-launch P01 | 5 | 2 tasks | 6 files |
 | Phase 08-cms-revalidation-launch P02 | 9 | 2 tasks | 7 files |
+| Phase 08 P03 | 8 | 1 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -144,6 +145,8 @@ Recent decisions affecting current work:
 - [Phase 08-cms-revalidation-launch]: MobileMenu onPhoneClick callback from Header — dialog state lives in Header, shared across both header variants
 - [Phase 08-cms-revalidation-launch]: draftMode() in sanityFetch wrapped in try-catch — Next.js throws outside request scope during generateStaticParams at build time; fallback isDraft=false is correct behavior
 - [Phase 08-cms-revalidation-launch]: DraftModeIndicator placed outside MotionProvider in layout — fixed-position overlay independent of motion/animation context
+- [Phase 08-cms-revalidation-launch]: GA scripts injected via DOM createElement (not next/script) to allow dynamic load after consent event
+- [Phase 08-cms-revalidation-launch]: GoogleAnalytics component placed outside MotionProvider — analytics infrastructure independent of motion context
 
 ### Pending Todos
 

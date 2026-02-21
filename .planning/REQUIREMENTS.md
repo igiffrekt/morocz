@@ -125,8 +125,8 @@ Requirements for initial release. Each maps to roadmap phases.
 ### CMS Revalidation & Launch
 
 - [x] **LAUNCH-01**: Webhook revalidation route (`/api/revalidate`) with HMAC validation
-- [ ] **LAUNCH-02**: Sanity webhook configured pointing to production URL
-- [ ] **LAUNCH-03**: Full edit-to-publish cycle tested (< 30 seconds)
+- [x] **LAUNCH-02**: Sanity webhook configured pointing to production URL
+- [x] **LAUNCH-03**: Full edit-to-publish cycle tested (< 30 seconds)
 - [x] **LAUNCH-04**: Draft mode security verified
 - [x] **LAUNCH-05**: Contact info routing (phone/email CTA — no form data storage)
 
@@ -255,8 +255,8 @@ Which phases cover which requirements. Verified during roadmap creation (2026-02
 | RESP-02 | Phase 7 | Complete |
 | RESP-03 | Phase 3 | Complete |
 | LAUNCH-01 | Phase 8 | Complete |
-| LAUNCH-02 | Phase 8 | Pending |
-| LAUNCH-03 | Phase 8 | Pending |
+| LAUNCH-02 | Phase 8 | Complete |
+| LAUNCH-03 | Phase 8 | Complete |
 | LAUNCH-04 | Phase 8 | Complete |
 | LAUNCH-05 | Phase 8 | Complete |
 

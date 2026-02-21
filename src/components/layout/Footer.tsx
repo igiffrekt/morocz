@@ -25,6 +25,8 @@ interface FooterProps {
 
 export default function Footer({
   clinicName,
+  phone,
+  address,
   footerColumns,
   socialLinks,
   privacyPolicyUrl,
@@ -87,6 +89,18 @@ export default function Footer({
               </div>
             )}
           </div>
+
+          {/* Contact info */}
+          {(phone || address) && (
+            <div className="flex flex-col gap-2 mb-8 text-sm text-gray-300 relative z-10 md:flex-row md:gap-6">
+              {phone && (
+                <a href={`tel:${phone}`} className="hover:text-white transition-colors">
+                  {phone}
+                </a>
+              )}
+              {address && <span>{address}</span>}
+            </div>
+          )}
 
           {/* Copyright line */}
           <div className="flex flex-col md:flex-row justify-between items-center text-sm text-white/60 pt-8 border-t border-white/15">

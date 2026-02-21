@@ -161,31 +161,6 @@ export const blogPostBySlugQuery = defineQuery(`*[_type == "blogPost" && slug.cu
   publishedAt
 }`);
 
-// ─── Blog Categories ──────────────────────────────────────────────────────────
-// Revalidation tag: "blogCategory"
-
-export const allBlogCategoriesQuery = defineQuery(`*[_type == "blogCategory"] | order(order asc){
-  _id,
-  name,
-  slug,
-  order
-}`);
-
-// ─── Blog Posts by Category ───────────────────────────────────────────────────
-// Revalidation tag: "blogPost"
-
-export const blogPostsByCategoryQuery = defineQuery(
-  `*[_type == "blogPost" && category._ref == $categoryId] | order(publishedAt desc){
-  _id,
-  title,
-  slug,
-  category->{_id, name, slug},
-  featuredImage,
-  excerpt,
-  publishedAt
-}`,
-);
-
 // ─── Latest Blog Posts (homepage section) ─────────────────────────────────────
 // Revalidation tag: "blogPost"
 

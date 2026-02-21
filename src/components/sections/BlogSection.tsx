@@ -42,28 +42,6 @@ export function BlogSection({ heading, posts }: BlogSectionProps) {
               {heading}
             </h2>
           )}
-          <a
-            href="#blog"
-            className="group inline-flex shrink-0 items-center gap-2 text-sm font-bold uppercase tracking-wide text-primary transition-colors hover:text-primary/70"
-          >
-            Összes blog
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="transition-transform group-hover:translate-x-0.5"
-              aria-hidden="true"
-            >
-              <title>Nyíl jobbra</title>
-              <path d="m9 18 6-6-6-6" />
-            </svg>
-          </a>
         </div>
       </FadeIn>
 

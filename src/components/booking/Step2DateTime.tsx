@@ -219,204 +219,212 @@ export function Step2DateTime({
     <div>
       <h2 className="text-xl font-bold text-[var(--color-primary)] mb-6">Válasszon időpontot</h2>
 
-      {/* Calendar */}
-      <div className="bg-gray-50 rounded-2xl p-4 md:p-6 mb-6">
-        {/* Month navigation */}
-        <div className="flex items-center justify-between mb-4">
-          <button
-            type="button"
-            onClick={prevMonth}
-            disabled={!canGoPrev}
-            className="w-9 h-9 flex items-center justify-center rounded-xl text-gray-600 hover:bg-white hover:shadow-sm disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-            aria-label="Előző hónap"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              className="w-4 h-4"
-              aria-hidden="true"
+      <div className="flex flex-col md:flex-row gap-4 mb-6">
+        {/* Calendar — 70% on desktop */}
+        <div className="bg-gray-50 rounded-2xl p-4 md:p-5 md:w-[70%]">
+          {/* Month navigation */}
+          <div className="flex items-center justify-between mb-4">
+            <button
+              type="button"
+              onClick={prevMonth}
+              disabled={!canGoPrev}
+              className="w-9 h-9 flex items-center justify-center rounded-xl text-gray-600 hover:bg-white hover:shadow-sm disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+              aria-label="Előző hónap"
             >
-              <path
-                fillRule="evenodd"
-                d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </button>
-
-          <h3 className="text-sm font-bold text-gray-800 capitalize">
-            {formatMonthYear(viewYear, viewMonth)}
-          </h3>
-
-          <button
-            type="button"
-            onClick={nextMonth}
-            disabled={!canGoNext}
-            className="w-9 h-9 flex items-center justify-center rounded-xl text-gray-600 hover:bg-white hover:shadow-sm disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-            aria-label="Következő hónap"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              className="w-4 h-4"
-              aria-hidden="true"
-            >
-              <path
-                fillRule="evenodd"
-                d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 1 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </button>
-        </div>
-
-        {/* Weekday headers */}
-        <div className="grid grid-cols-7 mb-1">
-          {HU_WEEKDAYS.map((day) => (
-            <div key={day} className="text-center text-xs font-semibold text-gray-500 py-1">
-              {day}
-            </div>
-          ))}
-        </div>
-
-        {/* Calendar day grid */}
-        <div className="grid grid-cols-7 gap-0.5">
-          {calendarCells.map((cell, idx) => {
-            if (cell === null) {
-              // biome-ignore lint/suspicious/noArrayIndexKey: empty padding cells have no stable key
-              return <div key={`empty-${idx}`} className="h-10" aria-hidden="true" />;
-            }
-
-            const { day, dateStr } = cell;
-            const isAvailable = availableDatesSet.has(dateStr);
-            const isToday = dateStr === todayStr;
-            const isSelected = dateStr === selectedDate;
-            const isPast = dateStr < todayStr;
-            const isBeyondMax = dateStr > maxDateStr;
-            const isClickable = isAvailable && !isPast && !isBeyondMax;
-
-            // Availability stripe data
-            const avail = dayAvailability[dateStr];
-            const pct = avail && avail.total > 0 ? avail.available / avail.total : null;
-            const stripeColor =
-              pct === null
-                ? ""
-                : pct > 0.6
-                  ? "bg-[#99CEB7]"
-                  : pct > 0.25
-                    ? "bg-amber-400"
-                    : "bg-rose-400";
-
-            return (
-              <button
-                key={dateStr}
-                type="button"
-                onClick={() => handleDayClick(dateStr)}
-                disabled={!isClickable}
-                className={[
-                  "h-10 w-full rounded-lg text-sm font-medium transition-all duration-150 flex flex-col items-center justify-center relative overflow-hidden",
-                  isSelected
-                    ? "bg-[var(--color-primary)] text-white shadow-md"
-                    : isClickable
-                      ? "bg-white text-gray-800 hover:bg-[var(--color-primary)]/10 hover:text-[var(--color-primary)] shadow-sm cursor-pointer"
-                      : "text-gray-300 cursor-not-allowed",
-                  isToday && !isSelected ? "ring-1 ring-[var(--color-primary)]/30" : "",
-                ]
-                  .join(" ")
-                  .trim()}
-                aria-label={`${day}. nap${isAvailable && !isPast && !isBeyondMax ? " (szabad)" : " (nem elérhető)"}`}
-                aria-pressed={isSelected}
-                aria-current={isToday ? "date" : undefined}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                className="w-4 h-4"
+                aria-hidden="true"
               >
-                <span>{day}</span>
-                {isClickable && pct !== null && (
-                  <span
-                    className={[
-                      "absolute bottom-0.5 left-1/2 -translate-x-1/2 h-[3px] rounded-full transition-all duration-300",
-                      isSelected ? "bg-white/60" : stripeColor,
-                    ].join(" ")}
-                    style={{ width: `${Math.max(pct * 100, 12)}%` }}
-                    aria-hidden="true"
-                  />
-                )}
-              </button>
-            );
-          })}
+                <path
+                  fillRule="evenodd"
+                  d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+
+            <h3 className="text-sm font-bold text-gray-800 capitalize">
+              {formatMonthYear(viewYear, viewMonth)}
+            </h3>
+
+            <button
+              type="button"
+              onClick={nextMonth}
+              disabled={!canGoNext}
+              className="w-9 h-9 flex items-center justify-center rounded-xl text-gray-600 hover:bg-white hover:shadow-sm disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+              aria-label="Következő hónap"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                className="w-4 h-4"
+                aria-hidden="true"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 1 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+          </div>
+
+          {/* Weekday headers */}
+          <div className="grid grid-cols-7 mb-1">
+            {HU_WEEKDAYS.map((day) => (
+              <div key={day} className="text-center text-xs font-semibold text-gray-500 py-1">
+                {day}
+              </div>
+            ))}
+          </div>
+
+          {/* Calendar day grid */}
+          <div className="grid grid-cols-7 gap-0.5">
+            {calendarCells.map((cell, idx) => {
+              if (cell === null) {
+                // biome-ignore lint/suspicious/noArrayIndexKey: empty padding cells have no stable key
+                return <div key={`empty-${idx}`} className="h-10" aria-hidden="true" />;
+              }
+
+              const { day, dateStr } = cell;
+              const isAvailable = availableDatesSet.has(dateStr);
+              const isToday = dateStr === todayStr;
+              const isSelected = dateStr === selectedDate;
+              const isPast = dateStr < todayStr;
+              const isBeyondMax = dateStr > maxDateStr;
+              const isClickable = isAvailable && !isPast && !isBeyondMax;
+
+              // Availability stripe data
+              const avail = dayAvailability[dateStr];
+              const pct = avail && avail.total > 0 ? avail.available / avail.total : null;
+              const stripeColor =
+                pct === null
+                  ? ""
+                  : pct > 0.6
+                    ? "bg-[#99CEB7]"
+                    : pct > 0.25
+                      ? "bg-amber-400"
+                      : "bg-rose-400";
+
+              return (
+                <button
+                  key={dateStr}
+                  type="button"
+                  onClick={() => handleDayClick(dateStr)}
+                  disabled={!isClickable}
+                  className={[
+                    "h-10 w-full rounded-lg text-sm font-medium transition-all duration-150 flex flex-col items-center justify-center relative overflow-hidden",
+                    isSelected
+                      ? "bg-[var(--color-primary)] text-white shadow-md"
+                      : isClickable
+                        ? "bg-white text-gray-800 hover:bg-[var(--color-primary)]/10 hover:text-[var(--color-primary)] shadow-sm cursor-pointer"
+                        : "text-gray-300 cursor-not-allowed",
+                    isToday && !isSelected ? "ring-1 ring-[var(--color-primary)]/30" : "",
+                  ]
+                    .join(" ")
+                    .trim()}
+                  aria-label={`${day}. nap${isAvailable && !isPast && !isBeyondMax ? " (szabad)" : " (nem elérhető)"}`}
+                  aria-pressed={isSelected}
+                  aria-current={isToday ? "date" : undefined}
+                >
+                  <span>{day}</span>
+                  {isClickable && pct !== null && (
+                    <span
+                      className={[
+                        "absolute bottom-0.5 left-1/2 -translate-x-1/2 h-[3px] rounded-full transition-all duration-300",
+                        isSelected ? "bg-white/60" : stripeColor,
+                      ].join(" ")}
+                      style={{ width: `${Math.max(pct * 100, 12)}%` }}
+                      aria-hidden="true"
+                    />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Time slots — 30% on desktop, beside calendar */}
+        <div className="md:w-[30%]">
+          {!selectedDate && (
+            <div className="bg-gray-50 rounded-2xl h-full flex items-center justify-center px-4 py-8">
+              <p className="text-sm text-gray-400 text-center">Válasszon egy napot a naptárból</p>
+            </div>
+          )}
+
+          {selectedDate && (
+            <div className="bg-gray-50 rounded-2xl p-4 md:p-5">
+              <h3 className="text-sm font-semibold text-gray-700 mb-1">Elérhető időpontok</h3>
+              <p className="text-xs text-gray-500 mb-3 capitalize">
+                {formatSelectedDate(selectedDate)}
+              </p>
+
+              {/* Loading skeleton */}
+              {slotsLoading && (
+                <div aria-busy="true" className="grid grid-cols-2 gap-2">
+                  {["s0", "s1", "s2", "s3", "s4", "s5"].map((k) => (
+                    <div
+                      key={k}
+                      className="h-10 bg-gray-200 rounded-lg animate-pulse"
+                      aria-hidden="true"
+                    />
+                  ))}
+                </div>
+              )}
+
+              {/* Error state */}
+              {slotsError && !slotsLoading && (
+                <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+                  <p className="text-sm text-red-600">{slotsError}</p>
+                  <button
+                    type="button"
+                    onClick={() => void fetchSlots(selectedDate)}
+                    className="mt-2 text-xs text-red-700 underline hover:no-underline"
+                  >
+                    Újra megpróbál
+                  </button>
+                </div>
+              )}
+
+              {/* No slots */}
+              {!slotsLoading && !slotsError && slots.length === 0 && (
+                <div className="py-4 text-center">
+                  <p className="text-sm text-gray-500">Ezen a napon nincs szabad időpont.</p>
+                </div>
+              )}
+
+              {/* Slots grid */}
+              {!slotsLoading && !slotsError && slots.length > 0 && (
+                <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto">
+                  {slots.map((time) => {
+                    const isTimeSelected = time === selectedTime;
+                    return (
+                      <button
+                        key={time}
+                        type="button"
+                        onClick={() => onSelectTime(time)}
+                        className={[
+                          "h-10 rounded-lg text-sm font-semibold transition-all duration-150",
+                          isTimeSelected
+                            ? "bg-[var(--color-primary)] text-white shadow-md"
+                            : "bg-white border border-gray-200 text-gray-700 hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] shadow-sm",
+                        ].join(" ")}
+                        aria-pressed={isTimeSelected}
+                      >
+                        {time}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
-
-      {/* Time slots — shown after a date is selected */}
-      {selectedDate && (
-        <div className="mb-6">
-          <h3 className="text-sm font-semibold text-gray-700 mb-1">Elérhető időpontok</h3>
-          <p className="text-xs text-gray-500 mb-4 capitalize">
-            {formatSelectedDate(selectedDate)}
-          </p>
-
-          {/* Loading skeleton */}
-          {slotsLoading && (
-            <div aria-busy="true" className="grid grid-cols-3 md:grid-cols-4 gap-2">
-              {["s0", "s1", "s2", "s3", "s4", "s5", "s6", "s7"].map((k) => (
-                <div
-                  key={k}
-                  className="h-10 bg-gray-200 rounded-lg animate-pulse"
-                  aria-hidden="true"
-                />
-              ))}
-            </div>
-          )}
-
-          {/* Error state */}
-          {slotsError && !slotsLoading && (
-            <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3">
-              <p className="text-sm text-red-600">{slotsError}</p>
-              <button
-                type="button"
-                onClick={() => void fetchSlots(selectedDate)}
-                className="mt-2 text-xs text-red-700 underline hover:no-underline"
-              >
-                Újra megpróbál
-              </button>
-            </div>
-          )}
-
-          {/* No slots */}
-          {!slotsLoading && !slotsError && slots.length === 0 && (
-            <div className="bg-gray-50 rounded-xl px-4 py-6 text-center">
-              <p className="text-sm text-gray-500">
-                Ezen a napon nincs szabad időpont. Kérjük, válasszon másik napot.
-              </p>
-            </div>
-          )}
-
-          {/* Slots grid */}
-          {!slotsLoading && !slotsError && slots.length > 0 && (
-            <div className="grid grid-cols-3 md:grid-cols-4 gap-2">
-              {slots.map((time) => {
-                const isTimeSelected = time === selectedTime;
-                return (
-                  <button
-                    key={time}
-                    type="button"
-                    onClick={() => onSelectTime(time)}
-                    className={[
-                      "h-10 rounded-lg text-sm font-semibold transition-all duration-150",
-                      isTimeSelected
-                        ? "bg-[var(--color-primary)] text-white shadow-md"
-                        : "bg-white border border-gray-200 text-gray-700 hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] shadow-sm",
-                    ].join(" ")}
-                    aria-pressed={isTimeSelected}
-                  >
-                    {time}
-                  </button>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      )}
 
       {/* Navigation buttons */}
       <div className="flex items-center justify-between pt-2">

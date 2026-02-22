@@ -26,6 +26,7 @@ export default async function FoglalasTokenPage({
     patientPhone: string;
     reservationNumber: string;
     service: { name: string; appointmentDuration: number } | null;
+    serviceId: string;
     slotDate: string;
     slotTime: string;
     status: string;
@@ -38,6 +39,7 @@ export default async function FoglalasTokenPage({
     `*[_type == "booking" && managementToken == $manageToken][0]{
       _id, patientName, patientEmail, patientPhone, reservationNumber,
       service->{name, appointmentDuration},
+      "serviceId": service._ref,
       slotDate, slotTime, status, managementToken
     }`,
     { manageToken: token },

@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import type { ScheduleForAvailability } from "@/lib/slots";
 import { CancelDialog } from "./CancelDialog";
+import { ReschedulePanel } from "./ReschedulePanel";
 
 interface BookingManagementCardProps {
   booking: {
@@ -12,6 +14,7 @@ interface BookingManagementCardProps {
     patientPhone: string;
     reservationNumber: string;
     service: { name: string; appointmentDuration: number } | null;
+    serviceId: string;
     slotDate: string;
     slotTime: string;
     status: string;
@@ -34,9 +37,9 @@ function isWithin24Hours(slotDate: string, slotTime: string): boolean {
 type CardState = "idle" | "cancel-confirm" | "cancelled";
 
 export function BookingManagementCard({ booking, scheduleData }: BookingManagementCardProps) {
-  // scheduleData will be used by Plan 03 reschedule flow
-  void scheduleData;
+  const router = useRouter();
   const [cardState, setCardState] = useState<CardState>("idle");
+  const [showReschedule, setShowReschedule] = useState(false);
 
   const within24h = isWithin24Hours(booking.slotDate, booking.slotTime);
 
@@ -125,16 +128,25 @@ export function BookingManagementCard({ booking, scheduleData }: BookingManageme
       ) : (
         <div className="flex gap-3">
           <button
-            onClick={() => setCardState("cancel-confirm")}
+            onClick={() => {
+              setCardState("cancel-confirm");
+              setShowReschedule(false);
+            }}
             className="rounded-lg border border-red-300 bg-white px-5 py-2.5 text-sm font-semibold text-red-600 transition hover:bg-red-50"
           >
             Lemondás
           </button>
-          {/* Plan 03 will activate the reschedule flow */}
           <button
-            disabled
-            title="Hamarosan elérhető"
-            className="cursor-not-allowed rounded-lg border border-gray-200 bg-gray-100 px-5 py-2.5 text-sm font-semibold text-gray-400"
+            onClick={() => {
+              setShowReschedule((prev) => !prev);
+              setCardState("idle");
+            }}
+            className={[
+              "rounded-lg border px-5 py-2.5 text-sm font-semibold transition",
+              showReschedule
+                ? "border-[#23264F] bg-[#23264F] text-white hover:bg-[#1a1d3b]"
+                : "border-[#23264F] bg-white text-[#23264F] hover:bg-gray-50",
+            ].join(" ")}
           >
             Átütemezés
           </button>
@@ -147,6 +159,26 @@ export function BookingManagementCard({ booking, scheduleData }: BookingManageme
           booking={booking}
           onCancelled={() => setCardState("cancelled")}
           onClose={() => setCardState("idle")}
+        />
+      )}
+
+      {/* Reschedule picker */}
+      {showReschedule && cardState === "idle" && (
+        <ReschedulePanel
+          booking={{
+            _id: booking._id,
+            service: booking.service,
+            slotDate: booking.slotDate,
+            slotTime: booking.slotTime,
+            managementToken: booking.managementToken,
+            serviceId: booking.serviceId,
+          }}
+          scheduleData={scheduleData}
+          onRescheduled={() => {
+            setShowReschedule(false);
+            router.refresh();
+          }}
+          onCancel={() => setShowReschedule(false)}
         />
       )}
     </div>

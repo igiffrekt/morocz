@@ -100,22 +100,44 @@ export default function AuthStep({ onSuccess, defaultTab = "belepes" }: AuthStep
   }
 
   function mapErrorMessage(error: unknown): string {
-    const msg = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
+    // Better Auth returns { message?: string, code?: string, status?: number }
+    let msg = "";
+    if (error instanceof Error) {
+      msg = error.message;
+    } else if (typeof error === "string") {
+      msg = error;
+    } else if (error && typeof error === "object") {
+      const obj = error as Record<string, unknown>;
+      msg = String(obj.message ?? obj.code ?? obj.statusText ?? JSON.stringify(error));
+    } else {
+      msg = String(error);
+    }
+    msg = msg.toLowerCase();
 
     if (
       msg.includes("invalid") ||
       msg.includes("credentials") ||
       msg.includes("password") ||
-      msg.includes("not found")
+      msg.includes("not found") ||
+      msg.includes("incorrect")
     ) {
       return "Hibás e-mail cím vagy jelszó";
     }
-    if (msg.includes("already") || msg.includes("exists") || msg.includes("registered")) {
+    if (
+      msg.includes("already") ||
+      msg.includes("exists") ||
+      msg.includes("registered") ||
+      msg.includes("user_already")
+    ) {
       return "Ez az e-mail cím már regisztrálva van";
     }
     if (msg.includes("rate") || msg.includes("429") || msg.includes("too many")) {
       return "Kérjük, várjon egy percet, majd próbálja újra";
     }
+    if (msg.includes("weak") || msg.includes("short")) {
+      return "A jelszó túl gyenge. Kérjük, válasszon erősebb jelszót";
+    }
+    console.error("[AuthStep] Unhandled auth error:", error);
     return "Hiba történt, kérjük próbálja újra";
   }
 

@@ -33,10 +33,12 @@
   3. Each service document has an appointment duration field that controls slot length
   4. Sanity DPA is signed in account settings and DPIA document exists before any booking document is written
   5. Privacy policy page reflects booking data collection (name, email, phone)
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 09-01: TBD
+- [ ] 09-01-PLAN.md — Schedule schemas, service duration, desk structure, queries, types
+- [ ] 09-02-PLAN.md — GDPR compliance: DPIA document, consent text, privacy policy update
+- [ ] 09-03-PLAN.md — Custom Studio blocked dates calendar with range selection and holidays
 
 ### Phase 10: Authentication
 **Goal**: Patients and the admin can log in through separate, role-appropriate paths — patients via Google OAuth or email/password, admin via email/password only — with sessions that persist across browser refresh and route protection that cannot be bypassed.

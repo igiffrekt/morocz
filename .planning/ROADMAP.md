@@ -125,7 +125,7 @@ Phases execute in numeric order: 9 → 10 → 11 → 12 → 13 → 14
 |-------|----------------|--------|-----------|
 | 9. Data Foundation and GDPR | 3/3 | Complete | 2026-02-22 |
 | 10. Authentication | 3/3 | Complete    | 2026-02-22 |
-| 11. Booking Core | 2/4 | In Progress|  |
+| 11. Booking Core | 3/4 | In Progress|  |
 | 12. Patient Account | 0/? | Not started | - |
 | 13. Admin Dashboard | 0/? | Not started | - |
 | 14. Reminder Emails and Cron | 0/? | Not started | - |

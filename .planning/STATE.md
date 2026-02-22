@@ -32,6 +32,7 @@ Progress: [███████░░░] 75%
 | 11-booking-core | 3/4 | ~20 min | ~7 min |
 
 *Updated after each plan completion*
+| Phase 11-booking-core P02 | 15 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -67,6 +68,9 @@ Recent decisions affecting current work:
 - 11-03: AnimatePresence uses string step keys ("service"/"datetime"/"auth"/"confirm") to avoid key=0 animation bug
 - 11-03: Schedule data (weeklySchedule + blockedDates) fetched in Server Component page.tsx and passed as scheduleData prop to BookingWizard — no extra client-side API call for calendar highlighting
 - 11-03: Sanity WeeklyScheduleDay startTime/endTime normalized with ?? "" fallback before passing to ScheduleForAvailability
+- [Phase 11-02]: ifRevisionId is a Sanity patch chain method (.ifRevisionId(rev).set().commit()), not a commit option
+- [Phase 11-02]: Conflict response includes up to 5 nearest alternative slots sorted by absolute time distance from requested slot
+- [Phase 11-02]: Email fire-and-forget uses separate async function with try/catch — booking response never blocked by email failure
 
 ### Pending Todos
 
@@ -87,5 +91,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-22
-Stopped at: 11-03 complete. /idopontfoglalas booking page with 4-step wizard, AnimatePresence transitions, custom calendar, and slot picker. Next: 11-04 Step4Confirm + confirmation email.
+Stopped at: 11-02 complete (executed out-of-order after 11-03). GET /api/slots and POST /api/booking routes, buildConfirmationEmail() done. Next: 11-04 Step4Confirm + confirmation email.
 Resume file: none

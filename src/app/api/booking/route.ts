@@ -292,7 +292,7 @@ async function sendConfirmationEmail({
 
     const html = buildConfirmationEmail({
       patientName,
-      serviceName: service?.name ?? "Foglalt szolgáltatás",
+      serviceName: service?.name?.startsWith("Nőgyógyász") ? "Nőgyógyászati vizsgálat" : (service?.name ?? "Foglalt szolgáltatás"),
       date: formattedDate,
       time: slotTime,
       manageUrl,

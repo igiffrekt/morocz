@@ -170,7 +170,7 @@ export async function POST(request: Request): Promise<Response> {
       void sendRescheduleEmailAsync({
         patientName: booking.patientName,
         patientEmail: booking.patientEmail,
-        serviceName: booking.service?.name ?? "Szolgáltatás",
+        serviceName: booking.service?.name?.startsWith("Nőgyógyász") ? "Nőgyógyászati vizsgálat" : (booking.service?.name ?? "Szolgáltatás"),
         oldDate: booking.slotDate,
         oldTime: booking.slotTime,
         newDate,

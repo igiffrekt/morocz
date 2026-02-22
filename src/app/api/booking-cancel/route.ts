@@ -98,7 +98,7 @@ export async function POST(request: Request): Promise<Response> {
       void sendCancellationEmailAsync({
         patientName: booking.patientName,
         patientEmail: booking.patientEmail,
-        serviceName: booking.service?.name ?? "Foglalt szolgáltatás",
+        serviceName: booking.service?.name?.startsWith("Nőgyógyász") ? "Nőgyógyászati vizsgálat" : (booking.service?.name ?? "Foglalt szolgáltatás"),
         slotDate: booking.slotDate,
         slotTime: booking.slotTime,
       });

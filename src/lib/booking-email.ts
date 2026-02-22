@@ -11,6 +11,8 @@ const green = "#99CEB7";
 const lightGrey = "#F8F8F8";
 const textDark = "#1A1A2E";
 const textMuted = "#6B7280";
+const mapsUrl =
+  "https://www.google.com/maps/place/47%C2%B048'02.9%22N+18%C2%B044'44.4%22E/@47.8007963,18.7430918,17z/data=!3m1!4b1!4m4!3m3!8m2!3d47.8007927!4d18.7456667?entry=ttu&g_ep=EgoyMDI1MDkyOC4wIKXMDSoASAFQAw%3D%3D";
 
 /**
  * Builds a branded HTML confirmation email for a successful booking.
@@ -130,6 +132,12 @@ export function buildConfirmationEmail(params: {
                     <a href="${manageUrl}"
                       style="display: inline-block; padding: 11px 22px; background-color: ${navy}; color: #ffffff; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 600;">
                       Időpont kezelése
+                    </a>
+                  </td>
+                  <td>
+                    <a href="${mapsUrl}"
+                      style="display: inline-block; padding: 11px 22px; background-color: ${green}; color: ${navy}; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 600;">
+                      Útvonal
                     </a>
                   </td>
                 </tr>
@@ -474,10 +482,16 @@ export function buildRescheduleEmail(params: {
               </p>
               <table cellpadding="0" cellspacing="0" role="presentation">
                 <tr>
-                  <td>
+                  <td style="padding-right: 12px;">
                     <a href="${manageUrl}"
                       style="display: inline-block; padding: 11px 22px; background-color: ${navy}; color: #ffffff; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 600;">
                       Időpont kezelése
+                    </a>
+                  </td>
+                  <td>
+                    <a href="${mapsUrl}"
+                      style="display: inline-block; padding: 11px 22px; background-color: ${green}; color: ${navy}; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 600;">
+                      Útvonal
                     </a>
                   </td>
                 </tr>
@@ -638,6 +652,22 @@ export function buildReminderEmail(params: {
             </td>
           </tr>
 
+          <!-- Útvonal button -->
+          <tr>
+            <td style="padding: 28px 40px 0;">
+              <table cellpadding="0" cellspacing="0" role="presentation">
+                <tr>
+                  <td>
+                    <a href="${mapsUrl}"
+                      style="display: inline-block; padding: 11px 22px; background-color: ${green}; color: ${navy}; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 600;">
+                      Útvonal
+                    </a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
           <!-- Contact info -->
           <tr>
             <td style="padding: 28px 40px 0;">
@@ -646,7 +676,7 @@ export function buildReminderEmail(params: {
                 <tr>
                   <td>
                     <p style="margin: 0 0 6px; font-size: 13px; font-weight: 700; color: ${navy};">
-                      Kapcsolat és útvonal
+                      Kapcsolat
                     </p>
                     <p style="margin: 0 0 4px; font-size: 13px; color: ${textMuted};">
                       Telefon: <a href="tel:${clinicPhone}" style="color: ${navy}; text-decoration: none;">${clinicPhone}</a>

@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-22)
 
 **Core value:** Patients can discover Morocz Medical's services and book an appointment through a beautifully animated, fast, SEO-optimized website where every piece of content is manageable from Sanity CMS.
-**Current focus:** v2.0 Booking Module — Phase 11 data foundation in progress
+**Current focus:** v2.0 Booking Module — Phase 11 booking UI in progress
 
 ## Current Position
 
 Phase: 11 of 14 (Booking Core) — in progress
-Plan: 1 of 4 completed (11-01 booking data foundation done)
-Status: 11-01 complete, ready for 11-02 API routes
-Last activity: 2026-02-22 — 11-01 complete: bookingType, slotLockType schemas, write client, slot algorithm, GROQ queries
+Plan: 3 of 4 completed (11-01 data foundation, 11-02 API routes, 11-03 booking UI done)
+Status: 11-03 complete, ready for 11-04 confirmation + email
+Last activity: 2026-02-22 — 11-03 complete: /idopontfoglalas page, BookingWizard, StepIndicator, Step1Service, Step2DateTime calendar+slots
 
-Progress: [████░░░░░░] 25%
+Progress: [███████░░░] 75%
 
 ## Performance Metrics
 
@@ -29,7 +29,7 @@ Progress: [████░░░░░░] 25%
 |-------|-------|-------|----------|
 | 09-data-foundation-and-gdpr | 3 | ~11 min | ~4 min |
 | 10-authentication | 3 | ~30 min | ~10 min |
-| 11-booking-core | 1/4 | ~4 min | ~4 min |
+| 11-booking-core | 3/4 | ~20 min | ~7 min |
 
 *Updated after each plan completion*
 
@@ -64,6 +64,9 @@ Recent decisions affecting current work:
 - 11-01: HH:MM local time strings (not ISO datetime) used throughout to avoid TZ confusion
 - 11-01: Write client lazy null-singleton (same pattern as db/index.ts) prevents build-time crash when SANITY_WRITE_TOKEN not set
 - 11-01: patientEmail uses string + regex validation (not Sanity email type) for schema version compatibility
+- 11-03: AnimatePresence uses string step keys ("service"/"datetime"/"auth"/"confirm") to avoid key=0 animation bug
+- 11-03: Schedule data (weeklySchedule + blockedDates) fetched in Server Component page.tsx and passed as scheduleData prop to BookingWizard — no extra client-side API call for calendar highlighting
+- 11-03: Sanity WeeklyScheduleDay startTime/endTime normalized with ?? "" fallback before passing to ScheduleForAvailability
 
 ### Pending Todos
 
@@ -84,5 +87,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-22
-Stopped at: 11-01 complete. Phase 11 plan 01 done: bookingType/slotLockType schemas, write client, slot generation algorithm, GROQ queries. Next: 11-02 API routes.
+Stopped at: 11-03 complete. /idopontfoglalas booking page with 4-step wizard, AnimatePresence transitions, custom calendar, and slot picker. Next: 11-04 Step4Confirm + confirmation email.
 Resume file: none

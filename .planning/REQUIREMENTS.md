@@ -24,13 +24,13 @@ Requirements for the booking module. Each maps to roadmap phases.
 
 ### Booking
 
-- [ ] **BOOK-01**: Patient can select a service from the list on /idopontfoglalas
-- [ ] **BOOK-02**: Patient can browse available dates on a calendar (available days highlighted)
-- [ ] **BOOK-03**: Patient can pick a time slot from available slots for the selected date
+- [x] **BOOK-01**: Patient can select a service from the list on /idopontfoglalas
+- [x] **BOOK-02**: Patient can browse available dates on a calendar (available days highlighted)
+- [x] **BOOK-03**: Patient can pick a time slot from available slots for the selected date
 - [ ] **BOOK-04**: Patient provides name, email, phone at booking confirmation
 - [x] **BOOK-05**: Booking is created instantly as a Sanity document with per-slot optimistic locking
 - [x] **BOOK-06**: Double-booking is prevented via ifRevisionID on slot documents
-- [ ] **BOOK-07**: Auth gate appears after slot selection, not before browsing
+- [x] **BOOK-07**: Auth gate appears after slot selection, not before browsing
 
 ### Notifications
 
@@ -59,9 +59,9 @@ Requirements for the booking module. Each maps to roadmap phases.
 
 ### UX Polish
 
-- [ ] **UX-01**: Booking flow uses animated step transitions (Motion v12)
-- [ ] **UX-02**: All booking UI strings in proper Hungarian with accented characters
-- [ ] **UX-03**: Booking page matches existing site design system
+- [x] **UX-01**: Booking flow uses animated step transitions (Motion v12)
+- [x] **UX-02**: All booking UI strings in proper Hungarian with accented characters
+- [x] **UX-03**: Booking page matches existing site design system
 
 ## Future Requirements
 
@@ -106,13 +106,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SCHED-02 | Phase 9 | Complete |
 | SCHED-03 | Phase 9 | Complete |
 | SCHED-04 | Phase 9 | Complete |
-| BOOK-01 | Phase 11 | Pending |
-| BOOK-02 | Phase 11 | Pending |
-| BOOK-03 | Phase 11 | Pending |
+| BOOK-01 | Phase 11 | Complete |
+| BOOK-02 | Phase 11 | Complete |
+| BOOK-03 | Phase 11 | Complete |
 | BOOK-04 | Phase 11 | Pending |
 | BOOK-05 | Phase 11 | Complete (11-01) |
 | BOOK-06 | Phase 11 | Complete (11-01) |
-| BOOK-07 | Phase 11 | Pending |
+| BOOK-07 | Phase 11 | Complete |
 | NOTIF-01 | Phase 11 | Pending |
 | NOTIF-02 | Phase 14 | Pending |
 | NOTIF-03 | Phase 12 | Pending |
@@ -126,9 +126,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | GDPR-01 | Phase 9 | Pending |
 | GDPR-02 | Phase 9 | Pending |
 | GDPR-03 | Phase 9 | Pending |
-| UX-01 | Phase 11 | Pending |
-| UX-02 | Phase 11 | Pending |
-| UX-03 | Phase 11 | Pending |
+| UX-01 | Phase 11 | Complete |
+| UX-02 | Phase 11 | Complete |
+| UX-03 | Phase 11 | Complete |
 
 **Coverage:**
 - v2.0 requirements: 32 total

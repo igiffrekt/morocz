@@ -70,7 +70,7 @@ Plans:
 **Plans**: 4 plans
 
 Plans:
-- [ ] 11-01-PLAN.md — Sanity schemas (booking, slotLock), write client, slot generation algorithm, GROQ queries
+- [x] 11-01-PLAN.md — Sanity schemas (booking, slotLock), write client, slot generation algorithm, GROQ queries
 - [ ] 11-02-PLAN.md — API routes: GET /api/slots + POST /api/booking with ifRevisionID locking + confirmation email
 - [ ] 11-03-PLAN.md — Booking page /idopontfoglalas, wizard shell, StepIndicator, Step1Service, Step2DateTime
 - [ ] 11-04-PLAN.md — Step3Auth, Step4Confirm, BookingSuccess, sessionStorage persistence, conflict handling
@@ -125,7 +125,7 @@ Phases execute in numeric order: 9 → 10 → 11 → 12 → 13 → 14
 |-------|----------------|--------|-----------|
 | 9. Data Foundation and GDPR | 3/3 | Complete | 2026-02-22 |
 | 10. Authentication | 3/3 | Complete    | 2026-02-22 |
-| 11. Booking Core | 0/4 | Not started | - |
+| 11. Booking Core | 1/4 | In progress | - |
 | 12. Patient Account | 0/? | Not started | - |
 | 13. Admin Dashboard | 0/? | Not started | - |
 | 14. Reminder Emails and Cron | 0/? | Not started | - |

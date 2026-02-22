@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-22)
 
 **Core value:** Patients can discover Morocz Medical's services and book an appointment through a beautifully animated, fast, SEO-optimized website where every piece of content is manageable from Sanity CMS.
-**Current focus:** v2.0 Booking Module — Phase 10 authentication complete
+**Current focus:** v2.0 Booking Module — Phase 11 data foundation in progress
 
 ## Current Position
 
-Phase: 10 of 14 (Authentication) — complete
-Plan: 3 of 3 completed (10-03 admin auth done)
-Status: 10-03 complete, ready for Phase 11
-Last activity: 2026-02-22 — 10-03 complete: admin page, seed script, invite endpoint
+Phase: 11 of 14 (Booking Core) — in progress
+Plan: 1 of 4 completed (11-01 booking data foundation done)
+Status: 11-01 complete, ready for 11-02 API routes
+Last activity: 2026-02-22 — 11-01 complete: bookingType, slotLockType schemas, write client, slot algorithm, GROQ queries
 
-Progress: [███░░░░░░░] 21%
+Progress: [████░░░░░░] 25%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4 (v2.0)
+- Total plans completed: 5 (v2.0)
 - Average duration: ~5 min
-- Total execution time: ~22 min
+- Total execution time: ~26 min
 
 **By Phase:**
 
@@ -29,6 +29,7 @@ Progress: [███░░░░░░░] 21%
 |-------|-------|-------|----------|
 | 09-data-foundation-and-gdpr | 3 | ~11 min | ~4 min |
 | 10-authentication | 3 | ~30 min | ~10 min |
+| 11-booking-core | 1/4 | ~4 min | ~4 min |
 
 *Updated after each plan completion*
 
@@ -59,6 +60,10 @@ Recent decisions affecting current work:
 - 10-03: Admin page role check uses auth.api.getSession() in Server Component — middleware only checks cookie presence, not role
 - 10-03: AdminSignOut extracted as separate client component to allow sign-out button inside Server Component page
 - 10-03: Admin invite uses crypto.randomUUID().slice(0, 12) for temporary password — simple and sufficient for 2-admin setup
+- 11-01: Slot generation uses 20-min base granularity with sub-slot conflict checking for multi-slot services
+- 11-01: HH:MM local time strings (not ISO datetime) used throughout to avoid TZ confusion
+- 11-01: Write client lazy null-singleton (same pattern as db/index.ts) prevents build-time crash when SANITY_WRITE_TOKEN not set
+- 11-01: patientEmail uses string + regex validation (not Sanity email type) for schema version compatibility
 
 ### Pending Todos
 
@@ -70,6 +75,7 @@ Recent decisions affecting current work:
 - USER ACTION REQUIRED: Set up Google OAuth credentials (GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET)
 - USER ACTION REQUIRED: Generate BETTER_AUTH_SECRET and add to .env.local
 - USER ACTION REQUIRED: Create Resend API key and add RESEND_API_KEY
+- USER ACTION REQUIRED: Create Sanity API token with "Editor" role and set SANITY_WRITE_TOKEN in .env.local
 
 ### Blockers/Concerns
 
@@ -78,5 +84,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-22
-Stopped at: 10-03 complete. Phase 10 authentication fully done (infra, patient auth UI, admin auth UI). Next: Phase 11 booking flow.
+Stopped at: 11-01 complete. Phase 11 plan 01 done: bookingType/slotLockType schemas, write client, slot generation algorithm, GROQ queries. Next: 11-02 API routes.
 Resume file: none

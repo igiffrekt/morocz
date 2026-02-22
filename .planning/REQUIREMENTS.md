@@ -28,8 +28,8 @@ Requirements for the booking module. Each maps to roadmap phases.
 - [ ] **BOOK-02**: Patient can browse available dates on a calendar (available days highlighted)
 - [ ] **BOOK-03**: Patient can pick a time slot from available slots for the selected date
 - [ ] **BOOK-04**: Patient provides name, email, phone at booking confirmation
-- [ ] **BOOK-05**: Booking is created instantly as a Sanity document with per-slot optimistic locking
-- [ ] **BOOK-06**: Double-booking is prevented via ifRevisionID on slot documents
+- [x] **BOOK-05**: Booking is created instantly as a Sanity document with per-slot optimistic locking
+- [x] **BOOK-06**: Double-booking is prevented via ifRevisionID on slot documents
 - [ ] **BOOK-07**: Auth gate appears after slot selection, not before browsing
 
 ### Notifications
@@ -110,8 +110,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | BOOK-02 | Phase 11 | Pending |
 | BOOK-03 | Phase 11 | Pending |
 | BOOK-04 | Phase 11 | Pending |
-| BOOK-05 | Phase 11 | Pending |
-| BOOK-06 | Phase 11 | Pending |
+| BOOK-05 | Phase 11 | Complete (11-01) |
+| BOOK-06 | Phase 11 | Complete (11-01) |
 | BOOK-07 | Phase 11 | Pending |
 | NOTIF-01 | Phase 11 | Pending |
 | NOTIF-02 | Phase 14 | Pending |

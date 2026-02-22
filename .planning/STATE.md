@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-02-22)
 
 **Core value:** Patients can discover Morocz Medical's services and book an appointment through a beautifully animated, fast, SEO-optimized website where every piece of content is manageable from Sanity CMS.
-**Current focus:** v2.0 Booking Module — Phase 10 patient auth UI complete
+**Current focus:** v2.0 Booking Module — Phase 10 authentication complete
 
 ## Current Position
 
-Phase: 10 of 14 (Authentication) — in progress
-Plan: 2 of ? completed (10-02 patient auth UI done)
-Status: 10-02 complete, ready for next plan
-Last activity: 2026-02-22 — 10-02 complete: AuthStep + ForgotPassword UI components
+Phase: 10 of 14 (Authentication) — complete
+Plan: 3 of 3 completed (10-03 admin auth done)
+Status: 10-03 complete, ready for Phase 11
+Last activity: 2026-02-22 — 10-03 complete: admin page, seed script, invite endpoint
 
 Progress: [███░░░░░░░] 21%
 
@@ -28,7 +28,7 @@ Progress: [███░░░░░░░] 21%
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 09-data-foundation-and-gdpr | 3 | ~11 min | ~4 min |
-| 10-authentication | 2 (so far) | ~15 min | ~7.5 min |
+| 10-authentication | 3 | ~30 min | ~10 min |
 
 *Updated after each plan completion*
 
@@ -56,6 +56,9 @@ Recent decisions affecting current work:
 - 10-01: Auth schema manually generated from Better Auth CLI introspection (CLI requires DATABASE_URL, not available during setup)
 - 10-01: auth route has force-dynamic to prevent Next.js static evaluation
 - 10-02: authClient.requestPasswordReset is the correct method (not forgetPassword — that doesn't exist in Better Auth client API)
+- 10-03: Admin page role check uses auth.api.getSession() in Server Component — middleware only checks cookie presence, not role
+- 10-03: AdminSignOut extracted as separate client component to allow sign-out button inside Server Component page
+- 10-03: Admin invite uses crypto.randomUUID().slice(0, 12) for temporary password — simple and sufficient for 2-admin setup
 
 ### Pending Todos
 
@@ -75,5 +78,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-22
-Stopped at: 10-02 complete. Patient auth UI (AuthStep + ForgotPassword) done. Next: remaining Phase 10 plans (admin auth UI, etc.)
+Stopped at: 10-03 complete. Phase 10 authentication fully done (infra, patient auth UI, admin auth UI). Next: Phase 11 booking flow.
 Resume file: none

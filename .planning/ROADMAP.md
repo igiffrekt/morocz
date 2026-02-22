@@ -76,18 +76,21 @@ Plans:
 - [ ] 11-04-PLAN.md — Step3Auth, Step4Confirm, BookingSuccess, sessionStorage persistence, conflict handling
 
 ### Phase 12: Patient Account
-**Goal**: A logged-in patient can view all their appointments, cancel an upcoming appointment (within the 24-hour window), and receive a cancellation confirmation email.
+**Goal**: A patient can manage their booking via a token-based link from the confirmation email — view appointment details, cancel (with 24h window), reschedule (atomic slot swap), and receive Hungarian confirmation emails for each action.
 **Depends on**: Phase 11
 **Requirements**: ACCT-01, ACCT-02, ACCT-03, NOTIF-03
 **Success Criteria** (what must be TRUE):
-  1. Logged-in patient can see all upcoming and past appointments on /fiokom
+  1. Patient can visit /foglalas/:token and see their appointment details (service, date, time)
   2. Patient can cancel a booking that is more than 24 hours away; the slot becomes available again
   3. Patient attempting to cancel a booking less than 24 hours away sees a Hungarian error message explaining the window has passed
   4. Patient receives a Hungarian cancellation confirmation email after successfully cancelling
-**Plans**: TBD
+  5. Patient can reschedule an appointment (new date/time) with atomic swap; receives reschedule email
+**Plans**: 3 plans
 
 Plans:
-- [ ] 12-01: TBD
+- [ ] 12-01-PLAN.md — Schema updates (managementToken, reminderSent), token generation, email builders (cancel, reschedule, reminder)
+- [ ] 12-02-PLAN.md — Management page /foglalas/:token, BookingManagementCard, CancelDialog, cancel API with 24h enforcement
+- [ ] 12-03-PLAN.md — ReschedulePanel with inline date/time picker, reschedule API with atomic slot swap, human verification
 
 ### Phase 13: Admin Dashboard
 **Goal**: The admin can log in to a separate, role-gated dashboard and view today's appointments in order, browse the weekly calendar, access patient contact details, and manually cancel a booking with the patient notified.
@@ -126,6 +129,6 @@ Phases execute in numeric order: 9 → 10 → 11 → 12 → 13 → 14
 | 9. Data Foundation and GDPR | 3/3 | Complete | 2026-02-22 |
 | 10. Authentication | 3/3 | Complete    | 2026-02-22 |
 | 11. Booking Core | 4/4 | Complete   | 2026-02-22 |
-| 12. Patient Account | 0/? | Not started | - |
+| 12. Patient Account | 0/3 | Planned | - |
 | 13. Admin Dashboard | 0/? | Not started | - |
 | 14. Reminder Emails and Cron | 0/? | Not started | - |

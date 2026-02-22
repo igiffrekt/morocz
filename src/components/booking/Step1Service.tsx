@@ -34,7 +34,7 @@ export function Step1Service({ services, selectedServiceId, onSelect, onNext }: 
               onClick={() => onSelect(service._id, name, duration)}
               className={[
                 "text-left rounded-2xl border-2 p-6 transition-all duration-200 cursor-pointer",
-                "hover:shadow-md hover:scale-[1.01]",
+                "hover:shadow-md",
                 isSelected
                   ? "border-[var(--color-primary)] bg-[var(--color-primary)]/5 shadow-md"
                   : "border-gray-200 bg-white hover:border-[var(--color-primary)]/40",

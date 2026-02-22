@@ -19,21 +19,31 @@ export const auth = betterAuth({
     minPasswordLength: 6,
 
     sendResetPassword: async ({ user, url }: { user: { email: string }; url: string }) => {
-      void getResend().emails.send({
-        from: "noreply@moroczmedical.hu",
-        to: user.email,
-        subject: "Jelszó visszaállítása",
-        html: `<p>A jelszó visszaállításához kattintson az alábbi linkre:</p><p><a href="${url}">Jelszó visszaállítása</a></p><p>A link 1 óráig érvényes.</p>`,
-      });
+      if (!process.env.RESEND_API_KEY) return;
+      try {
+        void getResend().emails.send({
+          from: "noreply@moroczmedical.hu",
+          to: user.email,
+          subject: "Jelszó visszaállítása",
+          html: `<p>A jelszó visszaállításához kattintson az alábbi linkre:</p><p><a href="${url}">Jelszó visszaállítása</a></p><p>A link 1 óráig érvényes.</p>`,
+        });
+      } catch {
+        console.error("[auth] Failed to send reset password email to", user.email);
+      }
     },
 
     sendVerificationEmail: async ({ user, url }: { user: { email: string }; url: string }) => {
-      void getResend().emails.send({
-        from: "noreply@moroczmedical.hu",
-        to: user.email,
-        subject: "E-mail cím megerősítése",
-        html: `<p>Az e-mail cím megerősítéséhez kattintson az alábbi linkre:</p><p><a href="${url}">E-mail megerősítése</a></p>`,
-      });
+      if (!process.env.RESEND_API_KEY) return;
+      try {
+        void getResend().emails.send({
+          from: "noreply@moroczmedical.hu",
+          to: user.email,
+          subject: "E-mail cím megerősítése",
+          html: `<p>Az e-mail cím megerősítéséhez kattintson az alábbi linkre:</p><p><a href="${url}">E-mail megerősítése</a></p>`,
+        });
+      } catch {
+        console.error("[auth] Failed to send verification email to", user.email);
+      }
     },
   },
 

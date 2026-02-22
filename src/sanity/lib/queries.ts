@@ -271,7 +271,7 @@ export const slotLockByIdQuery = defineQuery(
 // Revalidation tag: "service"
 
 export const servicesForBookingQuery = defineQuery(
-  `*[_type == "service" && name in ["Nőgyógyászat", "Várandósgondozás"]] | order(order asc){
+  `*[_type == "service" && (name match "Nőgyógyász*" || name match "Várandós*")] | order(order asc){
   _id,
   name,
   appointmentDuration,

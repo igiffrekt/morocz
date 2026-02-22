@@ -17,10 +17,10 @@ Requirements for the booking module. Each maps to roadmap phases.
 
 ### Schedule
 
-- [ ] **SCHED-01**: Doctor can define weekly recurring availability in Sanity Studio (per-weekday start/end time, slot duration)
-- [ ] **SCHED-02**: Doctor can block specific dates in Sanity Studio (vacations, holidays)
-- [ ] **SCHED-03**: Service-linked slot duration: each service defines its own appointment length
-- [ ] **SCHED-04**: Buffer time between appointments is configurable in Sanity Studio
+- [x] **SCHED-01**: Doctor can define weekly recurring availability in Sanity Studio (per-weekday start/end time, slot duration)
+- [x] **SCHED-02**: Doctor can block specific dates in Sanity Studio (vacations, holidays)
+- [x] **SCHED-03**: Service-linked slot duration: each service defines its own appointment length
+- [x] **SCHED-04**: Buffer time between appointments is configurable in Sanity Studio
 
 ### Booking
 
@@ -102,10 +102,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AUTH-03 | Phase 10 | Pending |
 | AUTH-04 | Phase 10 | Pending |
 | AUTH-05 | Phase 10 | Pending |
-| SCHED-01 | Phase 9 | Pending |
-| SCHED-02 | Phase 9 | Pending |
-| SCHED-03 | Phase 9 | Pending |
-| SCHED-04 | Phase 9 | Pending |
+| SCHED-01 | Phase 9 | Complete |
+| SCHED-02 | Phase 9 | Complete |
+| SCHED-03 | Phase 9 | Complete |
+| SCHED-04 | Phase 9 | Complete |
 | BOOK-01 | Phase 11 | Pending |
 | BOOK-02 | Phase 11 | Pending |
 | BOOK-03 | Phase 11 | Pending |

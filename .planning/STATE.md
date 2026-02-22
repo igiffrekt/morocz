@@ -5,29 +5,29 @@
 See: .planning/PROJECT.md (updated 2026-02-22)
 
 **Core value:** Patients can discover Morocz Medical's services and book an appointment through a beautifully animated, fast, SEO-optimized website where every piece of content is manageable from Sanity CMS.
-**Current focus:** v2.0 Booking Module — Phase 9 ready to plan
+**Current focus:** v2.0 Booking Module — Phase 9 in progress (Plan 1 complete)
 
 ## Current Position
 
 Phase: 9 of 14 (Data Foundation and GDPR)
-Plan: — of — in current phase
-Status: Ready to plan
-Last activity: 2026-02-22 — v2.0 roadmap created, phases 9-14 defined
+Plan: 1 of 3 complete in current phase
+Status: In progress
+Last activity: 2026-02-22 — 09-01 complete: weeklySchedule and blockedDate schemas, service duration, Studio structure, queries, TS types
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [█░░░░░░░░░] 5%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 0 (v2.0)
-- Average duration: —
-- Total execution time: —
+- Total plans completed: 1 (v2.0)
+- Average duration: 3 min
+- Total execution time: 3 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| 09-data-foundation-and-gdpr | 1 | 3 min | 3 min |
 
 *Updated after each plan completion*
 
@@ -44,6 +44,10 @@ Recent decisions affecting current work:
 - v2.0 arch: Admin auth is email/password only, role set from ADMIN_EMAIL env var — no OAuth for admin
 - v2.0 arch: Zod v3 (not v4) — Zod 4 is ESM-only and breaks Sanity v4 builds
 - v2.0 arch: Vercel Cron for reminder emails; Inngest documented as upgrade path
+- 09-01: weeklySchedule days array pre-populated via initialValue (Mon-Fri working, Sat/Sun off) with empty time strings
+- 09-01: startTime/endTime use conditional validation via rule.custom() reading context.parent.isDayOff
+- 09-01: blockedDate.isHoliday is readOnly at schema level — populated programmatically in Plan 03
+- 09-01: appointmentDuration defaults to 20 min, matching weeklySchedule defaultSlotDuration default
 
 ### Pending Todos
 
@@ -60,5 +64,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-22
-Stopped at: v2.0 roadmap created. 32 requirements mapped across 6 phases (9-14). Ready to plan Phase 9.
+Stopped at: Completed 09-01-PLAN.md — Sanity scheduling schemas (weeklySchedule, blockedDate, service duration, Studio structure, queries, TS types)
 Resume file: None

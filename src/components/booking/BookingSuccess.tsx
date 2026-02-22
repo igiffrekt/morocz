@@ -61,14 +61,39 @@ export function BookingSuccess({
         </div>
       </div>
 
-      {/* Email confirmation note */}
-      <p className="text-sm text-gray-600 mb-6">
-        Visszaigazoló e-mailt küldtünk a(z){" "}
-        <span className="font-medium text-gray-800">{patientEmail}</span> címre.
-      </p>
+      {/* Email confirmation note with inbox tip */}
+      <div className="bg-blue-50 border border-blue-100 rounded-2xl p-5 text-left max-w-sm mx-auto mb-4">
+        <div className="flex items-start gap-3">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#3b82f6"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="w-5 h-5 mt-0.5 shrink-0"
+            aria-hidden="true"
+          >
+            <rect x="2" y="4" width="20" height="16" rx="2" />
+            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+          </svg>
+          <div>
+            <p className="text-sm text-gray-700">
+              Visszaigazoló e-mailt küldtünk a(z){" "}
+              <span className="font-medium text-gray-900">{patientEmail}</span> címre.
+            </p>
+            <p className="text-xs text-gray-500 mt-1.5">
+              A Google ezt általában a <span className="font-medium text-gray-600">Promóciók</span>{" "}
+              kategóriába helyezi — kérjük, ott is nézze meg. A lemondással kapcsolatos
+              információkat is ebben az e-mailben találja.
+            </p>
+          </div>
+        </div>
+      </div>
 
-      {/* Next steps */}
-      <div className="bg-[var(--color-accent)]/10 rounded-2xl p-5 text-left max-w-sm mx-auto mb-8">
+      {/* Visit info */}
+      <div className="bg-[var(--color-accent)]/10 rounded-2xl p-5 text-left max-w-sm mx-auto mb-4">
         <h3 className="text-sm font-semibold text-[var(--color-primary)] mb-3">
           Tudnivalók a látogatással kapcsolatban
         </h3>
@@ -87,14 +112,40 @@ export function BookingSuccess({
             />
             Hozza magával a TAJ kártyáját és a személyi igazolványát.
           </li>
-          <li className="flex items-start gap-2 text-sm text-gray-700">
-            <span
-              className="mt-1 w-1.5 h-1.5 rounded-full bg-[#99CEB7] shrink-0"
-              aria-hidden="true"
-            />
-            Lemondás vagy időpont módosítás a visszaigazoló e-mailben található linkeken lehetséges.
-          </li>
         </ul>
+      </div>
+
+      {/* Cancellation policy */}
+      <div className="bg-amber-50 border border-amber-100 rounded-2xl p-5 text-left max-w-sm mx-auto mb-8">
+        <div className="flex items-start gap-3">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#d97706"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="w-5 h-5 mt-0.5 shrink-0"
+            aria-hidden="true"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          <div>
+            <h3 className="text-sm font-semibold text-amber-800 mb-1.5">
+              Időpontfoglalás lemondása
+            </h3>
+            <p className="text-sm text-gray-700">
+              Lemondani a foglalt időpontot maximum <span className="font-medium">24 órával</span> a
+              rendelés előtt lehetséges a visszaigazoló e-mailben található linkre kattintva.
+            </p>
+            <p className="text-xs text-amber-700 mt-2 font-medium">
+              A 24 órán belüli lemondásért készenléti díjat számolunk fel: 10.000 Ft / alkalom.
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Action buttons */}

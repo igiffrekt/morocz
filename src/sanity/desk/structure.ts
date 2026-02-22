@@ -60,6 +60,14 @@ export const structure: StructureResolver = (S) =>
                     .documentId("blockedDate")
                     .title("Blokkolt napok szerkesztése"),
                 ),
+              S.listItem()
+                .title("Foglalások")
+                .schemaType("booking")
+                .child(S.documentTypeList("booking").title("Foglalások")),
+              S.listItem()
+                .title("Időpont zárak")
+                .schemaType("slotLock")
+                .child(S.documentTypeList("slotLock").title("Időpont zárak")),
             ]),
         ),
 

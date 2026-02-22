@@ -305,6 +305,33 @@ export type BlockedDate = {
 
 // ─── All Document Types Union ─────────────────────────────────────────────────
 
+// ─── Booking ──────────────────────────────────────────────────────────────────
+
+export type Booking = {
+  _type: "booking";
+  _id: string;
+  service?: SanityReference;
+  slotDate?: string;
+  slotTime?: string;
+  patientName?: string;
+  patientEmail?: string;
+  patientPhone?: string;
+  userId?: string;
+  status?: "confirmed" | "cancelled" | "rescheduled";
+  createdAt?: string;
+};
+
+// ─── Slot Lock ────────────────────────────────────────────────────────────────
+
+export type SlotLock = {
+  _type: "slotLock";
+  _id: string;
+  slotId?: string;
+  status?: "available" | "held" | "booked";
+  heldUntil?: string;
+  bookingRef?: SanityReference;
+};
+
 export type AllSanitySchemaTypes =
   | Homepage
   | SiteSettings
@@ -316,7 +343,9 @@ export type AllSanitySchemaTypes =
   | BlogPost
   | PrivacyPolicy
   | WeeklySchedule
-  | BlockedDate;
+  | BlockedDate
+  | Booking
+  | SlotLock;
 
 // ─── Query Result Types ───────────────────────────────────────────────────────
 // These types match the shape returned by GROQ queries that dereference references inline.
@@ -394,3 +423,33 @@ export type BlogPostDetailResult = {
   ogImage?: SanityImageObject;
   publishedAt?: string;
 };
+
+// ─── Booking Query Result Types ───────────────────────────────────────────────
+
+export type BookingsForDateQueryResult = Array<{
+  _id: string;
+  slotTime?: string;
+  service?: { _id: string; appointmentDuration?: number } | null;
+}>;
+
+export type SlotLocksForDateQueryResult = Array<{
+  _id: string;
+  _rev: string;
+  slotId?: string;
+  status?: "available" | "held" | "booked";
+  heldUntil?: string | null;
+}>;
+
+export type SlotLockByIdQueryResult = {
+  _id: string;
+  _rev: string;
+  status?: "available" | "held" | "booked";
+  heldUntil?: string | null;
+} | null;
+
+export type ServicesForBookingQueryResult = Array<{
+  _id: string;
+  name?: string;
+  appointmentDuration?: number;
+  icon?: SanityImageObject;
+}>;

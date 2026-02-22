@@ -230,3 +230,51 @@ export const blockedDatesQuery = defineQuery(
   }
 }`,
 );
+
+// ─── Bookings for Date ───────────────────────────────────────────────────────
+// Revalidation tag: "booking"
+
+export const bookingsForDateQuery = defineQuery(
+  `*[_type == "booking" && slotDate == $date && status == "confirmed"]{
+  _id,
+  slotTime,
+  service->{_id, appointmentDuration}
+}`,
+);
+
+// ─── Slot Locks for Date ─────────────────────────────────────────────────────
+// Revalidation tag: "slotLock"
+
+export const slotLocksForDateQuery = defineQuery(
+  `*[_type == "slotLock" && slotId match $datePrefix && (status == "booked" || (status == "held" && heldUntil > now()))]{
+  _id,
+  _rev,
+  slotId,
+  status,
+  heldUntil
+}`,
+);
+
+// ─── Single Slot Lock ────────────────────────────────────────────────────────
+// Revalidation tag: "slotLock"
+
+export const slotLockByIdQuery = defineQuery(
+  `*[_type == "slotLock" && slotId == $slotId][0]{
+  _id,
+  _rev,
+  status,
+  heldUntil
+}`,
+);
+
+// ─── Services for Booking ────────────────────────────────────────────────────
+// Revalidation tag: "service"
+
+export const servicesForBookingQuery = defineQuery(
+  `*[_type == "service"] | order(order asc){
+  _id,
+  name,
+  appointmentDuration,
+  icon
+}`,
+);

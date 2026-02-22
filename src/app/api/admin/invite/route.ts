@@ -1,12 +1,7 @@
 import { headers } from "next/headers";
-import { Resend } from "resend";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
-
-// Lazy Resend initialization — same pattern as auth.ts to avoid build-time crash.
-function getResend() {
-  return new Resend(process.env.RESEND_API_KEY);
-}
+import { sendEmail } from "@/lib/email";
 
 const InviteBodySchema = z.object({
   email: z.string().email("Érvénytelen e-mail cím formátum."),
@@ -78,9 +73,8 @@ export async function POST(request: Request): Promise<Response> {
     );
   }
 
-  // ── 5. Send invite email via Resend (fire-and-forget) ──────────────────────
-  void getResend().emails.send({
-    from: "noreply@moroczmedical.hu",
+  // ── 5. Send invite email via Gmail API (fire-and-forget) ───────────────────
+  void sendEmail({
     to: email,
     subject: "Meghívó — Morocz Medical Admin",
     html: `

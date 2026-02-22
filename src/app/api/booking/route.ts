@@ -1,9 +1,9 @@
 import { headers } from "next/headers";
 import { defineQuery } from "next-sanity";
-import { Resend } from "resend";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { buildConfirmationEmail } from "@/lib/booking-email";
+import { isEmailConfigured, sendEmail } from "@/lib/email";
 import { getWriteClient } from "@/lib/sanity-write-client";
 import { generateAvailableSlots } from "@/lib/slots";
 import { sanityFetch } from "@/sanity/lib/fetch";
@@ -16,11 +16,6 @@ import {
 } from "@/sanity/lib/queries";
 
 export const dynamic = "force-dynamic";
-
-// Lazy Resend initialization — avoids build-time crash when RESEND_API_KEY is absent.
-function getResend() {
-  return new Resend(process.env.RESEND_API_KEY);
-}
 
 // Inline query for service name + duration by ID
 const serviceForEmailQuery = defineQuery(
@@ -167,7 +162,7 @@ export async function POST(request: Request): Promise<Response> {
     .commit();
 
   // ── 9. Send confirmation email (fire-and-forget) ───────────────────────────
-  if (process.env.RESEND_API_KEY) {
+  if (isEmailConfigured()) {
     void sendConfirmationEmail({
       booking: { _id: booking._id, managementToken },
       serviceId,
@@ -305,8 +300,7 @@ async function sendConfirmationEmail({
       clinicAddress: "1000 Budapest, Klinika utca 1.",
     });
 
-    await getResend().emails.send({
-      from: "noreply@moroczmedical.hu",
+    await sendEmail({
       to: patientEmail,
       subject: "Időpontfoglalás visszaigazolása — Mórocz Medical",
       html,

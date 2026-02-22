@@ -2,14 +2,8 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
 import { admin } from "better-auth/plugins";
-import { Resend } from "resend";
 import { db } from "./db";
-
-// Lazy Resend initialization to avoid throwing during Next.js build-time analysis
-// when RESEND_API_KEY is not set in the build environment.
-function getResend() {
-  return new Resend(process.env.RESEND_API_KEY);
-}
+import { isEmailConfigured, sendEmail } from "./email";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, { provider: "pg" }),
@@ -19,10 +13,9 @@ export const auth = betterAuth({
     minPasswordLength: 6,
 
     sendResetPassword: async ({ user, url }: { user: { email: string }; url: string }) => {
-      if (!process.env.RESEND_API_KEY) return;
+      if (!isEmailConfigured()) return;
       try {
-        void getResend().emails.send({
-          from: "noreply@moroczmedical.hu",
+        void sendEmail({
           to: user.email,
           subject: "Jelszó visszaállítása",
           html: `<p>A jelszó visszaállításához kattintson az alábbi linkre:</p><p><a href="${url}">Jelszó visszaállítása</a></p><p>A link 1 óráig érvényes.</p>`,
@@ -33,10 +26,9 @@ export const auth = betterAuth({
     },
 
     sendVerificationEmail: async ({ user, url }: { user: { email: string }; url: string }) => {
-      if (!process.env.RESEND_API_KEY) return;
+      if (!isEmailConfigured()) return;
       try {
-        void getResend().emails.send({
-          from: "noreply@moroczmedical.hu",
+        void sendEmail({
           to: user.email,
           subject: "E-mail cím megerősítése",
           html: `<p>Az e-mail cím megerősítéséhez kattintson az alábbi linkre:</p><p><a href="${url}">E-mail megerősítése</a></p>`,

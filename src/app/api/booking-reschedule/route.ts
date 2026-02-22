@@ -1,14 +1,9 @@
-import { Resend } from "resend";
 import { z } from "zod";
 import { buildRescheduleEmail } from "@/lib/booking-email";
+import { isEmailConfigured, sendEmail } from "@/lib/email";
 import { getWriteClient } from "@/lib/sanity-write-client";
 
 export const dynamic = "force-dynamic";
-
-// Lazy Resend initialization — avoids build-time crash when RESEND_API_KEY is absent.
-function getResend() {
-  return new Resend(process.env.RESEND_API_KEY);
-}
 
 // ── Request body schema ────────────────────────────────────────────────────────
 const RescheduleSchema = z.object({
@@ -171,7 +166,7 @@ export async function POST(request: Request): Promise<Response> {
       .commit();
 
     // ── 7. Send reschedule email (fire-and-forget) ─────────────────────────────
-    if (process.env.RESEND_API_KEY) {
+    if (isEmailConfigured()) {
       void sendRescheduleEmailAsync({
         patientName: booking.patientName,
         patientEmail: booking.patientEmail,
@@ -242,8 +237,7 @@ async function sendRescheduleEmailAsync({
       clinicAddress: "1000 Budapest, Klinika utca 1.",
     });
 
-    await getResend().emails.send({
-      from: "noreply@moroczmedical.hu",
+    await sendEmail({
       to: patientEmail,
       subject: "Időpont áthelyezve — Mórocz Medical",
       html,

@@ -1,14 +1,9 @@
-import { Resend } from "resend";
 import { z } from "zod";
 import { buildCancellationEmail } from "@/lib/booking-email";
+import { isEmailConfigured, sendEmail } from "@/lib/email";
 import { getWriteClient } from "@/lib/sanity-write-client";
 
 export const dynamic = "force-dynamic";
-
-// Lazy Resend initialization — avoids build-time crash when RESEND_API_KEY is absent.
-function getResend() {
-  return new Resend(process.env.RESEND_API_KEY);
-}
 
 // ── Request body schema ────────────────────────────────────────────────────────
 const CancelSchema = z.object({
@@ -99,7 +94,7 @@ export async function POST(request: Request): Promise<Response> {
     }
 
     // ── 6. Send cancellation email (fire-and-forget) ───────────────────────────
-    if (process.env.RESEND_API_KEY) {
+    if (isEmailConfigured()) {
       void sendCancellationEmailAsync({
         patientName: booking.patientName,
         patientEmail: booking.patientEmail,
@@ -158,8 +153,7 @@ async function sendCancellationEmailAsync({
       newBookingUrl,
     });
 
-    await getResend().emails.send({
-      from: "noreply@moroczmedical.hu",
+    await sendEmail({
       to: patientEmail,
       subject: "Időpont lemondva — Mórocz Medical",
       html,

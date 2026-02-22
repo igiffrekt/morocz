@@ -54,6 +54,8 @@ function getMaxDateString(): string {
   return toDateString(max.getFullYear(), max.getMonth(), max.getDate());
 }
 
+type DayAvailability = { available: number; total: number };
+
 export function Step2DateTime({
   selectedDate,
   selectedTime,
@@ -71,6 +73,7 @@ export function Step2DateTime({
   const [slots, setSlots] = useState<string[]>([]);
   const [slotsLoading, setSlotsLoading] = useState(false);
   const [slotsError, setSlotsError] = useState<string | null>(null);
+  const [dayAvailability, setDayAvailability] = useState<Record<string, DayAvailability>>({});
 
   const todayStr = getTodayString();
   const maxDateStr = getMaxDateString();
@@ -129,6 +132,24 @@ export function Step2DateTime({
       setSlotsError(null);
     }
   }, [selectedDate, fetchSlots]);
+
+  // Fetch per-day availability for the visible month (batch endpoint)
+  useEffect(() => {
+    if (!serviceId) return;
+    const monthStr = `${String(viewYear)}-${String(viewMonth + 1).padStart(2, "0")}`;
+    let cancelled = false;
+    fetch(`/api/slots/availability?month=${monthStr}&serviceId=${encodeURIComponent(serviceId)}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: { availability?: Record<string, DayAvailability> } | null) => {
+        if (!cancelled && data?.availability) {
+          setDayAvailability((prev) => ({ ...prev, ...data.availability }));
+        }
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [viewYear, viewMonth, serviceId]);
 
   // Month navigation bounds
   const canGoPrev = !(viewYear === today.getFullYear() && viewMonth === today.getMonth());
@@ -265,7 +286,7 @@ export function Step2DateTime({
           {calendarCells.map((cell, idx) => {
             if (cell === null) {
               // biome-ignore lint/suspicious/noArrayIndexKey: empty padding cells have no stable key
-              return <div key={`empty-${idx}`} className="h-9" aria-hidden="true" />;
+              return <div key={`empty-${idx}`} className="h-12" aria-hidden="true" />;
             }
 
             const { day, dateStr } = cell;
@@ -276,6 +297,18 @@ export function Step2DateTime({
             const isBeyondMax = dateStr > maxDateStr;
             const isClickable = isAvailable && !isPast && !isBeyondMax;
 
+            // Availability stripe data
+            const avail = dayAvailability[dateStr];
+            const pct = avail && avail.total > 0 ? avail.available / avail.total : null;
+            const stripeColor =
+              pct === null
+                ? ""
+                : pct > 0.6
+                  ? "bg-[#99CEB7]"
+                  : pct > 0.25
+                    ? "bg-amber-400"
+                    : "bg-rose-400";
+
             return (
               <button
                 key={dateStr}
@@ -283,7 +316,7 @@ export function Step2DateTime({
                 onClick={() => handleDayClick(dateStr)}
                 disabled={!isClickable}
                 className={[
-                  "h-9 w-full rounded-lg text-sm font-medium transition-all duration-150",
+                  "h-12 w-full rounded-lg text-sm font-medium transition-all duration-150 flex flex-col items-center justify-center gap-0.5 relative",
                   isSelected
                     ? "bg-[var(--color-primary)] text-white shadow-md"
                     : isClickable
@@ -297,7 +330,17 @@ export function Step2DateTime({
                 aria-pressed={isSelected}
                 aria-current={isToday ? "date" : undefined}
               >
-                {day}
+                <span>{day}</span>
+                {isClickable && pct !== null && (
+                  <span
+                    className={[
+                      "h-[3px] rounded-full transition-all duration-300",
+                      isSelected ? "bg-white/60" : stripeColor,
+                    ].join(" ")}
+                    style={{ width: `${Math.max(pct * 100, 12)}%` }}
+                    aria-hidden="true"
+                  />
+                )}
               </button>
             );
           })}

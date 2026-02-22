@@ -16,7 +16,7 @@
 
 - [x] **Phase 9: Data Foundation and GDPR** - Sanity booking schemas, GDPR compliance, and doctor schedule setup
 - [x] **Phase 10: Authentication** - Patient and admin auth with Better Auth, role separation, and route protection (completed 2026-02-22)
-- [ ] **Phase 11: Booking Core** - Slot generation, calendar UI, booking creation, and confirmation email
+- [x] **Phase 11: Booking Core** - Slot generation, calendar UI, booking creation, and confirmation email (completed 2026-02-22)
 - [ ] **Phase 12: Patient Account** - /fiokom dashboard, appointment management, and cancellation
 - [ ] **Phase 13: Admin Dashboard** - Admin-only calendar view, daily appointments, and manual cancellation
 - [ ] **Phase 14: Reminder Emails and Cron** - 24h pre-appointment reminders via Vercel Cron
@@ -125,7 +125,7 @@ Phases execute in numeric order: 9 → 10 → 11 → 12 → 13 → 14
 |-------|----------------|--------|-----------|
 | 9. Data Foundation and GDPR | 3/3 | Complete | 2026-02-22 |
 | 10. Authentication | 3/3 | Complete    | 2026-02-22 |
-| 11. Booking Core | 3/4 | In Progress|  |
+| 11. Booking Core | 4/4 | Complete   | 2026-02-22 |
 | 12. Patient Account | 0/? | Not started | - |
 | 13. Admin Dashboard | 0/? | Not started | - |
 | 14. Reminder Emails and Cron | 0/? | Not started | - |

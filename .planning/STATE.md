@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-22)
 
 ## Current Position
 
-Phase: 11 of 14 (Booking Core) — in progress
-Plan: 3 of 4 completed (11-01 data foundation, 11-02 API routes, 11-03 booking UI done)
-Status: 11-03 complete, ready for 11-04 confirmation + email
-Last activity: 2026-02-22 — 11-03 complete: /idopontfoglalas page, BookingWizard, StepIndicator, Step1Service, Step2DateTime calendar+slots
+Phase: 11 of 14 (Booking Core) — human-verify checkpoint
+Plan: 4 of 4 auto tasks complete (11-01 data, 11-02 API routes, 11-03 UI, 11-04 confirmation wizard)
+Status: 11-04 auto tasks done; Task 3 checkpoint awaiting browser verification of full wizard flow
+Last activity: 2026-02-22 — 11-04 complete: Step3Auth, Step4Confirm, BookingSuccess, BookingWizard wired end-to-end
 
-Progress: [███████░░░] 75%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -29,10 +29,11 @@ Progress: [███████░░░] 75%
 |-------|-------|-------|----------|
 | 09-data-foundation-and-gdpr | 3 | ~11 min | ~4 min |
 | 10-authentication | 3 | ~30 min | ~10 min |
-| 11-booking-core | 3/4 | ~20 min | ~7 min |
+| 11-booking-core | 4/4 | ~25 min | ~6 min |
 
 *Updated after each plan completion*
 | Phase 11-booking-core P02 | 15 | 2 tasks | 3 files |
+| Phase 11-booking-core P04 | 5 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -71,6 +72,9 @@ Recent decisions affecting current work:
 - [Phase 11-02]: ifRevisionId is a Sanity patch chain method (.ifRevisionId(rev).set().commit()), not a commit option
 - [Phase 11-02]: Conflict response includes up to 5 nearest alternative slots sorted by absolute time distance from requested slot
 - [Phase 11-02]: Email fire-and-forget uses separate async function with try/catch — booking response never blocked by email failure
+- [Phase 11-booking-core]: Step4Confirm passes patientName/patientEmail to onSuccess so BookingSuccess avoids a second useSession call
+- [Phase 11-booking-core]: SessionStorage key morocz-booking-wizard stores {currentStep, selections, timestamp} with 30-min TTL gate for OAuth redirect recovery
+- [Phase 11-booking-core]: Conflict panel is inline above animated step area, not a modal, so alternatives persist during step animation
 
 ### Pending Todos
 
@@ -91,5 +95,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-22
-Stopped at: 11-02 complete (executed out-of-order after 11-03). GET /api/slots and POST /api/booking routes, buildConfirmationEmail() done. Next: 11-04 Step4Confirm + confirmation email.
+Stopped at: 11-04 Task 3 checkpoint:human-verify — full booking wizard built, awaiting browser verification at /idopontfoglalas. All 4 phases of booking-core are complete pending human sign-off.
 Resume file: none

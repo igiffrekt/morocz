@@ -286,7 +286,7 @@ export function Step2DateTime({
           {calendarCells.map((cell, idx) => {
             if (cell === null) {
               // biome-ignore lint/suspicious/noArrayIndexKey: empty padding cells have no stable key
-              return <div key={`empty-${idx}`} className="aspect-square" aria-hidden="true" />;
+              return <div key={`empty-${idx}`} className="h-10" aria-hidden="true" />;
             }
 
             const { day, dateStr } = cell;
@@ -316,7 +316,7 @@ export function Step2DateTime({
                 onClick={() => handleDayClick(dateStr)}
                 disabled={!isClickable}
                 className={[
-                  "aspect-square w-full rounded-lg text-sm font-medium transition-all duration-150 flex flex-col items-center justify-center gap-0.5 relative",
+                  "h-10 w-full rounded-lg text-sm font-medium transition-all duration-150 flex flex-col items-center justify-center gap-0.5 relative",
                   isSelected
                     ? "bg-[var(--color-primary)] text-white shadow-md"
                     : isClickable

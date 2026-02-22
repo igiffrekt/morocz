@@ -9,10 +9,10 @@ See: .planning/PROJECT.md (updated 2026-02-22)
 
 ## Current Position
 
-Phase: 12 of 14 (Patient Account) — executing
-Plan: 2 of 3 complete (12-02 management page + cancel flow)
-Status: 12-02 complete; next is 12-03 reschedule flow
-Last activity: 2026-02-22 — 12-02 complete: /foglalas/:token management page, cancel dialog, POST /api/booking-cancel with 24h enforcement + slot release + email
+Phase: 12 of 14 (Patient Account) — complete
+Plan: 3 of 3 complete
+Status: Phase 12 complete; next is Phase 13 (Admin Dashboard)
+Last activity: 2026-02-22 — 12-03 complete: ReschedulePanel, atomic slot swap API, reschedule success state UX fix, Gmail API migration
 
 Progress: [██████████] 100%
 
@@ -82,6 +82,11 @@ Recent decisions affecting current work:
 - [Phase 12-patient-account]: 12-02: $token is a reserved key in @sanity/client QueryParams (token?: never) — use $manageToken for managementToken GROQ queries
 - [Phase 12-patient-account]: 12-02: scheduleData prop pre-fetched in Server Component and threaded to BookingManagementCard — Plan 03 reschedule picker can use it without additional API calls
 - [Phase 12-patient-account]: 12-02: slotLock release on cancellation wrapped in try/catch — cancellation succeeds even if slotLock document is missing
+- [Phase 12-patient-account]: 12-03: Atomic swap ordering — lock new slot (ifRevisionId) first, release old slot second; partial failure is acceptable degraded state
+- [Phase 12-patient-account]: 12-03: Reschedule success state (CardState "rescheduled") prevents 24h restriction flash after rescheduling to near-future dates
+- [Phase 12-patient-account]: Gmail API (googleapis OAuth2) replaced Resend for all transactional emails — src/lib/email.ts with RFC 2047 subject encoding
+- [Phase 12-patient-account]: Service name mapping: startsWith("Nőgyógyász") → "Nőgyógyászati vizsgálat" in all email routes
+- [Phase 12-patient-account]: Email templates include "Útvonal" button linking to Google Maps clinic location
 
 ### Pending Todos
 
@@ -102,5 +107,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-22
-Stopped at: Completed 12-patient-account-02-PLAN.md — management page at /foglalas/:token, cancel dialog, cancel API route complete.
+Stopped at: Phase 12 complete — all 3 plans executed. Gmail API migration done across codebase. Ready for Phase 13.
 Resume file: none

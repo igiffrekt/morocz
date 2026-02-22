@@ -17,7 +17,7 @@
 - [x] **Phase 9: Data Foundation and GDPR** - Sanity booking schemas, GDPR compliance, and doctor schedule setup
 - [x] **Phase 10: Authentication** - Patient and admin auth with Better Auth, role separation, and route protection (completed 2026-02-22)
 - [x] **Phase 11: Booking Core** - Slot generation, calendar UI, booking creation, and confirmation email (completed 2026-02-22)
-- [ ] **Phase 12: Patient Account** - /fiokom dashboard, appointment management, and cancellation
+- [x] **Phase 12: Patient Account** - /fiokom dashboard, appointment management, and cancellation (completed 2026-02-22)
 - [ ] **Phase 13: Admin Dashboard** - Admin-only calendar view, daily appointments, and manual cancellation
 - [ ] **Phase 14: Reminder Emails and Cron** - 24h pre-appointment reminders via Vercel Cron
 
@@ -71,9 +71,9 @@ Plans:
 
 Plans:
 - [x] 11-01-PLAN.md — Sanity schemas (booking, slotLock), write client, slot generation algorithm, GROQ queries
-- [ ] 11-02-PLAN.md — API routes: GET /api/slots + POST /api/booking with ifRevisionID locking + confirmation email
-- [ ] 11-03-PLAN.md — Booking page /idopontfoglalas, wizard shell, StepIndicator, Step1Service, Step2DateTime
-- [ ] 11-04-PLAN.md — Step3Auth, Step4Confirm, BookingSuccess, sessionStorage persistence, conflict handling
+- [x] 11-02-PLAN.md — API routes: GET /api/slots + POST /api/booking with ifRevisionID locking + confirmation email
+- [x] 11-03-PLAN.md — Booking page /idopontfoglalas, wizard shell, StepIndicator, Step1Service, Step2DateTime
+- [x] 11-04-PLAN.md — Step3Auth, Step4Confirm, BookingSuccess, sessionStorage persistence, conflict handling
 
 ### Phase 12: Patient Account
 **Goal**: A patient can manage their booking via a token-based link from the confirmation email — view appointment details, cancel (with 24h window), reschedule (atomic slot swap), and receive Hungarian confirmation emails for each action.
@@ -88,9 +88,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 12-01-PLAN.md — Schema updates (managementToken, reminderSent), token generation, email builders (cancel, reschedule, reminder)
-- [ ] 12-02-PLAN.md — Management page /foglalas/:token, BookingManagementCard, CancelDialog, cancel API with 24h enforcement
-- [ ] 12-03-PLAN.md — ReschedulePanel with inline date/time picker, reschedule API with atomic slot swap, human verification
+- [x] 12-01-PLAN.md — Schema updates (managementToken, reminderSent), token generation, email builders (cancel, reschedule, reminder)
+- [x] 12-02-PLAN.md — Management page /foglalas/:token, BookingManagementCard, CancelDialog, cancel API with 24h enforcement
+- [x] 12-03-PLAN.md — ReschedulePanel with inline date/time picker, reschedule API with atomic slot swap, human verification
 
 ### Phase 13: Admin Dashboard
 **Goal**: The admin can log in to a separate, role-gated dashboard and view today's appointments in order, browse the weekly calendar, access patient contact details, and manually cancel a booking with the patient notified.
@@ -129,6 +129,6 @@ Phases execute in numeric order: 9 → 10 → 11 → 12 → 13 → 14
 | 9. Data Foundation and GDPR | 3/3 | Complete | 2026-02-22 |
 | 10. Authentication | 3/3 | Complete    | 2026-02-22 |
 | 11. Booking Core | 4/4 | Complete   | 2026-02-22 |
-| 12. Patient Account | 2/3 | In Progress|  |
+| 12. Patient Account | 3/3 | Complete | 2026-02-22 |
 | 13. Admin Dashboard | 0/? | Not started | - |
 | 14. Reminder Emails and Cron | 0/? | Not started | - |

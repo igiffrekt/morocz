@@ -1,0 +1,171 @@
+import { Resend } from "resend";
+import { z } from "zod";
+import { buildCancellationEmail } from "@/lib/booking-email";
+import { getWriteClient } from "@/lib/sanity-write-client";
+
+export const dynamic = "force-dynamic";
+
+// Lazy Resend initialization — avoids build-time crash when RESEND_API_KEY is absent.
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY);
+}
+
+// ── Request body schema ────────────────────────────────────────────────────────
+const CancelSchema = z.object({
+  token: z.string().min(1, "Token megadása kötelező."),
+});
+
+// ── 24h window enforcement ─────────────────────────────────────────────────────
+function isWithin24Hours(slotDate: string, slotTime: string): boolean {
+  const [h, m] = slotTime.split(":").map(Number);
+  const appt = new Date(
+    `${slotDate}T${String(h ?? 0).padStart(2, "0")}:${String(m ?? 0).padStart(2, "0")}:00`,
+  );
+  return (appt.getTime() - Date.now()) / (1000 * 60 * 60) < 24;
+}
+
+// ── POST handler ───────────────────────────────────────────────────────────────
+export async function POST(request: Request): Promise<Response> {
+  try {
+    // ── 1. Parse and validate body ─────────────────────────────────────────────
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return Response.json({ error: "Érvénytelen kérés törzs." }, { status: 400 });
+    }
+
+    const parsed = CancelSchema.safeParse(body);
+    if (!parsed.success) {
+      const firstError = parsed.error.issues[0]?.message ?? "Érvénytelen kérés.";
+      return Response.json({ error: firstError }, { status: 400 });
+    }
+
+    const { token } = parsed.data;
+
+    // ── 2. Fetch booking by managementToken ────────────────────────────────────
+    // Note: $token is reserved in @sanity/client QueryParams — use $manageToken instead
+    type BookingForCancel = {
+      _id: string;
+      patientName: string;
+      patientEmail: string;
+      service: { name: string } | null;
+      slotDate: string;
+      slotTime: string;
+      status: string;
+      managementToken: string;
+    };
+
+    const booking = await getWriteClient().fetch<BookingForCancel | null>(
+      `*[_type == "booking" && managementToken == $manageToken && status == "confirmed"][0]{
+        _id, patientName, patientEmail, service->{name},
+        slotDate, slotTime, status, managementToken
+      }`,
+      { manageToken: token },
+    );
+
+    if (!booking) {
+      return Response.json(
+        { error: "Érvénytelen vagy lejárt hivatkozás." },
+        { status: 404 },
+      );
+    }
+
+    // ── 3. Enforce 24h window server-side ──────────────────────────────────────
+    if (isWithin24Hours(booking.slotDate, booking.slotTime)) {
+      return Response.json(
+        {
+          error:
+            "Az időpont már nem mondható le (kevesebb mint 24 óra van hátra). Kérjük, hívjon minket: +36 1 000 0000",
+        },
+        { status: 403 },
+      );
+    }
+
+    // ── 4. Patch booking status to "cancelled" ─────────────────────────────────
+    await getWriteClient().patch(booking._id).set({ status: "cancelled" }).commit();
+
+    // ── 5. Release the slot — patch slotLock to available ─────────────────────
+    const slotLockDocId = `slotLock-${booking.slotDate}-${booking.slotTime.replace(":", "-")}`;
+    try {
+      await getWriteClient()
+        .patch(slotLockDocId)
+        .set({ status: "available" })
+        .unset(["bookingRef"])
+        .commit();
+    } catch (slotErr) {
+      // If slotLock doesn't exist or fails, log warning but do not fail the cancellation
+      console.warn("[api/booking-cancel] Failed to release slotLock:", slotErr);
+    }
+
+    // ── 6. Send cancellation email (fire-and-forget) ───────────────────────────
+    if (process.env.RESEND_API_KEY) {
+      void sendCancellationEmailAsync({
+        patientName: booking.patientName,
+        patientEmail: booking.patientEmail,
+        serviceName: booking.service?.name ?? "Foglalt szolgáltatás",
+        slotDate: booking.slotDate,
+        slotTime: booking.slotTime,
+      });
+    }
+
+    // ── 7. Return success ──────────────────────────────────────────────────────
+    return Response.json(
+      { success: true, message: "Az időpont sikeresen lemondva." },
+      { status: 200 },
+    );
+  } catch (err) {
+    console.error("[api/booking-cancel] Unexpected error:", err);
+    return Response.json(
+      { error: "Hiba történt. Kérjük, próbálja újra." },
+      { status: 500 },
+    );
+  }
+}
+
+// ── Helper: send cancellation email fire-and-forget ───────────────────────────
+async function sendCancellationEmailAsync({
+  patientName,
+  patientEmail,
+  serviceName,
+  slotDate,
+  slotTime,
+}: {
+  patientName: string;
+  patientEmail: string;
+  serviceName: string;
+  slotDate: string;
+  slotTime: string;
+}) {
+  try {
+    const formattedDate = new Date(slotDate).toLocaleDateString("hu-HU", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      weekday: "long",
+    });
+
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://drmoroczangela.hu";
+    const newBookingUrl = `${appUrl}/idopontfoglalas`;
+
+    const html = buildCancellationEmail({
+      patientName,
+      serviceName,
+      date: formattedDate,
+      time: slotTime,
+      clinicPhone: "+36 1 000 0000",
+      clinicAddress: "1000 Budapest, Klinika utca 1.",
+      newBookingUrl,
+    });
+
+    await getResend().emails.send({
+      from: "noreply@moroczmedical.hu",
+      to: patientEmail,
+      subject: "Időpont lemondva — Mórocz Medical",
+      html,
+    });
+  } catch (err) {
+    // Fire-and-forget: log but never throw — cancellation is already processed
+    console.error("[api/booking-cancel] Failed to send cancellation email:", err);
+  }
+}

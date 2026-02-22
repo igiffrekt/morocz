@@ -1,4 +1,5 @@
 import type { SchemaTypeDefinition } from "sanity";
+import { blockedDateType } from "./blockedDateType";
 import { blogCategoryType } from "./blogCategoryType";
 import { blogPostType } from "./blogPostType";
 import { homepageType } from "./homepageType";
@@ -8,6 +9,7 @@ import { serviceCategoryType } from "./serviceCategoryType";
 import { serviceType } from "./serviceType";
 import { siteSettingsType } from "./siteSettingsType";
 import { testimonialType } from "./testimonialType";
+import { weeklyScheduleType } from "./weeklyScheduleType";
 
 export const schemaTypes: SchemaTypeDefinition[] = [
   homepageType,
@@ -19,4 +21,6 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   blogCategoryType,
   blogPostType,
   privacyPolicyType,
+  weeklyScheduleType,
+  blockedDateType,
 ];

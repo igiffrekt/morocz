@@ -14,7 +14,7 @@
 
 ## Phases
 
-- [ ] **Phase 9: Data Foundation and GDPR** - Sanity booking schemas, GDPR compliance, and doctor schedule setup
+- [x] **Phase 9: Data Foundation and GDPR** - Sanity booking schemas, GDPR compliance, and doctor schedule setup
 - [ ] **Phase 10: Authentication** - Patient and admin auth with Auth.js v5, role separation, and route protection
 - [ ] **Phase 11: Booking Core** - Slot generation, calendar UI, booking creation, and confirmation email
 - [ ] **Phase 12: Patient Account** - /fiokom dashboard, appointment management, and cancellation
@@ -36,9 +36,9 @@
 **Plans**: 3 plans
 
 Plans:
-- [ ] 09-01-PLAN.md — Schedule schemas, service duration, desk structure, queries, types
-- [ ] 09-02-PLAN.md — GDPR compliance: DPIA document, consent text, privacy policy update
-- [ ] 09-03-PLAN.md — Custom Studio blocked dates calendar with range selection and holidays
+- [x] 09-01-PLAN.md — Schedule schemas, service duration, desk structure, queries, types
+- [x] 09-02-PLAN.md — GDPR compliance: DPIA document, consent text, privacy policy update
+- [x] 09-03-PLAN.md — Custom Studio blocked dates calendar with range selection and holidays
 
 ### Phase 10: Authentication
 **Goal**: Patients and the admin can log in through separate, role-appropriate paths — patients via Google OAuth or email/password, admin via email/password only — with sessions that persist across browser refresh and route protection that cannot be bypassed.
@@ -118,7 +118,7 @@ Phases execute in numeric order: 9 → 10 → 11 → 12 → 13 → 14
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 9. Data Foundation and GDPR | 1/3 | In Progress|  |
+| 9. Data Foundation and GDPR | 3/3 | Complete | 2026-02-22 |
 | 10. Authentication | 0/? | Not started | - |
 | 11. Booking Core | 0/? | Not started | - |
 | 12. Patient Account | 0/? | Not started | - |

@@ -5,29 +5,29 @@
 See: .planning/PROJECT.md (updated 2026-02-22)
 
 **Core value:** Patients can discover Morocz Medical's services and book an appointment through a beautifully animated, fast, SEO-optimized website where every piece of content is manageable from Sanity CMS.
-**Current focus:** v2.0 Booking Module — Phase 9 in progress (Plan 1 complete)
+**Current focus:** v2.0 Booking Module — Phase 9 complete, Phase 10 next
 
 ## Current Position
 
-Phase: 9 of 14 (Data Foundation and GDPR)
-Plan: 1 of 3 complete in current phase
-Status: In progress
-Last activity: 2026-02-22 — 09-01 complete: weeklySchedule and blockedDate schemas, service duration, Studio structure, queries, TS types
+Phase: 10 of 14 (Authentication) — not started
+Plan: 0 of ? (Phase 10 not yet planned)
+Status: Phase 9 complete, ready to plan Phase 10
+Last activity: 2026-02-22 — Phase 9 complete: all 3 plans done (schemas, GDPR, calendar)
 
-Progress: [█░░░░░░░░░] 5%
+Progress: [██░░░░░░░░] 17%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1 (v2.0)
-- Average duration: 3 min
-- Total execution time: 3 min
+- Total plans completed: 3 (v2.0)
+- Average duration: ~4 min
+- Total execution time: ~11 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 09-data-foundation-and-gdpr | 1 | 3 min | 3 min |
+| 09-data-foundation-and-gdpr | 3 | ~11 min | ~4 min |
 
 *Updated after each plan completion*
 
@@ -46,8 +46,10 @@ Recent decisions affecting current work:
 - v2.0 arch: Vercel Cron for reminder emails; Inngest documented as upgrade path
 - 09-01: weeklySchedule days array pre-populated via initialValue (Mon-Fri working, Sat/Sun off) with empty time strings
 - 09-01: startTime/endTime use conditional validation via rule.custom() reading context.parent.isDayOff
-- 09-01: blockedDate.isHoliday is readOnly at schema level — populated programmatically in Plan 03
+- 09-01: blockedDate.isHoliday is readOnly at schema level — populated programmatically via BlockedDatesInput
 - 09-01: appointmentDuration defaults to 20 min, matching weeklySchedule defaultSlotDuration default
+- 09-03: Custom Sanity input components in src/sanity/components/ with inline styles (not @sanity/ui)
+- 09-03: getHungarianHolidays reusable for Phase 11 slot generation
 
 ### Pending Todos
 
@@ -58,11 +60,10 @@ Recent decisions affecting current work:
 
 ### Blockers/Concerns
 
-- Phase 9: Hybrid slot model (pure function for generation + on-demand documents for ifRevisionID locking) needs a design spike at plan time before schema is finalized
 - Phase 10: Auth.js v5 is beta — spot-check callback signatures and AUTH_* env var naming against live authjs.dev docs at start of Phase 10; Better Auth documented as confirmed fallback
 
 ## Session Continuity
 
 Last session: 2026-02-22
-Stopped at: Completed 09-01-PLAN.md — Sanity scheduling schemas (weeklySchedule, blockedDate, service duration, Studio structure, queries, TS types)
-Resume file: None
+Stopped at: Phase 9 complete. Phase 10 (Authentication) ready to discuss/plan.
+Resume file: none

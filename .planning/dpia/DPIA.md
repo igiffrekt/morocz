@@ -178,7 +178,7 @@ No Article 9 (special-category) data is processed. Appointment type describes th
 
 | Processor  | Role                             | Data shared                        | DPA status                          | Region    |
 | ---------- | -------------------------------- | ----------------------------------- | ----------------------------------- | --------- |
-| Sanity.io  | CMS / primary data store         | All patient personal data (name, email, phone, bookings) | **Required — must be signed at sanity.io/manage** | EU (Frankfurt) |
+| Sanity.io  | CMS / primary data store         | All patient personal data (name, email, phone, bookings) | Covered by Sanity ToS + security policy (EU hosting, AES-256 at rest). Contact support for formal DPA if needed. | EU (Frankfurt) |
 | Vercel     | Hosting / API runtime            | Data in transit; no persistent storage by Vercel | Covered by Vercel's GDPR DPA (accepted on account creation) | EU West (preferred) |
 | Resend     | Transactional email (Phase 11+)  | Email address, name (in email body) | Must be accepted when activating Resend | EU        |
 
@@ -192,7 +192,7 @@ Sub-processor chains for each processor above are governed by their published su
 
 Before any patient data is written to Sanity (i.e., before Phase 10 registration goes live):
 
-- [ ] **Sanity DPA signed** — Go to https://www.sanity.io/manage → Project Settings → Legal → sign the Data Processing Agreement
+- [ ] **Sanity DPA reviewed** — Sanity does not have a self-service DPA signing page. Their GDPR compliance is documented at https://www.sanity.io/security. If a formal signed DPA is needed, contact Sanity support. For most use cases, their ToS and security commitments (EU data hosting, encryption at rest) provide sufficient data processing coverage.
 - [ ] **Sanity dataset set to "private"** — verify in Sanity project settings
 - [ ] **HTTPS enforced on production Vercel deployment** — automatic but confirm
 - [ ] **Doctor has reviewed this DPIA** — sign off in the section below

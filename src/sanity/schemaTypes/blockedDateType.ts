@@ -1,4 +1,5 @@
 import { defineField, defineType } from "sanity";
+import { BlockedDatesInput } from "../components/BlockedDatesInput";
 
 export const blockedDateType = defineType({
   name: "blockedDate",
@@ -9,6 +10,7 @@ export const blockedDateType = defineType({
       name: "dates",
       title: "Blokkolt dátumok",
       type: "array",
+      components: { input: BlockedDatesInput },
       of: [
         {
           type: "object",

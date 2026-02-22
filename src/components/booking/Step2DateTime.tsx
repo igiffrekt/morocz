@@ -316,7 +316,7 @@ export function Step2DateTime({
                 onClick={() => handleDayClick(dateStr)}
                 disabled={!isClickable}
                 className={[
-                  "h-10 w-full rounded-lg text-sm font-medium transition-all duration-150 flex flex-col items-center justify-center gap-0.5 relative",
+                  "h-10 w-full rounded-lg text-sm font-medium transition-all duration-150 flex flex-col items-center justify-center relative overflow-hidden",
                   isSelected
                     ? "bg-[var(--color-primary)] text-white shadow-md"
                     : isClickable
@@ -334,7 +334,7 @@ export function Step2DateTime({
                 {isClickable && pct !== null && (
                   <span
                     className={[
-                      "h-[3px] rounded-full transition-all duration-300",
+                      "absolute bottom-0.5 left-1/2 -translate-x-1/2 h-[3px] rounded-full transition-all duration-300",
                       isSelected ? "bg-white/60" : stripeColor,
                     ].join(" ")}
                     style={{ width: `${Math.max(pct * 100, 12)}%` }}

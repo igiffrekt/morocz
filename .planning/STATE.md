@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-02-22)
 ## Current Position
 
 Phase: 12 of 14 (Patient Account) — executing
-Plan: 1 of 3 complete (12-01 token fields + email builders)
-Status: 12-01 complete; next is 12-02 management page at /foglalas/:token
-Last activity: 2026-02-22 — 12-01 complete: managementToken + reminderSent fields, updated confirmation email, 3 new email builders
+Plan: 2 of 3 complete (12-02 management page + cancel flow)
+Status: 12-02 complete; next is 12-03 reschedule flow
+Last activity: 2026-02-22 — 12-02 complete: /foglalas/:token management page, cancel dialog, POST /api/booking-cancel with 24h enforcement + slot release + email
 
 Progress: [██████████] 100%
 
@@ -79,6 +79,9 @@ Recent decisions affecting current work:
 - [Phase 12-patient-account]: 12-01: Single manageUrl (/foglalas/:token) replaces separate cancel/reschedule URLs in confirmation email
 - [Phase 12-patient-account]: 12-01: buildReminderEmail has no action buttons — 24h cutoff aligns with reminder send time
 - [Phase 12-patient-account]: 12-01: crypto.randomUUID() used for managementToken (Web Crypto API, globally available in Next.js 15)
+- [Phase 12-patient-account]: 12-02: $token is a reserved key in @sanity/client QueryParams (token?: never) — use $manageToken for managementToken GROQ queries
+- [Phase 12-patient-account]: 12-02: scheduleData prop pre-fetched in Server Component and threaded to BookingManagementCard — Plan 03 reschedule picker can use it without additional API calls
+- [Phase 12-patient-account]: 12-02: slotLock release on cancellation wrapped in try/catch — cancellation succeeds even if slotLock document is missing
 
 ### Pending Todos
 
@@ -99,5 +102,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-22
-Stopped at: Completed 12-patient-account-01-PLAN.md — managementToken schema fields, email infrastructure complete.
+Stopped at: Completed 12-patient-account-02-PLAN.md — management page at /foglalas/:token, cancel dialog, cancel API route complete.
 Resume file: none

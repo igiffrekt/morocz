@@ -41,7 +41,7 @@ Requirements for the booking module. Each maps to roadmap phases.
 ### Patient Account
 
 - [x] **ACCT-01**: Patient can view upcoming appointments on /fiokom
-- [ ] **ACCT-02**: Patient can cancel an appointment (24h cancellation window enforced)
+- [x] **ACCT-02**: Patient can cancel an appointment (24h cancellation window enforced)
 - [ ] **ACCT-03**: Patient can reschedule an appointment (cancel old + book new atomically)
 
 ### Admin Dashboard
@@ -117,7 +117,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | NOTIF-02 | Phase 14 | Pending |
 | NOTIF-03 | Phase 12 | Complete |
 | ACCT-01 | Phase 12 | Complete |
-| ACCT-02 | Phase 12 | Pending |
+| ACCT-02 | Phase 12 | Complete |
 | ACCT-03 | Phase 12 | Pending |
 | ADMIN-01 | Phase 13 | Pending |
 | ADMIN-02 | Phase 13 | Pending |

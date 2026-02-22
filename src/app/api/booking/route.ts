@@ -144,9 +144,11 @@ export async function POST(request: Request): Promise<Response> {
 
   // ── 7. Create booking document ─────────────────────────────────────────────
   const reservationNumber = generateReservationNumber();
+  const managementToken = crypto.randomUUID();
   const booking = await getWriteClient().create({
     _type: "booking",
     reservationNumber,
+    managementToken,
     service: { _type: "reference", _ref: serviceId },
     slotDate,
     slotTime,
@@ -167,13 +169,13 @@ export async function POST(request: Request): Promise<Response> {
   // ── 9. Send confirmation email (fire-and-forget) ───────────────────────────
   if (process.env.RESEND_API_KEY) {
     void sendConfirmationEmail({
-    booking,
-    serviceId,
-    slotDate,
-    slotTime,
-    patientName,
-    patientEmail,
-  });
+      booking: { _id: booking._id, managementToken },
+      serviceId,
+      slotDate,
+      slotTime,
+      patientName,
+      patientEmail,
+    });
   }
 
   // ── 10. Return success ─────────────────────────────────────────────────────
@@ -269,7 +271,7 @@ async function sendConfirmationEmail({
   patientName,
   patientEmail,
 }: {
-  booking: { _id: string };
+  booking: { _id: string; managementToken: string };
   serviceId: string;
   slotDate: string;
   slotTime: string;
@@ -291,16 +293,14 @@ async function sendConfirmationEmail({
     });
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://drmoroczangela.hu";
-    const cancelUrl = `${appUrl}/fiokom?cancel=${booking._id}`;
-    const rescheduleUrl = `${appUrl}/fiokom?reschedule=${booking._id}`;
+    const manageUrl = `${appUrl}/foglalas/${booking.managementToken}`;
 
     const html = buildConfirmationEmail({
       patientName,
       serviceName: service?.name ?? "Foglalt szolgáltatás",
       date: formattedDate,
       time: slotTime,
-      cancelUrl,
-      rescheduleUrl,
+      manageUrl,
       clinicPhone: "+36 1 000 0000",
       clinicAddress: "1000 Budapest, Klinika utca 1.",
     });

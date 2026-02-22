@@ -43,6 +43,24 @@ export const serviceType = defineType({
       type: "number",
       description: "Kisebb szám = előbb jelenik meg",
     }),
+    defineField({
+      name: "appointmentDuration",
+      title: "Időpont hossza (perc)",
+      type: "number",
+      description:
+        "Szolgáltatás időtartama percben. Ha hosszabb, mint az alap időpont, több egymást követő slotot foglal le.",
+      options: {
+        list: [
+          { title: "10 perc", value: 10 },
+          { title: "15 perc", value: 15 },
+          { title: "20 perc", value: 20 },
+          { title: "30 perc", value: 30 },
+          { title: "45 perc", value: 45 },
+          { title: "60 perc", value: 60 },
+        ],
+      },
+      initialValue: 20,
+    }),
   ],
   preview: {
     select: {

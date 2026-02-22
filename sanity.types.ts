@@ -176,6 +176,7 @@ export type Service = {
   icon?: SanityImageObject;
   category?: SanityReference<ServiceCategory>;
   order?: number;
+  appointmentDuration?: 10 | 15 | 20 | 30 | 45 | 60;
 };
 
 export type LabTest = {
@@ -272,6 +273,36 @@ export type PrivacyPolicy = {
   lastUpdated?: string;
 };
 
+// Weekly schedule day configuration
+export type WeeklyScheduleDay = {
+  _key: string;
+  dayOfWeek: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+  isDayOff: boolean;
+  startTime?: string;
+  endTime?: string;
+};
+
+export type WeeklySchedule = {
+  _type: "weeklySchedule";
+  _id: string;
+  defaultSlotDuration: 10 | 15 | 20 | 30 | 45 | 60;
+  bufferMinutes: number;
+  days: WeeklyScheduleDay[];
+};
+
+// Blocked date entry
+export type BlockedDateEntry = {
+  _key: string;
+  date: string;
+  isHoliday: boolean;
+};
+
+export type BlockedDate = {
+  _type: "blockedDate";
+  _id: string;
+  dates: BlockedDateEntry[];
+};
+
 // ─── All Document Types Union ─────────────────────────────────────────────────
 
 export type AllSanitySchemaTypes =
@@ -283,7 +314,9 @@ export type AllSanitySchemaTypes =
   | Testimonial
   | BlogCategory
   | BlogPost
-  | PrivacyPolicy;
+  | PrivacyPolicy
+  | WeeklySchedule
+  | BlockedDate;
 
 // ─── Query Result Types ───────────────────────────────────────────────────────
 // These types match the shape returned by GROQ queries that dereference references inline.
@@ -296,6 +329,7 @@ export type ServiceQueryResult = {
   icon?: SanityImageObject;
   category?: { _id: string; name?: string; emoji?: string };
   order?: number;
+  appointmentDuration?: 10 | 15 | 20 | 30 | 45 | 60;
 };
 
 export type ServiceCategoryQueryResult = {

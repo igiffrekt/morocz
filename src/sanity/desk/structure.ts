@@ -37,6 +37,34 @@ export const structure: StructureResolver = (S) =>
 
       S.divider(),
 
+      // Időpontfoglalás group (schedule + blocked dates singletons)
+      S.listItem()
+        .title("Időpontfoglalás")
+        .child(
+          S.list()
+            .title("Időpontfoglalás")
+            .items([
+              S.listItem()
+                .title("Heti beosztás")
+                .child(
+                  S.document()
+                    .schemaType("weeklySchedule")
+                    .documentId("weeklySchedule")
+                    .title("Heti beosztás szerkesztése"),
+                ),
+              S.listItem()
+                .title("Blokkolt napok")
+                .child(
+                  S.document()
+                    .schemaType("blockedDate")
+                    .documentId("blockedDate")
+                    .title("Blokkolt napok szerkesztése"),
+                ),
+            ]),
+        ),
+
+      S.divider(),
+
       // Vélemények (Testimonials — standalone)
       S.listItem()
         .title("Vélemények")

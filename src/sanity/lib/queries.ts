@@ -75,7 +75,8 @@ export const allServicesQuery = defineQuery(`*[_type == "service"] | order(order
   price,
   icon,
   category->{_id, name, emoji},
-  order
+  order,
+  appointmentDuration
 }`);
 
 // ─── Service Categories ───────────────────────────────────────────────────────
@@ -197,5 +198,35 @@ export const privacyPolicyQuery = defineQuery(
   title,
   body,
   lastUpdated
+}`,
+);
+
+// ─── Weekly Schedule ──────────────────────────────────────────────────────────
+// Revalidation tag: "weeklySchedule"
+
+export const weeklyScheduleQuery = defineQuery(
+  `*[_type == "weeklySchedule" && _id == "weeklySchedule"][0]{
+  defaultSlotDuration,
+  bufferMinutes,
+  days[]{
+    _key,
+    dayOfWeek,
+    isDayOff,
+    startTime,
+    endTime
+  }
+}`,
+);
+
+// ─── Blocked Dates ────────────────────────────────────────────────────────────
+// Revalidation tag: "blockedDate"
+
+export const blockedDatesQuery = defineQuery(
+  `*[_type == "blockedDate" && _id == "blockedDate"][0]{
+  dates[]{
+    _key,
+    date,
+    isHoliday
+  }
 }`,
 );

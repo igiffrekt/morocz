@@ -86,7 +86,7 @@ export default async function FoglalasTokenPage({
   function PageWrapper({ children }: { children: React.ReactNode }) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#F0F2F5] px-4 py-12">
-        <div className="w-full max-w-lg">
+        <div className="w-full max-w-2xl">
           <p className="mb-6 text-center text-sm font-semibold uppercase tracking-widest text-[#23264F]">
             Mórocz Medical
           </p>

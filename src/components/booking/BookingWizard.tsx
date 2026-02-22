@@ -27,6 +27,7 @@ interface BookingSelections {
 
 interface BookingResult {
   bookingId: string;
+  reservationNumber: string;
   patientName: string;
   patientEmail: string;
 }
@@ -164,10 +165,10 @@ export function BookingWizard({ services, scheduleData }: BookingWizardProps) {
     setSelections((prev) => ({ ...prev, selectedTime: time }));
   }
 
-  function handleBookingSuccess(bookingId: string, patientName: string, patientEmail: string) {
+  function handleBookingSuccess(bookingId: string, reservationNumber: string, patientName: string, patientEmail: string) {
     sessionStorage.removeItem(STORAGE_KEY);
     if (holdTimerRef.current) clearTimeout(holdTimerRef.current);
-    setBookingResult({ bookingId, patientName, patientEmail });
+    setBookingResult({ bookingId, reservationNumber, patientName, patientEmail });
     setCurrentStep(5); // Show success
   }
 
@@ -224,6 +225,7 @@ export function BookingWizard({ services, scheduleData }: BookingWizardProps) {
           serviceName={selections.serviceName ?? ""}
           date={selections.selectedDate ? formatDateHungarian(selections.selectedDate) : ""}
           time={selections.selectedTime ?? ""}
+          reservationNumber={bookingResult.reservationNumber}
           patientName={bookingResult.patientName}
           patientEmail={bookingResult.patientEmail}
           onNewBooking={resetWizard}

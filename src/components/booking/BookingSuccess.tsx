@@ -6,6 +6,7 @@ interface SuccessProps {
   serviceName: string;
   date: string; // Pre-formatted Hungarian date
   time: string; // "09:20"
+  reservationNumber: string;
   patientName: string;
   patientEmail: string;
   onNewBooking: () => void;
@@ -15,6 +16,7 @@ export function BookingSuccess({
   serviceName,
   date,
   time,
+  reservationNumber,
   patientName,
   patientEmail,
   onNewBooking,
@@ -48,6 +50,10 @@ export function BookingSuccess({
       {/* Booking summary card */}
       <div className="bg-gray-50 rounded-2xl p-5 text-left max-w-sm mx-auto space-y-3 mb-6 shadow-sm">
         <div className="flex items-start gap-3">
+          <span className="text-xs text-gray-500 w-24 shrink-0 pt-0.5">Foglalási szám:</span>
+          <span className="text-sm font-bold tracking-wider text-[var(--color-primary)]">{reservationNumber}</span>
+        </div>
+        <div className="flex items-start gap-3">
           <span className="text-xs text-gray-500 w-24 shrink-0 pt-0.5">Szolgáltatás:</span>
           <span className="text-sm font-semibold text-[var(--color-primary)]">{serviceName}</span>
         </div>
@@ -61,62 +67,64 @@ export function BookingSuccess({
         </div>
       </div>
 
-      {/* Email confirmation note with inbox tip */}
-      <div className="bg-blue-50 border border-blue-100 rounded-2xl p-5 text-left max-w-sm mx-auto mb-4">
-        <div className="flex items-start gap-3">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="#3b82f6"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="w-5 h-5 mt-0.5 shrink-0"
-            aria-hidden="true"
-          >
-            <rect x="2" y="4" width="20" height="16" rx="2" />
-            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-          </svg>
-          <div>
-            <p className="text-sm text-gray-700">
-              Visszaigazoló e-mailt küldtünk a(z){" "}
-              <span className="font-medium text-gray-900">{patientEmail}</span> címre.
-            </p>
-            <p className="text-xs text-gray-500 mt-1.5">
-              A Google ezt általában a <span className="font-medium text-gray-600">Promóciók</span>{" "}
-              kategóriába helyezi — kérjük, ott is nézze meg. A lemondással kapcsolatos
-              információkat is ebben az e-mailben találja.
-            </p>
+      {/* Info cards — 2 columns on desktop */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left mb-8">
+        {/* Email confirmation note with inbox tip */}
+        <div className="bg-blue-50 border border-blue-100 rounded-2xl p-5">
+          <div className="flex items-start gap-3">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#3b82f6"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="w-5 h-5 mt-0.5 shrink-0"
+              aria-hidden="true"
+            >
+              <rect x="2" y="4" width="20" height="16" rx="2" />
+              <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+            </svg>
+            <div>
+              <p className="text-sm text-gray-700">
+                Visszaigazoló e-mailt küldtünk a(z){" "}
+                <span className="font-medium text-gray-900">{patientEmail}</span> címre.
+              </p>
+              <p className="text-xs text-gray-500 mt-1.5">
+                A Google ezt általában a <span className="font-medium text-gray-600">Promóciók</span>{" "}
+                kategóriába helyezi — kérjük, ott is nézze meg. A lemondással kapcsolatos
+                információkat is ebben az e-mailben találja.
+              </p>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Visit info */}
-      <div className="bg-[var(--color-accent)]/10 rounded-2xl p-5 text-left max-w-sm mx-auto mb-4">
-        <h3 className="text-sm font-semibold text-[var(--color-primary)] mb-3">
-          Tudnivalók a látogatással kapcsolatban
-        </h3>
-        <ul className="space-y-2">
-          <li className="flex items-start gap-2 text-sm text-gray-700">
-            <span
-              className="mt-1 w-1.5 h-1.5 rounded-full bg-[#99CEB7] shrink-0"
-              aria-hidden="true"
-            />
-            Kérjük, érkezzen 5 perccel a megadott időpont előtt.
-          </li>
-          <li className="flex items-start gap-2 text-sm text-gray-700">
-            <span
-              className="mt-1 w-1.5 h-1.5 rounded-full bg-[#99CEB7] shrink-0"
-              aria-hidden="true"
-            />
-            Hozza magával a TAJ kártyáját és a személyi igazolványát.
-          </li>
-        </ul>
-      </div>
+        {/* Visit info */}
+        <div className="bg-[var(--color-accent)]/10 rounded-2xl p-5">
+          <h3 className="text-sm font-semibold text-[var(--color-primary)] mb-3">
+            Tudnivalók a látogatással kapcsolatban
+          </h3>
+          <ul className="space-y-2">
+            <li className="flex items-start gap-2 text-sm text-gray-700">
+              <span
+                className="mt-1 w-1.5 h-1.5 rounded-full bg-[#99CEB7] shrink-0"
+                aria-hidden="true"
+              />
+              Kérjük, érkezzen 5 perccel a megadott időpont előtt.
+            </li>
+            <li className="flex items-start gap-2 text-sm text-gray-700">
+              <span
+                className="mt-1 w-1.5 h-1.5 rounded-full bg-[#99CEB7] shrink-0"
+                aria-hidden="true"
+              />
+              Hozza magával a TAJ kártyáját és a személyi igazolványát.
+            </li>
+          </ul>
+        </div>
 
-      {/* Cancellation policy */}
-      <div className="bg-amber-50 border border-amber-100 rounded-2xl p-5 text-left max-w-sm mx-auto mb-8">
+        {/* Cancellation policy */}
+        <div className="bg-amber-50 border border-amber-100 rounded-2xl p-5 md:col-span-2">
         <div className="flex items-start gap-3">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -145,6 +153,7 @@ export function BookingSuccess({
               A 24 órán belüli lemondásért készenléti díjat számolunk fel: 10.000 Ft / alkalom.
             </p>
           </div>
+        </div>
         </div>
       </div>
 

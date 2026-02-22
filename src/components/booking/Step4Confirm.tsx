@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 import { useSession } from "@/lib/auth-client";
 
@@ -13,7 +13,7 @@ interface Step4Props {
     selectedTime: string;
   };
   onBack: () => void;
-  onSuccess: (bookingId: string, patientName: string, patientEmail: string) => void;
+  onSuccess: (bookingId: string, reservationNumber: string, patientName: string, patientEmail: string) => void;
   onConflict: (alternatives: string[]) => void;
 }
 
@@ -40,8 +40,13 @@ function formatDateHungarian(dateStr: string): string {
 export function Step4Confirm({ selections, onBack, onSuccess, onConflict }: Step4Props) {
   const { data: session } = useSession();
 
-  const [patientName, setPatientName] = useState(session?.user?.name ?? "");
-  const [patientEmail, setPatientEmail] = useState(session?.user?.email ?? "");
+  const [patientName, setPatientName] = useState("");
+  const [patientEmail, setPatientEmail] = useState("");
+
+  useEffect(() => {
+    if (session?.user?.name && !patientName) setPatientName(session.user.name);
+    if (session?.user?.email && !patientEmail) setPatientEmail(session.user.email);
+  }, [session]);
   const [patientPhone, setPatientPhone] = useState("");
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
@@ -90,12 +95,13 @@ export function Step4Confirm({ selections, onBack, onSuccess, onConflict }: Step
 
       const data = (await res.json()) as {
         bookingId?: string;
+        reservationNumber?: string;
         error?: string;
         alternatives?: string[];
       };
 
       if (res.status === 201 && data.bookingId) {
-        onSuccess(data.bookingId, patientName, patientEmail);
+        onSuccess(data.bookingId, data.reservationNumber ?? "", patientName, patientEmail);
         return;
       }
 
@@ -130,7 +136,7 @@ export function Step4Confirm({ selections, onBack, onSuccess, onConflict }: Step
           </span>
         </div>
         <div className="flex items-start gap-2">
-          <span className="text-xs text-gray-500 w-24 shrink-0 pt-0.5">Időpont:</span>
+          <span className="text-xs text-gray-500 w-24 shrink-0 pt-0.5">Dátum:</span>
           <span className="text-sm font-medium text-gray-800 capitalize">{formattedDate}</span>
         </div>
         <div className="flex items-start gap-2">

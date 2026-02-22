@@ -54,6 +54,13 @@ export const bookingType = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
+      name: "reservationNumber",
+      title: "Foglalási szám",
+      type: "string",
+      description: "Egyedi azonosító a páciens számára (pl. M-A3K7X2)",
+      readOnly: true,
+    }),
+    defineField({
       name: "userId",
       title: "Felhasználó ID",
       type: "string",
@@ -83,11 +90,13 @@ export const bookingType = defineType({
       title: "patientName",
       date: "slotDate",
       time: "slotTime",
+      reservationNumber: "reservationNumber",
     },
-    prepare({ title, date, time }) {
+    prepare({ title, date, time, reservationNumber }) {
+      const sub = [reservationNumber, date && time ? `${date} ${time}` : date].filter(Boolean).join(" — ");
       return {
         title: title ?? "Ismeretlen páciens",
-        subtitle: date && time ? `${date} ${time}` : (date ?? "Dátum nincs beállítva"),
+        subtitle: sub || "Dátum nincs beállítva",
       };
     },
   },

@@ -135,6 +135,17 @@ Without this token, the write client will throw at runtime when booking creation
 - generateAvailableSlots ready for slot display logic in UI (Plan 03)
 - Schemas will appear in Sanity Studio under Időpontfoglalás once SANITY_WRITE_TOKEN is set and bookings exist
 
+## Self-Check: PASSED
+
+- FOUND: src/sanity/schemaTypes/bookingType.ts
+- FOUND: src/sanity/schemaTypes/slotLockType.ts
+- FOUND: src/lib/sanity-write-client.ts
+- FOUND: src/lib/slots.ts
+- FOUND: .planning/phases/11-booking-core/11-01-SUMMARY.md
+- Commit 3eaea20 verified (Task 1: schemas)
+- Commit fd048b3 verified (Task 2: write client, slots, queries)
+- Commit 06a36e3 verified (docs: plan complete)
+
 ---
 *Phase: 11-booking-core*
 *Completed: 2026-02-22*

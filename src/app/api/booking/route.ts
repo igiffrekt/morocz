@@ -143,8 +143,10 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   // ── 7. Create booking document ─────────────────────────────────────────────
+  const reservationNumber = generateReservationNumber();
   const booking = await getWriteClient().create({
     _type: "booking",
+    reservationNumber,
     service: { _type: "reference", _ref: serviceId },
     slotDate,
     slotTime,
@@ -163,7 +165,8 @@ export async function POST(request: Request): Promise<Response> {
     .commit();
 
   // ── 9. Send confirmation email (fire-and-forget) ───────────────────────────
-  void sendConfirmationEmail({
+  if (process.env.RESEND_API_KEY) {
+    void sendConfirmationEmail({
     booking,
     serviceId,
     slotDate,
@@ -171,10 +174,11 @@ export async function POST(request: Request): Promise<Response> {
     patientName,
     patientEmail,
   });
+  }
 
   // ── 10. Return success ─────────────────────────────────────────────────────
   return Response.json(
-    { bookingId: booking._id, message: "Időpont sikeresen lefoglalva." },
+    { bookingId: booking._id, reservationNumber, message: "Időpont sikeresen lefoglalva." },
     { status: 201 },
   );
 }
@@ -311,4 +315,14 @@ async function sendConfirmationEmail({
     // Fire-and-forget: log but never throw — booking is already confirmed
     console.error("[api/booking] Failed to send confirmation email:", err);
   }
+}
+
+// ── Helper: generate a short, readable reservation number ────────────────────
+function generateReservationNumber(): string {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no 0/O/1/I to avoid confusion
+  let code = "";
+  for (let i = 0; i < 6; i++) {
+    code += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return `M-${code}`;
 }

@@ -316,9 +316,12 @@ export type Booking = {
   patientName?: string;
   patientEmail?: string;
   patientPhone?: string;
+  reservationNumber?: string;
+  managementToken?: string;
   userId?: string;
   status?: "confirmed" | "cancelled" | "rescheduled";
   createdAt?: string;
+  reminderSent?: boolean;
 };
 
 // ─── Slot Lock ────────────────────────────────────────────────────────────────

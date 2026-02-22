@@ -61,6 +61,13 @@ export const bookingType = defineType({
       readOnly: true,
     }),
     defineField({
+      name: "managementToken",
+      title: "Kezelési token",
+      type: "string",
+      description: "Egyedi azonosító az időpont kezelési linkjéhez (/foglalas/:token)",
+      readOnly: true,
+    }),
+    defineField({
       name: "userId",
       title: "Felhasználó ID",
       type: "string",
@@ -83,6 +90,13 @@ export const bookingType = defineType({
       name: "createdAt",
       title: "Létrehozva",
       type: "datetime",
+    }),
+    defineField({
+      name: "reminderSent",
+      title: "Emlékeztető elküldve",
+      type: "boolean",
+      description: "Igaz, ha a 24 órás emlékeztető e-mail már ki lett küldve",
+      initialValue: false,
     }),
   ],
   preview: {

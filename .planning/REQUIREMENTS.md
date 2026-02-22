@@ -11,9 +11,9 @@ Requirements for the booking module. Each maps to roadmap phases.
 
 - [ ] **AUTH-01**: Patient can register with email and password
 - [ ] **AUTH-02**: Patient can register/login with Google OAuth
-- [ ] **AUTH-03**: Patient session persists across browser refresh (JWT)
+- [x] **AUTH-03**: Patient session persists across browser refresh (JWT)
 - [ ] **AUTH-04**: Admin can log in with email/password to access the dashboard
-- [ ] **AUTH-05**: Admin and patient auth are separate role paths
+- [x] **AUTH-05**: Admin and patient auth are separate role paths
 
 ### Schedule
 
@@ -99,9 +99,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 |-------------|-------|--------|
 | AUTH-01 | Phase 10 | Pending |
 | AUTH-02 | Phase 10 | Pending |
-| AUTH-03 | Phase 10 | Pending |
+| AUTH-03 | Phase 10 | Complete |
 | AUTH-04 | Phase 10 | Pending |
-| AUTH-05 | Phase 10 | Pending |
+| AUTH-05 | Phase 10 | Complete |
 | SCHED-01 | Phase 9 | Complete |
 | SCHED-02 | Phase 9 | Complete |
 | SCHED-03 | Phase 9 | Complete |

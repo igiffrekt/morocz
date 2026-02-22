@@ -20,13 +20,14 @@ const mapsUrl =
 export function buildConfirmationEmail(params: {
   patientName: string;
   serviceName: string;
+  reservationNumber: string;
   date: string; // Pre-formatted Hungarian date string
   time: string; // "09:20"
   manageUrl: string; // /foglalas/:token — handles both cancel and reschedule
   clinicPhone: string;
   clinicAddress: string;
 }): string {
-  const { patientName, serviceName, date, time, manageUrl, clinicPhone, clinicAddress } = params;
+  const { patientName, serviceName, reservationNumber, date, time, manageUrl, clinicPhone, clinicAddress } = params;
 
   return `<!DOCTYPE html>
 <html lang="hu">
@@ -77,6 +78,13 @@ export function buildConfirmationEmail(params: {
                 style="background-color: ${lightGrey}; border-radius: 8px; border-left: 4px solid ${green}; overflow: hidden;">
                 <tr>
                   <td style="padding: 24px;">
+
+                    <p style="margin: 0 0 4px; font-size: 11px; font-weight: 700; color: ${textMuted}; text-transform: uppercase; letter-spacing: 0.07em;">
+                      Foglalási szám
+                    </p>
+                    <p style="margin: 0 0 16px; font-size: 16px; font-weight: 700; color: ${navy}; font-family: monospace, monospace;">
+                      ${reservationNumber}
+                    </p>
 
                     <p style="margin: 0 0 4px; font-size: 11px; font-weight: 700; color: ${textMuted}; text-transform: uppercase; letter-spacing: 0.07em;">
                       Szolgáltatás
@@ -195,13 +203,14 @@ export function buildConfirmationEmail(params: {
 export function buildCancellationEmail(params: {
   patientName: string;
   serviceName: string;
+  reservationNumber: string;
   date: string; // Pre-formatted Hungarian date string
   time: string; // "09:20"
   clinicPhone: string;
   clinicAddress: string;
   newBookingUrl: string; // /idopontfoglalas
 }): string {
-  const { patientName, serviceName, date, time, clinicPhone, clinicAddress, newBookingUrl } =
+  const { patientName, serviceName, reservationNumber, date, time, clinicPhone, clinicAddress, newBookingUrl } =
     params;
 
   return `<!DOCTYPE html>
@@ -253,6 +262,13 @@ export function buildCancellationEmail(params: {
                 style="background-color: ${lightGrey}; border-radius: 8px; border-left: 4px solid #E5E7EB; overflow: hidden;">
                 <tr>
                   <td style="padding: 24px;">
+
+                    <p style="margin: 0 0 4px; font-size: 11px; font-weight: 700; color: ${textMuted}; text-transform: uppercase; letter-spacing: 0.07em;">
+                      Foglalási szám
+                    </p>
+                    <p style="margin: 0 0 16px; font-size: 16px; font-weight: 700; color: ${textMuted}; font-family: monospace, monospace;">
+                      ${reservationNumber}
+                    </p>
 
                     <p style="margin: 0 0 4px; font-size: 11px; font-weight: 700; color: ${textMuted}; text-transform: uppercase; letter-spacing: 0.07em;">
                       Lemondott szolgáltatás
@@ -343,6 +359,7 @@ export function buildCancellationEmail(params: {
 export function buildRescheduleEmail(params: {
   patientName: string;
   serviceName: string;
+  reservationNumber: string;
   oldDate: string; // Pre-formatted Hungarian date string
   oldTime: string; // "09:20"
   newDate: string; // Pre-formatted Hungarian date string
@@ -354,6 +371,7 @@ export function buildRescheduleEmail(params: {
   const {
     patientName,
     serviceName,
+    reservationNumber,
     oldDate,
     oldTime,
     newDate,
@@ -431,6 +449,13 @@ export function buildRescheduleEmail(params: {
                 style="background-color: ${lightGrey}; border-radius: 8px; border-left: 4px solid ${green}; overflow: hidden;">
                 <tr>
                   <td style="padding: 24px;">
+
+                    <p style="margin: 0 0 4px; font-size: 11px; font-weight: 700; color: ${textMuted}; text-transform: uppercase; letter-spacing: 0.07em;">
+                      Foglalási szám
+                    </p>
+                    <p style="margin: 0 0 16px; font-size: 16px; font-weight: 700; color: ${navy}; font-family: monospace, monospace;">
+                      ${reservationNumber}
+                    </p>
 
                     <p style="margin: 0 0 4px; font-size: 11px; font-weight: 700; color: ${textMuted}; text-transform: uppercase; letter-spacing: 0.07em;">
                       Szolgáltatás

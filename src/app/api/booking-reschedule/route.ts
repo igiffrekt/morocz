@@ -46,6 +46,7 @@ export async function POST(request: Request): Promise<Response> {
       _id: string;
       patientName: string;
       patientEmail: string;
+      reservationNumber: string;
       service: { name: string; appointmentDuration: number } | null;
       slotDate: string;
       slotTime: string;
@@ -55,7 +56,7 @@ export async function POST(request: Request): Promise<Response> {
 
     const booking = await getWriteClient().fetch<BookingForReschedule | null>(
       `*[_type == "booking" && managementToken == $manageToken && status == "confirmed"][0]{
-        _id, patientName, patientEmail, service->{name, appointmentDuration},
+        _id, patientName, patientEmail, reservationNumber, service->{name, appointmentDuration},
         slotDate, slotTime, managementToken, "serviceId": service._ref
       }`,
       { manageToken: token },
@@ -73,7 +74,7 @@ export async function POST(request: Request): Promise<Response> {
       return Response.json(
         {
           error:
-            "Az időpont már nem helyezhető át (kevesebb mint 24 óra van hátra). Kérjük, hívjon minket: +36 1 000 0000",
+            "Az időpont már nem helyezhető át (kevesebb mint 24 óra van hátra). Kérjük, hívjon minket: +36 70 639 5239",
         },
         { status: 403 },
       );
@@ -170,6 +171,7 @@ export async function POST(request: Request): Promise<Response> {
       void sendRescheduleEmailAsync({
         patientName: booking.patientName,
         patientEmail: booking.patientEmail,
+        reservationNumber: booking.reservationNumber,
         serviceName: booking.service?.name?.startsWith("Nőgyógyász") ? "Nőgyógyászati vizsgálat" : (booking.service?.name ?? "Szolgáltatás"),
         oldDate: booking.slotDate,
         oldTime: booking.slotTime,
@@ -197,6 +199,7 @@ export async function POST(request: Request): Promise<Response> {
 async function sendRescheduleEmailAsync({
   patientName,
   patientEmail,
+  reservationNumber,
   serviceName,
   oldDate,
   oldTime,
@@ -206,6 +209,7 @@ async function sendRescheduleEmailAsync({
 }: {
   patientName: string;
   patientEmail: string;
+  reservationNumber: string;
   serviceName: string;
   oldDate: string;
   oldTime: string;
@@ -228,13 +232,14 @@ async function sendRescheduleEmailAsync({
     const html = buildRescheduleEmail({
       patientName,
       serviceName,
+      reservationNumber,
       oldDate: formatHuDate(oldDate),
       oldTime,
       newDate: formatHuDate(newDate),
       newTime,
       manageUrl,
-      clinicPhone: "+36 1 000 0000",
-      clinicAddress: "1000 Budapest, Klinika utca 1.",
+      clinicPhone: "+36 70 639 5239",
+      clinicAddress: "2500 Esztergom, Martsa Alajos utca 6/c.",
     });
 
     await sendEmail({

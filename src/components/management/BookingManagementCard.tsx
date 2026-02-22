@@ -149,17 +149,17 @@ export function BookingManagementCard({ booking, scheduleData }: BookingManageme
         </div>
       </div>
 
-      {/* 24h warning or action buttons */}
+      {/* 24h info or action buttons */}
       {within24h ? (
-        <div className="rounded-lg bg-[#F4DCD6] p-4 text-sm text-[#23264F]">
-          <p className="font-semibold">Az időpont már nem módosítható (24 órán belüli foglalás).</p>
-          <p className="mt-1">
-            Kérjük, hívjon minket:{" "}
+        <div className="rounded-lg bg-gray-50 border border-gray-200 p-4 text-sm text-gray-600">
+          <p>
+            Az időpont módosítása és lemondása már nem lehetséges (kevesebb mint 24 óra van hátra).
+            Kérdés esetén hívjon minket:{" "}
             <a
-              href="tel:+3610000000"
-              className="font-bold underline hover:no-underline"
+              href="tel:+36706395239"
+              className="font-semibold text-[#23264F] underline hover:no-underline"
             >
-              +36 1 000 0000
+              +36 70 639 5239
             </a>
           </p>
         </div>

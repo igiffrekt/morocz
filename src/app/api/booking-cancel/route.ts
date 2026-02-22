@@ -44,6 +44,7 @@ export async function POST(request: Request): Promise<Response> {
       _id: string;
       patientName: string;
       patientEmail: string;
+      reservationNumber: string;
       service: { name: string } | null;
       slotDate: string;
       slotTime: string;
@@ -53,7 +54,7 @@ export async function POST(request: Request): Promise<Response> {
 
     const booking = await getWriteClient().fetch<BookingForCancel | null>(
       `*[_type == "booking" && managementToken == $manageToken && status == "confirmed"][0]{
-        _id, patientName, patientEmail, service->{name},
+        _id, patientName, patientEmail, reservationNumber, service->{name},
         slotDate, slotTime, status, managementToken
       }`,
       { manageToken: token },
@@ -71,7 +72,7 @@ export async function POST(request: Request): Promise<Response> {
       return Response.json(
         {
           error:
-            "Az időpont már nem mondható le (kevesebb mint 24 óra van hátra). Kérjük, hívjon minket: +36 1 000 0000",
+            "Az időpont már nem mondható le (kevesebb mint 24 óra van hátra). Kérjük, hívjon minket: +36 70 639 5239",
         },
         { status: 403 },
       );
@@ -98,6 +99,7 @@ export async function POST(request: Request): Promise<Response> {
       void sendCancellationEmailAsync({
         patientName: booking.patientName,
         patientEmail: booking.patientEmail,
+        reservationNumber: booking.reservationNumber,
         serviceName: booking.service?.name?.startsWith("Nőgyógyász") ? "Nőgyógyászati vizsgálat" : (booking.service?.name ?? "Foglalt szolgáltatás"),
         slotDate: booking.slotDate,
         slotTime: booking.slotTime,
@@ -122,12 +124,14 @@ export async function POST(request: Request): Promise<Response> {
 async function sendCancellationEmailAsync({
   patientName,
   patientEmail,
+  reservationNumber,
   serviceName,
   slotDate,
   slotTime,
 }: {
   patientName: string;
   patientEmail: string;
+  reservationNumber: string;
   serviceName: string;
   slotDate: string;
   slotTime: string;
@@ -146,10 +150,11 @@ async function sendCancellationEmailAsync({
     const html = buildCancellationEmail({
       patientName,
       serviceName,
+      reservationNumber,
       date: formattedDate,
       time: slotTime,
-      clinicPhone: "+36 1 000 0000",
-      clinicAddress: "1000 Budapest, Klinika utca 1.",
+      clinicPhone: "+36 70 639 5239",
+      clinicAddress: "2500 Esztergom, Martsa Alajos utca 6/c.",
       newBookingUrl,
     });
 

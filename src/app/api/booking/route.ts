@@ -165,6 +165,7 @@ export async function POST(request: Request): Promise<Response> {
   if (isEmailConfigured()) {
     void sendConfirmationEmail({
       booking: { _id: booking._id, managementToken },
+      reservationNumber,
       serviceId,
       slotDate,
       slotTime,
@@ -260,6 +261,7 @@ async function getAlternativeSlots(
 // ── Helper: send confirmation email fire-and-forget ───────────────────────────
 async function sendConfirmationEmail({
   booking,
+  reservationNumber,
   serviceId,
   slotDate,
   slotTime,
@@ -267,6 +269,7 @@ async function sendConfirmationEmail({
   patientEmail,
 }: {
   booking: { _id: string; managementToken: string };
+  reservationNumber: string;
   serviceId: string;
   slotDate: string;
   slotTime: string;
@@ -293,11 +296,12 @@ async function sendConfirmationEmail({
     const html = buildConfirmationEmail({
       patientName,
       serviceName: service?.name?.startsWith("Nőgyógyász") ? "Nőgyógyászati vizsgálat" : (service?.name ?? "Foglalt szolgáltatás"),
+      reservationNumber,
       date: formattedDate,
       time: slotTime,
       manageUrl,
-      clinicPhone: "+36 1 000 0000",
-      clinicAddress: "1000 Budapest, Klinika utca 1.",
+      clinicPhone: "+36 70 639 5239",
+      clinicAddress: "2500 Esztergom, Martsa Alajos utca 6/c.",
     });
 
     await sendEmail({

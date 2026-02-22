@@ -51,12 +51,22 @@ export default async function IdopontfoglalasPage() {
     blockedDates: (blockedDatesDoc?.dates ?? []).map((d) => d.date ?? "").filter(Boolean),
   };
 
+  // Collapse matching services into exactly 2 booking options:
+  // - First "Nőgyógyász*" service → displayed as "Nőgyógyászat"
+  // - "Várandósgondozás" (exact match)
+  const gyneService = services.find((s) => s.name?.startsWith("Nőgyógyász"));
+  const prenatalService = services.find((s) => s.name === "Várandósgondozás");
+  const bookingServices = [
+    ...(gyneService ? [{ ...gyneService, name: "Nőgyógyászat" }] : []),
+    ...(prenatalService ? [prenatalService] : []),
+  ];
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-12">
       <h1 className="text-3xl md:text-4xl font-bold text-[var(--color-primary)] mb-8">
         Időpontfoglalás
       </h1>
-      <BookingWizard services={services} scheduleData={scheduleData} />
+      <BookingWizard services={bookingServices} scheduleData={scheduleData} />
     </div>
   );
 }

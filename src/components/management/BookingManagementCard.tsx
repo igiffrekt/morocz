@@ -34,12 +34,13 @@ function isWithin24Hours(slotDate: string, slotTime: string): boolean {
   return (appt.getTime() - Date.now()) / (1000 * 60 * 60) < 24;
 }
 
-type CardState = "idle" | "cancel-confirm" | "cancelled";
+type CardState = "idle" | "cancel-confirm" | "cancelled" | "rescheduled";
 
 export function BookingManagementCard({ booking, scheduleData }: BookingManagementCardProps) {
   const router = useRouter();
   const [cardState, setCardState] = useState<CardState>("idle");
   const [showReschedule, setShowReschedule] = useState(false);
+  const [rescheduledTo, setRescheduledTo] = useState<{ date: string; time: string } | null>(null);
 
   const within24h = isWithin24Hours(booking.slotDate, booking.slotTime);
 
@@ -70,6 +71,43 @@ export function BookingManagementCard({ booking, scheduleData }: BookingManageme
         >
           Új időpont foglalása
         </a>
+      </div>
+    );
+  }
+
+  if (cardState === "rescheduled" && rescheduledTo) {
+    const newFormattedDate = new Date(rescheduledTo.date).toLocaleDateString("hu-HU", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      weekday: "long",
+    });
+
+    return (
+      <div className="rounded-xl bg-white p-8 shadow-md">
+        <div className="mb-4 flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#99CEB7]">
+            <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+            </svg>
+          </div>
+          <h2 className="text-xl font-bold text-[#23264F]">Időpont sikeresen áthelyezve</h2>
+        </div>
+        <div className="mb-6 rounded-lg border-l-4 border-[#99CEB7] bg-gray-50 p-5">
+          <p className="mb-1 text-xs font-bold uppercase tracking-wider text-gray-500">Új időpont</p>
+          <p className="text-base font-semibold text-[#23264F]">
+            {newFormattedDate}, {rescheduledTo.time}
+          </p>
+        </div>
+        <p className="mb-6 text-gray-600">
+          Visszaigazoló e-mailt küldtünk az új időpontról.
+        </p>
+        <button
+          onClick={() => router.refresh()}
+          className="inline-block rounded-lg bg-[#99CEB7] px-6 py-3 text-sm font-semibold text-[#23264F] transition hover:bg-[#80bea6]"
+        >
+          Foglalás megtekintése
+        </button>
       </div>
     );
   }
@@ -174,9 +212,10 @@ export function BookingManagementCard({ booking, scheduleData }: BookingManageme
             serviceId: booking.serviceId,
           }}
           scheduleData={scheduleData}
-          onRescheduled={() => {
+          onRescheduled={(newDate, newTime) => {
             setShowReschedule(false);
-            router.refresh();
+            setRescheduledTo({ date: newDate, time: newTime });
+            setCardState("rescheduled");
           }}
           onCancel={() => setShowReschedule(false)}
         />

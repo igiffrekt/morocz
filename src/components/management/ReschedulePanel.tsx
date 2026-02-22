@@ -17,7 +17,7 @@ interface ReschedulePanelProps {
     schedule: ScheduleForAvailability;
     blockedDates: string[];
   };
-  onRescheduled: () => void;
+  onRescheduled: (newDate: string, newTime: string) => void;
   onCancel: () => void;
 }
 
@@ -195,7 +195,7 @@ export function ReschedulePanel({
       });
 
       if (res.ok) {
-        onRescheduled();
+        onRescheduled(selectedDate, selectedTime);
         return;
       }
 

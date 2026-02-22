@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-02-22)
 
 **Core value:** Patients can discover Morocz Medical's services and book an appointment through a beautifully animated, fast, SEO-optimized website where every piece of content is manageable from Sanity CMS.
-**Current focus:** v2.0 Booking Module — Phase 11 booking UI in progress
+**Current focus:** v2.0 Booking Module — Phase 12 patient account (token-based management)
 
 ## Current Position
 
-Phase: 11 of 14 (Booking Core) — human-verify checkpoint
-Plan: 4 of 4 auto tasks complete (11-01 data, 11-02 API routes, 11-03 UI, 11-04 confirmation wizard)
-Status: 11-04 auto tasks done; Task 3 checkpoint awaiting browser verification of full wizard flow
-Last activity: 2026-02-22 — 11-04 complete: Step3Auth, Step4Confirm, BookingSuccess, BookingWizard wired end-to-end
+Phase: 12 of 14 (Patient Account) — executing
+Plan: 1 of 3 complete (12-01 token fields + email builders)
+Status: 12-01 complete; next is 12-02 management page at /foglalas/:token
+Last activity: 2026-02-22 — 12-01 complete: managementToken + reminderSent fields, updated confirmation email, 3 new email builders
 
 Progress: [██████████] 100%
 
@@ -34,6 +34,7 @@ Progress: [██████████] 100%
 *Updated after each plan completion*
 | Phase 11-booking-core P02 | 15 | 2 tasks | 3 files |
 | Phase 11-booking-core P04 | 5 | 2 tasks | 4 files |
+| Phase 12-patient-account P01 | 5 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -75,6 +76,9 @@ Recent decisions affecting current work:
 - [Phase 11-booking-core]: Step4Confirm passes patientName/patientEmail to onSuccess so BookingSuccess avoids a second useSession call
 - [Phase 11-booking-core]: SessionStorage key morocz-booking-wizard stores {currentStep, selections, timestamp} with 30-min TTL gate for OAuth redirect recovery
 - [Phase 11-booking-core]: Conflict panel is inline above animated step area, not a modal, so alternatives persist during step animation
+- [Phase 12-patient-account]: 12-01: Single manageUrl (/foglalas/:token) replaces separate cancel/reschedule URLs in confirmation email
+- [Phase 12-patient-account]: 12-01: buildReminderEmail has no action buttons — 24h cutoff aligns with reminder send time
+- [Phase 12-patient-account]: 12-01: crypto.randomUUID() used for managementToken (Web Crypto API, globally available in Next.js 15)
 
 ### Pending Todos
 
@@ -95,5 +99,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-22
-Stopped at: 11-04 Task 3 checkpoint:human-verify — full booking wizard built, awaiting browser verification at /idopontfoglalas. All 4 phases of booking-core are complete pending human sign-off.
+Stopped at: Completed 12-patient-account-01-PLAN.md — managementToken schema fields, email infrastructure complete.
 Resume file: none

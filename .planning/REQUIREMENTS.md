@@ -36,11 +36,11 @@ Requirements for the booking module. Each maps to roadmap phases.
 
 - [x] **NOTIF-01**: Patient receives confirmation email immediately after booking
 - [ ] **NOTIF-02**: Patient receives reminder email 24 hours before appointment
-- [ ] **NOTIF-03**: Patient receives cancellation confirmation email
+- [x] **NOTIF-03**: Patient receives cancellation confirmation email
 
 ### Patient Account
 
-- [ ] **ACCT-01**: Patient can view upcoming appointments on /fiokom
+- [x] **ACCT-01**: Patient can view upcoming appointments on /fiokom
 - [ ] **ACCT-02**: Patient can cancel an appointment (24h cancellation window enforced)
 - [ ] **ACCT-03**: Patient can reschedule an appointment (cancel old + book new atomically)
 
@@ -115,8 +115,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | BOOK-07 | Phase 11 | Complete |
 | NOTIF-01 | Phase 11 | Complete |
 | NOTIF-02 | Phase 14 | Pending |
-| NOTIF-03 | Phase 12 | Pending |
-| ACCT-01 | Phase 12 | Pending |
+| NOTIF-03 | Phase 12 | Complete |
+| ACCT-01 | Phase 12 | Complete |
 | ACCT-02 | Phase 12 | Pending |
 | ACCT-03 | Phase 12 | Pending |
 | ADMIN-01 | Phase 13 | Pending |

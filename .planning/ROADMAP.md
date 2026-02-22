@@ -54,8 +54,8 @@ Plans:
 
 Plans:
 - [x] 10-01-PLAN.md — Auth infrastructure: Better Auth + Drizzle + Neon, API route, middleware, session config
-- [ ] 10-02-PLAN.md — Patient auth components: AuthStep (tabs, Google OAuth, email/password) + ForgotPassword
-- [ ] 10-03-PLAN.md — Admin auth: inline /admin login, role-gated dashboard, seed script, invite endpoint
+- [x] 10-02-PLAN.md — Patient auth components: AuthStep (tabs, Google OAuth, email/password) + ForgotPassword
+- [x] 10-03-PLAN.md — Admin auth: inline /admin login, role-gated dashboard, seed script, invite endpoint
 
 ### Phase 11: Booking Core
 **Goal**: A patient can browse available slots on /idopontfoglalas, pick a service, date, and time, authenticate, confirm their details, and receive an immediate confirmation email — with double-booking prevented at the data layer.
@@ -67,10 +67,13 @@ Plans:
   3. Patient submits name, email, and phone at confirmation; a booking Sanity document is created instantly
   4. Patient receives a Hungarian confirmation email immediately after booking
   5. If two patients attempt the same slot simultaneously, only one succeeds; the other sees a Hungarian error message and is shown alternative slots
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 11-01: TBD
+- [ ] 11-01-PLAN.md — Sanity schemas (booking, slotLock), write client, slot generation algorithm, GROQ queries
+- [ ] 11-02-PLAN.md — API routes: GET /api/slots + POST /api/booking with ifRevisionID locking + confirmation email
+- [ ] 11-03-PLAN.md — Booking page /idopontfoglalas, wizard shell, StepIndicator, Step1Service, Step2DateTime
+- [ ] 11-04-PLAN.md — Step3Auth, Step4Confirm, BookingSuccess, sessionStorage persistence, conflict handling
 
 ### Phase 12: Patient Account
 **Goal**: A logged-in patient can view all their appointments, cancel an upcoming appointment (within the 24-hour window), and receive a cancellation confirmation email.
@@ -122,7 +125,7 @@ Phases execute in numeric order: 9 → 10 → 11 → 12 → 13 → 14
 |-------|----------------|--------|-----------|
 | 9. Data Foundation and GDPR | 3/3 | Complete | 2026-02-22 |
 | 10. Authentication | 3/3 | Complete    | 2026-02-22 |
-| 11. Booking Core | 0/? | Not started | - |
+| 11. Booking Core | 0/4 | Not started | - |
 | 12. Patient Account | 0/? | Not started | - |
 | 13. Admin Dashboard | 0/? | Not started | - |
 | 14. Reminder Emails and Cron | 0/? | Not started | - |

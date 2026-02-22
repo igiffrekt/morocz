@@ -47,13 +47,15 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. Patient can register with email and password and log in on a subsequent visit
   2. Patient can log in with their Google account via OAuth
-  3. Patient stays logged in across browser refresh (JWT session)
+  3. Patient stays logged in across browser refresh (30-day session)
   4. Admin can log in with email/password and reach the /admin dashboard; a patient session cannot reach /admin
-  5. Visiting /fiokom or /admin without a valid session redirects to /bejelentkezes
-**Plans**: TBD
+  5. Visiting /admin without a valid session shows an inline login form; a non-admin session shows access denied
+**Plans**: 3 plans
 
 Plans:
-- [ ] 10-01: TBD
+- [ ] 10-01-PLAN.md — Auth infrastructure: Better Auth + Drizzle + Neon, API route, middleware, session config
+- [ ] 10-02-PLAN.md — Patient auth components: AuthStep (tabs, Google OAuth, email/password) + ForgotPassword
+- [ ] 10-03-PLAN.md — Admin auth: inline /admin login, role-gated dashboard, seed script, invite endpoint
 
 ### Phase 11: Booking Core
 **Goal**: A patient can browse available slots on /idopontfoglalas, pick a service, date, and time, authenticate, confirm their details, and receive an immediate confirmation email — with double-booking prevented at the data layer.
@@ -119,7 +121,7 @@ Phases execute in numeric order: 9 → 10 → 11 → 12 → 13 → 14
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 9. Data Foundation and GDPR | 3/3 | Complete | 2026-02-22 |
-| 10. Authentication | 0/? | Not started | - |
+| 10. Authentication | 0/3 | Planned | - |
 | 11. Booking Core | 0/? | Not started | - |
 | 12. Patient Account | 0/? | Not started | - |
 | 13. Admin Dashboard | 0/? | Not started | - |

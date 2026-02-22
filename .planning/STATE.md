@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-02-22)
 
 **Core value:** Patients can discover Morocz Medical's services and book an appointment through a beautifully animated, fast, SEO-optimized website where every piece of content is manageable from Sanity CMS.
-**Current focus:** v2.0 Booking Module — Phase 10 authentication infrastructure complete
+**Current focus:** v2.0 Booking Module — Phase 10 patient auth UI complete
 
 ## Current Position
 
 Phase: 10 of 14 (Authentication) — in progress
-Plan: 1 of ? completed (10-01 auth infrastructure done)
-Status: 10-01 complete, ready for next plan
-Last activity: 2026-02-22 — 10-01 complete: Better Auth + Drizzle + Neon infrastructure
+Plan: 2 of ? completed (10-02 patient auth UI done)
+Status: 10-02 complete, ready for next plan
+Last activity: 2026-02-22 — 10-02 complete: AuthStep + ForgotPassword UI components
 
 Progress: [███░░░░░░░] 21%
 
@@ -28,7 +28,7 @@ Progress: [███░░░░░░░] 21%
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 09-data-foundation-and-gdpr | 3 | ~11 min | ~4 min |
-| 10-authentication | 1 (so far) | ~11 min | ~11 min |
+| 10-authentication | 2 (so far) | ~15 min | ~7.5 min |
 
 *Updated after each plan completion*
 
@@ -55,6 +55,7 @@ Recent decisions affecting current work:
 - 10-01: Resend initialized lazily inside email callbacks, not at module level (build compatibility)
 - 10-01: Auth schema manually generated from Better Auth CLI introspection (CLI requires DATABASE_URL, not available during setup)
 - 10-01: auth route has force-dynamic to prevent Next.js static evaluation
+- 10-02: authClient.requestPasswordReset is the correct method (not forgetPassword — that doesn't exist in Better Auth client API)
 
 ### Pending Todos
 
@@ -74,5 +75,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-22
-Stopped at: 10-01 complete. Auth infrastructure in place. Next: remaining Phase 10 plans (patient auth UI, admin auth UI, etc.)
+Stopped at: 10-02 complete. Patient auth UI (AuthStep + ForgotPassword) done. Next: remaining Phase 10 plans (admin auth UI, etc.)
 Resume file: none

@@ -785,24 +785,71 @@ export function buildAdminCancellationEmail(params: {
 
 /**
  * Builds a branded HTML reminder email sent 24 hours before the appointment.
+ * Supports combined emails when a patient has multiple appointments on the same day.
  * No cancel/reschedule links — 24h window has passed by reminder time.
+ * Uses formal Hungarian magázó tone throughout.
  */
 export function buildReminderEmail(params: {
   patientName: string;
-  serviceName: string;
-  date: string; // Pre-formatted Hungarian date string
-  time: string; // "09:20"
+  appointments: Array<{
+    serviceName: string;
+    date: string; // Pre-formatted Hungarian date string
+    time: string; // "09:20"
+  }>;
   clinicPhone: string;
   clinicAddress: string;
 }): string {
-  const { patientName, serviceName, date, time, clinicPhone, clinicAddress } = params;
+  const { patientName, appointments, clinicPhone, clinicAddress } = params;
+  const isPlural = appointments.length > 1;
+
+  const titleText = isPlural
+    ? "Emlékeztető: holnapi időpontjai"
+    : "Emlékeztető: holnapi időpontja";
+
+  const greetingText = isPlural
+    ? "Tisztelt Páciensünk, emlékeztetjük, hogy holnap időpontjai vannak nálunk."
+    : "Tisztelt Páciensünk, emlékeztetjük, hogy holnap időpontja van nálunk.";
+
+  // Render one detail card per appointment, separated by 12px margin
+  const appointmentCards = appointments
+    .map(
+      (appt, index) => `
+          <!-- Appointment details ${index + 1} -->
+          <tr>
+            <td style="padding: ${index === 0 ? "24px" : "12px"} 40px 0;">
+              <table width="100%" cellpadding="0" cellspacing="0" role="presentation"
+                style="background-color: ${lightGrey}; border-radius: 8px; border-left: 4px solid ${green}; overflow: hidden;">
+                <tr>
+                  <td style="padding: 24px;">
+
+                    <p style="margin: 0 0 4px; font-size: 11px; font-weight: 700; color: ${textMuted}; text-transform: uppercase; letter-spacing: 0.07em;">
+                      Szolgáltatás
+                    </p>
+                    <p style="margin: 0 0 16px; font-size: 16px; font-weight: 600; color: ${textDark};">
+                      ${appt.serviceName}
+                    </p>
+
+                    <p style="margin: 0 0 4px; font-size: 11px; font-weight: 700; color: ${textMuted}; text-transform: uppercase; letter-spacing: 0.07em;">
+                      Időpont
+                    </p>
+                    <p style="margin: 0; font-size: 16px; font-weight: 600; color: ${navy};">
+                      ${appt.date}, ${appt.time}
+                    </p>
+
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>`,
+    )
+    .join("");
 
   return `<!DOCTYPE html>
 <html lang="hu">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Emlékeztető: holnapi időpontja</title>
+  <title>${titleText}</title>
 </head>
 <body style="margin: 0; padding: 0; background-color: #F0F2F5; font-family: ui-sans-serif, system-ui, -apple-system, Arial, sans-serif;">
 
@@ -822,7 +869,7 @@ export function buildReminderEmail(params: {
                 Mórocz Medical
               </p>
               <h1 style="margin: 8px 0 0; font-size: 22px; font-weight: 700; color: #ffffff; line-height: 1.3;">
-                Emlékeztető: holnapi időpontja
+                ${titleText}
               </h1>
             </td>
           </tr>
@@ -830,42 +877,13 @@ export function buildReminderEmail(params: {
           <!-- Greeting -->
           <tr>
             <td style="padding: 32px 40px 0;">
-              <p style="margin: 0; font-size: 16px; color: ${textDark}; line-height: 1.6;">
-                Kedves <strong>${patientName}</strong>!
-              </p>
-              <p style="margin: 12px 0 0; font-size: 15px; color: ${textMuted}; line-height: 1.7;">
-                Emlékeztetjük, hogy holnap időpontja van nálunk. Örömmel várjuk!
+              <p style="margin: 0; font-size: 15px; color: ${textMuted}; line-height: 1.7;">
+                ${greetingText} Örömmel várjuk!
               </p>
             </td>
           </tr>
 
-          <!-- Appointment details -->
-          <tr>
-            <td style="padding: 24px 40px 0;">
-              <table width="100%" cellpadding="0" cellspacing="0" role="presentation"
-                style="background-color: ${lightGrey}; border-radius: 8px; border-left: 4px solid ${green}; overflow: hidden;">
-                <tr>
-                  <td style="padding: 24px;">
-
-                    <p style="margin: 0 0 4px; font-size: 11px; font-weight: 700; color: ${textMuted}; text-transform: uppercase; letter-spacing: 0.07em;">
-                      Szolgáltatás
-                    </p>
-                    <p style="margin: 0 0 16px; font-size: 16px; font-weight: 600; color: ${textDark};">
-                      ${serviceName}
-                    </p>
-
-                    <p style="margin: 0 0 4px; font-size: 11px; font-weight: 700; color: ${textMuted}; text-transform: uppercase; letter-spacing: 0.07em;">
-                      Időpont
-                    </p>
-                    <p style="margin: 0; font-size: 16px; font-weight: 600; color: ${navy};">
-                      ${date}, ${time}
-                    </p>
-
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
+          ${appointmentCards}
 
           <!-- Reminders -->
           <tr>

@@ -57,9 +57,13 @@ See `.planning/MILESTONES.md` for full details and stats.
 - ✓ Admin dashboard with email/password login (calendar view, today's appointments, patient details) — v2.0
 - ✓ Minimal patient data collection: name, email, phone — v2.0
 
-### Active
+### Active (v2.1)
 
-(None — planning next milestone)
+- [ ] Automated test coverage for critical paths (booking flow, API routes, slot generation)
+- [ ] Dead code removal (orphan routes, unused schema values, leftover artifacts)
+- [ ] Performance optimization (images, bundle size, Core Web Vitals)
+- [ ] Error handling hardening (API edge cases, user-facing error messages)
+- [ ] Accessibility improvements (ARIA, keyboard navigation, screen reader support)
 
 ### Out of Scope
 
@@ -143,5 +147,16 @@ The user wants a collaborative development team mindset:
 | Vercel Cron for reminders | Simple hourly trigger; Inngest documented as upgrade path | ✓ Good |
 | Neon Postgres + Drizzle | Auth sessions + cron audit log need relational DB | ✓ Good |
 
+## Current Milestone: v2.1 Polish
+
+**Goal:** Harden the codebase with automated tests, remove dead code, optimize performance, improve error handling, and ensure accessibility — making the site production-confident and maintainable.
+
+**Target areas:**
+- Automated test coverage for critical booking and API paths
+- Dead code cleanup (orphan routes, unused schema values)
+- Performance optimization (images, lazy loading, bundle size, Core Web Vitals)
+- API error handling and edge case coverage
+- Accessibility audit and ARIA improvements
+
 ---
-*Last updated: 2026-02-23 after v2.0 milestone*
+*Last updated: 2026-02-23 after v2.1 milestone start*

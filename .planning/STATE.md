@@ -5,15 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Core value:** Patients can discover Morocz Medical's services and book an appointment through a beautifully animated, fast, SEO-optimized website where every piece of content is manageable from Sanity CMS.
-**Current focus:** Planning next milestone
+**Current focus:** v2.1 Polish — defining requirements
 
 ## Current Position
 
-Phase: v2.0 complete (14 phases shipped across 2 milestones)
-Status: v2.0 Booking Module shipped 2026-02-23
-Last activity: 2026-02-23 — milestone v2.0 archived
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-02-23 — Milestone v2.1 started
 
-Progress: [██████████] 100%
+Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
@@ -41,5 +42,5 @@ None currently blocking.
 ## Session Continuity
 
 Last session: 2026-02-23
-Stopped at: Milestone v2.0 archived. Ready for next milestone.
+Stopped at: Defining v2.1 requirements
 Resume file: none

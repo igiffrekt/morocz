@@ -163,7 +163,7 @@ export async function POST(request: Request): Promise<Response> {
     // Update booking document with new date/time
     await getWriteClient()
       .patch(booking._id)
-      .set({ slotDate: newDate, slotTime: newTime })
+      .set({ slotDate: newDate, slotTime: newTime, reminderSent: false })
       .commit();
 
     // ── 7. Send reschedule email (fire-and-forget) ─────────────────────────────

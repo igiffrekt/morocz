@@ -46,10 +46,10 @@ Requirements for the booking module. Each maps to roadmap phases.
 
 ### Admin Dashboard
 
-- [ ] **ADMIN-01**: Admin can view today's appointments in chronological order
-- [ ] **ADMIN-02**: Admin can view weekly calendar with booked and free slots
-- [ ] **ADMIN-03**: Admin can see patient details (name, email, phone) per booking
-- [ ] **ADMIN-04**: Admin can manually cancel a booking (patient gets cancellation email)
+- [x] **ADMIN-01**: Admin can view today's appointments in chronological order
+- [x] **ADMIN-02**: Admin can view weekly calendar with booked and free slots
+- [x] **ADMIN-03**: Admin can see patient details (name, email, phone) per booking
+- [x] **ADMIN-04**: Admin can manually cancel a booking (patient gets cancellation email)
 
 ### GDPR & Legal
 
@@ -119,10 +119,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ACCT-01 | Phase 12 | Complete |
 | ACCT-02 | Phase 12 | Complete |
 | ACCT-03 | Phase 12 | Pending |
-| ADMIN-01 | Phase 13 | Pending |
-| ADMIN-02 | Phase 13 | Pending |
-| ADMIN-03 | Phase 13 | Pending |
-| ADMIN-04 | Phase 13 | Pending |
+| ADMIN-01 | Phase 13 | Complete |
+| ADMIN-02 | Phase 13 | Complete |
+| ADMIN-03 | Phase 13 | Complete |
+| ADMIN-04 | Phase 13 | Complete |
 | GDPR-01 | Phase 9 | Pending |
 | GDPR-02 | Phase 9 | Pending |
 | GDPR-03 | Phase 9 | Pending |

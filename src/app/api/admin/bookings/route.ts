@@ -42,7 +42,7 @@ export async function GET(request: Request): Promise<Response> {
     // ── 3a. Email-based query (patient history) ────────────────────────────────
     if (email) {
       const bookings = await getWriteClient().fetch<AdminBookingRow[]>(
-        `*[_type == "booking" && patientEmail == $email] | order(slotDate desc, slotTime desc) {
+        `*[_type == "booking" && !(_id in path("drafts.**")) && patientEmail == $email] | order(slotDate desc, slotTime desc) {
           _id,
           patientName,
           patientEmail,
@@ -86,7 +86,7 @@ export async function GET(request: Request): Promise<Response> {
 
     // ── 4. Fetch bookings via GROQ (real-time write client — no CDN) ───────────
     const bookings = await getWriteClient().fetch<AdminBookingRow[]>(
-      `*[_type == "booking" && slotDate >= $startDate && slotDate <= $endDate] | order(slotDate asc, slotTime asc) {
+      `*[_type == "booking" && !(_id in path("drafts.**")) && slotDate >= $startDate && slotDate <= $endDate] | order(slotDate asc, slotTime asc) {
         _id,
         patientName,
         patientEmail,

@@ -123,7 +123,7 @@ export default function AdminPatientModal({
     backdrop: {
       position: "fixed" as const,
       inset: 0,
-      backgroundColor: "rgba(0,0,0,0.6)",
+      backgroundColor: "rgba(0,0,0,0.4)",
       zIndex: 40,
       display: "flex",
       alignItems: "center",
@@ -132,15 +132,15 @@ export default function AdminPatientModal({
     },
     modal: {
       position: "relative" as const,
-      backgroundColor: "#1e293b",
-      borderRadius: "0.625rem",
+      backgroundColor: "#ffffff",
+      borderRadius: "1.5rem",
       width: "100%",
       maxWidth: "32rem",
       maxHeight: "90vh",
       overflowY: "auto" as const,
       zIndex: 50,
       padding: "1.5rem",
-      boxShadow: "0 25px 50px rgba(0,0,0,0.5)",
+      boxShadow: "0 25px 50px rgba(36,42,95,0.15)",
     },
     closeBtn: {
       position: "absolute" as const,
@@ -148,7 +148,7 @@ export default function AdminPatientModal({
       right: "3rem",
       background: "none",
       border: "none",
-      color: "#64748b",
+      color: "#94a3b8",
       fontSize: "1.25rem",
       cursor: "pointer",
       padding: "0.25rem",
@@ -160,8 +160,8 @@ export default function AdminPatientModal({
       top: "1rem",
       right: "1rem",
       background: "none",
-      border: "1px solid #334155",
-      color: "#94a3b8",
+      border: "1px solid #e8eaf0",
+      color: "#64748b",
       fontSize: "1.125rem",
       cursor: "pointer",
       padding: "0.1875rem 0.5rem",
@@ -209,10 +209,10 @@ export default function AdminPatientModal({
                 const rect = menuButtonRef.current?.getBoundingClientRect();
                 return rect ? `${rect.left}px` : "auto";
               })(),
-              backgroundColor: "#0f172a",
-              border: "1px solid #334155",
-              borderRadius: "0.375rem",
-              boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
+              backgroundColor: "#ffffff",
+              border: "1px solid #e8eaf0",
+              borderRadius: "0.75rem",
+              boxShadow: "0 8px 24px rgba(36,42,95,0.12)",
               zIndex: 60,
               minWidth: "10rem",
               overflow: "hidden",
@@ -230,7 +230,7 @@ export default function AdminPatientModal({
                 padding: "0.625rem 0.875rem",
                 background: "none",
                 border: "none",
-                color: "#f87171",
+                color: "#9f1239",
                 fontSize: "0.875rem",
                 cursor: "pointer",
                 textAlign: "left" as const,
@@ -248,7 +248,7 @@ export default function AdminPatientModal({
               margin: "0 0 0.875rem",
               fontSize: "1.125rem",
               fontWeight: 700,
-              color: "#f8fafc",
+              color: "#242a5f",
               paddingRight: "4rem",
             }}
           >
@@ -258,12 +258,12 @@ export default function AdminPatientModal({
           <div style={{ display: "flex", flexDirection: "column", gap: "0.375rem" }}>
             {/* Email */}
             <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-              <span style={{ fontSize: "0.75rem", color: "#64748b", width: "5rem", flexShrink: 0 }}>
+              <span style={{ fontSize: "0.75rem", color: "#94a3b8", width: "5rem", flexShrink: 0 }}>
                 E-mail
               </span>
               <a
                 href={`mailto:${booking.patientEmail}`}
-                style={{ fontSize: "0.875rem", color: "#67e8f9", textDecoration: "none" }}
+                style={{ fontSize: "0.875rem", color: "#242a5f", textDecoration: "none" }}
               >
                 {booking.patientEmail}
               </a>
@@ -271,12 +271,12 @@ export default function AdminPatientModal({
 
             {/* Phone */}
             <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-              <span style={{ fontSize: "0.75rem", color: "#64748b", width: "5rem", flexShrink: 0 }}>
+              <span style={{ fontSize: "0.75rem", color: "#94a3b8", width: "5rem", flexShrink: 0 }}>
                 Telefon
               </span>
               <a
                 href={`tel:${booking.patientPhone}`}
-                style={{ fontSize: "0.875rem", color: "#67e8f9", textDecoration: "none" }}
+                style={{ fontSize: "0.875rem", color: "#242a5f", textDecoration: "none" }}
               >
                 {booking.patientPhone}
               </a>
@@ -286,11 +286,11 @@ export default function AdminPatientModal({
             {booking.service && (
               <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
                 <span
-                  style={{ fontSize: "0.75rem", color: "#64748b", width: "5rem", flexShrink: 0 }}
+                  style={{ fontSize: "0.75rem", color: "#94a3b8", width: "5rem", flexShrink: 0 }}
                 >
                   Szolgáltatás
                 </span>
-                <span style={{ fontSize: "0.875rem", color: "#f8fafc" }}>
+                <span style={{ fontSize: "0.875rem", color: "#1A1D2D" }}>
                   {booking.service.name}
                 </span>
               </div>
@@ -298,23 +298,23 @@ export default function AdminPatientModal({
 
             {/* Date */}
             <div style={{ display: "flex", alignItems: "flex-start", gap: "0.5rem" }}>
-              <span style={{ fontSize: "0.75rem", color: "#64748b", width: "5rem", flexShrink: 0 }}>
+              <span style={{ fontSize: "0.75rem", color: "#94a3b8", width: "5rem", flexShrink: 0 }}>
                 Dátum
               </span>
-              <span style={{ fontSize: "0.875rem", color: "#f8fafc" }}>{formattedDate}</span>
+              <span style={{ fontSize: "0.875rem", color: "#1A1D2D" }}>{formattedDate}</span>
             </div>
 
             {/* Time */}
             <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-              <span style={{ fontSize: "0.75rem", color: "#64748b", width: "5rem", flexShrink: 0 }}>
+              <span style={{ fontSize: "0.75rem", color: "#94a3b8", width: "5rem", flexShrink: 0 }}>
                 Időpont
               </span>
-              <span style={{ fontSize: "0.875rem", color: "#f8fafc" }}>{booking.slotTime}</span>
+              <span style={{ fontSize: "0.875rem", color: "#1A1D2D" }}>{booking.slotTime}</span>
             </div>
 
             {/* Reservation number */}
             <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-              <span style={{ fontSize: "0.75rem", color: "#64748b", width: "5rem", flexShrink: 0 }}>
+              <span style={{ fontSize: "0.75rem", color: "#94a3b8", width: "5rem", flexShrink: 0 }}>
                 Foglalási sz.
               </span>
               <span
@@ -330,7 +330,7 @@ export default function AdminPatientModal({
 
             {/* Status */}
             <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-              <span style={{ fontSize: "0.75rem", color: "#64748b", width: "5rem", flexShrink: 0 }}>
+              <span style={{ fontSize: "0.75rem", color: "#94a3b8", width: "5rem", flexShrink: 0 }}>
                 Státusz
               </span>
               <span
@@ -339,8 +339,13 @@ export default function AdminPatientModal({
                   fontWeight: 600,
                   padding: "0.1875rem 0.5rem",
                   borderRadius: "9999px",
-                  backgroundColor: isCancelled ? "#374151" : "#166534",
-                  color: isCancelled ? "#9ca3af" : "#bbf7d0",
+                  backgroundColor: isCancelled
+                    ? "rgba(231,193,211,0.15)"
+                    : "rgba(153,206,183,0.15)",
+                  color: isCancelled ? "#9f1239" : "#099268",
+                  border: isCancelled
+                    ? "1px solid rgba(231,193,211,0.25)"
+                    : "1px solid rgba(153,206,183,0.25)",
                   textTransform: "uppercase" as const,
                   letterSpacing: "0.04em",
                 }}
@@ -352,7 +357,7 @@ export default function AdminPatientModal({
         </div>
 
         {/* ── Divider ───────────────────────────────────────────────────────── */}
-        <div style={{ borderTop: "1px solid #334155", marginBottom: "1.25rem" }} />
+        <div style={{ borderTop: "1px solid #e8eaf0", marginBottom: "1.25rem" }} />
 
         {/* ── Cancel confirmation view ──────────────────────────────────────── */}
         {view === "cancel-confirm" && (
@@ -362,13 +367,13 @@ export default function AdminPatientModal({
                 margin: "0 0 0.5rem",
                 fontSize: "1rem",
                 fontWeight: 600,
-                color: "#f87171",
+                color: "#9f1239",
               }}
             >
               Biztosan lemondja ezt az időpontot?
             </h3>
-            <p style={{ margin: "0 0 0.875rem", fontSize: "0.875rem", color: "#94a3b8" }}>
-              <strong style={{ color: "#f8fafc" }}>{booking.patientName}</strong>
+            <p style={{ margin: "0 0 0.875rem", fontSize: "0.875rem", color: "#64748b" }}>
+              <strong style={{ color: "#1A1D2D" }}>{booking.patientName}</strong>
               {" — "}
               {formattedDate}, {booking.slotTime}
             </p>
@@ -381,10 +386,10 @@ export default function AdminPatientModal({
               rows={3}
               style={{
                 width: "100%",
-                backgroundColor: "#0f172a",
-                border: "1px solid #334155",
-                borderRadius: "0.375rem",
-                color: "#f8fafc",
+                backgroundColor: "#ffffff",
+                border: "1px solid #e8eaf0",
+                borderRadius: "0.75rem",
+                color: "#1A1D2D",
                 fontSize: "0.875rem",
                 padding: "0.625rem 0.75rem",
                 resize: "vertical" as const,
@@ -401,8 +406,8 @@ export default function AdminPatientModal({
                 style={{
                   margin: "0 0 0.75rem",
                   fontSize: "0.875rem",
-                  color: "#f87171",
-                  backgroundColor: "rgba(248,113,113,0.1)",
+                  color: "#ef4444",
+                  backgroundColor: "rgba(239,68,68,0.08)",
                   padding: "0.5rem 0.75rem",
                   borderRadius: "0.375rem",
                 }}
@@ -420,10 +425,10 @@ export default function AdminPatientModal({
                 style={{
                   flex: 1,
                   padding: "0.625rem 1rem",
-                  backgroundColor: isCancelling ? "#7f1d1d" : "#dc2626",
+                  backgroundColor: isCancelling ? "#881337" : "#9f1239",
                   color: "#fff",
                   border: "none",
-                  borderRadius: "0.375rem",
+                  borderRadius: "0.75rem",
                   fontSize: "0.875rem",
                   fontWeight: 600,
                   cursor: isCancelling ? "not-allowed" : "pointer",
@@ -444,9 +449,9 @@ export default function AdminPatientModal({
                   flex: 1,
                   padding: "0.625rem 1rem",
                   backgroundColor: "transparent",
-                  color: "#94a3b8",
-                  border: "1px solid #334155",
-                  borderRadius: "0.375rem",
+                  color: "#64748b",
+                  border: "1px solid #e8eaf0",
+                  borderRadius: "0.75rem",
                   fontSize: "0.875rem",
                   fontWeight: 600,
                   cursor: isCancelling ? "not-allowed" : "pointer",
@@ -459,7 +464,7 @@ export default function AdminPatientModal({
             {/* Divider before history */}
             <div
               style={{
-                borderTop: "1px solid #334155",
+                borderTop: "1px solid #e8eaf0",
                 marginTop: "1.25rem",
                 marginBottom: "1.25rem",
               }}
@@ -474,7 +479,7 @@ export default function AdminPatientModal({
               margin: "0 0 0.75rem",
               fontSize: "0.8125rem",
               fontWeight: 600,
-              color: "#64748b",
+              color: "#242a5f",
               textTransform: "uppercase" as const,
               letterSpacing: "0.05em",
             }}
@@ -515,9 +520,9 @@ export default function AdminPatientModal({
                         alignItems: "center",
                         justifyContent: "space-between",
                         padding: "0.5rem 0.625rem",
-                        backgroundColor: isCurrent ? "rgba(153,206,183,0.08)" : "#0f172a",
-                        border: `1px solid ${isCurrent ? "#99CEB7" : "#1e293b"}`,
-                        borderRadius: "0.375rem",
+                        backgroundColor: isCurrent ? "rgba(153,206,183,0.06)" : "#F2F4F8",
+                        border: `1px solid ${isCurrent ? "#99CEB7" : "#e8eaf0"}`,
+                        borderRadius: "0.75rem",
                         gap: "0.5rem",
                       }}
                     >
@@ -533,7 +538,7 @@ export default function AdminPatientModal({
                           style={{
                             fontSize: "0.8125rem",
                             fontWeight: isCurrent ? 700 : 400,
-                            color: isCurrent ? "#99CEB7" : "#94a3b8",
+                            color: isCurrent ? "#099268" : "#64748b",
                             whiteSpace: "nowrap",
                           }}
                         >
@@ -543,7 +548,7 @@ export default function AdminPatientModal({
                               style={{
                                 marginLeft: "0.375rem",
                                 fontSize: "0.6875rem",
-                                color: "#99CEB7",
+                                color: "#099268",
                                 opacity: 0.75,
                               }}
                             >
@@ -571,8 +576,10 @@ export default function AdminPatientModal({
                           fontWeight: 600,
                           padding: "0.15rem 0.4rem",
                           borderRadius: "9999px",
-                          backgroundColor: hCancelled ? "#374151" : "#166534",
-                          color: hCancelled ? "#9ca3af" : "#bbf7d0",
+                          backgroundColor: hCancelled
+                            ? "rgba(231,193,211,0.15)"
+                            : "rgba(153,206,183,0.15)",
+                          color: hCancelled ? "#9f1239" : "#099268",
                           textTransform: "uppercase" as const,
                           letterSpacing: "0.04em",
                           flexShrink: 0,

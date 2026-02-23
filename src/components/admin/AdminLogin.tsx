@@ -23,16 +23,16 @@ export function AdminSignOut() {
       onClick={handleSignOut}
       disabled={loading}
       style={{
-        marginTop: "1.5rem",
-        padding: "0.5rem 1.25rem",
-        backgroundColor: "#475569",
-        color: "#f8fafc",
-        border: "none",
-        borderRadius: "0.375rem",
+        padding: "0.375rem 0.875rem",
+        backgroundColor: "transparent",
+        color: "#ffffff",
+        border: "1px solid rgba(255,255,255,0.3)",
+        borderRadius: "9999px",
         cursor: loading ? "not-allowed" : "pointer",
-        fontSize: "0.875rem",
+        fontSize: "0.8125rem",
         fontWeight: 500,
         opacity: loading ? 0.7 : 1,
+        transition: "all 0.15s",
       }}
     >
       {loading ? "Kijelentkezés..." : "Kijelentkezés"}
@@ -112,10 +112,10 @@ export default function AdminLogin() {
   const inputStyle: React.CSSProperties = {
     width: "100%",
     padding: "0.625rem 0.875rem",
-    backgroundColor: "#1e293b",
-    border: "1px solid #334155",
-    borderRadius: "0.375rem",
-    color: "#f8fafc",
+    backgroundColor: "#ffffff",
+    border: "1px solid #e8eaf0",
+    borderRadius: "0.75rem",
+    color: "#1A1D2D",
     fontSize: "0.875rem",
     outline: "none",
     boxSizing: "border-box",
@@ -125,12 +125,12 @@ export default function AdminLogin() {
     display: "block",
     fontSize: "0.8125rem",
     fontWeight: 500,
-    color: "#94a3b8",
+    color: "#64748b",
     marginBottom: "0.375rem",
   };
 
   const errorStyle: React.CSSProperties = {
-    color: "#f87171",
+    color: "#ef4444",
     fontSize: "0.75rem",
     marginTop: "0.25rem",
   };
@@ -143,17 +143,17 @@ export default function AdminLogin() {
         alignItems: "center",
         justifyContent: "center",
         padding: "1.5rem",
-        backgroundColor: "#0f172a",
+        backgroundColor: "#F2F4F8",
       }}
     >
       <div
         style={{
           width: "100%",
           maxWidth: "24rem",
-          backgroundColor: "#1e293b",
-          borderRadius: "0.5rem",
+          backgroundColor: "#ffffff",
+          borderRadius: "1.5rem",
           padding: "2rem",
-          boxShadow: "0 4px 24px rgba(0,0,0,0.4)",
+          boxShadow: "0 4px 24px rgba(36,42,95,0.08)",
         }}
       >
         {/* Heading */}
@@ -162,7 +162,7 @@ export default function AdminLogin() {
             margin: "0 0 0.375rem",
             fontSize: "1.25rem",
             fontWeight: 700,
-            color: "#f8fafc",
+            color: "#242a5f",
             letterSpacing: "-0.01em",
           }}
         >
@@ -172,7 +172,7 @@ export default function AdminLogin() {
           style={{
             margin: "0 0 1.75rem",
             fontSize: "0.875rem",
-            color: "#94a3b8",
+            color: "#64748b",
           }}
         >
           Kérjük, jelentkezzen be az admin fiókjával.
@@ -221,9 +221,9 @@ export default function AdminLogin() {
                 ...errorStyle,
                 marginBottom: "1rem",
                 padding: "0.625rem 0.875rem",
-                backgroundColor: "rgba(248, 113, 113, 0.1)",
+                backgroundColor: "rgba(239, 68, 68, 0.08)",
                 borderRadius: "0.375rem",
-                border: "1px solid rgba(248, 113, 113, 0.2)",
+                border: "1px solid rgba(239, 68, 68, 0.15)",
               }}
             >
               {formError}
@@ -237,10 +237,10 @@ export default function AdminLogin() {
             style={{
               width: "100%",
               padding: "0.625rem 1rem",
-              backgroundColor: loading ? "#475569" : "#334155",
-              color: "#f8fafc",
-              border: "1px solid #475569",
-              borderRadius: "0.375rem",
+              backgroundColor: loading ? "#1e2550" : "#242a5f",
+              color: "#ffffff",
+              border: "none",
+              borderRadius: "9999px",
               cursor: loading ? "not-allowed" : "pointer",
               fontSize: "0.875rem",
               fontWeight: 600,

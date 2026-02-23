@@ -38,7 +38,7 @@ function getMonthRange(year: number, month: number): { startDate: string; endDat
   return { startDate: fmt(start), endDate: fmt(end) };
 }
 
-const BOOKINGS_QUERY = `*[_type == "booking" && slotDate >= $startDate && slotDate <= $endDate] | order(slotDate asc, slotTime asc) {
+const BOOKINGS_QUERY = `*[_type == "booking" && !(_id in path("drafts.**")) && slotDate >= $startDate && slotDate <= $endDate] | order(slotDate asc, slotTime asc) {
   _id,
   patientName,
   patientEmail,
@@ -69,17 +69,18 @@ export default async function AdminPage() {
           alignItems: "center",
           justifyContent: "center",
           padding: "1.5rem",
-          backgroundColor: "#0f172a",
+          backgroundColor: "#F2F4F8",
         }}
       >
         <div
           style={{
             width: "100%",
             maxWidth: "24rem",
-            backgroundColor: "#1e293b",
-            borderRadius: "0.5rem",
+            backgroundColor: "#ffffff",
+            borderRadius: "1.5rem",
             padding: "2rem",
             textAlign: "center",
+            boxShadow: "0 4px 24px rgba(36,42,95,0.08)",
           }}
         >
           <h1
@@ -87,7 +88,7 @@ export default async function AdminPage() {
               margin: "0 0 0.75rem",
               fontSize: "1.25rem",
               fontWeight: 700,
-              color: "#f87171",
+              color: "#ef4444",
             }}
           >
             Hozzáférés megtagadva
@@ -96,7 +97,7 @@ export default async function AdminPage() {
             style={{
               margin: "0 0 1.5rem",
               fontSize: "0.875rem",
-              color: "#94a3b8",
+              color: "#64748b",
               lineHeight: 1.6,
             }}
           >
@@ -107,9 +108,9 @@ export default async function AdminPage() {
             style={{
               display: "inline-block",
               padding: "0.5rem 1.25rem",
-              backgroundColor: "#334155",
-              color: "#f8fafc",
-              borderRadius: "0.375rem",
+              backgroundColor: "#242a5f",
+              color: "#ffffff",
+              borderRadius: "9999px",
               textDecoration: "none",
               fontSize: "0.875rem",
               fontWeight: 500,

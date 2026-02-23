@@ -63,6 +63,7 @@ export default function AdminCalendar({
 }: AdminCalendarProps) {
   const [viewYear, setViewYear] = useState(initialYear);
   const [viewMonth, setViewMonth] = useState(initialMonth);
+  const [hoveredDay, setHoveredDay] = useState<string | null>(null);
 
   const todayStr = getTodayString();
 
@@ -127,13 +128,15 @@ export default function AdminCalendar({
   return (
     <div
       style={{
-        backgroundColor: "#1e293b",
-        borderRadius: "0.5rem",
-        padding: "1rem",
+        backgroundColor: "#ffffff",
+        borderRadius: "1rem",
+        padding: "0",
         display: "flex",
         flexDirection: "column",
         height: "100%",
         overflow: "hidden",
+        border: "1px solid #e8eaf0",
+        boxShadow: "0 1px 3px rgba(36,42,95,0.06)",
       }}
     >
       {/* ── Toggle bar ────────────────────────────────────────────────────── */}
@@ -142,7 +145,8 @@ export default function AdminCalendar({
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          marginBottom: "1rem",
+          padding: "0.875rem 1.25rem",
+          borderBottom: "1px solid #e8eaf0",
           flexShrink: 0,
         }}
       >
@@ -150,10 +154,9 @@ export default function AdminCalendar({
           style={{
             margin: 0,
             fontSize: "0.875rem",
-            fontWeight: 600,
-            color: "#94a3b8",
-            textTransform: "uppercase",
-            letterSpacing: "0.05em",
+            fontWeight: 700,
+            color: "#242a5f",
+            letterSpacing: "0.01em",
           }}
         >
           Naptár
@@ -162,9 +165,9 @@ export default function AdminCalendar({
         <div
           style={{
             display: "flex",
-            backgroundColor: "#0f172a",
+            backgroundColor: "#f1f5f9",
             borderRadius: "9999px",
-            padding: "0.2rem",
+            padding: "0.1875rem",
             gap: "0.125rem",
           }}
         >
@@ -174,15 +177,15 @@ export default function AdminCalendar({
               type="button"
               onClick={() => onViewModeChange(mode)}
               style={{
-                padding: "0.25rem 0.875rem",
+                padding: "0.3125rem 0.875rem",
                 borderRadius: "9999px",
                 border: "none",
-                fontSize: "0.8125rem",
-                fontWeight: 500,
+                fontSize: "0.75rem",
+                fontWeight: 600,
                 cursor: "pointer",
                 transition: "all 0.15s",
-                backgroundColor: viewMode === mode ? "#334155" : "transparent",
-                color: viewMode === mode ? "#f8fafc" : "#64748b",
+                backgroundColor: viewMode === mode ? "#242a5f" : "transparent",
+                color: viewMode === mode ? "#ffffff" : "#64748b",
               }}
             >
               {mode === "month" ? "Hónap" : "Hét"}
@@ -193,14 +196,15 @@ export default function AdminCalendar({
 
       {/* ── Month view ───────────────────────────────────────────────────────── */}
       {viewMode === "month" && (
-        <div style={{ flex: 1, overflow: "auto" }}>
+        <div style={{ flex: 1, overflow: "auto", padding: "1rem 1.25rem 1.25rem" }}>
           {/* Month navigation header */}
           <div
             style={{
               display: "flex",
               alignItems: "center",
-              justifyContent: "space-between",
-              marginBottom: "0.75rem",
+              justifyContent: "center",
+              gap: "1.25rem",
+              marginBottom: "1rem",
             }}
           >
             <button
@@ -208,29 +212,31 @@ export default function AdminCalendar({
               onClick={prevMonth}
               aria-label="Előző hónap"
               style={{
-                width: "2rem",
-                height: "2rem",
+                width: "2.25rem",
+                height: "2.25rem",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 backgroundColor: "transparent",
-                border: "1px solid #334155",
-                borderRadius: "0.375rem",
-                color: "#94a3b8",
+                border: "1px solid #e8eaf0",
+                borderRadius: "0.5rem",
+                color: "#64748b",
                 cursor: "pointer",
-                fontSize: "1rem",
+                fontSize: "1.125rem",
                 transition: "all 0.15s",
               }}
             >
-              ‹
+              &#8249;
             </button>
 
             <span
               style={{
                 fontSize: "0.9375rem",
                 fontWeight: 600,
-                color: "#f8fafc",
+                color: "#242a5f",
                 textTransform: "capitalize",
+                minWidth: "10rem",
+                textAlign: "center",
               }}
             >
               {formatMonthYear(viewYear, viewMonth)}
@@ -241,21 +247,21 @@ export default function AdminCalendar({
               onClick={nextMonth}
               aria-label="Következő hónap"
               style={{
-                width: "2rem",
-                height: "2rem",
+                width: "2.25rem",
+                height: "2.25rem",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 backgroundColor: "transparent",
-                border: "1px solid #334155",
-                borderRadius: "0.375rem",
-                color: "#94a3b8",
+                border: "1px solid #e8eaf0",
+                borderRadius: "0.5rem",
+                color: "#64748b",
                 cursor: "pointer",
-                fontSize: "1rem",
+                fontSize: "1.125rem",
                 transition: "all 0.15s",
               }}
             >
-              ›
+              &#8250;
             </button>
           </div>
 
@@ -264,88 +270,146 @@ export default function AdminCalendar({
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(7, 1fr)",
-              marginBottom: "0.375rem",
+              marginBottom: "0.5rem",
             }}
           >
-            {HU_WEEKDAYS.map((day) => (
-              <div
-                key={day}
-                style={{
-                  textAlign: "center",
-                  fontSize: "0.75rem",
-                  fontWeight: 600,
-                  color: "#475569",
-                  padding: "0.25rem 0",
-                }}
-              >
-                {day}
-              </div>
-            ))}
-          </div>
-
-          {/* Day grid */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(7, 1fr)",
-              gap: "0.25rem",
-            }}
-          >
-            {calendarCells.map((cell, idx) => {
-              if (cell === null) {
-                return (
-                  // biome-ignore lint/suspicious/noArrayIndexKey: empty padding cells have no stable key
-                  <div key={`empty-${idx}`} style={{ height: "2.5rem" }} aria-hidden="true" />
-                );
-              }
-
-              const { day, dateStr } = cell;
-              const isToday = dateStr === todayStr;
-              const isSelected = dateStr === selectedDate;
-              const bookingCount = bookingDotMap.get(dateStr) ?? 0;
-              const hasDot = bookingCount > 0;
-
+            {HU_WEEKDAYS.map((day, idx) => {
+              const isWeekend = idx >= 5;
               return (
-                <button
-                  key={dateStr}
-                  type="button"
-                  onClick={() => onSelectDate(dateStr)}
-                  aria-label={`${String(day)}. nap`}
-                  aria-pressed={isSelected}
-                  aria-current={isToday ? "date" : undefined}
+                <div
+                  key={day}
                   style={{
-                    height: "2.5rem",
-                    width: "100%",
-                    borderRadius: "0.375rem",
-                    border: isToday && !isSelected ? "1px solid #99CEB7" : "1px solid transparent",
-                    backgroundColor: isSelected ? "#99CEB7" : "transparent",
-                    color: isSelected ? "#0f172a" : isToday ? "#99CEB7" : "#cbd5e1",
-                    fontSize: "0.875rem",
-                    fontWeight: isToday || isSelected ? 700 : 400,
-                    cursor: "pointer",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "2px",
-                    transition: "all 0.1s",
-                    position: "relative",
+                    textAlign: "center",
+                    fontSize: "0.6875rem",
+                    fontWeight: 600,
+                    color: isWeekend ? "#cbd5e1" : "#94a3b8",
+                    padding: "0.375rem 0",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
                   }}
                 >
-                  <span>{day}</span>
-                  {hasDot && (
-                    <span
-                      aria-hidden="true"
-                      style={{
-                        width: "4px",
-                        height: "4px",
-                        borderRadius: "50%",
-                        backgroundColor: isSelected ? "#0f172a" : "#99CEB7",
-                        flexShrink: 0,
-                      }}
-                    />
-                  )}
-                </button>
+                  {day}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Day grid — rendered as week rows with separators */}
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            {Array.from({ length: Math.ceil(calendarCells.length / 7) }, (_, rowIdx) => {
+              const rowCells = calendarCells.slice(rowIdx * 7, rowIdx * 7 + 7);
+              const isLastRow = rowIdx === Math.ceil(calendarCells.length / 7) - 1;
+
+              return (
+                <div
+                  key={`row-${String(rowIdx)}`}
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(7, 1fr)",
+                    gap: "0.25rem",
+                    padding: "0.25rem 0",
+                    borderBottom: isLastRow ? "none" : "1px solid #f0f1f5",
+                  }}
+                >
+                  {rowCells.map((cell, colIdx) => {
+                    const isWeekendCol = colIdx >= 5;
+
+                    if (cell === null) {
+                      return (
+                        <div
+                          key={`empty-r${String(rowIdx)}c${String(colIdx)}`}
+                          style={{
+                            height: "3rem",
+                            backgroundColor: isWeekendCol ? "rgba(0,0,0,0.02)" : "transparent",
+                            borderRadius: "0.5rem",
+                          }}
+                          aria-hidden="true"
+                        />
+                      );
+                    }
+
+                    const { day, dateStr } = cell;
+                    const isToday = dateStr === todayStr;
+                    const isSelected = dateStr === selectedDate;
+                    const isHovered = dateStr === hoveredDay;
+                    const bookingCount = bookingDotMap.get(dateStr) ?? 0;
+                    const hasBookings = bookingCount > 0;
+
+                    let cellBg = isWeekendCol ? "rgba(0,0,0,0.02)" : "transparent";
+                    if (isHovered && !isSelected) {
+                      cellBg = "rgba(0,0,0,0.04)";
+                    }
+
+                    return (
+                      <button
+                        key={dateStr}
+                        type="button"
+                        onClick={() => onSelectDate(dateStr)}
+                        onMouseEnter={() => setHoveredDay(dateStr)}
+                        onMouseLeave={() => setHoveredDay(null)}
+                        aria-label={`${String(day)}. nap`}
+                        aria-pressed={isSelected}
+                        aria-current={isToday ? "date" : undefined}
+                        style={{
+                          height: "3rem",
+                          width: "100%",
+                          borderRadius: "0.5rem",
+                          border: "1px solid transparent",
+                          backgroundColor: cellBg,
+                          color: "#1e293b",
+                          fontSize: "0.875rem",
+                          fontWeight: isToday || isSelected ? 700 : 400,
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          transition: "all 0.12s ease",
+                          position: "relative",
+                          overflow: "hidden",
+                          padding: 0,
+                        }}
+                      >
+                        {/* Left-border accent for days with bookings */}
+                        {hasBookings && (
+                          <span
+                            aria-hidden="true"
+                            style={{
+                              position: "absolute",
+                              left: "0",
+                              top: "20%",
+                              bottom: "20%",
+                              width: "3px",
+                              borderRadius: "0 2px 2px 0",
+                              backgroundColor: "#99CEB7",
+                            }}
+                          />
+                        )}
+
+                        {/* Day number with circle background for today/selected */}
+                        <span
+                          style={{
+                            width: "2rem",
+                            height: "2rem",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            borderRadius: "50%",
+                            backgroundColor: isSelected
+                              ? "#242a5f"
+                              : isToday
+                                ? "#99CEB7"
+                                : "transparent",
+                            color: isSelected || isToday ? "#ffffff" : "#1A1D2D",
+                            lineHeight: 1,
+                            transition: "all 0.12s ease",
+                          }}
+                        >
+                          {day}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
               );
             })}
           </div>
@@ -354,7 +418,7 @@ export default function AdminCalendar({
 
       {/* ── Week view ─────────────────────────────────────────────────────────── */}
       {viewMode === "week" && (
-        <div style={{ flex: 1, overflow: "auto", minHeight: 0 }}>
+        <div style={{ flex: 1, overflow: "auto", minHeight: 0, padding: "0.75rem" }}>
           <AdminWeekView
             selectedDate={selectedDate}
             bookings={weekBookings}

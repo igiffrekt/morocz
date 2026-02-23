@@ -27,3 +27,30 @@
 
 ---
 
+
+## v2.0 Booking Module (Shipped: 2026-02-23)
+
+**Delivered:** A full online booking system — patients can self-book appointments, manage their bookings, and receive automated email reminders, while the admin manages everything through a role-gated calendar dashboard.
+
+**Stats:**
+- Phases: 9-14
+- Plans: 17 total
+- Commits: 96
+- Files: 119 changed, 26,575 insertions, 3,302 deletions
+- Timeline: 2 days (2026-02-21 → 2026-02-23)
+
+**Key accomplishments:**
+1. Sanity scheduling schemas (weeklySchedule, blockedDates) with custom Studio calendar input and Hungarian holiday generator
+2. Patient auth via Better Auth (Google OAuth + email/password) and role-gated admin auth with Neon Postgres sessions
+3. 4-step booking wizard at /idopontfoglalas with animated step transitions, double-booking prevention via ifRevisionID optimistic locking
+4. Patient self-service at /foglalas/:token — cancel with 24h window enforcement, atomic reschedule with slot swap, Hungarian email notifications
+5. Admin dashboard with month/week calendar views, overlapping booking layout, patient detail modal, and admin cancellation flow
+6. Automated 24h reminder emails via Vercel Cron with DST-safe timezone handling, per-patient grouping, and idempotent delivery
+
+**Known gaps:**
+- GDPR-03: Sanity DPA signing (organizational — requires contacting Sanity support, not a code deliverable)
+
+**Archives:** milestones/v2.0-ROADMAP.md, milestones/v2.0-REQUIREMENTS.md, milestones/v2.0-MILESTONE-AUDIT.md
+
+---
+

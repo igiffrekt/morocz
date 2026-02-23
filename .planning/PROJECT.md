@@ -2,7 +2,7 @@
 
 ## What This Is
 
-A single-practice medical website for Morocz Medical in Esztergom, Hungary. A modern, visually polished, Hungarian-language homepage with advanced animations, modular Sanity CMS content management, and excellent SEO. The site showcases the practice's services, lab tests, patient testimonials, and a blog — with every content element independently editable from Sanity.
+A single-practice medical website and online booking system for Morocz Medical in Esztergom, Hungary. A modern, visually polished, Hungarian-language site with advanced animations, modular Sanity CMS content management, excellent SEO, and a full patient booking flow — including self-service appointment management, admin dashboard, and automated email reminders.
 
 ## Core Value
 
@@ -10,12 +10,17 @@ Patients can discover Morocz Medical's services and book an appointment through 
 
 ## Current State
 
-**v1.0 shipped 2026-02-21** — Full medical practice website live with:
-- Next.js 15 + Tailwind v4 + Sanity v4 CMS + Motion v12 animations
-- 8 Sanity document schemas, embedded Studio at /studio, 10+ centralized GROQ queries
-- Animated homepage: hero with typewriter headline, services filter, lab tests grid, testimonials carousel, blog section
-- Complete SEO: JSON-LD (MedicalClinic, Physician, BlogPosting, BreadcrumbList), Open Graph, GDPR cookie notice, privacy policy
-- Launch infrastructure: HMAC webhook revalidation, draft mode preview, GA4 with consent gate, branded 404
+**v2.0 shipped 2026-02-23** — Full booking module on top of the v1.0 website:
+- Better Auth with Google OAuth + email/password, role-gated admin (Neon Postgres)
+- 4-step booking wizard at /idopontfoglalas with animated transitions, ifRevisionID double-booking prevention
+- Patient self-service at /foglalas/:token — cancel (24h window), reschedule (atomic slot swap)
+- Admin dashboard at /admin — month/week calendar, patient details modal, manual cancellation
+- Gmail API transactional emails (confirmation, cancellation, reschedule, reminder)
+- Vercel Cron 24h reminder emails with DST-safe timezone handling and idempotent delivery
+- GDPR consent checkbox with privacy policy link in booking form
+- 11 Sanity document schemas total, Drizzle ORM for auth/cron tables
+
+**Cumulative:** 220 commits, ~280 files, ~75k lines across v1.0 + v2.0.
 
 See `.planning/MILESTONES.md` for full details and stats.
 
@@ -40,21 +45,24 @@ See `.planning/MILESTONES.md` for full details and stats.
 - [x] Responsive design across all breakpoints
 - [x] Header with logo, navigation, and contact/login actions
 
-### Active (v2.0)
+### Validated (v2.0)
 
-- [ ] Patient authentication: Google OAuth + email/password registration and login
-- [ ] Online booking calendar at dedicated /idopontfoglalas page
-- [ ] Doctor defines weekly schedule + blocked dates in Sanity Studio; slots auto-generated
-- [ ] Patient picks service → date → time from available slots
-- [ ] Instant booking with email confirmation and pre-appointment reminder
-- [ ] Patient self-service: cancel or reschedule via logged-in account
-- [ ] Bookings stored as Sanity documents
-- [ ] Admin dashboard with proper email/password login (calendar view, today's appointments, patient details)
-- [ ] Minimal patient data collection: name, email, phone
+- ✓ Patient authentication: Google OAuth + email/password registration and login — v2.0
+- ✓ Online booking calendar at dedicated /idopontfoglalas page — v2.0
+- ✓ Doctor defines weekly schedule + blocked dates in Sanity Studio; slots auto-generated — v2.0
+- ✓ Patient picks service → date → time from available slots — v2.0
+- ✓ Instant booking with email confirmation and pre-appointment reminder — v2.0
+- ✓ Patient self-service: cancel or reschedule via token-based management link — v2.0
+- ✓ Bookings stored as Sanity documents with ifRevisionID locking — v2.0
+- ✓ Admin dashboard with email/password login (calendar view, today's appointments, patient details) — v2.0
+- ✓ Minimal patient data collection: name, email, phone — v2.0
+
+### Active
+
+(None — planning next milestone)
 
 ### Out of Scope
 
-- Appointment booking system — ~~will be built separately~~ **moved to Active (v2.0)**
 - Dark mode — not needed for this practice
 - Multi-language support — Hungarian only
 - Mobile app — web only
@@ -62,8 +70,14 @@ See `.planning/MILESTONES.md` for full details and stats.
 - Statistics counters section — removed from design
 - App download section — removed from design
 - Product deals/shop section — removed from design (medical practice, not e-commerce)
-- Real-time chat — not needed for v1
-- User authentication/accounts — ~~not needed for public-facing site~~ **moved to Active (v2.0, patient auth for booking)**
+- Real-time chat — not needed
+- SMS reminders — requires paid SMS gateway; email sufficient for now
+- Payment/deposit at booking — PCI-DSS complexity; defer until no-show data justifies it
+- Real-time WebSocket slot updates — Vercel serverless doesn't support persistent connections; overkill for single-doctor volume
+- Multi-doctor scheduling — single-doctor practice; schedule is global
+- Patient medical history — GDPR Article 9 special category data; store only name/email/phone
+- EHR/EMR integration — Hungarian GP systems require certified integrations
+- Waitlist queue — heavy complexity for marginal gain at low volume
 
 ## Context
 
@@ -84,6 +98,10 @@ A complete HTML/CSS design template exists at `home_design/code.html` with a ful
 - **Framework:** Next.js 15.5.12 (App Router)
 - **Styling:** Tailwind CSS v4 (CSS-first, @theme tokens in globals.css)
 - **CMS:** Sanity v4.22.0 + next-sanity v11.6.12
+- **Auth:** Better Auth v1 (Google OAuth + email/password, admin plugin)
+- **Database:** Neon Postgres + Drizzle ORM (auth sessions, cron audit log)
+- **Email:** Gmail API via googleapis (OAuth2, RFC 2047 encoding)
+- **Cron:** Vercel Cron (hourly reminder job)
 - **Animations:** Motion v12 (import from 'motion/react')
 - **Linting:** Biome v2.4.2 (CSS linting disabled for Tailwind compatibility)
 - **Deployment:** Vercel
@@ -108,28 +126,22 @@ The user wants a collaborative development team mindset:
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Next.js 15 + Tailwind v4 + Sanity v4 | User's explicit choice; modern stack | v1.0 Validated |
-| Hungarian only | Single-market practice | v1.0 Validated |
-| No dark mode | Practice doesn't need it | v1.0 Validated |
-| Appointment booking separate | Complex feature for later | v2.0 Active |
-| Remove podcast/events/stats/deals/app sections | Not relevant for medical practice | v1.0 Validated |
-| Motion v12 for animations | Complex animation requirements need robust library | v1.0 Validated |
-| Sanity modular schema | Every content piece independently editable | v1.0 Validated |
-| No separate blog listing page | Homepage shows 2 latest posts; deliberate scope decision | v1.0 Accepted |
-| Service card colors hardcoded | Not CMS-editable; locked in Phase 4 | v1.0 Validated |
-| Server Component data fetching | All Sanity fetches in page.tsx/layout.tsx, never in section components | v1.0 Validated |
-
-## Current Milestone: v2.0 Booking Module
-
-**Goal:** Patients can self-book appointments online — pick a service, choose an available slot, get instant confirmation, and manage their bookings through their account.
-
-**Target features:**
-- Patient auth (Google OAuth + email/password)
-- Online calendar with service-linked time slots
-- Doctor schedule management in Sanity Studio
-- Email confirmation and reminders
-- Patient self-service (cancel/reschedule)
-- Admin dashboard with login (calendar, daily view, patient details)
+| Next.js 15 + Tailwind v4 + Sanity v4 | User's explicit choice; modern stack | ✓ Good |
+| Hungarian only | Single-market practice | ✓ Good |
+| No dark mode | Practice doesn't need it | ✓ Good |
+| Remove podcast/events/stats/deals/app sections | Not relevant for medical practice | ✓ Good |
+| Motion v12 for animations | Complex animation requirements need robust library | ✓ Good |
+| Sanity modular schema | Every content piece independently editable | ✓ Good |
+| No separate blog listing page | Homepage shows 2 latest posts; deliberate scope decision | ✓ Good |
+| Service card colors hardcoded | Not CMS-editable; locked in Phase 4 | ✓ Good |
+| Server Component data fetching | All Sanity fetches in page.tsx/layout.tsx, never in section components | ✓ Good |
+| Better Auth replaces Auth.js v5 | Auth.js v5 abandoned; Better Auth acquired it in late 2025 | ✓ Good |
+| Per-slot Sanity documents with ifRevisionID | Double-booking prevention at data layer, not query-based | ✓ Good |
+| Gmail API for transactional email | Vercel blocks outbound SMTP; Resend had issues | ✓ Good |
+| Token-based booking management | /foglalas/:token — no session required for cancel/reschedule | ✓ Good |
+| Zod v3 (not v4) | Zod 4 is ESM-only and breaks Sanity v4 builds | ✓ Good |
+| Vercel Cron for reminders | Simple hourly trigger; Inngest documented as upgrade path | ✓ Good |
+| Neon Postgres + Drizzle | Auth sessions + cron audit log need relational DB | ✓ Good |
 
 ---
-*Last updated: 2026-02-21 after v2.0 milestone start*
+*Last updated: 2026-02-23 after v2.0 milestone*

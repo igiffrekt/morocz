@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-22)
 ## Current Position
 
 Phase: 13 of 14 (Admin Dashboard) — in progress
-Plan: 1 of 3 complete
-Status: Phase 13 plan 01 complete — admin API layer done; plans 02 (calendar UI) and 03 (day panel UI) remain
-Last activity: 2026-02-23 — 13-01 complete: GET /api/admin/bookings, POST /api/admin/booking-cancel, buildAdminCancellationEmail
+Plan: 2 of 3 complete
+Status: Phase 13 plan 02 complete — two-panel dashboard UI done (calendar + day panel); plan 03 (patient detail modal + cancel flow) remains
+Last activity: 2026-02-23 — 13-02 complete: AdminDashboard, AdminCalendar, AdminWeekView, AdminDayPanel, updated admin page.tsx
 
-Progress: [███████░░░] 71%
+Progress: [████████░░] 76%
 
 ## Performance Metrics
 
@@ -90,6 +90,10 @@ Recent decisions affecting current work:
 - [Phase 13-admin-dashboard]: 13-01: Admin bookings API uses getWriteClient() not CDN — admin data must be real-time accurate
 - [Phase 13-admin-dashboard]: 13-01: Admin cancel uses _id directly (not managementToken) — admin has direct DB access, no token auth needed
 - [Phase 13-admin-dashboard]: 13-01: buildAdminCancellationEmail distinct from patient cancel — "A rendelő lemondta" header, optional reason block, softer outlined CTA button
+- [Phase 13-admin-dashboard]: 13-02: AdminWeekView imported by AdminCalendar (not AdminDashboard) — AdminCalendar renders it directly in week mode
+- [Phase 13-admin-dashboard]: 13-02: handleBookingClick is no-op stub in AdminDashboard — Plan 03 wires patient detail modal into this callback
+- [Phase 13-admin-dashboard]: 13-02: AdminBooking type exported from AdminDashboard.tsx — single source of truth imported by all admin child components
+- [Phase 13-admin-dashboard]: 13-02: Server Component fetches today + month bookings in parallel via Promise.all for zero-delay initial render
 
 ### Pending Todos
 
@@ -110,5 +114,5 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-23
-Stopped at: Completed 13-01-PLAN.md — admin API layer done (bookings GET, booking-cancel POST, buildAdminCancellationEmail). Phase 13 plans 02 and 03 remain.
+Stopped at: Completed 13-02-PLAN.md — admin dashboard UI done (AdminDashboard, AdminCalendar, AdminWeekView, AdminDayPanel). Phase 13 plan 03 remains (patient detail modal + cancel flow).
 Resume file: none

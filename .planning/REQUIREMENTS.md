@@ -42,7 +42,7 @@ Requirements for the booking module. Each maps to roadmap phases.
 
 - [x] **ACCT-01**: Patient can view upcoming appointments on /fiokom
 - [x] **ACCT-02**: Patient can cancel an appointment (24h cancellation window enforced)
-- [ ] **ACCT-03**: Patient can reschedule an appointment (cancel old + book new atomically)
+- [x] **ACCT-03**: Patient can reschedule an appointment (cancel old + book new atomically)
 
 ### Admin Dashboard
 
@@ -53,9 +53,9 @@ Requirements for the booking module. Each maps to roadmap phases.
 
 ### GDPR & Legal
 
-- [ ] **GDPR-01**: Patient gives explicit consent for data processing at registration
-- [ ] **GDPR-02**: Privacy policy updated to cover booking data
-- [ ] **GDPR-03**: Sanity DPA signed before first patient data write
+- [x] **GDPR-01**: Patient gives explicit consent for data processing at registration
+- [x] **GDPR-02**: Privacy policy updated to cover booking data
+- [ ] **GDPR-03**: Sanity DPA signed before first patient data write (organizational — contact Sanity support)
 
 ### UX Polish
 
@@ -118,14 +118,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 | NOTIF-03 | Phase 12 | Complete |
 | ACCT-01 | Phase 12 | Complete |
 | ACCT-02 | Phase 12 | Complete |
-| ACCT-03 | Phase 12 | Pending |
+| ACCT-03 | Phase 12 | Complete |
 | ADMIN-01 | Phase 13 | Complete |
 | ADMIN-02 | Phase 13 | Complete |
 | ADMIN-03 | Phase 13 | Complete |
 | ADMIN-04 | Phase 13 | Complete |
-| GDPR-01 | Phase 9 | Pending |
-| GDPR-02 | Phase 9 | Pending |
-| GDPR-03 | Phase 9 | Pending |
+| GDPR-01 | Phase 9 | Complete |
+| GDPR-02 | Phase 9 | Complete |
+| GDPR-03 | Phase 9 | Pending (organizational) |
 | UX-01 | Phase 11 | Complete |
 | UX-02 | Phase 11 | Complete |
 | UX-03 | Phase 11 | Complete |

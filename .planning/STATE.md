@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Core value:** Patients can discover Morocz Medical's services and book an appointment through a beautifully animated, fast, SEO-optimized website where every piece of content is manageable from Sanity CMS.
-**Current focus:** v2.1 Polish — defining requirements
+**Current focus:** v2.1 Polish — defining requirements (paused mid-scoping)
 
 ## Current Position
 
 Phase: Not started (defining requirements)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-02-23 — Milestone v2.1 started
+Status: Requirements scoping paused — research complete, 2/4 categories scoped
+Last activity: 2026-02-23 — paused during requirement scoping
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [██░░░░░░░░] 15%
 
 ## Performance Metrics
 
@@ -29,6 +29,18 @@ Progress: [░░░░░░░░░░] 0%
 
 Decisions are logged in PROJECT.md Key Decisions table.
 
+### Scoping Progress (v2.1)
+
+Research complete — 4 files in .planning/research/ + SUMMARY.md
+
+**Categories scoped so far:**
+- Testing: **Both** — unit tests (Vitest for slot generation, time logic, Zod) + E2E (Playwright booking flow)
+- Accessibility: **Both** — basic ARIA fixes + full WCAG compliance (calendar keyboard nav, focus management)
+- Performance: NOT YET SCOPED — paused here
+- Dead Code Cleanup: NOT YET SCOPED
+
+**Resume at:** Performance scoping question, then dead code, then generate REQUIREMENTS.md
+
 ### Pending Todos
 
 - Deploy and set CRON_SECRET env var in Vercel Dashboard
@@ -42,5 +54,5 @@ None currently blocking.
 ## Session Continuity
 
 Last session: 2026-02-23
-Stopped at: Defining v2.1 requirements
-Resume file: none
+Stopped at: v2.1 requirement scoping — research done, testing + accessibility scoped, performance + dead code still need scoping
+Resume with: `/gsd:new-milestone` — will detect STATE.md and resume from scoping

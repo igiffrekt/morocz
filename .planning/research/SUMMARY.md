@@ -1,229 +1,206 @@
 # Project Research Summary
 
-**Project:** Morocz Medical — v2.0 Booking Module
-**Domain:** Patient appointment booking module added to an existing Next.js 15 + Sanity v4 medical practice website (Hungarian, single-doctor private practice, Esztergom)
-**Researched:** 2026-02-22
-**Confidence:** MEDIUM-HIGH
+**Project:** Morocz Medical v2.1 — Polish and Hardening Milestone
+**Domain:** Next.js 15 App Router medical practice site — testing, performance, accessibility, dead code
+**Researched:** 2026-02-23
+**Confidence:** HIGH
 
 ## Executive Summary
 
-The Morocz Medical v2.0 booking module is a well-defined problem: a low-to-medium complexity patient self-service booking system integrated into an existing Next.js 15 App Router + Sanity v4 site. The recommended approach is to build entirely within the existing stack, adding Auth.js v5 (next-auth@beta) with JWT sessions, react-day-picker for the calendar UI, and Resend for transactional email. The module has six distinct components — Sanity data schemas, patient authentication, a booking calendar flow, patient account pages, an admin dashboard, and an email notification system — each with clear build-order dependencies: schemas must exist before auth, auth before any protected page, and the booking document schema before emails or the admin dashboard can be built.
+Morocz Medical v2.1 is a quality hardening milestone on top of a fully-shipped v2.0 medical booking platform. The site runs Next.js 15 App Router + Sanity v4 + Tailwind v4 + Better Auth + Motion v12 on Vercel, with zero test coverage and known accessibility gaps. The research consensus is clear: this milestone adds no user-facing features — it makes the existing system production-confident through targeted testing, WCAG 2.1 AA compliance, performance optimization, and dead code removal. The recommended approach follows Next.js 15's own guidance exactly: Vitest for pure functions and synchronous client component logic, Playwright for E2E flows covering async Server Components, and @axe-core/playwright for automated accessibility scanning within existing E2E tests.
 
-The most significant architectural decision is how to model slot availability in Sanity. Sanity is eventually consistent in its GROQ search store, which means checking availability via a GROQ query immediately before writing a booking document is inherently racy and will produce double bookings under concurrent load. The correct approach is to use Sanity's `ifRevisionID` optimistic locking on per-slot status documents rather than a query-based availability check. This decision must be made in Phase 1 and cannot be retrofitted — it affects the schema design, the booking Server Action pattern, and the conflict error UX. Everything downstream depends on getting the data model right from the start.
+The highest-risk area is the testing architecture. Next.js 15 async Server Components cannot be unit-tested with Vitest — attempting to do so wastes significant time on unworkable workarounds. The codebase's critical business logic (slot generation, 24-hour cancellation window, Zod validation schemas) is correctly expressed as pure functions, making them ideal Vitest targets with no mocking overhead. Motion v12's extensive use throughout every component requires a `window.matchMedia` mock in the Vitest setup file, or Motion must be mocked entirely for component tests focused on non-animation concerns. The testing boundary must be established on Day 1 before any test files are written.
 
-The secondary risk cluster is security and GDPR compliance. Because the system processes patient contact data (names, emails, phone numbers), a Data Processing Agreement with Sanity must be signed and a Data Protection Impact Assessment completed before the first patient record is written. Auth.js v5's mandatory split-config pattern (edge-safe `auth.config.ts` for middleware, full `auth.ts` for Node.js contexts) is a known breaking point that must be established in Phase 2 before any route protection is added. The Sanity write token must never appear in a `NEXT_PUBLIC_*` environment variable. All of these are binary failures — one mistake means expensive recovery, not an incremental fix.
+Accessibility carries the highest patient impact in this milestone. A booking wizard that screen readers cannot navigate is a healthcare access barrier, not merely a UX inconvenience — and WCAG 2.1 AA is a legal requirement under the EU Web Accessibility Directive (Hungarian WAD). The two most critical fixes — `aria-invalid`/`aria-describedby` on form error states and `role="alert"` on dynamic error containers — are low-complexity but high-value. The ARIA grid pattern for the calendar and focus management on wizard step transitions are more complex and must ship together with their associated keyboard behaviors, coordinating with Motion v12's AnimatePresence exit timing. Performance work centers on adding `sizes` attributes to Sanity images and auditing the client bundle for unexpected large dependencies. Dead code removal requires a grep-first audit of all Sanity field references before any deletion, because TypeScript's static analysis cannot see GROQ query strings.
 
 ## Key Findings
 
 ### Recommended Stack
 
-The existing stack (Next.js 15.2, React 19, Tailwind v4, Sanity v4, Motion v12, Vercel) is locked. New additions are minimal and deliberate. Auth.js v5 is the only auth library with first-class Next.js 15 App Router support, handling both Google OAuth and email/password Credentials in one config with JWT sessions (no database adapter required). `bcryptjs` (pure JS) is chosen over native `bcrypt` because it runs in all Vercel runtimes including Edge. `react-day-picker v9` is the correct calendar component — headless, Tailwind-compatible, ships with a Hungarian locale, and is React 19 compatible. Resend handles transactional email via HTTP API (Vercel blocks outbound SMTP). Vercel Cron Jobs handle reminder scheduling for this volume; Inngest is documented as the upgrade path if scheduling complexity grows. Zod 3 (`^3.24`) is used for form validation — Zod 4 is ESM-only and causes interop issues with Sanity v4's CommonJS internals.
+The existing stack (Next.js 15, Sanity v4, Tailwind v4, Motion v12, Better Auth, Drizzle, Biome, Zod) requires no changes for v2.1. All stack additions are dev-only quality tooling. Vitest 4.0.18 is the officially supported unit test runner for Next.js 15 (Node >=20 already met on Vercel). Playwright 1.58.2 is the official E2E recommendation. The critical version constraint is `@next/bundle-analyzer` must be pinned to `^15.2.0` — not the latest `^16.x` — to match the installed Next.js version.
 
-**Core technologies:**
-- `next-auth@beta` (Auth.js v5): Patient and admin authentication — only auth library with first-class Next.js 15 App Router + Edge middleware support; JWT sessions, no database adapter required
-- `bcryptjs ^2.4.3`: Password hashing — pure JS, works in all Vercel runtimes including Edge; native `bcrypt` crashes in middleware
-- `react-day-picker ^9.13.2`: Booking calendar UI — headless/unstyled (Tailwind-compatible), built-in Hungarian locale (`hu`), React 19 compatible, date-fns bundled
-- `resend ^4.x` + `@react-email/components ^1.0.8`: Email sending — HTTP API (not SMTP), free tier 3,000 emails/month, React email templates; Nodemailer is blocked by Vercel
-- `zod ^3.24`: Form and Server Action validation — Zod 3 is CJS+ESM compatible; Zod 4 breaks Sanity v4 builds
-- Vercel Cron Jobs: Reminder email scheduling — zero dependency, sufficient for single-practice volume (<50 bookings/day)
+**Core technologies added (all dev dependencies):**
+- `vitest@^4.0.18` + `@vitejs/plugin-react@^5.1.4` + `jsdom` + `vite-tsconfig-paths`: Unit test runner — officially supported by Next.js 15, 3-28x faster than Jest in CI, ESM-native; `vite-tsconfig-paths` is required to resolve `@/` aliases or all tests fail at import
+- `@testing-library/react@^16.x` + `@testing-library/jest-dom@^6.9.1`: Component testing utilities — Jest-compatible API works with Vitest despite the package name; import `@testing-library/jest-dom` in the Vitest setup file once
+- `@playwright/test@^1.58.2`: E2E testing — only tool that can test async Server Components; controls a real browser against the live Next.js server
+- `@axe-core/playwright@^4.11.1`: Accessibility scanning — Deque's official Playwright integration; catches ~57% of WCAG violations automatically; run inline with functional E2E tests, not as a separate suite
+- `knip@^5.85.0`: Dead code detection — finds orphan files, unused exports, and stale `package.json` dependencies; built-in Next.js plugin understands App Router entry conventions and avoids false positives on `page.tsx`, `layout.tsx`, `route.ts`
+- `@next/bundle-analyzer@^15.2.0`: Bundle visualization — identifies large dependencies leaking into the client bundle; run once with `ANALYZE=true npm run build`; pin to `^15.x`, not `^16.x`
 
-**What not to use:** `next-auth-sanity` (archived September 2025, no v5 support), Sanity database session adapter, `NEXT_PUBLIC_SANITY_WRITE_TOKEN`, Nodemailer with SMTP, FullCalendar, Prisma/PostgreSQL, `react-email` in production code (dev-only preview tool).
-
-See `.planning/research/STACK.md` for full version compatibility matrix, installation commands, and alternatives considered.
+**Deliberately excluded:**
+- MSW: Over-engineering for ~10 API routes; pure business logic testable without network mocking; E2E covers the rest
+- Storybook: No component design system; ~5 reusable UI patterns does not justify the setup overhead
+- Jest: Slower than Vitest, requires babel transform for ESM; no advantage for this setup
+- Lighthouse CI: Single-developer project; Vercel Analytics monitors Core Web Vitals; manual Lighthouse sufficient
+- `@axe-core/react` dev runtime: Logs to browser console during development, not CI-compatible, noisy — same issues caught by `@axe-core/playwright`
 
 ### Expected Features
 
-The full feature dependency graph is documented in `.planning/research/FEATURES.md`. The dependency chain is critical: Doctor Schedule (Sanity) → Slot Generation → Calendar UI → Booking Creation → Confirmation Email / Account Page / Admin Dashboard. The schedule schema is the foundation of the entire system; nothing else can be built without it.
+The feature scope is entirely hardening — no new user-facing functionality. Priorities are derived from user impact (screen reader accessibility = healthcare access barrier) and risk (zero test coverage on core booking logic = no regression safety net).
 
-**Must have (table stakes — required for v2.0 launch):**
-- Doctor schedule schema in Sanity (weekday availability, slot duration, buffer time, blocked dates) — foundation dependency
-- Slot generation — server-side pure function, schedule rules minus existing bookings
-- Date picker + time slot grid — react-day-picker with Hungarian locale
-- Service selection linked to slot duration (different services take different amounts of time)
-- Patient auth — Google OAuth + email/password registration/login (Auth.js v5)
-- Booking creation — Sanity document with patient data, service, datetime, status
-- Booking confirmation email — immediate, on booking creation via Resend
-- Patient account page (`/fiokom`) — upcoming appointments, cancellation (with 24h window enforcement)
-- Pre-appointment reminder email — 24h before, via Vercel Cron with `reminderSent` flag
-- Admin dashboard (`/admin`) — today's appointments, week view, patient details, manual cancellation
-- Admin auth — separate credentials-only login (role in JWT, set from `ADMIN_EMAIL` env var)
-- Double-booking prevention — `ifRevisionID` optimistic locking at booking creation
+**Must have (v2.1 P1 — launch blockers):**
+- Vitest setup + unit tests for `generateAvailableSlots` (edge cases: blocked dates, bufferMinutes, maxDaysAhead, past dates, no schedule) — core booking logic with zero coverage
+- Unit tests for `isWithin24Hours()` with mocked `Date.now()` — boundary bug here causes data integrity issues for patients and admin
+- Unit tests for `BookingFormSchema` Zod validation — validates Hungarian error message correctness
+- Playwright setup + homepage smoke test — catches catastrophic SSR/Sanity regression on deploy
+- `aria-invalid` + `aria-describedby` on all Step4Confirm form inputs — WCAG 3.3.1/3.3.3; screen readers cannot identify errored fields without these
+- `role="alert"` on global error states (Step4Confirm, booking wizard 409 conflict, admin cancellation) — screen readers miss dynamically injected errors without a live region
+- `sizes` attribute on all `<Image>` components missing it — prevents oversized image downloads on mobile; direct LCP and CLS impact
+- Remove `"rescheduled"` from Sanity `bookingType.ts` status enum — orphan schema value that no route handler ever writes; causes developer confusion
+- `<html lang="hu">` verification in root layout — WCAG 2.1 Level A failure (SC 3.1.1) if missing; trivial fix
 
-**Should have (add after v2.0 validation):**
-- Reschedule flow — cancel old + create new atomically (Sanity transaction); high complexity, deferred
-- Buffer time configuration in Sanity Studio — add if doctor reports running late between appointments
-- Animated booking step transitions — Motion v12 already installed; add once core flow is stable
+**Should have (v2.1 P2 — meaningful improvement, tractable cost):**
+- E2E: booking wizard step-through with `page.route()` API stubs (avoids writing to production Sanity)
+- E2E: patient self-service cancel flow via `/foglalas/:token`
+- Focus management on wizard step transitions (delayed by animation duration + 50ms buffer to avoid conflict with AnimatePresence)
+- `role="grid"` + arrow key day navigation on calendar (must ship together — role without keyboard handler is a WCAG 4.1.2 violation)
+- `aria-live="polite"` on time slot loading region in Step2DateTime
+- `optimizePackageImports` in `next.config.ts` for `motion`, `sanity`, `next-sanity`
+- `noUnusedLocals: true` and `noUnusedParameters: true` in `tsconfig.json`
+- Consistent `ApiErrorResponse` shared type in `src/types/api.ts`, applied to all route handlers
 
-**Defer to v3+:**
-- SMS reminders — requires paid gateway, GDPR consent for SMS, carrier complexity
-- Waitlist / cancellation notification queue — complex for marginal gain at this volume
-- Payment / deposit at booking — Barion or Stripe, Hungarian tax receipts (bizonylat), refund flows
-- Google Calendar / iCal sync — explicitly excluded from v2.0
+**Defer to v3+ (P3 — useful but not time-sensitive):**
+- Knip full audit — run as a one-time cleanup pass when codebase drift is more significant
+- Bundle analyzer deep-dive with optimization follow-up — schedule before any v3 features add new heavy dependencies
+- Playwright test for admin dashboard cancellation flow
 
-**Anti-features (explicitly excluded):** Real-time WebSocket slot availability, multi-doctor scheduling, patient medical history in booking, EHR/EMR integration, recurring appointments, online prescription requests.
+**Anti-features (explicitly excluded):**
+- Full component test suite with React Testing Library — async Server Components cannot be unit-tested; RTL mocking overhead for Sanity + auth + Motion is enormous with low signal
+- 100% code coverage target — incentivises trivial tests while real logic goes untested; target critical paths instead
+- Lighthouse CI in every PR — adds noise; Vercel preview deployments already run Lighthouse; single-developer workflow
+- Migrating from Biome to ESLint for jsx-a11y — Biome v2 already handles the most common a11y rules; disrupts established tooling
 
 ### Architecture Approach
 
-The booking module is entirely additive — nothing in the existing codebase is deleted, and only two files are modified (the Sanity schema index and the revalidation webhook). The architecture is built around four route areas: the existing public routes (unchanged), the new `/idopontfoglalas` booking flow (public, requires auth only at confirmation step), the `/fiokom` patient account area (auth-gated), and the `(admin)` route group with its own layout (role-gated, completely separate shell from the public site). Auth.js v5 uses a mandatory split-config pattern: `auth.config.ts` for the Edge-safe middleware and `auth.ts` for the full Node.js instance. Slot availability is served by a `GET /api/booking/availability` Route Handler (not a Server Action — Server Actions are POST-only and cannot be polled). All mutations go through Server Actions with session verification inside each action, not just in middleware.
+The v2.1 architecture adds a three-layer test suite on top of the existing app without touching the production code structure. Unit tests (`__tests__/` at project root) cover pure functions directly imported from `src/lib/`. API route integration tests use `next-test-api-route-handler` (NTARH) to execute real route handlers with mocked external dependencies (Sanity, Better Auth, Gmail). E2E tests (`e2e/` at project root) run Playwright against a real Next.js server, covering the full async Server Component + Client Component + API Route stack together. Accessibility scans run inline with E2E tests via `@axe-core/playwright` — not as a separate test suite.
 
-**Major components:**
-1. **Sanity schemas** (`bookingType`, `doctorScheduleType`) — data contracts for the entire module; one singleton schedule document (template rules) + one booking document per appointment; individual time slots are generated as a pure function, NOT stored as Sanity documents
-2. **Auth layer** (`auth.config.ts`, `auth.ts`, `middleware.ts`) — mandatory split-config pattern; JWT sessions (no adapter); patient and admin roles distinguished via `role` field in JWT; admin role assigned only when email matches `ADMIN_EMAIL` env var
-3. **Slot generation** (`lib/booking/slots.ts`) — pure TypeScript function; takes schedule rules + existing bookings for a date → returns available time slots; testable in isolation with no Sanity dependency
-4. **Booking Server Actions** (`lib/actions/booking.actions.ts`) — `createBooking`, `cancelBooking`; all session-verified; `ifRevisionID` locking on per-slot Sanity document at write time; confirmation email sent synchronously within the action
-5. **BookingCalendar client component** — multi-step flow (service → date → time → confirm); polls `GET /api/booking/availability` for live slot state; all availability queries use `{ next: { revalidate: 0 } }` — never cached via ISR
-6. **Admin dashboard** (`(admin)/layout.tsx` + `admin/page.tsx`) — separate route group with its own layout shell (no public Header/Footer); role check in layout AND every page Server Component independently
-7. **Email system** (`lib/email.ts`) — Resend HTTP API; confirmation sent synchronously in `createBooking` Server Action; reminders via Vercel Cron daily job querying bookings in next 24-25h window, with `reminderSent` flag to prevent duplicates
+**Major components added:**
+1. `vitest.config.mts` — Vitest config with jsdom environment, `vite-tsconfig-paths` for `@/` alias resolution, and setup file for the `matchMedia` mock required by Motion v12
+2. `playwright.config.ts` — Playwright config with webServer, three projects (setup for admin auth, admin-chromium with storageState, public-chromium without auth), and `reuseExistingServer` for local dev
+3. `__tests__/lib/slots.test.ts` + `__tests__/lib/booking-email.test.ts` — pure function unit tests requiring zero mocks; test inputs and outputs only
+4. `__tests__/api/*.test.ts` — API route integration tests via NTARH with `vi.hoisted()` + `vi.mock()` for Sanity, Better Auth, and Gmail; test Zod validation, auth checks, business logic, and response shape
+5. `e2e/booking-flow.spec.ts` + `e2e/accessibility.spec.ts` — Playwright E2E covering booking wizard and axe WCAG scans on all major pages
+6. `e2e/auth/setup.ts` — Admin `storageState` setup; logs in once per CI run, saves cookies to `.admin-auth.json` (gitignored)
 
-See `.planning/research/ARCHITECTURE.md` for full project structure, code examples, and data flow diagrams.
+**Key patterns from architecture research:**
+- `vi.hoisted()` + `vi.mock()` before handler imports — required by Vitest's module hoisting; reverse order breaks mock injection
+- NTARH `testApiHandler` for all API route tests — direct `Request` construction fails because Next.js Route Handlers require internal context (`headers()`, `cookies()`) that NTARH provides
+- `page.route()` in Playwright for stubbing API responses in booking wizard E2E — avoids writing test booking documents to production Sanity
+- `await page.waitForLoadState('networkidle')` + optional `await page.waitForTimeout(500)` before axe scans — Motion animations must settle before axe runs to avoid false positives from mid-animation opacity states
+- Playwright `storageState` auth reuse — log in once in the `setup` project, load session file in tests requiring auth; eliminates per-test login overhead
 
 ### Critical Pitfalls
 
-Twelve pitfalls are documented in `.planning/research/PITFALLS.md`. The five that are CRITICAL must all be addressed before the first patient interaction:
+1. **Vitest cannot test async Server Components** — `async function Page()` components throw `Error: Objects are not valid as a React child` in jsdom. Establish the testing boundary on Day 1: Vitest for pure functions and synchronous client components; Playwright for everything that calls `sanityFetch()` or is an `async` component. No Vitest test file should ever import from `page.tsx` or `layout.tsx`.
 
-1. **Sanity eventual consistency — the double-booking trap** — GROQ queries for availability are eventually consistent. Two concurrent requests can both read "slot available" and both create a booking document, resulting in a real double-booked appointment. Prevention: model each time slot as a Sanity document with a `status` field; use `client.patch(slotId).set({ status: 'booked' }).ifRevisionID(slotRev).commit()` at booking creation; return HTTP 409 with Hungarian error message if slot taken. This is a Phase 1 schema decision — it cannot be retrofitted.
+2. **Motion v12 breaks jsdom tests with `window.matchMedia` missing** — Every component using `motion.div`, `AnimatePresence`, or `useReducedMotion` fails with `TypeError: window.matchMedia is not a function`. Add the `matchMedia` mock to `vitest.setup.ts` before writing the first component test. For tests focused on non-animation logic, mock `motion/react` entirely with `vi.mock()`.
 
-2. **GDPR compliance before first patient record** — Sign the Sanity Data Processing Agreement in Sanity account settings and complete a DPIA before any booking document is written. Build a patient erasure API (GROQ + batch delete). Store only name, email, phone — never health information. Set the Sanity dataset to private. Protect `/studio` with admin auth middleware.
+3. **Dead code removal can silently break Sanity queries** — TypeScript static analysis cannot see GROQ query strings. Before removing any Sanity field, schema type, or query export, run `grep -r "fieldName" src/` to find string references. Never hand-edit `sanity.types.ts` — run `npm run typegen` after schema changes. Run `npm run build` after every removal batch.
 
-3. **Auth.js v5 split-config for Edge middleware** — All auth in a single `auth.ts` crashes middleware on Vercel Edge runtime. `auth.config.ts` must be Edge-safe (no adapter, no database calls, no heavy imports); `middleware.ts` imports only `authConfig`. This error appears on Vercel but not in local development — easy to miss and expensive to debug.
+4. **Performance optimization can break Motion animations or worsen LCP** — Adding `loading="lazy"` to the hero doctor image (which already has `priority={true}`) removes the preload link and tanks LCP score. Changing `width`/`height` on `motion.div` elements using the `layout` prop causes animation jumps. Audit existing image configuration before applying any blanket rules; treat `IntroOverlay`, `CircleWipeLink`, and `ServicesSection AnimatePresence` containers as "do not change dimensions" zones.
 
-4. **Middleware-only route protection (CVE-2025-29927)** — Middleware is a UX redirect, not a security gate. Every protected Server Component and every Server Action must call `await auth()` and verify session independently. Admin routes must verify `session.user.role === "admin"` in the layout AND each page.
+5. **Accessibility focus management conflicts with `AnimatePresence` exit animations** — Moving focus to a new step element while the old element is still in its 250ms exit animation causes screen readers to announce disappearing content and breaks keyboard Tab order during the transition. Delay `focus()` calls by animation duration + 50ms (300ms total). Place `aria-live` regions outside `AnimatePresence` wrappers so they are always in the DOM regardless of step animation state.
 
-5. **Sanity write token in client bundle** — Any env var with `NEXT_PUBLIC_` prefix is compiled into the browser JavaScript bundle. The Sanity write token must be `SANITY_WRITE_TOKEN` (no `NEXT_PUBLIC_` prefix), imported only in files with `"use server"` directive. One mistake exposes write access to all Sanity content.
-
-Additional HIGH severity pitfalls: ISR cache on booking availability (must use `revalidate: 0`), Nodemailer SMTP blocked by Vercel (use Resend), plaintext password storage (must use bcryptjs with cost factor 12+), no `reminderSent` flag on bookings (causes duplicate reminder emails on every cron run), no rate limiting on booking and auth endpoints.
+6. **`CRON_SECRET` authorization check must never be removed** — The auth check in `/api/cron/reminders/route.ts` looks like defensive boilerplate that dead code tools might flag as "unreachable" or "unnecessary." Removing it makes the endpoint publicly callable by anyone. Verify this check remains intact after any dead code removal pass on the cron route.
 
 ## Implications for Roadmap
 
-The feature dependency graph and pitfall prevention requirements define a clear 6-phase structure. The ordering is driven by hard dependencies, not preference — phases cannot be reordered without creating blockers.
+Based on combined research, the v2.1 work divides naturally into four phases with clear dependency ordering. Testing infrastructure must come first because it creates the safety net that makes subsequent changes low-risk. Performance and dead code work are largely independent but benefit from the test suite being in place. Complex accessibility improvements depend on both the Playwright infrastructure (for axe verification) and on understanding the animation timing constraints first encountered in simpler fixes.
 
-### Phase 1: Data Foundation and GDPR Architecture
+### Phase 1: Test Infrastructure Foundation
+**Rationale:** Zero test coverage means every change in this milestone carries regression risk. The testing boundary (Vitest vs. Playwright) and setup details (matchMedia mock, tsconfig paths, NTARH, storageState) must be established before any test files are written — retrofitting them after tests exist means breaking and rewriting tests. The architecture research defines a clear four-step build order: Vitest config first, unit tests on pure functions second (no mocks, immediate value), API route integration tests third (NTARH + mocks), Playwright E2E fourth (real server required).
+**Delivers:** Vitest running with jsdom environment, matchMedia mock, and `@/` path resolution. Passing unit tests for `generateAvailableSlots`, `isWithin24Hours()`, and `BookingFormSchema`. Playwright configured with webServer, admin storageState setup, and public vs. admin test project split. Homepage smoke test passing.
+**Addresses:** All P1 unit test requirements. P1 Playwright setup. P2 booking wizard E2E and self-service E2E (can begin after Playwright is operational).
+**Avoids:** Testing async Server Components with Vitest (Pitfall 1). Motion matchMedia crash in jsdom (Pitfall 2). Playwright hitting production Sanity with test bookings (security pitfall from PITFALLS.md).
 
-**Rationale:** The Sanity schemas are the data contracts for the entire system. Nothing else can be built until the `doctorSchedule` and `booking` document types exist and TypeScript types are generated from them. More critically, the GDPR obligations (DPA, DPIA) must be satisfied before any patient data can enter the system — this is a legal prerequisite, not a technical nicety. The slot model decision (per-slot documents with `ifRevisionID`) is a Phase 1 architectural commitment that cannot be changed without a full data migration.
+### Phase 2: Core Accessibility Fixes
+**Rationale:** P1 accessibility fixes are low-complexity relative to the ARIA grid work but high-impact for screen reader users. `aria-invalid`/`aria-describedby` and `role="alert"` are mechanical additions that do not interact with animation code. Completing these before the calendar ARIA grid keeps each phase's scope tight and allows axe scans to verify the Phase 2 fixes before Phase 4 introduces more complex ARIA patterns.
+**Delivers:** WCAG 3.3.1/3.3.3 compliant booking form error states on all Step4Confirm inputs. `role="alert"` on global error containers in booking wizard and admin cancellation. `<html lang="hu">` confirmed in root layout. axe scans on key pages passing for all P2-addressed violations.
+**Addresses:** `aria-invalid` + `aria-describedby` on form inputs (P1). `role="alert"` on global errors (P1). Lang attribute (P1).
+**Avoids:** Overly aggressive `aria-live="assertive"` for non-error announcements (use `polite` for step transitions, `assertive` only for booking errors). Redundant announcements from multiple live regions. Adding `tabIndex` to `motion.div` wrappers (makes container focusable, breaks tab order).
 
-**Delivers:** Sanity schemas (`doctorSchedule` singleton, `booking` document); slot status document design; GROQ queries for schedule and bookings; Sanity write client (`writeClient.ts`, server-only with `import 'server-only'`); revalidation webhook updated for new types; GDPR DPA signed in Sanity account; DPIA documented; doctor populates initial schedule in Studio.
+### Phase 3: Performance Audit and Image Optimization
+**Rationale:** Performance work is independent of testing and accessibility phases. Running `@next/bundle-analyzer` first establishes a baseline and informs which `optimizePackageImports` entries are actually needed — do not add optimizations blindly. Image `sizes` fixes are the highest-value performance change with the lowest risk of regression. The AVIF + WebP format configuration in `next.config.ts` is a one-line addition.
+**Delivers:** All `<Image>` components with correct `sizes` attributes matching their CSS breakpoints. `formats: ['image/avif', 'image/webp']` in `next.config.ts`. `@next/bundle-analyzer` integrated and run once. `optimizePackageImports` for `motion`, `sanity`, `next-sanity` added after bundle analysis confirms they inflate the client bundle.
+**Addresses:** `sizes` attribute on all images (P1). `optimizePackageImports` config (P2). Bundle analyzer audit (P3 prerequisite for `optimizePackageImports`).
+**Avoids:** Adding `loading="lazy"` to images with `priority={true}` (Pitfall 4 — worsens LCP). Changing dimensions on Motion `layout` containers (Pitfall 4 — breaks animation). AVIF-only without WebP fallback (architecture anti-pattern 3 — breaks older Safari).
 
-**Addresses:** Doctor schedule definition (weekday availability, slot duration, break times, blocked dates), booking document structure, service-linked duration (add `appointmentDurationMinutes` to existing service schema).
-
-**Avoids:** Sanity eventual consistency / double-booking (per-slot document model committed before any booking code is written); GDPR violation before first patient record; write token exposure (write client established as server-only from day one).
-
-### Phase 2: Authentication
-
-**Rationale:** Auth gates all patient and admin routes. The split-config pattern must be established correctly here — retrofitting it later means touching every file that imports from auth. Role separation (patient vs. admin) must be codified before any role-gated routes exist. Password hashing pattern must be established before the first patient account can be created.
-
-**Delivers:** `auth.config.ts` (Edge-safe provider config: Google OAuth + Credentials, role callbacks), `auth.ts` (full JWT instance), `middleware.ts` (route protection for `/fiokom` and `/admin`), Auth.js API route handler, login page (`/bejelentkezes`), patient registration with bcryptjs password hashing (cost factor 12), Header updated with "Bejelentkezés" / "Fiókom" links.
-
-**Uses:** `next-auth@beta`, `bcryptjs`, `zod@^3.24` for Credentials form validation.
-
-**Avoids:** Auth.js v5 Edge split-config runtime crash; middleware-only protection (CVE-2025-29927 pattern); admin/patient role mixing (role set in JWT callback from `ADMIN_EMAIL` env var only); plaintext password storage.
-
-### Phase 3: Booking Core — Slot Generation, Calendar UI, Booking Creation
-
-**Rationale:** This is the heart of the module. With schemas (Phase 1) and auth (Phase 2) in place, the full booking flow can be built end-to-end: slot generation logic, the availability Route Handler, the multi-step calendar UI, and the booking Server Action. Confirmation email is included here because it fires synchronously inside the same Server Action that creates the booking — separating them would require a more complex event system and is unnecessary at this volume.
-
-**Delivers:** `lib/booking/slots.ts` (pure slot generation function, unit-tested in isolation), `GET /api/booking/availability` Route Handler (with `revalidate: 0`), `createBooking` Server Action (session verification + `ifRevisionID` locking + confirmation email), `BookingCalendar` multi-step client component (service → date → time → confirm), `/idopontfoglalas` page, `lib/email.ts` (Resend integration), booking confirmation email template in Hungarian.
-
-**Uses:** `react-day-picker` with `hu` locale, `resend`, `@react-email/components`.
-
-**Avoids:** ISR cache on availability data (`revalidate: 0` on all availability queries); Nodemailer SMTP (Resend from the start); double-booking (`ifRevisionID` in Server Action, 409 response with Hungarian error); Server Actions for read operations (Route Handler for GET availability).
-
-### Phase 4: Patient Account
-
-**Rationale:** After booking creation works, the patient needs to manage their appointments. This phase depends on auth (Phase 2) and booking documents (Phase 3). The 24-hour cancellation window must be enforced server-side in the `cancelBooking` action. Cancellation email is included here.
-
-**Delivers:** `/fiokom` patient dashboard (upcoming and past bookings via GROQ filtered by session email), `/fiokom/foglalas/[id]` booking detail with cancel action, `cancelBooking` Server Action (24h window enforcement, Sanity mutation, cancellation email via Resend).
-
-**Avoids:** Auth check only in middleware (each page Server Component verifies session independently); ISR on patient booking list (`revalidate: 0` for patient's bookings).
-
-### Phase 5: Admin Dashboard
-
-**Rationale:** The admin dashboard depends on booking documents (Phase 3) and role-based auth (Phase 2). It must be isolated in its own `(admin)` route group with a separate layout shell — this prevents the public site's layout (siteSettings fetch, Header, Footer, Motion animations, GA4) from loading unnecessarily on admin pages.
-
-**Delivers:** `(admin)/layout.tsx` (admin shell, role guard — redirects non-admin to `/bejelentkezes`), `/admin` page (today's appointments chronological list + week calendar view, always fresh data with `revalidate: 0`), `/admin/foglalas/[id]` booking detail with manual cancellation capability and admin-triggered cancellation email.
-
-**Avoids:** Admin dashboard sharing the public root layout (anti-pattern); role check only in layout (each page Server Component also checks `session.user.role === "admin"`); admin accessible to patients by URL navigation.
-
-### Phase 6: Reminder Emails and Cron
-
-**Rationale:** Reminder emails are functionally independent of all patient-facing features — they only require confirmed booking documents. They are placed last because Vercel Cron jobs can only be tested in production (they do not run in `next dev`). The `reminderSent` field added to the booking schema is a non-breaking addition.
-
-**Delivers:** `reminderSent: boolean` field added to `booking` Sanity schema, Vercel Cron job (`GET /api/cron/reminders` Route Handler secured with `CRON_SECRET`), `vercel.json` cron entry (daily at 08:00 Europe/Budapest), reminder email template in Hungarian, GROQ query for bookings in next 24-25h window where `!reminderSent`, `reminderSent: true` patch after sending.
-
-**Avoids:** Duplicate reminders on each cron run (`reminderSent` flag prevents re-sending); unauthenticated cron endpoint (`CRON_SECRET` header verification); incorrect cron granularity assumptions (daily on Vercel free tier, hourly on Pro — document which plan is in use).
+### Phase 4: Complex Accessibility and Dead Code Cleanup
+**Rationale:** Focus management and ARIA grid implementation are the most complex tasks in the milestone — they require careful coordination with Motion v12's AnimatePresence exit timing and must be manually verified with a screen reader. Placing them last means axe infrastructure (Phase 1) and simpler ARIA patterns (Phase 2) are fully operational as a baseline. Dead code removal is placed last because the Knip audit is most valuable when all intentional code additions for the milestone are complete, minimizing the risk of cleaning up code that another phase was about to write.
+**Delivers:** Focus management on wizard step transitions (delayed 300ms after AnimatePresence exit via setTimeout; `aria-live` region outside AnimatePresence for step announcements). `role="grid"` + arrow key day navigation on calendar (shipped together as WCAG 4.1.2 requires). `aria-live="polite"` on slot loading region in Step2DateTime. Knip audit completed and confirmed dead code removed. `"rescheduled"` status removed from Sanity `bookingType.ts` schema (with `npm run typegen` regeneration). `noUnusedLocals: true` + `noUnusedParameters: true` in `tsconfig.json`. `ApiErrorResponse` shared type created in `src/types/api.ts`.
+**Addresses:** Focus management on step transitions (P2). `role="grid"` + arrow keys (P2). `aria-live` on slot loading (P2). Remove `"rescheduled"` enum (P1 — simple, low-risk, placed here because it requires schema changes and typegen). Knip audit (P3). `noUnusedLocals`/`noUnusedParameters` (P2). `ApiErrorResponse` type (P2).
+**Avoids:** Moving focus before AnimatePresence exit completes (Pitfall 5 — causes screen reader double-announcement and broken keyboard flow). `role="grid"` without arrow key handler (WCAG 4.1.2 violation — role implies keyboard behavior that must be supported). Removing Sanity fields without grep audit (Pitfall 3). Removing `CRON_SECRET` check in cron route (Pitfall 6).
 
 ### Phase Ordering Rationale
 
-- Phase 1 before everything: Sanity schema TypeGen output is the type foundation all subsequent TypeScript code depends on. GDPR DPA must precede any patient data write — no exceptions.
-- Phase 2 before Phases 3-5: Auth is the security foundation. All protected routes require `await auth()` inside them — you cannot build the routes before auth exists.
-- Phase 3 before Phases 4-5: The booking document must exist before the patient account or admin dashboard can display anything meaningful.
-- Phases 4 and 5 are independent after Phase 3: Patient account and admin dashboard share no dependencies on each other; they can be built in either order or simultaneously.
-- Phase 6 last: Cron jobs require production deployment to test. All other features should be verified locally before addressing the one component that requires Vercel infrastructure.
+- **Testing first:** Test infrastructure is the safety net for every other change. Running without tests means accessibility fixes, image attribute changes, and dead code removal all carry silent regression risk.
+- **Simple accessibility before complex accessibility:** `aria-invalid`/`aria-describedby`/`role="alert"` carry zero animation interaction risk and validate immediately with axe. The ARIA grid + focus management work requires understanding animation timing constraints and must be manually verified with a screen reader — placing it last gives Phase 2 findings time to inform Phase 4's approach.
+- **Performance before dead code:** Bundle analysis may identify dependencies that the dead code phase should also evaluate. Completing performance work first avoids duplicate decision-making about the same large packages.
+- **Dead code last:** Irreversible. All intentional code additions for the milestone should be complete before determining what is genuinely unused — this prevents removing code that a later phase was about to modify.
 
 ### Research Flags
 
 Phases likely needing deeper research during planning:
+- **Phase 1 — Better Auth mock pattern for NTARH tests:** The general `vi.mock('@/lib/auth')` pattern is documented in ARCHITECTURE.md, but the exact session object shape returned by Better Auth v1.4.18's `auth.api.getSession()` must be confirmed against the actual `src/lib/auth.ts` before writing `booking.test.ts`. The community documentation for mocking Better Auth is sparse (LOW confidence per PITFALLS.md sources).
+- **Phase 4 — ARIA grid keyboard interaction:** The W3C APG grid pattern requires arrow key navigation, Home/End for first/last cell, and PageUp/PageDown for previous/next month. The full keyboard contract is well-specified but non-trivial to implement correctly with React state. Allocate time for manual keyboard testing with NVDA + Firefox (most common screen reader in Central Europe) before marking Phase 4 done.
 
-- **Phase 1:** The tension between the ARCHITECTURE.md recommendation (slots as a pure function, no slot documents) and the PITFALLS.md recommendation (per-slot status documents for `ifRevisionID` locking) needs to be resolved with a concrete implementation design before the schema is finalized. The recommended resolution: per-slot documents exist for the locking transaction, but the list of possible slots for a given day is computed as a pure function — slot documents are created on-demand when a slot is selected, not pre-generated for all future dates. This hybrid needs a design spike.
-- **Phase 2:** Auth.js v5 is still in beta (`5.0.0-beta.25+`). The exact Google OAuth callback URL configuration, session type augmentation TypeScript pattern, and `AUTH_*` env var naming (replaces `NEXTAUTH_*`) should be verified against the live `authjs.dev` docs at implementation time. Better Auth (`better-auth` package, which has native Sanity adapter support) should be noted as a documented fallback if Auth.js v5 beta stability causes problems.
-- **Phase 6:** Vercel Cron free-tier (daily) vs. Pro (hourly) limits should be confirmed at implementation time. If the practice is on Vercel Pro, hourly crons give ±1h reminder accuracy. If free tier, accuracy is ±24h — which may be acceptable for a "24 hours before" reminder but is a business decision that should be explicit.
-
-Phases with standard, well-documented patterns (can skip research-phase):
-
-- **Phase 3 (slot generation):** A pure function computing available slots from schedule rules is a well-understood algorithm. Iterate over the day's hours, subtract break windows, subtract existing bookings. No novel integration.
-- **Phase 4 (patient account):** Standard protected Server Component with GROQ filtered by session email. Documented cancellation patterns.
-- **Phase 5 (admin dashboard):** Standard route group pattern with role-based layout guard. Fully documented in Next.js official docs and ARCHITECTURE.md.
+Phases with standard patterns (skip research-phase):
+- **Phase 2:** `aria-invalid`, `aria-describedby`, `role="alert"` are fully specified in WCAG 2.1 SC 3.3.1/3.3.3 and have well-documented React implementation patterns. No additional research needed.
+- **Phase 3:** `@next/bundle-analyzer` configuration and `next/image` `sizes` patterns are documented in official Next.js docs. Full configuration snippets are provided in both STACK.md and ARCHITECTURE.md. No additional research needed.
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | MEDIUM-HIGH | Core libraries verified via npm and official docs. Auth.js v5 is beta — callback signatures and env var naming may shift before stable release. Zod v3 vs v4 compatibility confirmed against Sanity v4 build system. |
-| Features | HIGH | Table stakes verified against multiple scheduling platforms (Jane App, Acuity, Cliniko) and medical practice UX studies. GDPR requirements verified against EU guidance and Hungarian law (Act XLVII of 1997 on health data processing). |
-| Architecture | HIGH for patterns / MEDIUM for Auth.js specifics | Split-config pattern confirmed in Auth.js v5 official migration guide. Slot-generation-as-pure-function is a widely-used pattern. Some Auth.js v5 beta callback type signatures may shift before stable release. |
-| Pitfalls | MEDIUM-HIGH | Critical pitfalls verified against official sources: Sanity transaction docs (ifRevisionID), CVE-2025-29927 disclosure (multiple corroborating sources), Vercel SMTP KB. GDPR pitfalls confirmed via NAIH enforcement data and EU healthcare GDPR guidance. |
+| Stack | HIGH | All versions verified against npm registries and official docs as of 2026-02-23. Full version compatibility matrix in STACK.md. `@next/bundle-analyzer` version pin to `^15.x` is a confirmed requirement. |
+| Features | HIGH | P1/P2/P3 priorities derived from WCAG 2.1 spec (authoritative W3C), Next.js official testing guide (authoritative), and direct codebase inspection (first-party). Anti-feature rationale strongly supported by architecture constraints. |
+| Architecture | HIGH | Three-layer test strategy matches Next.js official guidance exactly. NTARH, storageState, and axe timing patterns backed by official Playwright and Next.js docs. Build order validated against hard dependency chain. |
+| Pitfalls | HIGH for most / MEDIUM for Better Auth mocking | Critical pitfalls (async Server Component limitation, matchMedia, CRON_SECRET, AnimatePresence focus timing) verified against official docs and direct codebase inspection. Better Auth mocking pattern has LOW community documentation — needs validation at implementation time. |
 
-**Overall confidence:** MEDIUM-HIGH
+**Overall confidence:** HIGH
 
 ### Gaps to Address
 
-- **Slot document model vs. computed availability:** ARCHITECTURE.md recommends computing slots as a pure function (no slot documents stored in Sanity). PITFALLS.md requires per-slot documents for `ifRevisionID` optimistic locking. These are in tension. The recommended resolution — per-slot documents created on-demand at booking confirmation time, not pre-generated — needs to be explicitly designed in Phase 1 before any booking code is written.
-- **Auth.js v5 beta stability:** The exact API surface (callback signatures, session type augmentation, AUTH_ env var names) should be spot-checked against the live authjs.dev docs at the start of Phase 2. Better Auth should be evaluated and documented as the confirmed fallback before Phase 2 begins.
-- **Sanity dataset privacy:** Confirm the Morocz Sanity dataset is set to "private" (not "public") before Phase 1 schema work begins. If currently public, any GROQ query from the browser can enumerate all documents — this must be verified before any patient document type is added.
-- **Resend domain verification:** SPF, DKIM, and DMARC DNS records must be configured for the sending domain before Phase 3 email testing. This is a DNS infrastructure task that should be scheduled during Phase 3, not discovered at email go-live.
-- **Sanity Studio auth protection:** The Studio at `/studio` must be protected by admin auth middleware before any patient booking documents exist in the system. This is a Phase 1/Phase 2 boundary task that must not be deferred.
+- **Better Auth mock pattern for API route tests:** Limited community documentation for mocking Better Auth v1.4.18 session in NTARH integration tests. The session object shape (what `auth.api.getSession()` returns) must be confirmed against `src/lib/auth.ts` at the start of Phase 1 before writing integration tests. If the standard `vi.mock('@/lib/auth')` pattern proves insufficient, consider using Playwright for the booking creation flow coverage instead of NTARH.
+- **Sanity image double-processing:** PITFALLS.md notes that passing Sanity CDN URLs through `next/image` causes double-processing (Sanity CDN transforms + Next.js Vercel image optimizer). ARCHITECTURE.md provides a `SanityImage` component pattern using `@sanity/asset-utils`. Verify at Phase 3 implementation time whether the current codebase uses this pattern or raw `urlFor()` URLs — the fix differs in each case.
+- **Hungarian screen reader behavior:** WCAG compliance with Hungarian date/time formatting must be verified manually with NVDA + Firefox. Time slot labels like "14:30" and date announcements may be rendered unexpectedly in Hungarian by screen readers. This cannot be automated with axe — schedule a manual screen reader session after Phase 4 completes.
+- **IntroOverlay and CircleWipeLink test coverage:** These components use `sessionStorage`, `document.createPortal`, `usePathname`, `useRouter`, and `useReducedMotion` simultaneously — they are untestable with Vitest without mocking out all meaning from the tests. The correct approach is Playwright E2E: verify intro overlay appears on first visit (clean sessionStorage), skips on second visit; verify circle wipe plays and navigation occurs. Plan this in Phase 1 alongside the other E2E work.
 
 ## Sources
 
 ### Primary (HIGH confidence)
-- Auth.js v5 official migration guide — https://authjs.dev/getting-started/migrating-to-v5 — edge split-config, JWT strategy, AUTH_ env vars
-- Auth.js v5 edge compatibility guide — https://authjs.dev/guides/edge-compatibility
-- CVE-2025-29927 — https://www.offsec.com/blog/cve-2025-29927/ — middleware-only auth bypass, defense-in-depth requirement
-- Sanity Transactions official docs — https://www.sanity.io/docs/content-lake/transactions — ifRevisionID optimistic locking, eventual consistency in GROQ-based mutations
-- Sanity Security and GDPR — https://www.sanity.io/security — DPA available, customer is data controller
-- Vercel SMTP restrictions KB — https://vercel.com/kb/guide/sending-emails-from-an-application-on-vercel — SMTP blocked, Resend recommended
-- Vercel Cron Jobs — https://vercel.com/docs/cron-jobs — daily limit (free tier), hourly (Pro)
-- react-day-picker v9 React 19 compatibility — https://github.com/gpbl/react-day-picker/issues/2665
-- react-day-picker Hungarian locale — https://daypicker.dev/localization/changing-locale
-- Resend pricing / free tier — https://resend.com/pricing (3,000 emails/month)
-- React Email 5.0 React 19 support — https://resend.com/blog/react-email-5
-- Next.js route groups — https://nextjs.org/docs/app/api-reference/file-conventions/route-groups
-- Next.js Server Actions vs Route Handlers — https://nextjs.org/docs/app/building-your-application/data-fetching/server-actions-and-mutations
+- Next.js Testing Guide — Vitest (official, updated 2026-02-20): https://nextjs.org/docs/app/guides/testing/vitest
+- Next.js Testing Guide — Playwright (official): https://nextjs.org/docs/app/guides/testing/playwright
+- Next.js Image Optimization — `sizes`, `priority`, `formats` (official): https://nextjs.org/docs/app/api-reference/components/image
+- Next.js Package Bundling Guide — `optimizePackageImports` (official): https://nextjs.org/docs/app/guides/package-bundling
+- ARIA Grid Pattern — W3C APG: https://www.w3.org/WAI/ARIA/apg/patterns/grid/
+- ARIA Date Picker Dialog Pattern — W3C APG: https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/examples/datepicker-dialog/
+- Playwright accessibility testing with @axe-core/playwright (official): https://playwright.dev/docs/accessibility-testing
+- Playwright authentication storageState (official): https://playwright.dev/docs/auth
+- next-test-api-route-handler — App Router support since v4.0.0: https://github.com/Xunnamius/next-test-api-route-handler
+- Vitest 4.0 release notes: https://vitest.dev/blog/vitest-4
+- Knip 5.85.0 + Next.js plugin: https://knip.dev/reference/plugins/next
+- @axe-core/playwright v4.11.1 on npm (published 2026-02-07): https://www.npmjs.com/package/@axe-core/playwright
+- HHS Accessibility Rule May 2026 — healthcare site WCAG 2.1 AA legal requirement: https://www.mwe.com/insights/may-2026-deadline-hhs-imposes-accessibility-standards-for-healthcare-company-websites-mobile-apps-kiosks/
+- Optimizing Core Web Vitals — Vercel KB: https://vercel.com/kb/guide/optimizing-core-web-vitals-in-2024
+- Direct codebase inspection (first-party): `src/lib/slots.ts`, `src/components/motion/IntroOverlay.tsx`, `src/components/motion/CircleWipeLink.tsx`, `src/components/booking/BookingWizard.tsx`, `src/app/api/cron/reminders/route.ts`, `src/sanity/schemas/bookingType.ts`
 
 ### Secondary (MEDIUM confidence)
-- GDPR for healthcare — sprinto.com, gdprlocal.com — DPIA requirement, Article 6(1)(b) legal basis for appointment bookings
-- Hungary GDPR enforcement (NAIH) — cms.law — healthcare sector focus, right-to-erasure enforcement in 2025
-- Act XLVII of 1997 on Hungarian health data processing — cms.law expert guide
-- Acuity Scheduling — double-booking prevention, cancellation policy best practices, buffer time standard
-- Jane App — service-linked slot duration, buffer time between appointments (standard medical scheduling features)
-- Zod 3 vs 4 ESM compatibility — zod.dev/v4, npm package registry
-- bcryptjs edge runtime safety — github.com/vercel/next.js/issues/69002
-- Auth.js v5 Credentials + Next.js 15 practitioner guide — codevoweb.com
-- Europe/Budapest DST schedule — timeanddate.com (UTC+1 CET winter, UTC+2 CEST summer; transitions last Sunday March/October)
+- Mock `window.matchMedia` in Vitest: https://rebeccamdeprey.com/blog/mock-windowmatchmedia-in-vitest
+- jsdom-testing-mocks (matchMedia mock for AnimatePresence): https://www.npmjs.com/package/jsdom-testing-mocks
+- Mocking Framer Motion / Motion v12 with vi.mock: https://www.hectane.com/blog/mock-framer-motion-with-jest
+- Sanity + next/image integration pitfalls (January 2026): https://medium.com/@drazen.bebic/image-optimization-with-next-js-and-sanity-io-6956b9ceae4f
+- WCAG 2.2 Complete Guide — AllAccessible: https://www.allaccessible.org/blog/wcag-22-complete-guide-2025
+- Healthcare Website Accessibility obligations — AllAccessible: https://www.allaccessible.org/blog/healthcare-website-accessibility-hipaa-ada-compliance
+- Core Web Vitals Optimization Next.js 15 — makersden.io: https://makersden.io/blog/optimize-web-vitals-in-nextjs-2025
+- Knip dead code detection comparison — Level Up Coding: https://levelup.gitconnected.com/dead-code-detection-in-typescript-projects-why-we-chose-knip-over-ts-prune-8feea827da35
+- Biome v2 test domain — Vitest auto-detection: https://biomejs.dev/linter/domains/
+- Tailwind v4 CSS-first approach and PurgeCSS incompatibility: https://github.com/tailwindlabs/tailwindcss/discussions/16634
+- Vitest vs Jest 2026 benchmark: https://www.sitepoint.com/vitest-vs-jest-2026-migration-benchmark/
 
-### Tertiary (LOW confidence — validate at implementation)
-- Better Auth as fallback to Auth.js v5 — community reports of native Sanity adapter support; verify directly at implementation time if Auth.js v5 beta causes problems
-- Inngest as Vercel Cron upgrade path — npm package page, free tier 50k executions/month; not needed for v2.0 but documented as upgrade path
+### Tertiary (LOW confidence)
+- How to mock Better Auth with MSW — GitHub Discussion (sparse community documentation; Better Auth mocking for NTARH needs validation at implementation time): https://github.com/better-auth/better-auth/discussions/4230
 
 ---
-*Research completed: 2026-02-22*
+*Research completed: 2026-02-23*
 *Ready for roadmap: yes*

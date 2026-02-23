@@ -1,117 +1,250 @@
 # Stack Research
 
-**Domain:** Medical practice appointment booking module (auth + calendar UI + email + admin dashboard)
-**Researched:** 2026-02-22
-**Confidence:** MEDIUM-HIGH — core libraries verified via WebSearch with official npm/docs cross-check; Auth.js v5 still beta so some details flagged as MEDIUM
+**Domain:** Testing, performance, accessibility, and code quality hardening for a Next.js 15 + Sanity v4 + Vercel medical practice site
+**Researched:** 2026-02-23
+**Confidence:** HIGH — all versions verified against npm registries and official docs (Feb 2026)
 
 ---
 
-## Existing Stack (Locked — Do Not Change)
+## Context: What Already Exists (Do Not Change)
 
 | Technology | Version | Notes |
 |------------|---------|-------|
-| Next.js | ^15.2.0 | App Router; actual project version, NOT 16 |
+| Next.js | ^15.2.0 | App Router, Turbopack dev |
 | React | ^19.0.0 | Bundled with Next.js |
-| Tailwind CSS | ^4.0.0 | CSS-first via @theme |
+| Tailwind CSS | ^4.0.0 | CSS-first |
 | Sanity | ^4.22.0 | CMS + embedded Studio |
-| next-sanity | ^11.6.12 | Sanity toolkit |
+| Better Auth | ^1.4.18 | Google OAuth + email/password |
+| Drizzle ORM | ^0.45.1 | Auth sessions + cron audit log |
 | Motion | ^12.34.2 | Animations |
-| Biome | ^2.4.2 | Linting |
-| Vercel | — | Deployment |
+| Biome | ^2.4.2 | Linting + formatting (CSS linting disabled) |
+| Zod | ^3.25.76 | Schema validation (v3 required for Sanity compatibility) |
+| Vercel | — | Deployment + Cron |
 
-**Note on version discrepancy:** The existing project package.json shows Next.js ^15.2.0 and Sanity ^4.22.0, not the v16/v5 versions researched for v1. Research proceeds against the **actual installed versions**. All library compatibility verified for Next.js 15 + React 19 + Sanity v4.
+Biome already handles `noUnusedImports` (warn) and `noUnusedVariables`. This narrows the dead-code tooling gap to file-level and dependency-level detection.
 
 ---
 
 ## Recommended Stack Additions
 
-### Authentication — Patient Auth
+### Testing — Unit + Component
 
 | Technology | Version | Purpose | Why Recommended |
 |------------|---------|---------|-----------------|
-| next-auth | @beta (~5.0.0-beta.25+) | Auth.js v5 for Next.js | Only auth library with first-class Next.js 15 App Router support. Single `auth()` function works in Server Components, Server Actions, Route Handlers, and middleware. Supports Google OAuth + Credentials in one config. JWT session strategy (no database adapter needed for stateless sessions). |
-| bcryptjs | ^2.4.3 | Password hashing | bcryptjs (pure JS) works in all runtimes including Vercel Edge. Standard `bcrypt` (native bindings) crashes in middleware and some edge contexts. Note: bcryptjs maintenance is limited (last update ~2020) but it is the only practical option for edge-compatible bcrypt on Vercel. Use only in server-side code (Server Actions, Route Handlers). |
+| vitest | ^4.0.18 | Test runner | Officially supported by Next.js 15 (see nextjs.org/docs/app/guides/testing/vitest updated 2026-02-20). Faster than Jest in CI (benchmarks show 3-28x speedup). Uses Vite internally but works alongside Next.js's own Webpack bundler — Vite is installed as a peer dependency of vitest and does not replace Next.js's build. Compatible with React 19. Node >=20 required (already met on Vercel). |
+| @vitejs/plugin-react | ^5.1.4 | React transform for Vitest | Required by Vitest to process JSX/TSX in test files. Does not affect Next.js build pipeline. |
+| @testing-library/react | ^16.x | Component testing utilities | Standard React testing companion. Vitest-compatible (Jest-compatible API). Tests components via user-visible behavior, not implementation. React 19 compatible. |
+| @testing-library/dom | ^10.x | DOM query utilities | Peer dependency of @testing-library/react. Required for `screen`, `getByRole`, etc. |
+| @testing-library/jest-dom | ^6.9.1 | Custom DOM matchers | Adds `toBeInTheDocument()`, `toHaveTextContent()`, etc. Works with Vitest despite the "jest" name — Vitest's Jest-compatible API accepts all jest-dom matchers. |
+| jsdom | ^25.x | Browser DOM simulation | Vitest test environment for component rendering. Simulates browser APIs without a real browser. Lighter than happy-dom for React component testing. |
+| vite-tsconfig-paths | ^5.x | TypeScript path alias resolution | Required so Vitest resolves `@/components/...` aliases from tsconfig.json. Without it, all tests will fail with module-not-found errors on path aliases. |
 
-**Auth strategy decision:**
-- **No Sanity adapter for Auth.js v5.** The `next-auth-sanity` package (v1.5.3, last published 2023) is incompatible with Auth.js v5. There is no official `@auth/sanity-adapter`. Strategy: use Auth.js v5 with `strategy: "jwt"` (stateless JWT sessions — no database adapter required). User accounts are stored as Sanity documents directly via write token in Server Actions.
-- **Patient session data** lives in signed JWTs (name, email, Sanity patient document `_id`). No separate session table needed.
-- **Admin dashboard auth** uses the same Auth.js v5 Credentials provider with a hardcoded single admin email/password (environment variables). Admin role distinguished via a `role: "admin"` field in the JWT.
+**Critical limitation:** Vitest cannot test async React Server Components (the `async function Page()` pattern used throughout this codebase). Server Component unit tests require awaiting the component manually or wrapping in a non-async shell. The official Next.js guidance is: use Vitest for synchronous Client Components and pure utility functions; use Playwright E2E for async Server Component behavior.
 
-### Booking Calendar UI
+**What to unit test with Vitest:**
+- Slot generation logic (`src/lib/slots.ts` or equivalent) — pure functions, no RSC
+- Date/time utilities (DST handling, reminder window calculations)
+- Booking validation schemas (Zod schemas)
+- Client Components in isolation (BookingWizard steps, StepIndicator, form inputs)
+- API route handler logic (by importing and calling the handler function directly with mocked Request objects)
 
-| Technology | Version | Purpose | Why Recommended |
-|------------|---------|---------|-----------------|
-| react-day-picker | ^9.13.2 | Date picker calendar component | Headless, unstyled by default — renders cleanly with Tailwind v4. Zero opinions on UI. Supports disabling dates (booked slots, doctor's blocked dates). Built-in Hungarian locale via `react-day-picker/locale` (`hu` export). date-fns is bundled as a dependency in v9 (no separate install). Widely used (3,700+ npm dependents), actively maintained, React 19 compatible. |
+**What to test with Playwright instead:**
+- Full booking flow (Step 1 → Step 4 → confirmation)
+- Admin login and dashboard interactions
+- Cancel/reschedule via token link
+- GDPR consent checkbox enforcement
 
-**Why not alternatives:**
-- Mobiscroll: commercial license, not open source
-- react-datepicker: older, heavier, styled by default (harder to match Morocz design)
-- DayPilot: overkill for slot picker, not well-suited for custom UI
-- shadcn/ui Calendar: uses react-day-picker under the hood anyway; adding shadcn just for Calendar adds Radix UI overhead and conflicts with Tailwind v4 CSS-first approach
+---
 
-### Email Sending
-
-| Technology | Version | Purpose | Why Recommended |
-|------------|---------|---------|-----------------|
-| resend | ^4.x (latest ~4.0+) | Transactional email API | Free tier: 3,000 emails/month — more than sufficient for a single-doctor practice. Official Next.js App Router example + Server Action integration. React Email built by same team, seamless integration. Simple API: `resend.emails.send({...})`. No SMTP config needed. |
-| @react-email/components | ^1.0.8 | React component library for emails | Build confirmation and reminder emails as React components with inline styles (email-safe rendering). Works with Resend's `react` field for template rendering. Zero-config: render HTML from JSX components. |
-
-**Note on react-email package:** The `react-email` package (v5.2.8) is for the dev preview server (run `npx react-email dev`). In production code, only `@react-email/components` is imported — `resend` calls its `render()` function server-side. Do not import `react-email` in app code.
-
-### Scheduled Email Reminders
+### Testing — End-to-End
 
 | Technology | Version | Purpose | Why Recommended |
 |------------|---------|---------|-----------------|
-| inngest | ^3.52.3 | Background job orchestration for scheduled reminders | Vercel cron jobs can trigger reminder emails (e.g., 24h before appointment) but have no retry logic and no state. Inngest provides durable execution, retries, and scheduling with a free tier of 50k executions/month — well within a medical practice's volume. Vercel marketplace integration makes deployment zero-config. Standard Schema support added in Sep 2025 (Zod 4 compatible). |
+| @playwright/test | ^1.58.2 | E2E browser testing | Official Next.js E2E testing recommendation (nextjs.org/docs/app/guides/testing/playwright). Tests run against the real running app, so async Server Components, Sanity data fetching, and Better Auth all work correctly. Supports multiple browsers (Chromium, Firefox, WebKit). Page Object Model pattern scales well. Vercel preview URL testing supported via `baseURL` env var. |
+| @axe-core/playwright | ^4.11.1 | Accessibility scanning in E2E tests | Deque's official Playwright integration for axe-core. Scans pages for WCAG 2.1 AA violations within existing Playwright tests. `AxeBuilder.analyze()` returns violations with element selectors, severity, and fix guidance. Catches ~57% of WCAG issues automatically. Does not require separate accessibility test files — add `axeBuilder.analyze()` assertions to existing E2E tests. |
 
-**Alternative — Vercel Cron Jobs only:**
-- Vercel cron can run a function on a schedule (e.g., every hour, check appointments due tomorrow, send emails)
-- Simpler to implement than Inngest: just a `vercel.json` cron entry + a Route Handler
-- No SDK or extra dependency
-- Acceptable for low volume (< 50 appointments/day)
-- **Recommended approach for v2.0:** Start with Vercel Cron + Resend (simpler). Add Inngest only if retry logic or complex workflow steps (e.g., send → wait → check if cancelled → send reminder) become needed.
+**Playwright scope for this project:**
+- Happy-path booking flow with real (or seeded) slot data
+- Admin calendar view loads and displays bookings
+- Cancel flow via `/foglalas/[token]` page
+- Accessibility scans on: homepage, booking wizard, foglalas management page, admin dashboard
+- Run against `localhost:3000` in CI; optionally against Vercel preview URLs
 
-**Decision:** Use **Vercel Cron Jobs** (no extra package) for v2.0. Inngest is noted as the upgrade path if scheduling complexity grows.
+---
 
-### Form Validation
+### Dead Code Detection
 
 | Technology | Version | Purpose | Why Recommended |
 |------------|---------|---------|-----------------|
-| zod | ^3.24.x | Schema validation for booking forms and server actions | Zod 4 (latest 4.3.6) is ESM-only and may cause issues with Sanity's CommonJS-compatible ecosystem. Use **Zod 3** (`^3.24`) for compatibility. Shared schema between client-side validation and server-side Server Action validation. Standard pattern in Next.js 15 App Router ecosystem. |
+| knip | ^5.85.0 | Unused files, exports, and dependencies | Biome already catches unused imports within a file. Knip adds the missing layer: finds orphan files never imported by any entry point, unused named exports across module boundaries, and `package.json` dependencies that are installed but never imported. Has a built-in Next.js plugin (auto-enabled when `next` is in dependencies) that understands App Router entry conventions (`page.tsx`, `layout.tsx`, `route.ts`, `error.tsx`, etc.) so it does not false-positive on Next.js special files. Run as a one-time audit, not in CI watch mode. |
 
-**Note on Zod v4:** Zod 4 was released in 2025 and is ESM-only. Sanity v4 uses CommonJS internally. To avoid module compatibility issues, pin to Zod 3 (`^3.24.x`). Reassess when Sanity v5 is adopted.
+**What Knip will find that Biome misses:**
+- Sanity schema files that are imported in `sanity.config.ts` but have no corresponding page or component using their type
+- Orphan route files left over from iteration (e.g., `/api/booking-cancel` vs `/api/admin/booking-cancel` — two cancel endpoints that may overlap)
+- `package.json` devDependencies that were added during development but are no longer referenced
 
-### Supporting Utilities
+**Knip configuration notes:**
+- The Next.js plugin auto-detects `src/app` structure — no manual entry point configuration needed
+- Sanity schema files will need to be listed in `knip.json` as entry points (Sanity config imports them dynamically) or added to the ignore list to avoid false positives
+- Biome config, Drizzle config, and Sanity CLI config are auto-detected as entry points by their respective plugins
 
-| Library | Version | Purpose | When to Use |
-|---------|---------|---------|-------------|
-| date-fns | bundled with react-day-picker v9 | Date manipulation and formatting | Bundled by react-day-picker v9 — do not install separately unless you need additional functions not exposed by react-day-picker. If needed directly: `npm install date-fns@^4.1.0` but only after verifying ESM compatibility with Sanity v4 build. |
+---
+
+### Performance Analysis
+
+| Technology | Version | Purpose | Why Recommended |
+|------------|---------|---------|-----------------|
+| @next/bundle-analyzer | ^15.2.0 (match Next.js version) | JavaScript bundle visualization | Official Next.js plugin. Wraps webpack-bundle-analyzer to generate interactive treemaps of client, server, and edge bundles. Run once (`ANALYZE=true npm run build`) to identify bloated imports. Pin to same version as `next` to avoid compatibility issues. Pinned to 15.x not 16.x because the project uses Next.js 15. |
+
+**What to look for in bundle analysis for this project:**
+- `googleapis` (Gmail API) — verify it's server-only and not leaking into client bundle (it's large)
+- `motion` (Motion v12) — check client bundle size; lazy load animation components if large
+- `sanity` — studio code must not appear in public-facing client bundles
+- Third-party auth redirect scripts from Better Auth
+
+**No additional performance tooling needed at this scale.** Vercel Analytics (already available on Vercel) provides real-user Core Web Vitals data. Lighthouse can be run manually via Chrome DevTools. Lighthouse CI (a separate npm package) adds complexity without meaningful benefit for a single-doctor site with no regression risk from a team of many contributors.
+
+---
+
+### Accessibility
+
+No new npm packages needed beyond `@axe-core/playwright` (listed above). The accessibility workflow is:
+
+1. `@axe-core/playwright` in E2E tests catches automated WCAG violations
+2. Manual keyboard navigation audit (Tab, Enter, Escape, arrow keys on booking wizard)
+3. Manual screen reader check with NVDA (free, Windows) or VoiceOver (macOS)
+4. Biome's existing rules catch some a11y anti-patterns (e.g., `noBlankTarget` for links)
+
+**Avoid `@axe-core/react`:** The `@axe-core/react` package injects into the React render cycle and logs to the browser console during development. It is noisy (catches same issues as Playwright), does not integrate with CI, and adds a development-only import that must be carefully guarded. The Playwright integration is cleaner and CI-compatible.
 
 ---
 
 ## Installation
 
 ```bash
-# Authentication
-npm install next-auth@beta bcryptjs
-npm install -D @types/bcryptjs
+# Unit testing
+npm install -D vitest @vitejs/plugin-react @testing-library/react @testing-library/dom @testing-library/jest-dom jsdom vite-tsconfig-paths
 
-# Booking calendar UI
-npm install react-day-picker
+# E2E testing + accessibility
+npm install -D @playwright/test @axe-core/playwright
+npx playwright install --with-deps chromium
 
-# Email — production sending
-npm install resend @react-email/components
+# Dead code detection
+npm install -D knip
 
-# Form validation
-npm install zod@^3.24
-
-# Dev: email template preview (not imported in app code)
-npm install -D react-email
+# Bundle analysis
+npm install -D @next/bundle-analyzer
 ```
 
-**No additional install needed:**
-- Vercel Cron Jobs: configured via `vercel.json`, no npm package
-- date-fns: bundled inside react-day-picker v9
+---
+
+## Configuration Snippets
+
+### vitest.config.mts
+
+```typescript
+import { defineConfig } from "vitest/config";
+import react from "@vitejs/plugin-react";
+import tsconfigPaths from "vite-tsconfig-paths";
+
+export default defineConfig({
+  plugins: [tsconfigPaths(), react()],
+  test: {
+    environment: "jsdom",
+    setupFiles: ["./src/test/setup.ts"],
+    globals: true,
+  },
+});
+```
+
+### src/test/setup.ts
+
+```typescript
+import "@testing-library/jest-dom";
+```
+
+### playwright.config.ts
+
+```typescript
+import { defineConfig, devices } from "@playwright/test";
+
+export default defineConfig({
+  testDir: "./e2e",
+  fullyParallel: true,
+  forbidOnly: !!process.env.CI,
+  retries: process.env.CI ? 2 : 0,
+  workers: process.env.CI ? 1 : undefined,
+  reporter: "html",
+  use: {
+    baseURL: process.env.BASE_URL || "http://localhost:3000",
+    trace: "on-first-retry",
+  },
+  projects: [
+    { name: "chromium", use: { ...devices["Desktop Chrome"] } },
+  ],
+  webServer: {
+    command: "npm run dev",
+    url: "http://localhost:3000",
+    reuseExistingServer: !process.env.CI,
+  },
+});
+```
+
+### knip.json
+
+```json
+{
+  "$schema": "https://unpkg.com/knip@latest/schema.json",
+  "entry": [
+    "sanity.config.ts",
+    "sanity.cli.ts",
+    "drizzle.config.ts",
+    "middleware.ts",
+    "src/sanity/schemas/**/*.ts"
+  ],
+  "ignore": [
+    "animations/**",
+    "home_design/**",
+    "scripts/**"
+  ]
+}
+```
+
+### next.config.ts with bundle analyzer
+
+```typescript
+import type { NextConfig } from "next";
+import bundleAnalyzer from "@next/bundle-analyzer";
+
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === "true",
+});
+
+const nextConfig: NextConfig = {
+  images: {
+    remotePatterns: [
+      { protocol: "https", hostname: "cdn.sanity.io" },
+    ],
+  },
+};
+
+export default withBundleAnalyzer(nextConfig);
+```
+
+### package.json scripts to add
+
+```json
+{
+  "scripts": {
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "analyze": "ANALYZE=true next build",
+    "knip": "knip"
+  }
+}
+```
 
 ---
 
@@ -119,81 +252,25 @@ npm install -D react-email
 
 | Recommended | Alternative | When to Use Alternative |
 |-------------|-------------|-------------------------|
-| next-auth@beta (Auth.js v5) | Clerk | Clerk is faster to integrate (hosted UI) but costs $25+/month for >10k MAU and adds an external vendor dependency. Auth.js v5 is free, self-hosted, and keeps patient data in Sanity. Use Clerk if auth complexity becomes unmanageable or if the practice scales significantly. |
-| next-auth@beta (Auth.js v5) | Better Auth | Better Auth is a newer, stable alternative gaining traction in 2025-2026. It has native Sanity adapter support and may be worth evaluating if Auth.js v5 beta instability causes problems during development. MEDIUM confidence. |
-| bcryptjs | bcrypt (native) | Use native `bcrypt` only if you switch to Node.js middleware (available experimentally in Next.js 15.2+) and are NOT on Vercel Edge. For Vercel, bcryptjs is the safe choice. |
-| react-day-picker | flatpickr / Pikaday | Vanilla JS calendar libraries — harder to integrate with React state and Tailwind. No React 19 support. Avoid. |
-| resend | SendGrid | SendGrid works but has a more complex API and the free tier (100/day) is tighter. Resend's free tier (3,000/month) is more generous for a medical practice. |
-| resend | Nodemailer + SMTP | Requires managing SMTP credentials and an email provider. More moving parts, harder to debug delivery. Resend abstracts all of this. |
-| zod@^3.24 | zod@^4.x | Only upgrade to Zod 4 after Sanity v5 migration (v5 supports ESM natively). |
-| Vercel Cron | Inngest | Use Inngest if scheduling logic becomes complex (multi-step workflows, conditional sends, retry on failure). For v2.0 with simple "send reminder 24h before appointment" logic, Vercel Cron is sufficient and adds zero dependencies. |
+| Vitest ^4.0.18 | Jest | Jest remains the Next.js default if you use `create-next-app` with Jest template. No advantage over Vitest for a new test setup on this project — Vitest is faster, ESM-native, and officially supported. Avoid Jest here. |
+| @playwright/test | Cypress | Cypress has excellent DX for interactive debugging but is slower in CI, does not support multi-browser testing on free tier, and has weaker network interception for testing auth flows. Playwright is the Next.js official recommendation. |
+| @axe-core/playwright | axe-playwright (third-party) | `axe-playwright` is a community wrapper vs `@axe-core/playwright` which is Deque's official package. Use the official Deque package. |
+| knip | depcheck | depcheck only checks package.json dependencies, not unused exports or orphan files. Knip is a strict superset of what depcheck offers. |
+| @next/bundle-analyzer | webpack-bundle-analyzer directly | @next/bundle-analyzer wraps webpack-bundle-analyzer with correct Next.js integration. Using webpack-bundle-analyzer directly requires manual configuration that Next.js's plugin handles automatically. |
+| Manual Lighthouse | Lighthouse CI (LHCI) | Lighthouse CI adds a server, GitHub Action, and assertion configuration. For a single-developer medical site with no weekly releases from a team, LHCI adds overhead without proportional benefit. Run Lighthouse manually via Chrome DevTools or PageSpeed Insights after each deploy. |
 
 ---
 
-## What NOT to Use
+## What NOT to Add
 
 | Avoid | Why | Use Instead |
 |-------|-----|-------------|
-| `next-auth-sanity` package | Last published 2023, incompatible with Auth.js v5 adapter interface. No Auth.js v5 adapter exists for Sanity. | JWT strategy (stateless sessions) + store user documents directly via Sanity write token in Server Actions |
-| Middleware-based auth guards (CVE-2025-29927) | Critical vulnerability patched in Next.js 15.2.3 — middleware auth bypass possible via `x-middleware-subrequest` header. Even patched, middleware should NOT be the primary auth gate. | Data Access Layer (DAL) pattern: validate session inside Server Actions and Route Handlers using `auth()` from Auth.js v5. |
-| `react-email` package in production app code | Dev-only preview server tool. Importing it in app code adds unnecessary bundle weight. | `@react-email/components` for email templates; `resend` handles rendering internally |
-| bcrypt (native Node bindings) | Crashes in Vercel Edge Runtime; crashes in some Next.js middleware contexts | `bcryptjs` for all password hashing |
-| FullCalendar | Heavy library (~200kb), overkill for a slot-picker UI, licence costs for premium features | `react-day-picker` for date selection; custom slot grid for time selection (simple HTML + Tailwind) |
-| Prisma / any SQL database | This stack already uses Sanity as the data layer. Adding Prisma + PostgreSQL for auth sessions creates unnecessary infrastructure complexity and cost for a single-doctor practice. | Auth.js v5 JWT sessions (no database needed) + Sanity for user/booking document storage |
-| `NEXT_PUBLIC_SANITY_TOKEN` with write access | Any token prefixed `NEXT_PUBLIC_` is embedded in the browser bundle. A write token exposed this way allows anyone to modify or delete Sanity content. | `SANITY_WRITE_TOKEN` (no `NEXT_PUBLIC_` prefix) — server-side only via Server Actions or Route Handlers |
-
----
-
-## Stack Patterns by Variant
-
-**Patient auth (Google OAuth + email/password):**
-- Auth.js v5 with `strategy: "jwt"` — no database adapter
-- Google provider for OAuth; Credentials provider for email/password
-- On successful Credentials login, look up patient document in Sanity by email; store Sanity `_id` in JWT token
-- On Google OAuth first login, create patient document in Sanity via Server Action with write token
-
-**Admin dashboard auth:**
-- Same Auth.js v5 config, separate Credentials provider check: `if (email === process.env.ADMIN_EMAIL && bcrypt.compareSync(password, process.env.ADMIN_PASSWORD_HASH))`
-- Store `role: "admin"` in JWT so admin pages can check `session.user.role === "admin"` without a database query
-- Admin dashboard route group: `app/(admin)/` with a layout that enforces admin role
-
-**Booking data storage in Sanity:**
-- Create a `booking` document type in Sanity schema (patientRef, serviceRef, date, timeSlot, status, notes)
-- All writes via Server Actions using `serverClient` (write token, never exposed to client)
-- Availability check: GROQ query counts bookings for a given date + time slot before confirming
-- **Optimistic conflict resolution:** Check availability in Server Action immediately before write; return error if slot taken (no distributed locking needed for single-doctor low-volume practice)
-
-**Email confirmation flow:**
-- Server Action creates booking → sends confirmation via Resend in same action
-- Reminder: Vercel Cron job runs daily at 08:00 → queries Sanity for bookings the next day → sends reminder emails via Resend
-
-**Hungarian locale in date picker:**
-```tsx
-'use client'
-import { DayPicker } from 'react-day-picker'
-import { hu } from 'react-day-picker/locale'
-
-<DayPicker
-  locale={hu}
-  disabled={disabledDates}
-  onSelect={handleDateSelect}
-  mode="single"
-/>
-```
-
-**Sanity write client (Server Action pattern):**
-```typescript
-// lib/sanity/writeClient.ts — server only, never import in client components
-import { createClient } from 'next-sanity'
-
-export const writeClient = createClient({
-  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
-  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET!,
-  apiVersion: '2024-01-01',
-  useCdn: false,
-  token: process.env.SANITY_WRITE_TOKEN, // NOT NEXT_PUBLIC_
-})
-```
+| Storybook | Heavy setup (webpack config, addon overhead). Unnecessary for a site with ~5 reusable UI patterns. No component design system justified at this scale. | Test components with Vitest + @testing-library/react directly |
+| Jest | Slower than Vitest, requires babel transform for ESM (extra config), no advantage for a greenfield test setup. | Vitest |
+| @axe-core/react (dev runtime) | Logs to browser console during development, not CI-compatible, noisy. Same issues caught by @axe-core/playwright in E2E tests. | @axe-core/playwright |
+| Percy / Chromatic visual regression | No design system, no component library. Visual regression testing is overkill for a medical practice site that rarely changes UI. | Manual visual review |
+| Sentry | Free tier limited; adds bundle weight and vendor dependency. Single-developer project does not need error monitoring infrastructure. | Vercel's built-in error logging + Next.js error boundaries |
+| react-testing-library/user-event | Adds complexity over @testing-library/react's built-in `fireEvent`. Only needed for complex interaction sequences. Add only if specific tests require it. | @testing-library/react `fireEvent` |
 
 ---
 
@@ -201,55 +278,48 @@ export const writeClient = createClient({
 
 | Package | Compatible With | Notes |
 |---------|-----------------|-------|
-| next-auth@beta | next@^15.2.0 | Auth.js v5 explicitly supports Next.js 14+; 15 is fully supported |
-| next-auth@beta | react@^19.0.0 | React 19 compatible — confirmed by multiple 2025/2026 tutorials |
-| bcryptjs@^2.4.3 | next@^15.2.0 (Vercel) | Pure JS — no native bindings; works in all runtimes including Edge |
-| react-day-picker@^9.13.2 | react@^19.0.0 | React 19 compatible since v9.4.3 (confirmed via GitHub issue #2665) |
-| react-day-picker@^9.13.2 | next@^15.2.0 | Client component only (`'use client'`); no SSR dependency |
-| resend@^4.x | next@^15.2.0 | Server-only (Server Actions / Route Handlers); no client import |
-| @react-email/components@^1.0.8 | react@^19.0.0 | Confirmed React 19.2 support per Resend blog (react-email 5.0) |
-| zod@^3.24 | sanity@^4.22.0 | Zod 3 is CommonJS + ESM compatible; safe with Sanity v4 |
-| zod@^4.x | sanity@^4.22.0 | ESM-only; may cause CJS/ESM interop issues with Sanity v4 — AVOID |
-
----
-
-## Security Notes
-
-### Auth.js v5 + CVE-2025-29927
-The CVE-2025-29927 middleware bypass (March 2025, CVSS 9.1) demonstrated that middleware-based auth is not a sufficient security gate. **Do not use middleware as the primary auth check for booking or admin routes.** Always validate the session inside the Server Action or Route Handler using Auth.js v5's `auth()` function. Middleware can redirect unauthenticated users for UX (avoiding a full page load), but the server-side check is the authoritative gate.
-
-### Sanity Write Token
-- Store as `SANITY_WRITE_TOKEN` (no `NEXT_PUBLIC_` prefix)
-- Only import `writeClient` in files that have `'use server'` or are server-only Route Handlers
-- Add `import 'server-only'` at the top of `lib/sanity/writeClient.ts` to get a build-time error if accidentally imported in a client bundle
-
-### Patient Data (GDPR / Hungary)
-- Collect minimum: name, email, phone, selected service, date, time
-- Store in Sanity (same data store as all CMS content — auditable)
-- Do not store session tokens or OAuth tokens in Sanity
-- Auth.js v5 JWT sessions are signed (not encrypted by default) — set `AUTH_SECRET` to a strong random value in Vercel environment variables
+| vitest@^4.0.18 | Node >=20 | Vercel's Node.js runtime is 20+ by default. Confirmed compatible. |
+| vitest@^4.0.18 | next@^15.2.0 | Vitest runs independently of Next.js build. Uses its own Vite pipeline for test files only. No conflict. |
+| vitest@^4.0.18 | react@^19.0.0 | React 19 compatible. @vitejs/plugin-react@^5.1.4 supports React 19. |
+| @playwright/test@^1.58.2 | next@^15.2.0 | Tests the running Next.js server — no version coupling at the package level. |
+| @axe-core/playwright@^4.11.1 | @playwright/test@^1.58.2 | Peer dependency on `@playwright/test` — must match the playwright version installed. Both at latest stable as of 2026-02-23. |
+| @next/bundle-analyzer | next@^15.2.0 | Pin to same minor as `next`. Use `^15.2.0` not `^16.x`. |
+| knip@^5.85.0 | next@^15.2.0 | Next.js plugin built into knip. No version coupling beyond knip detecting `next` in package.json. |
+| @testing-library/jest-dom@^6.9.1 | vitest@^4.0.18 | Works via Vitest's Jest-compatible API. Import in vitest setup file, not per-test. |
+| zod@^3.25.76 | vitest@^4.0.18 | No interaction. Zod schemas are imported in test files normally. |
 
 ---
 
 ## Sources
 
-- Auth.js v5 installation docs — https://authjs.dev/getting-started/installation — MEDIUM (beta, docs in flux)
-- CVE-2025-29927 middleware bypass — https://securitylabs.datadoghq.com/articles/nextjs-middleware-auth-bypass/ — HIGH
-- next-auth-sanity v1.5.3 incompatibility — https://www.npmjs.com/package/next-auth-sanity — HIGH (last published 2023, pre-v5)
-- react-day-picker v9.13.2 React 19 compatibility — https://github.com/gpbl/react-day-picker/issues/2665 — HIGH
-- react-day-picker Hungarian locale — https://daypicker.dev/localization/changing-locale — HIGH
-- Resend npm v4.x — https://www.npmjs.com/package/resend — HIGH (latest confirmed Feb 2026)
-- Resend free tier 3,000/month — https://resend.com/pricing — HIGH
-- @react-email/components v1.0.8 — https://www.npmjs.com/package/@react-email/components — HIGH
-- React Email 5.0 React 19 support — https://resend.com/blog/react-email-5 — HIGH
-- Inngest v3.52.3 + free tier — https://www.npmjs.com/package/inngest — MEDIUM
-- Vercel Cron Jobs all plans — https://vercel.com/docs/cron-jobs — HIGH
-- Zod 3 vs 4 ESM compatibility — https://zod.dev/v4 + https://www.npmjs.com/package/zod — MEDIUM
-- bcryptjs edge runtime — https://github.com/vercel/next.js/issues/69002 — HIGH
-- Sanity write token security — https://nextjs.org/docs/app/guides/data-security — HIGH
-- Auth.js v5 JWT stateless sessions — https://authjs.dev/getting-started/migrating-to-v5 — MEDIUM
+- Next.js Vitest guide (updated 2026-02-20) — https://nextjs.org/docs/app/guides/testing/vitest — HIGH confidence
+- Playwright Next.js guide — https://nextjs.org/docs/app/guides/testing/playwright — HIGH confidence
+- @axe-core/playwright npm (v4.11.1, published 2026-02-07) — https://www.npmjs.com/package/@axe-core/playwright — HIGH confidence
+- Vitest 4.0 release notes — https://vitest.dev/blog/vitest-4 — HIGH confidence
+- Vitest requirements (Vite >=6, Node >=20) — https://vitest.dev/guide/ — HIGH confidence
+- Vitest 4.0.18 on npm — https://www.npmjs.com/package/vitest — HIGH confidence
+- knip 5.85.0 on npm (published 2026-02-22) — https://www.npmjs.com/package/knip — HIGH confidence
+- Knip Next.js plugin — https://knip.dev/reference/plugins/next — HIGH confidence
+- @playwright/test 1.58.2 on npm — https://www.npmjs.com/package/playwright — HIGH confidence
+- @next/bundle-analyzer npm (v16.1.6 latest, use 15.x for this project) — https://www.npmjs.com/package/@next/bundle-analyzer — HIGH confidence
+- @vitejs/plugin-react 5.1.4 on npm — https://www.npmjs.com/package/@vitejs/plugin-react — HIGH confidence
+- @testing-library/jest-dom 6.9.1 on npm — https://www.npmjs.com/package/@testing-library/jest-dom — HIGH confidence
+- msw 2.12.10 on npm — https://www.npmjs.com/package/msw — HIGH confidence (noted but not recommended — see below)
+- Vitest vs Jest 2026 — https://www.sitepoint.com/vitest-vs-jest-2026-migration-benchmark/ — MEDIUM confidence
 
 ---
 
-*Stack research for: Morocz Medical — v2.0 booking module (patient auth + calendar + email + admin)*
-*Researched: 2026-02-22*
+## Note on MSW (Mock Service Worker)
+
+MSW v2.12.10 is commonly recommended for mocking API calls in unit tests. It is deliberately excluded from this recommendation because:
+
+1. This project's critical API routes (`/api/booking`, `/api/slots`, `/api/cron/reminders`) are best tested via Playwright E2E against a real or test-seeded environment.
+2. The pure business logic in those routes (slot generation, DST handling, reminder window) can be extracted into pure functions and unit-tested without network mocking.
+3. Adding MSW for a ~10 API route codebase is over-engineering. The test surface area does not justify the setup overhead.
+
+Add MSW only if complex external API mocking (e.g., Gmail API, Sanity write API) becomes necessary in unit tests.
+
+---
+
+*Stack research for: Morocz Medical v2.1 — testing, performance, accessibility, dead code hardening*
+*Researched: 2026-02-23*

@@ -1,48 +1,21 @@
 # Feature Research
 
-**Domain:** Medical appointment booking module — single-doctor private practice (Hungarian, Esztergom)
-**Researched:** 2026-02-21
-**Confidence:** HIGH (table stakes verified against multiple authoritative booking platforms and UX studies; edge cases verified against industry documentation and technical sources)
+**Domain:** Medical practice website — v2.1 polish milestone (testing, performance, accessibility, code quality)
+**Researched:** 2026-02-23
+**Confidence:** HIGH (testing strategy from Next.js official docs and Vitest/Playwright documentation; accessibility from W3C WCAG 2.2 and ARIA Authoring Practices Guide; performance from Next.js 15 official guides; dead code tooling from knip documentation)
 
 ---
 
 ## Scope Note
 
-This document covers only the **v2.0 booking module** added to an existing Next.js 15 + Sanity v4 medical practice website. The marketing website features (homepage, services, blog, SEO) are documented in the prior research pass. Features here assume the existing stack is locked: Next.js 15 App Router, Tailwind v4, Sanity v4, Vercel deployment.
+This document covers the **v2.1 hardening milestone** for an existing Next.js 15 App Router + Sanity v4 + Tailwind v4 medical practice website. All features from v1.0 (homepage, animations, SEO) and v2.0 (booking wizard, admin dashboard, email notifications, auth) are already shipped. This milestone adds no user-facing features — it hardens what exists.
 
----
-
-## User Flows
-
-### Patient Flow (Self-Service Booking)
-
-```
-1. Arrive at /idopontfoglalas (booking page)
-2. Select service from dropdown or list (e.g. "Általános vizsgálat", "Laborteszt")
-3. Calendar view opens — available dates highlighted, unavailable dates greyed
-4. Pick a date → time slots for that date appear
-5. Select a time slot
-6. Auth gate: log in or register (Google OAuth or email/password)
-7. Confirm booking: name, phone shown (pre-filled from account), confirm button
-8. Booking created → confirmation email sent immediately
-9. Patient lands on /fiok (account page) — can see upcoming appointments
-10. 24h before appointment: reminder email sent automatically
-11. From account page: cancel or reschedule (within cancellation window)
-```
-
-### Doctor / Admin Flow (Schedule Management)
-
-```
-1. Doctor logs into Sanity Studio (/studio) with admin credentials
-2. Navigates to "Rendelési idő" (schedule) document — sets weekly recurring availability
-   - Per weekday: start time, end time, slot duration (e.g. 20 min), break times
-3. Navigates to "Zárolt napok" (blocked dates) — adds vacation days, holidays
-4. Admin dashboard (/admin) shows:
-   a. Today's appointments (chronological list with patient name, service, time)
-   b. Calendar view (week/month) with booked and free slots
-   c. Patient details (name, email, phone) per booking
-5. Admin can manually cancel a booking → patient receives cancellation email
-```
+**Current state of each category:**
+- Testing: zero test coverage; no test framework installed
+- Performance: next/image used throughout but no `sizes` attributes; no bundle analyzer; no `optimizePackageImports`; next.config.ts has only `remotePatterns`
+- Dead code: `/api/slots/availability` is NOT orphaned — Step2DateTime uses it for per-day availability stripes; `"rescheduled"` status exists in Sanity schema (`bookingType.ts`) but is never written by any route handler (reschedule route only updates `slotDate`/`slotTime`, never sets `status: "rescheduled"`)
+- Error handling: API routes have basic Zod validation and try/catch; form errors use inline `<p>` tags without `aria-invalid` or `aria-describedby`
+- Accessibility: calendar has `aria-label`, `aria-pressed`, `aria-current`; step indicator has `role="progressbar"`; testimonials have `aria-live="polite"`; form inputs have `<label>` associations; missing `aria-invalid`, `aria-describedby` on error states, `aria-live` on global errors, `role="grid"` on calendar, `aria-label` on time slot buttons
 
 ---
 
@@ -50,345 +23,236 @@ This document covers only the **v2.0 booking module** added to an existing Next.
 
 ### Table Stakes (Users Expect These)
 
-Features patients and the doctor assume exist. Missing these = the booking system feels broken.
+Features that a production-grade medical site must have. Missing these = site is not production-confident.
 
-| Feature | Why Expected | Complexity | Stack Notes |
-|---------|--------------|------------|-------------|
-| Service selection before slot picking | Patients need to pick what they're booking; slot duration may vary per service | LOW | Service data already exists in Sanity (v1 schemas); link service to duration |
-| Date picker with visual availability | Calendar showing green/grey dates is the universal booking UI pattern; 43% of patients say online booking is their favourite digital tool | MEDIUM | Use a headless calendar component (react-day-picker); fetch slot availability from API |
-| Time slot grid for selected date | Patients expect to see 09:00, 09:20, 09:40... and click one; no guessing | LOW | Slots generated server-side from doctor's schedule minus existing bookings |
-| Auth gate before confirming booking | Booking must be tied to an identity for patient self-service; gate after slot selection (not before — don't block browsing) | HIGH | NextAuth v5 (Auth.js) with Google provider + Credentials provider; sessions in JWT or DB |
-| Instant booking confirmation email | 100% expectation; absence creates anxiety and duplicate bookings | MEDIUM | Resend or Nodemailer + SMTP; sent from Next.js route handler on booking creation |
-| Account page showing upcoming appointments | Patients expect to see what they booked; also required for cancel/reschedule | MEDIUM | /fiok route, server component, GROQ query filtering bookings by patient email |
-| Cancel appointment from account | Standard self-service; patients expect this; reduces phone calls to clinic | MEDIUM | Booking document in Sanity updated to status: "lemondva"; trigger notification email |
-| Admin: today's appointments list | Doctor must see who's coming today without opening Sanity Studio; operational necessity | MEDIUM | /admin route (separate login), server component, GROQ query for today's date |
-| Admin: calendar / week view | Doctor needs to see the full schedule, not just today | MEDIUM | Calendar component in admin; same slot data, different view |
-| Doctor schedule definition in Sanity Studio | Doctor defines when they work; this is the source of truth for all slots | MEDIUM | Sanity schema: weekday availability + slot duration per service; GROQ generates slots |
-| Blocked dates in Sanity Studio | Vacation, public holidays, training days — doctor must be able to block any day | LOW | Array of date ranges in Sanity; slot generation excludes these |
-| Bookings stored as Sanity documents | Required per project spec; also gives admin visibility in Studio itself | MEDIUM | Sanity "booking" document: patient ref (or inline data), service ref, datetime, status |
-| Minimal patient data only | GDPR principle of data minimisation; only collect what's needed | LOW | Name + email + phone; no medical history, no insurance data, no address |
-| Pre-appointment reminder email (24h before) | Reduces no-shows by up to 30% (verified by multiple studies); patients expect it | MEDIUM | Cron job or Vercel cron + Resend; query bookings with datetime = tomorrow |
+| Feature | Why Expected | Complexity | Notes |
+|---------|--------------|------------|-------|
+| Unit tests for slot generation algorithm | `generateAvailableSlots` is pure, side-effect-free, and the most critical business logic in the codebase — the obvious first test target | LOW | Vitest (no React, no mocking needed). Edge cases: past dates, blocked dates, bufferMinutes, serviceDuration, maxDaysAhead, DST-adjacent dates |
+| Unit tests for booking API route validation | Zod schemas in `/api/booking` and `/api/booking-reschedule` are pure validation logic — trivially testable | LOW | Vitest; test valid/invalid inputs against the exported Zod schema |
+| Unit tests for 24h cancellation window | `isWithin24Hours()` helper in booking-reschedule route is pure logic with a date boundary — high-value, low-effort test | LOW | Vitest; mock `Date.now()` to test boundary conditions |
+| E2E smoke test: homepage loads | Catches catastrophic regressions in SSR, Sanity data fetching, and animation rendering | LOW | Playwright; verify `<h1>` exists, no error boundary triggered |
+| E2E smoke test: booking wizard completes | The most critical user path; 4 steps must work end-to-end | HIGH | Playwright; requires test auth session and Sanity test data or stubbed API responses |
+| E2E smoke test: patient self-service | `/foglalas/:token` cancel and reschedule flows must work after deploy | MEDIUM | Playwright; requires fixture booking document with known token |
+| `aria-invalid` and `aria-describedby` on form inputs | WCAG 2.1 Success Criterion 3.3.1 (Error Identification) and 3.3.3 (Error Suggestion) — required for screen reader users to understand form errors | LOW | Step4Confirm form fields, ReschedulePanel form; when `errors.patientName` is set, the input needs `aria-invalid="true"` and `aria-describedby` pointing to the error `<p>` |
+| `aria-live` on global error states | Screen readers must announce booking failure, network error, 409 conflict without page reload | LOW | Step4Confirm `globalError` div needs `role="alert"` (implicit `aria-live="assertive"`); same for admin cancellation errors |
+| `next/image` `sizes` attribute on all images | Without `sizes`, the browser downloads a full-width image even on mobile; this causes unnecessary network payload and hurts LCP | LOW | Every `<Image>` component in the codebase needs a `sizes` string matching its CSS layout (e.g. `sizes="(max-width: 768px) 100vw, 50vw"`) |
+| `priority` prop on LCP image | Hero doctor image is the LCP element; missing `priority` means it's lazy-loaded, hurting Core Web Vitals score | LOW | HeroSection.tsx already has `priority` — verify all above-fold images have it and none below-fold do |
+| Error boundary for booking wizard | If a Sanity fetch or API call throws during wizard rendering, the page should show a recovery UI, not a white screen | MEDIUM | Next.js `error.tsx` at the `/idopontfoglalas` segment level; show "Hiba történt. Kérjük, töltse újra az oldalt." with retry button |
+| Error boundary for admin dashboard | Admin must never see a white screen — any data fetch failure should show a graceful fallback | MEDIUM | `error.tsx` at the `/admin` route segment level |
 
 ### Differentiators (Competitive Advantage)
 
-Features that make this booking module stand out versus the typical Hungarian GP practice that uses phone-only booking or a generic third-party booking widget.
+Features that exceed baseline expectations and demonstrate production maturity for a medical practice site.
 
-| Feature | Value Proposition | Complexity | Stack Notes |
-|---------|-------------------|------------|-------------|
-| Service-linked slot duration | Different services take different amounts of time (GP visit = 20 min, lab consult = 10 min); most basic systems use one fixed slot length | MEDIUM | Sanity service document gets "appointmentDurationMinutes" field; slot generation uses this |
-| Reschedule (not just cancel) | Patients who can't make it should be able to pick a new slot without cancelling and re-booking from scratch; reduces friction and no-shows | HIGH | New slot selection flow triggered from account page; old slot freed, new slot reserved atomically |
-| Buffer time between appointments | Prevents the doctor from running perpetually late; 10-15 min buffer every N slots or configurable per service | MEDIUM | Sanity schedule schema includes buffer duration; slot generator skips buffer windows |
-| Animated booking flow (Motion v12) | Consistent with the premium feel of the v1 site; step transitions, calendar animations; most booking widgets look clinical and generic | MEDIUM | Use Motion v12 (already installed); animate step transitions, slot appearance, confirmation |
-| Hungarian language throughout | All booking UI in proper Hungarian with accented characters; third-party widgets typically offer imperfect Hungarian or require paid localisation | LOW | Built custom; all strings in Hungarian (e.g. "Válasszon időpontot", "Foglalás megerősítése") |
-| Admin dashboard built into site (not Studio) | Sanity Studio is a developer/editor tool; a clean /admin page with Today's appointments is far more usable for the doctor and receptionist | MEDIUM | Separate Next.js route with its own credentials-only auth; read-only queries to Sanity |
-| Email reminder content in Hungarian | Transactional emails matching the brand (dark navy, name, service, time, address) in proper Hungarian; generic platforms send poor Hungarian or English | LOW | Custom HTML email templates; Resend supports custom HTML |
+| Feature | Value Proposition | Complexity | Notes |
+|---------|-------------------|------------|-------|
+| Calendar ARIA grid pattern | The booking calendar should follow the W3C ARIA grid pattern: `role="grid"` on the calendar container, `role="row"` on rows, `role="gridcell"` on day buttons, arrow-key navigation between days | MEDIUM | W3C ARIA Authoring Practices Guide defines the grid pattern for date pickers; Step2DateTime calendar currently uses `<div class="grid">` without ARIA roles; keyboard-only users cannot navigate between days |
+| `aria-live` region for slot loading state | When a patient clicks a calendar day, time slots load asynchronously; screen readers must announce "Időpontok betöltése" and then the count of slots found | LOW | Step2DateTime time slot section needs `aria-live="polite"` with status messages; currently the loading skeleton uses `aria-busy="true"` but no live region announces completion |
+| `optimizePackageImports` in next.config.ts | Motion v12, googleapis, and sanity/next-sanity have deep import trees; Next.js 15 `optimizePackageImports` config option reduces bundle overhead without code changes | LOW | Add to `next.config.ts`: `experimental: { optimizePackageImports: ['motion', 'sanity', 'next-sanity'] }` — verify no build breakage |
+| Bundle analyzer audit | Identify what is actually in the client bundle; Motion v12 and googleapis are both large dependencies; confirm only needed parts are tree-shaken | LOW | `@next/bundle-analyzer` as a dev dependency; run once, document findings |
+| `noUnusedLocals` and `noUnusedParameters` in tsconfig.json | TypeScript can catch dead local variables and unused function parameters at compile time; currently disabled | LOW | Add to `tsconfig.json` compilerOptions; fix any newly flagged issues |
+| Knip audit for dead exports and files | Knip statically traces the module graph from entry points and flags unused exports, files, and dependencies; more thorough than TypeScript's own checks for Next.js route files | LOW | `npx knip` one-time audit; document findings and remove confirmed dead code |
+| Remove `"rescheduled"` from booking status enum | The Sanity `bookingType.ts` defines `status: "rescheduled"` as a valid value but no route handler ever writes it; confirmed orphan schema value | LOW | Remove from Sanity schema validation options to prevent confusion; the reschedule flow correctly keeps `status: "confirmed"` and updates `slotDate`/`slotTime` |
+| Consistent API error response shape | Current route handlers return `{ error: string }` but the shape is undocumented; define a typed `ApiErrorResponse` interface shared across all route handlers | LOW | Create `src/types/api.ts` with `ApiErrorResponse` and `ApiSuccessResponse` types; use in all route files |
+| `role="alert"` on 409 conflict state in booking wizard | When a slot conflict is detected (409), the error message appears but screen readers may not announce it without a live region | LOW | BookingWizard conflict state needs `role="alert"` on the error container |
+| Focus management on booking step transitions | When the wizard moves from step to step, focus should move to the new step's heading so keyboard/screen-reader users know the step changed | MEDIUM | Step transitions in BookingWizard.tsx need `useEffect` + `ref.current?.focus()` on the step heading after each step change |
+| Keyboard navigation for testimonials carousel | TestimonialsSection carousel uses dots for navigation; keyboard users need arrow key support and `aria-label` on each dot | LOW | Add `onKeyDown` handler for left/right arrows on carousel wrapper; dot buttons need `aria-label="X. vélemény"` |
+| `lang` attribute verification | `<html lang="hu">` must be set in root layout; missing lang attribute is a WCAG 2.1 Level A failure (SC 3.1.1) | LOW | Verify `layout.tsx` root layout; currently not confirmed present in codebase review |
 
 ### Anti-Features (Commonly Requested, Often Problematic)
 
-Features that seem valuable for a medical booking system but create disproportionate complexity, GDPR risk, or scope creep for a single-doctor practice.
+Features that seem appropriate for a polish milestone but create disproportionate complexity or maintenance burden.
 
 | Feature | Why Requested | Why Problematic | Alternative |
 |---------|---------------|-----------------|-------------|
-| SMS reminders | Patients open SMS more reliably than email | Requires a paid SMS gateway (Twilio, MessageBird), Hungarian phone number verification, carrier delivery complexity, extra GDPR consent for SMS marketing; email achieves the same outcome at zero marginal cost | Email reminder at 24h before appointment; clearly labelled as the confirmation method at booking time |
-| Payment / deposit collection at booking | Reduces no-shows; collects fee upfront | Requires Stripe or Barion integration, PCI-DSS compliance surface, Hungarian tax receipt (bizonylat) complexity, refund flow for cancellations; massive scope increase for an unproven feature | Implement cancellation window policy (24h notice); consider fee policy in v3 if no-show rate is high |
-| Real-time slot availability (WebSocket/SSE) | Two patients could be on the same slot simultaneously | Vercel serverless functions don't support persistent connections; Sanity is not a real-time booking engine; overkill for a single-doctor practice with low concurrent traffic | Optimistic booking with server-side validation at confirm step; if slot taken, show error and redirect to date picker — sufficient for this scale |
-| Waitlist / cancellation notifications to waiting patients | Fills cancelled slots automatically | Requires a queue, notification system, race condition handling for multiple waitlisted patients; heavy complexity for marginal gain at low volume | Show "Nincs szabad időpont ezen a napon" (No available slots on this day) and allow patient to check other days; if demand grows, add waitlist in v3 |
-| Multi-doctor / multi-room scheduling | Handles growth | Not applicable — single-doctor practice per project spec; adds location and resource dimensions to every query and UI | Single doctor, single room; schedule is global not per-doctor |
-| Patient medical history in booking | Collect intake form before appointment | Medical history is sensitive health data (GDPR Article 9 special category); storing it in Sanity CMS creates significant compliance liability; requires encryption, access control, retention policy | Collect only name, email, phone; doctor handles medical history via their existing practice management system |
-| EHR/EMR integration | Connect with the doctor's existing patient records system | Hungarian GP practices typically use Praxis (state system) or MedWorkS; API access is restricted or requires certified integrations; out of scope entirely | Standalone booking only; doctor maps booking to patient record manually |
-| Google Calendar / iCal sync | Doctor sees bookings in their personal calendar | Requires OAuth scope for calendar write access; adds auth complexity; Sanity + admin dashboard is the single source of truth | Admin dashboard at /admin shows today's appointments and week view; exportable if needed in v3 |
-| Recurring / repeat appointments | Patients with regular check-ups can set a standing slot | Complex to implement correctly (what if a slot in the series is taken? what if schedule changes?); rare need for private GP practice | Patient re-books manually each time; friction is acceptable at this scale |
-| Online prescription requests | Patients request repeat prescriptions through the portal | Medical regulatory compliance (e-Egészségügy system in Hungary), liability, scope explosion | Out of scope permanently; doctor handles via phone or in-person |
+| Full component test suite with React Testing Library | "More tests = better" — every component tested | Next.js 15 async Server Components cannot be unit-tested with Vitest/RTL; mocking Sanity, auth, and Motion adds enormous setup cost for low signal; components are visual, not business logic | Test pure utility functions (slots.ts, date helpers, Zod schemas) with Vitest; test user flows with Playwright E2E; skip component unit tests for this codebase |
+| 100% code coverage target | Coverage metrics give confidence | 100% coverage incentivises trivial tests on getters/setters while the real logic goes untested; creates maintenance burden when edge cases are refactored | Target the critical paths: slot generation, 24h window, booking creation; coverage is a byproduct, not a goal |
+| Lighthouse CI in every PR | Catch performance regressions early | Vercel preview deployments already run Lighthouse; adding a CI step that blocks merges on score regressions creates noise (Sanity CDN latency varies); single-developer project has no PR review bottleneck | Run Lighthouse manually on staging before each milestone; Vercel Analytics monitors real Core Web Vitals from production traffic |
+| axe-core automated accessibility testing in CI | Catch accessibility violations automatically | axe-core catches ~30-40% of WCAG violations; the remaining 60% (keyboard navigation, focus management, live regions) require manual testing; CI setup adds complexity | Run axe DevTools browser extension manually during accessibility audit; document findings and fix manually |
+| Migrating from Biome to ESLint for accessibility rules (eslint-plugin-jsx-a11y) | jsx-a11y has broader accessibility rule coverage | Biome v2 is already configured and working; Biome covers the most common a11y rules; migrating linters mid-project disrupts the established tooling without sufficient gain | Biome v2 handles aria-* and role= rules; supplement with manual NVDA/VoiceOver testing for live regions and keyboard flow |
+| Removing `/api/slots/availability` (misidentified as orphan) | The route was listed as a potential dead route | Step2DateTime.tsx actively fetches this endpoint on every month view change to render availability stripes on calendar days; deleting it would break the calendar | Keep the route; the original dead-code concern was incorrect |
+| Server-sent events for real-time slot updates | Prevent stale slot data while patient browses | Vercel serverless functions do not support persistent connections; already documented as out-of-scope in PROJECT.md; adds infrastructure complexity with no gain at single-doctor volume | Keep current approach: optimistic UI, server-side conflict detection at booking creation, 409 response with alternatives |
 
 ---
 
 ## Feature Dependencies
 
 ```
-[Doctor Schedule (Sanity)]
-    └──required by──> [Slot Generation] (no schedule = no slots to show)
-    └──required by──> [Blocked Dates] (blocked dates narrow the schedule)
+[Vitest setup]
+    └──required by──> [Unit tests: slots.ts]
+    └──required by──> [Unit tests: Zod schemas]
+    └──required by──> [Unit tests: isWithin24Hours]
 
-[Blocked Dates (Sanity)]
-    └──required by──> [Slot Generation] (excluded from available dates)
+[Playwright setup]
+    └──required by──> [E2E: homepage smoke]
+    └──required by──> [E2E: booking wizard]
+    └──required by──> [E2E: patient self-service]
 
-[Slot Generation (server-side)]
-    └──required by──> [Date Picker] (calendar knows which dates have slots)
-    └──required by──> [Time Slot Grid] (shows available times for a date)
+[E2E: booking wizard]
+    └──requires──> [Test auth session fixture]
+    └──requires──> [Sanity test data or API stub]
 
-[Time Slot Grid]
-    └──required by──> [Booking Creation] (a slot must be selected to book)
+[aria-invalid + aria-describedby on inputs]
+    └──enhances──> [Focus management on step transitions]
+        (fixing both together = complete keyboard/screen-reader booking flow)
 
-[Patient Auth (NextAuth)]
-    └──required by──> [Booking Creation] (must be logged in to book)
-    └──required by──> [Account Page] (shows patient's own bookings)
-    └──required by──> [Cancel / Reschedule] (must own the booking)
+[role="grid" on calendar]
+    └──requires──> [Arrow key navigation implementation]
+        (adding role without key handler = incorrect ARIA pattern)
 
-[Booking Creation (Sanity document)]
-    └──required by──> [Confirmation Email] (sent on document creation)
-    └──required by──> [Account Page] (queries patient's bookings)
-    └──required by──> [Admin Dashboard] (queries all bookings)
-    └──required by──> [Reminder Email] (cron queries upcoming bookings)
+[Bundle analyzer audit]
+    └──informs──> [optimizePackageImports config]
+        (identify problem before configuring solution)
 
-[Confirmation Email]
-    └──enhances──> [Reminder Email] (same email template system, different trigger)
+[Knip audit]
+    └──informs──> [Remove rescheduled status enum value]
+    └──informs──> [noUnusedLocals tsconfig flag]
+        (tooling first, then targeted cleanup)
 
-[Admin Dashboard]
-    └──requires──> [Admin Auth] (separate credentials, not patient NextAuth)
-
-[Reschedule]
-    └──requires──> [Cancel] (reschedule = cancel old + create new atomically)
-    └──requires──> [Slot Generation] (must show available slots for new date)
-    └──requires──> [Booking Creation] (creates a new booking document)
-
-[Service Selection]
-    └──enhances──> [Slot Generation] (slot duration derived from selected service)
-    └──enhances──> [Booking Creation] (service stored on booking document)
-
-[Pre-appointment Reminder]
-    └──requires──> [Booking Creation] (needs confirmed bookings to query)
-    └──requires──> [Cron trigger] (Vercel Cron or similar; runs daily)
+[Consistent ApiErrorResponse type]
+    └──enhances──> [E2E tests: error state assertions]
+        (typed error shape makes test assertions simpler)
 ```
 
 ### Dependency Notes
 
-- **Doctor schedule is the foundation:** Everything downstream — slot display, booking creation, admin view — depends on the schedule being defined in Sanity first. Phase 1 of the booking module must implement the schedule schema.
-- **Auth gates booking creation, not browsing:** Patients can browse available dates and slots without logging in. Auth is required only at the confirmation step. This reduces friction and improves conversion.
-- **Booking document is the hub:** Confirmation emails, reminder emails, account page, admin dashboard, and cancel/reschedule all read or write this document. The schema design is critical; get it right before building any consumer of it.
-- **Reschedule is a compose of cancel + re-book:** It must be atomic — if the new slot is unavailable, the original booking must be preserved. Implement with a Sanity transaction.
-- **Admin auth is separate from patient auth:** The admin dashboard (/admin) uses simple email/password (hardcoded credentials or Sanity-stored), not the same NextAuth flow as patients. This avoids giving doctor access to patient-facing OAuth flows.
+- **Vitest and Playwright are independent setups:** Both can be installed and configured in parallel; Vitest handles pure-function unit tests, Playwright handles full-stack E2E flows.
+- **ARIA grid + arrow key navigation must ship together:** Adding `role="grid"` to the calendar without implementing arrow-key focus management is a WCAG 4.1.2 failure — the role implies keyboard behaviour that must be supported.
+- **Bundle analyzer audit before config changes:** Run `@next/bundle-analyzer` first to confirm which packages are actually inflating the bundle before adding `optimizePackageImports`. Do not add optimizations blindly.
+- **Knip audit is read-only first:** Run knip, review its output carefully — Next.js route files are entry points and must be excluded from unused-file reports; knip has a Next.js plugin that handles this automatically.
 
 ---
 
-## Edge Cases
+## v2.1 Work Items
 
-### Double Booking (Race Condition)
+### Must Ship (v2.1 launch blockers)
 
-**Scenario:** Two patients view the same slot simultaneously and both click "Foglalás" (Book) at the same moment.
+Minimum hardening for the site to be considered production-confident.
 
-**Risk level:** LOW for a single-doctor practice (low concurrent traffic), but MUST be handled or a real double-booking occurs.
+- [ ] Vitest setup + unit tests for `generateAvailableSlots` (edge cases: blocked dates, bufferMinutes, maxDaysAhead, past dates, no schedule) — why essential: core booking logic with no current coverage
+- [ ] Unit tests for `isWithin24Hours()` with mocked `Date.now()` — why essential: boundary bug here causes patient or admin data integrity issue
+- [ ] Unit tests for `BookingFormSchema` Zod validation — why essential: validates Hungarian error messages are correct
+- [ ] Playwright setup + homepage smoke test — why essential: catches catastrophic SSR regression on deploy
+- [ ] `aria-invalid` + `aria-describedby` on all Step4Confirm form inputs — why essential: WCAG 3.3.1 / 3.3.3 compliance; screen readers cannot identify errored fields
+- [ ] `role="alert"` on global error states (Step4Confirm globalError, booking wizard conflict, admin cancellation) — why essential: screen readers miss dynamic error injection without live region
+- [ ] `sizes` attribute on all `<Image>` components without it — why essential: prevents oversized image downloads on mobile; direct LCP and CLS impact
+- [ ] Remove `"rescheduled"` from Sanity `bookingType.ts` status enum — why essential: orphan schema value that will never be set; creates confusion for future developers
+- [ ] `<html lang="hu">` verification in root layout — why essential: WCAG 2.1 Level A (SC 3.1.1) failure if missing; trivial fix
 
-**Prevention:**
-- At booking creation (API route), check slot availability atomically before writing the Sanity document.
-- Use Sanity's transaction API (`client.transaction()`) to check + create in one operation where possible.
-- If slot is already taken when the second request arrives, return a 409 conflict and redirect patient to date picker with a message: "Ez az időpont már foglalt. Kérjük, válasszon másikat."
-- For very high concurrency (unlikely here), a Redis distributed lock would be the industry solution — but overkill for a single-doctor practice.
+### Add After Core (v2.1 secondary)
 
-**Confidence:** HIGH (verified against Acuity Scheduling documentation and booking system design literature)
-
-### Timezone / Daylight Saving Time
-
-**Scenario:** Hungary uses CET (UTC+1) in winter and CEST (UTC+2) in summer. Clocks spring forward on the last Sunday of March and fall back on the last Sunday of October.
-
-**Risk level:** VERY LOW — clinic operates standard business hours (8:00–18:00); DST transitions happen at 2:00–3:00 AM which is outside all possible appointment slots.
-
-**Prevention:**
-- Store all booking datetimes in UTC in Sanity documents.
-- Display times in Hungarian local time (using `Europe/Budapest` timezone) throughout the UI and emails.
-- Use `date-fns-tz` or `Intl.DateTimeFormat` with `Europe/Budapest` for formatting.
-- No cross-timezone bookings expected — all patients and the clinic are in Hungary.
-
-**Confidence:** HIGH (Hungary timezone behavior confirmed by worlddata.info; medical practice hours make DST edge cases irrelevant)
-
-### Cancellation Window
-
-**Scenario:** Patient tries to cancel 30 minutes before their appointment.
-
-**Industry standard:** 24-hour cancellation window is the norm for medical practices; some use 48 hours.
-
-**Recommendation:** Block online self-service cancellation within 24 hours of appointment time. Display message: "Az időpontot már nem tudja online lemondani. Kérjük, hívja a rendelőt: [phone number]." The doctor can still cancel from the admin dashboard at any time.
-
-**Reasoning:** Prevents last-minute slot waste while giving a recoverable path (phone call). No-show fee infrastructure is explicitly excluded as an anti-feature.
-
-**Confidence:** MEDIUM (24-hour window is industry norm per multiple scheduling platform docs; specific threshold is a business decision)
-
-### Slot Duration Per Service
-
-**Scenario:** General consultation = 20 min; lab test consult = 10 min; specialist referral = 30 min.
-
-**Risk:** If all slots are the same duration, short services waste time and long services cause booking conflicts.
-
-**Prevention:**
-- Sanity service document gets an `appointmentDurationMinutes` field (integer, required).
-- Slot generation API reads the selected service's duration to compute slots for the day.
-- UI shows service duration next to service name: "Általános vizsgálat (20 perc)".
-
-**Confidence:** HIGH (standard feature of all major medical scheduling platforms including Jane App, Cliniko, Acuity)
-
-### Buffer Time Between Appointments
-
-**Scenario:** Back-to-back 20-minute slots with no breathing room causes the doctor to run perpetually late.
-
-**Prevention:**
-- Sanity schedule schema includes `bufferMinutes` field (e.g. 5 or 10).
-- Slot generator inserts non-bookable buffer windows between slots.
-- Buffer is not shown to patients — the next available slot simply starts later.
-
-**Confidence:** HIGH (buffer time is a standard scheduling feature; documented by Acuity, Jane App, Cliniko)
-
-### Slot Availability When Patient is Mid-Booking
-
-**Scenario:** Patient selects a slot at 10:00, spends 5 minutes on the auth/registration flow, then the slot gets taken by someone else.
-
-**Risk level:** LOW (single doctor, low traffic) but possible.
-
-**Prevention:**
-- Do NOT implement a hold/reservation timer (adds complexity for minimal gain at this scale).
-- At confirmation step, re-validate slot availability server-side before writing the Sanity document.
-- If taken: show error, redirect to date picker.
-- Slot selection is optimistic; booking creation is authoritative.
-
-**Confidence:** MEDIUM (standard approach for low-traffic booking systems; high-traffic systems use hold timers)
-
-### Patient Data GDPR Compliance
-
-**Scenario:** Booking system collects patient name, email, phone, appointment history.
-
-**GDPR obligations:**
-- Explicit consent required at registration for data processing.
-- Data minimisation: only name, email, phone (no medical history, no address).
-- Right to deletion: patient must be able to request account deletion.
-- Data retention policy: how long are past bookings stored? Recommend: 2 years (standard for administrative records; confirm with practice's data protection officer).
-- Privacy policy must be updated to cover booking data processing.
-
-**Confidence:** HIGH (GDPR Article 9 verified; healthcare data minimisation principle confirmed by GDPR Local and heydata.eu sources)
-
-### Admin Authentication
-
-**Scenario:** The admin dashboard at /admin must be accessible only to the doctor/receptionist.
-
-**Approach:** Separate credentials-based auth (not patient NextAuth). Options:
-- Simple: hardcoded hashed password in environment variables, checked via API route.
-- Better: Sanity user with admin role; check against Sanity token on login.
-
-**Recommendation:** Simple Next.js middleware protecting /admin routes + iron-session or JWT cookie with hardcoded credentials. Admin is one person; complexity of user management is not warranted.
-
----
-
-## MVP Definition
-
-### Launch With (v2.0 — Booking Module MVP)
-
-Minimum viable booking system. Every item is required for the system to function end-to-end.
-
-- [ ] Doctor schedule schema in Sanity (weekday availability, slot duration, buffer time)
-- [ ] Blocked dates schema in Sanity
-- [ ] Slot generation API (server-side, reads schedule + blocked dates + existing bookings)
-- [ ] Date picker UI showing available dates
-- [ ] Time slot grid for selected date
-- [ ] Service selection linked to slot duration
-- [ ] Patient auth: Google OAuth + email/password registration/login (NextAuth v5)
-- [ ] Booking creation: Sanity document with patient data, service, datetime, status
-- [ ] Confirmation email (immediate, on booking creation)
-- [ ] Account page (/fiok): upcoming appointments list
-- [ ] Cancel appointment from account page (with 24h window enforcement)
-- [ ] Pre-appointment reminder email (24h before, via Vercel Cron)
-- [ ] Admin dashboard (/admin): today's appointments, week calendar, patient details
-- [ ] Admin auth: separate credentials-only login
-- [ ] Double booking prevention: server-side slot validation at confirm step
-- [ ] All UI strings in proper Hungarian (accented characters throughout)
-
-### Add After Validation (v2.x)
-
-- [ ] Reschedule flow — add when cancel + re-book friction proves problematic; requires atomic transaction in Sanity
-- [ ] Buffer time configuration in Sanity Studio — add if doctor reports running late between appointments
-- [ ] Animated booking step transitions — add once core flow is stable; Motion v12 already installed
+- [ ] E2E: booking wizard step-through with stubbed `/api/slots` and `/api/booking` — trigger after Playwright setup is working
+- [ ] E2E: patient self-service cancel flow — trigger after booking wizard E2E is stable
+- [ ] Focus management on wizard step transitions — `useEffect` + `headingRef.current?.focus()` after step change
+- [ ] `role="grid"` on calendar + arrow key day navigation — implement together (role without key handler is a violation)
+- [ ] `aria-live="polite"` on time slot loading region in Step2DateTime
+- [ ] `optimizePackageImports` in next.config.ts for motion, sanity, next-sanity
+- [ ] `noUnusedLocals: true` and `noUnusedParameters: true` in tsconfig.json
+- [ ] Consistent `ApiErrorResponse` type in `src/types/api.ts`, applied to all route handlers
 
 ### Future Consideration (v3+)
 
-- [ ] SMS reminders — only if no-show rate remains high after email reminders; requires SMS gateway
-- [ ] Waitlist / cancellation notification queue — only if slots frequently fill within hours of opening
-- [ ] Payment / deposit at booking — only if no-show rate is commercially significant; requires Barion or Stripe
-- [ ] Google Calendar sync — only if doctor requests it explicitly
+- [ ] Knip full audit — run as a one-time cleanup pass when codebase is larger and drift is more likely
+- [ ] Bundle analyzer deep-dive — schedule before any v3 features add new heavy dependencies
+- [ ] Playwright test for admin dashboard cancellation flow — value grows when admin UI changes frequently
 
 ---
 
 ## Feature Prioritization Matrix
 
-| Feature | Patient Value | Admin Value | Implementation Cost | Priority |
-|---------|--------------|-------------|---------------------|----------|
-| Doctor schedule in Sanity | — | HIGH | MEDIUM | P1 (foundation) |
-| Slot generation API | HIGH | HIGH | MEDIUM | P1 (foundation) |
-| Date picker + time slot grid | HIGH | — | MEDIUM | P1 |
-| Service selection | HIGH | MEDIUM | LOW | P1 |
-| Patient auth (NextAuth) | HIGH | — | HIGH | P1 |
-| Booking creation (Sanity doc) | HIGH | HIGH | MEDIUM | P1 |
-| Confirmation email | HIGH | — | MEDIUM | P1 |
-| Account page + cancel | HIGH | — | MEDIUM | P1 |
-| Reminder email (cron) | HIGH | — | MEDIUM | P1 |
-| Admin dashboard | — | HIGH | MEDIUM | P1 |
-| Admin auth | — | HIGH | LOW | P1 |
-| Double booking prevention | HIGH | HIGH | LOW | P1 |
-| Reschedule flow | MEDIUM | MEDIUM | HIGH | P2 |
-| Buffer time config | LOW | HIGH | LOW | P2 |
-| Animated step transitions | MEDIUM | — | MEDIUM | P2 |
-| SMS reminders | MEDIUM | LOW | HIGH | P3 |
-| Waitlist | LOW | MEDIUM | HIGH | P3 |
-| Payment / deposit | LOW | MEDIUM | VERY HIGH | P3 |
+| Feature | User/Patient Value | Developer Confidence | Cost | Priority |
+|---------|-------------------|---------------------|------|----------|
+| Unit tests: slots.ts | — | HIGH | LOW | P1 |
+| Unit tests: isWithin24Hours | — | HIGH | LOW | P1 |
+| Unit tests: Zod schemas | — | MEDIUM | LOW | P1 |
+| Playwright: homepage smoke | — | HIGH | LOW | P1 |
+| aria-invalid + aria-describedby on forms | HIGH (a11y) | — | LOW | P1 |
+| role="alert" on global errors | HIGH (a11y) | — | LOW | P1 |
+| sizes on all Image components | HIGH (perf) | — | LOW | P1 |
+| Remove rescheduled status enum | — | MEDIUM | LOW | P1 |
+| html lang="hu" verification | MEDIUM (a11y) | — | LOW | P1 |
+| Playwright: booking wizard E2E | — | HIGH | HIGH | P2 |
+| Playwright: self-service E2E | — | MEDIUM | MEDIUM | P2 |
+| Focus management on step transitions | MEDIUM (a11y) | — | MEDIUM | P2 |
+| role="grid" + arrow keys on calendar | MEDIUM (a11y) | — | MEDIUM | P2 |
+| aria-live on slot loading region | MEDIUM (a11y) | — | LOW | P2 |
+| optimizePackageImports config | MEDIUM (perf) | — | LOW | P2 |
+| noUnusedLocals tsconfig flags | — | MEDIUM | LOW | P2 |
+| ApiErrorResponse shared type | — | MEDIUM | LOW | P2 |
+| Knip audit | — | LOW | LOW | P3 |
+| Bundle analyzer audit | — | LOW | LOW | P3 |
 
 **Priority key:**
-- P1: Required for v2.0 launch — booking module is non-functional without it
-- P2: Should add once P1 is working; improves experience
-- P3: Future consideration only if validated need
+- P1: Must ship in v2.1 — missing these means the site is not production-hardened
+- P2: Should ship in v2.1 — meaningful improvement, tractable cost
+- P3: Defer — useful but not time-sensitive; run ad-hoc when context allows
 
 ---
 
-## Existing Stack Dependencies
+## Accessibility Context: Medical Sites
 
-Dependencies on the already-built v1 infrastructure that the booking module can leverage or must integrate with.
+Medical websites carry heightened accessibility obligations compared to typical e-commerce or marketing sites. Specific considerations for this project:
 
-| Existing Asset | How Booking Module Uses It | Integration Notes |
-|---------------|---------------------------|-------------------|
-| Sanity v4 client (already configured) | Booking documents, schedule schema, blocked dates schema | Add new document types; reuse existing `client.ts` and GROQ query patterns |
-| Sanity service documents (v1 schema) | Link service to appointment duration; service selection in booking flow | Add `appointmentDurationMinutes` field to existing service schema |
-| Next.js 15 App Router | All booking routes (/idopontfoglalas, /fiok, /admin) use same routing; API routes for booking creation | New route groups; existing layout/header reused |
-| Tailwind v4 + design system | Booking UI uses same color palette, border radius, typography | No design system changes needed; booking page is consistent with homepage |
-| Motion v12 (already installed) | Animate booking step transitions, calendar, confirmation | Use existing motion/react import; no additional dependency |
-| GDPR cookie consent + privacy policy (v1) | Privacy policy must be updated to cover booking data; cookie consent already in place | Update privacy policy text; booking data processing requires explicit consent checkbox at registration |
-| GA4 + cookie consent gate (v1) | Booking funnel events (service selected, date selected, booking confirmed) can be tracked | Add GA4 events at each booking step if consent given; no new infrastructure |
-| Vercel deployment | Vercel Cron Jobs for reminder emails (available on Hobby plan) | Add vercel.json cron configuration; no additional hosting cost |
-| HMAC webhook revalidation (v1) | Booking documents in Sanity trigger revalidation of admin dashboard and account page on change | Reuse existing webhook handler; add booking document type to revalidation targets |
+**WCAG 2.1 AA is the legal minimum (globally).** HHS in the US requires WCAG 2.1 AA for healthcare websites with a May 2026 deadline. Hungary falls under EU accessibility directive (WAD), which also targets WCAG 2.1 AA. WCAG 2.2 AA (released October 2023) is an encouraged upgrade — the 9 new success criteria mostly affect mobile touch targets and focus indicators, both relevant to the booking wizard.
+
+**Booking forms are the highest-risk area.** A patient who cannot complete the booking form due to an accessibility barrier is denied healthcare access — a more severe consequence than, say, a broken e-commerce checkout. Priority should be: form error announcement, focus management in multi-step wizard, keyboard-accessible calendar.
+
+**The custom calendar is the most complex ARIA challenge.** A custom-built date picker that does not follow the ARIA grid pattern will fail automated and manual accessibility audits. The W3C ARIA Authoring Practices Guide defines the exact keyboard interaction pattern required: arrow keys navigate cells, Home/End go to first/last cell, PageUp/PageDown navigate months.
+
+**Screen readers tested against:** For Hungarian-language content, screen reader behaviour with Hungarian text should be verified with NVDA + Firefox (most common in Central Europe) and VoiceOver + Safari on macOS/iOS. Particular attention to Hungarian date/time formatting which screen readers may render unexpectedly.
 
 ---
 
-## Competitor Feature Analysis
+## Performance Context: Core Web Vitals for Medical Sites
 
-| Feature | Phone-Only (most HU practices) | Docplanner / Doktor24 (aggregator) | This Module |
-|---------|-------------------------------|-----------------------------------|-------------|
-| Self-service booking | No | Yes (aggregator flow) | Yes (native, on-site) |
-| Service-linked duration | N/A | Limited | Yes |
-| Auth / account | No | Yes (aggregator account) | Yes (own accounts) |
-| Cancellation online | No | Yes | Yes (with 24h window) |
-| Email confirmation | No | Yes | Yes |
-| Reminder emails | No | Yes | Yes (24h before) |
-| Admin dashboard | Paper/phone | Via aggregator portal | Yes (/admin page) |
-| Hungarian language | Yes | Yes | Yes (proper accented) |
-| Brand consistency | N/A | No (aggregator brand) | Yes (matches site design) |
-| GDPR data control | Full (no system) | Shared with aggregator | Full (own Sanity) |
-| No monthly platform fee | N/A | €30-150/month | None (Vercel + Resend free tier) |
+Patient trust correlates with site speed. A slow medical website signals unprofessionalism. Specific to this stack:
 
-**Conclusion:** The primary competitive advantage over phone-only booking is obvious: 24/7 availability, no hold music, instant confirmation. The advantage over aggregators (Docplanner) is brand consistency, zero platform dependency, lower data-sharing risk, and no monthly fee. The risk is that aggregators bring patient discovery traffic — this module serves existing/returning patients, not acquisition.
+**LCP target: under 2.5s on mobile.** The hero section has a large doctor image. HeroSection.tsx already has `priority` set — good. The risk is images without `sizes` causing the browser to download the full `srcset` variant when a smaller one would suffice.
+
+**CLS target: under 0.1.** Missing `width`/`height` on images or `sizes` attribute mismatches cause layout shifts. Sanity CDN images need proper aspect ratios specified.
+
+**INP (Interaction to Next Paint) target: under 200ms.** Motion v12 animations during step transitions can spike INP if not optimized. Use `will-change: transform` sparingly and prefer GPU-composited properties (transform, opacity) over layout-triggering ones (width, height, top, left).
+
+**Bundle size target:** The current stack (Motion v12, googleapis, Sanity client, next-sanity) can add significant client-side JavaScript. `optimizePackageImports` for Motion and Sanity ensures only used exports are bundled. The admin dashboard imports googleapis server-side only — verify it never leaks to client bundles.
+
+---
+
+## Testing Architecture Decision
+
+**Vitest for unit tests; Playwright for E2E. No React Testing Library.**
+
+Rationale:
+- Next.js 15 async Server Components cannot be rendered in JSDOM (Vitest limitation documented in official Next.js testing guide)
+- The codebase's critical business logic lives in pure TypeScript functions (`slots.ts`, Zod schemas, `isWithin24Hours`) — these are ideal Vitest targets
+- User flows that matter for confidence (booking, cancellation) require a real browser and real HTTP stack — Playwright is the right tool
+- RTL adds significant mocking overhead for Sanity, auth, and Motion with minimal signal gain; the time investment is better spent on E2E coverage
+- This matches the Next.js official testing guide recommendation: "we recommend using E2E tests for async components"
+
+**Test data strategy for E2E:**
+- Mock API responses at the network level with Playwright's `page.route()` for booking creation tests (avoids writing to production Sanity)
+- Use Playwright's `storageState` fixture to pre-authenticate test sessions
+- Smoke tests against staging deployment (Vercel preview URL) for homepage and public pages
 
 ---
 
 ## Sources
 
-- [Best Medical Appointment Scheduling Software 2025 — Noterro](https://www.noterro.com/blog/best-medical-appointment-scheduling-software) — MEDIUM confidence (industry roundup with feature analysis)
-- [Effective Patient Scheduling Systems — Tebra / The Intake](https://www.tebra.com/theintake/patient-experience/effective-patient-scheduling-systems-benefits-and-best-practices) — HIGH confidence (medical practice specialist, data-backed)
-- [How to Avoid Double Booking — Acuity Scheduling](https://acuityscheduling.com/learn/avoid-double-booking-appointments) — HIGH confidence (authoritative scheduling platform)
-- [Concurrency in Booking Systems — Medium / Abhishek Ranjan](https://medium.com/@abhishekranjandev/concurrency-conundrum-in-booking-systems-2e53dc717e8c) — MEDIUM confidence (technical deep-dive, consistent with industry sources)
-- [Double Booking Problem — Adam Djellouli](https://adamdjellouli.com/articles/databases_notes/07_concurrency_control/04_double_booking_problem) — MEDIUM confidence (database theory, matches PostgreSQL/MySQL documentation)
-- [Cancellation Policy Best Practices — Acuity Scheduling](https://acuityscheduling.com/learn/how-to-create-a-cancellation-policy) — HIGH confidence (authoritative scheduling platform)
-- [No-Show Policy for Medical Practices — Tebra](https://www.tebra.com/theintake/checklists-and-guides/patient-scheduling/no-show-policy-for-your-practice) — HIGH confidence (medical practice specialist)
-- [GDPR for Medical Practice — heydata.eu](https://heydata.eu/en/magazine/gdpr-for-medical-practice-9-steps-to-compliance) — HIGH confidence (GDPR compliance specialist, EU-specific)
-- [GDPR Healthcare Data Compliance — GDPR Local](https://gdprlocal.com/gdpr-health-data-compliance-key-considerations-for-healthcare-providers/) — HIGH confidence (GDPR specialist, healthcare focus)
-- [NextAuth.js 2025 — Strapi Blog](https://strapi.io/blog/nextauth-js-secure-authentication-next-js-guide) — MEDIUM confidence (current 2025 guide, verified against official NextAuth docs)
-- [Online Booking What Is Offered — Jane App](https://jane.app/guide/online-booking-choosing-what-is-offered-online-locations-staff-shifts-treatments-etc-and-individual-staff-preferences) — HIGH confidence (major medical scheduling platform, authoritative)
-- [Appointment Confirmation Emails — Twilio/SendGrid](https://sendgrid.com/en-us/blog/appointment-confirmation-email-examples) — MEDIUM confidence (email platform, best practice guidance)
-- [Hungary Timezone — World Data Info](https://www.worlddata.info/europe/hungary/timezones.php) — HIGH confidence (factual timezone data)
-- [Online Medical Booking System for Clinics — Booknetic](https://www.booknetic.com/blog/online-medical-appointment-booking-system) — MEDIUM confidence (booking plugin vendor, practical feature analysis)
+- [Next.js Testing Guide (official)](https://nextjs.org/docs/app/guides/testing) — HIGH confidence; official documentation
+- [Next.js Vitest Setup (official)](https://nextjs.org/docs/app/guides/testing/vitest) — HIGH confidence; official documentation
+- [Next.js Playwright Setup (official)](https://nextjs.org/docs/app/guides/testing/playwright) — HIGH confidence; official documentation
+- [ARIA Grid Pattern — W3C APG](https://www.w3.org/WAI/ARIA/apg/patterns/grid/) — HIGH confidence; W3C authoritative specification
+- [ARIA Date Picker Dialog Pattern — W3C APG](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/examples/datepicker-dialog/) — HIGH confidence; W3C authoritative specification
+- [WCAG 2.2 Complete Guide — AllAccessible](https://www.allaccessible.org/blog/wcag-22-complete-guide-2025) — MEDIUM confidence; verified against W3C WCAG 2.2 spec
+- [Healthcare Website Accessibility — AllAccessible](https://www.allaccessible.org/blog/healthcare-website-accessibility-hipaa-ada-compliance) — MEDIUM confidence; industry analysis with regulatory citations
+- [HHS Accessibility Rule May 2026 — mwe.com](https://www.mwe.com/insights/may-2026-deadline-hhs-imposes-accessibility-standards-for-healthcare-company-websites-mobile-apps-kiosks/) — HIGH confidence; law firm analysis of HHS final rule
+- [Next.js Image Optimization — official](https://nextjs.org/docs/app/api-reference/components/image) — HIGH confidence; official documentation
+- [Sanity + Next.js Image Optimization — Medium Jan 2026](https://medium.com/@drazen.bebic/image-optimization-with-next-js-and-sanity-io-6956b9ceae4f) — MEDIUM confidence; current, practical, verified against official docs
+- [Knip — official site](https://knip.dev/) — HIGH confidence; tool documentation
+- [Knip: Dead Code Detection — Level Up Coding](https://levelup.gitconnected.com/dead-code-detection-in-typescript-projects-why-we-chose-knip-over-ts-prune-8feea827da35) — MEDIUM confidence; practical comparison
+- [Next.js Package Bundling Guide — official](https://nextjs.org/docs/app/guides/package-bundling) — HIGH confidence; official documentation
+- [Core Web Vitals Optimization Next.js 15 — makersden.io](https://makersden.io/blog/optimize-web-vitals-in-nextjs-2025) — MEDIUM confidence; 2025 article verified against Vercel KB
 
 ---
 
-*Feature research for: Morocz Medical — v2.0 appointment booking module*
-*Researched: 2026-02-21*
+*Feature research for: Morocz Medical — v2.1 polish milestone (testing, performance, accessibility, code quality)*
+*Researched: 2026-02-23*

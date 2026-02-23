@@ -1,713 +1,407 @@
 # Architecture Research
 
-**Domain:** Booking module integration — Next.js 15 App Router + Sanity v4 + Auth.js v5
-**Researched:** 2026-02-21
-**Confidence:** HIGH for patterns / MEDIUM for some third-party adapter specifics
+**Domain:** Testing, performance optimization, and accessibility hardening — Next.js 15 App Router + Sanity v4 + Vercel
+**Researched:** 2026-02-23
+**Confidence:** HIGH for testing patterns / HIGH for performance / MEDIUM for accessibility tooling integration specifics
 
 ---
 
 ## Standard Architecture
 
-### System Overview — v2.0 Booking Module Added to Existing Site
+### System Overview — v2.1 Hardening Layer on Existing v2.0 System
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────┐
-│                        SANITY STUDIO (embedded /studio)                       │
-│  Existing schemas: homepage | services | labTests | testimonials | blog |     │
-│  NEW schemas:      doctorSchedule | booking | patient (user data)            │
-│  Admin views:      Booking calendar view (custom Studio tool or desk)        │
-└────────────────────────────────┬─────────────────────────────────────────────┘
-                                 │ Content Lake (Sanity HTTP API — write via SDK)
-                                 │ GROQ queries via sanityFetch() — READ
-                                 │ Sanity client mutations — WRITE (bookings)
-                                 ▼
-┌──────────────────────────────────────────────────────────────────────────────┐
-│                     NEXT.JS APP ROUTER (src/app/)                             │
+│                     TEST SUITE (src/__tests__/ + e2e/)                        │
 ├──────────────────────────────────────────────────────────────────────────────┤
-│  EXISTING (unchanged)                                                         │
-│  ├── layout.tsx                    — siteSettings fetch, Header + Footer     │
-│  ├── page.tsx                      — homepage sections                       │
-│  ├── blog/[slug]/page.tsx          — blog post detail                        │
-│  └── api/revalidate/route.ts       — HMAC webhook revalidation               │
-├──────────────────────────────────────────────────────────────────────────────┤
-│  NEW: Public booking flow  (route group: (public))                           │
-│  ├── idopontfoglalas/page.tsx      — booking calendar page (Server Component)│
-│  ├── idopontfoglalas/megerosites/  — booking confirmation page               │
-│  └── (auth flow wired into existing layout)                                  │
-├──────────────────────────────────────────────────────────────────────────────┤
-│  NEW: Patient account  (route group: (patient))                              │
-│  ├── fiokom/page.tsx               — patient dashboard: upcoming bookings    │
-│  └── fiokom/foglalas/[id]/page.tsx — booking detail / cancel / reschedule   │
-├──────────────────────────────────────────────────────────────────────────────┤
-│  NEW: Admin dashboard  (route group: (admin), separate layout)               │
-│  ├── (admin)/layout.tsx            — admin shell, no Header/Footer, auth guard│
-│  ├── admin/page.tsx                — today's appointments + calendar view    │
-│  └── admin/foglalas/[id]/page.tsx  — patient detail, status management      │
-├──────────────────────────────────────────────────────────────────────────────┤
-│  NEW: API routes                                                              │
-│  ├── api/auth/[...nextauth]/route.ts — Auth.js v5 handler                   │
-│  └── api/booking/availability/route.ts — slot availability (for polling)    │
-├──────────────────────────────────────────────────────────────────────────────┤
-│  NEW: Server Actions (src/lib/actions/)                                      │
-│  ├── booking.actions.ts            — createBooking, cancelBooking, reschedule│
-│  └── auth.actions.ts               — signIn, signOut wrappers if needed      │
-├──────────────────────────────────────────────────────────────────────────────┤
-│  NEW: Auth layer                                                              │
-│  ├── auth.config.ts                — providers (Google, Credentials), callbacks│
-│  ├── auth.ts                       — full Auth.js instance + Sanity adapter  │
-│  └── middleware.ts                 — JWT session check, route protection     │
+│  Unit (Vitest + RTL)         Integration (NTARH + Vitest)   E2E (Playwright) │
+│  ├── lib/slots.ts            ├── api/slots/route.ts         ├── booking flow  │
+│  ├── lib/booking-email.ts    ├── api/booking/route.ts       ├── admin login   │
+│  └── pure utility fns        ├── api/booking-cancel        └── accessibility │
+│                              └── api/booking-reschedule                       │
 └──────────────────────────────────────────────────────────────────────────────┘
                                  │
                                  ▼
 ┌──────────────────────────────────────────────────────────────────────────────┐
-│                         EXTERNAL SERVICES                                     │
-│  Resend (email)          — booking confirmation, reminder emails             │
-│  Google OAuth            — patient login via Google account                  │
-│  Vercel (deployment)     — no changes needed, same project                  │
+│                     EXISTING APP (unchanged structure)                        │
+├──────────────────────────────────────────────────────────────────────────────┤
+│  Server Components        Client Components        API Routes                 │
+│  (async, not unit-        (Vitest + RTL unit       (NTARH integration         │
+│   testable — use E2E)      testable with mocks)     tests)                    │
 └──────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Component Responsibilities
-
-| Component | Responsibility | Implementation |
-|-----------|----------------|----------------|
-| `auth.config.ts` | Auth providers + callbacks (edge-safe) | Google OAuth + Credentials; no adapter import |
-| `auth.ts` | Full Auth.js instance with Sanity adapter | Imports auth.config + adds adapter + JWT strategy |
-| `middleware.ts` | Route protection | Imports auth.config only (edge-safe); redirects unauthenticated users |
-| `(admin)/layout.tsx` | Admin shell + role check | Server Component; calls `auth()`, checks role = 'admin', redirect otherwise |
-| `idopontfoglalas/page.tsx` | Booking calendar page | Server Component; fetches schedule + availability from Sanity |
-| `fiokom/page.tsx` | Patient account | Server Component; calls `auth()`, fetches patient's bookings from Sanity |
-| `lib/actions/booking.actions.ts` | Create/cancel/reschedule bookings | Server Actions; auth check + Sanity mutation + Resend email |
-| `api/booking/availability/route.ts` | Live slot availability | Route Handler; called by client for real-time slot checks |
-| `sanity/schemaTypes/bookingType.ts` | Booking document | Sanity schema for appointments |
-| `sanity/schemaTypes/doctorScheduleType.ts` | Weekly schedule + blocked dates | Sanity schema for availability configuration |
-
----
-
-## Integration: Patient Auth
-
-### Decision: Auth.js v5 (next-auth@5) with JWT strategy
-
-Auth.js v5 is the correct choice for Next.js 15 App Router. Use JWT session strategy — not database sessions — because:
-
-1. The Sanity adapter (`next-auth-sanity`) was archived September 2025 and does not support Auth.js v5.
-2. A custom Sanity adapter is the path forward but adds implementation risk.
-3. JWT sessions require no adapter, work on Vercel Edge, and are sufficient for a single-practice site with low auth volume.
-4. Patient user data (name, email, phone) can be stored as a Sanity `patient` document on first booking — decoupled from Auth.js session management.
-
-**Session location:** JWT in an HTTP-only cookie. Available everywhere via `auth()`.
-
-### Auth Configuration Split (required for middleware edge-compatibility)
-
-```
-auth.config.ts        — providers + callbacks; NO adapter import; used in middleware
-auth.ts               — imports auth.config; adds session strategy: 'jwt'; exports auth, handlers, signIn, signOut
-middleware.ts         — imports from auth.config only; runs on Vercel Edge runtime
-app/api/auth/[...nextauth]/route.ts — exports { GET, POST } from auth.ts handlers
-```
-
-**Pattern:**
-```typescript
-// auth.config.ts — edge-safe, no adapter
-import type { NextAuthConfig } from 'next-auth'
-import Google from 'next-auth/providers/google'
-import Credentials from 'next-auth/providers/credentials'
-
-export const authConfig: NextAuthConfig = {
-  providers: [
-    Google,
-    Credentials({
-      credentials: { email: {}, password: {} },
-      async authorize(credentials) {
-        // Verify against Sanity patient document
-        // Return user object or null
-      },
-    }),
-  ],
-  callbacks: {
-    authorized({ auth, request: { nextUrl } }) {
-      const isLoggedIn = !!auth?.user
-      const isOnPatientArea = nextUrl.pathname.startsWith('/fiokom')
-      const isOnAdminArea = nextUrl.pathname.startsWith('/admin')
-      if (isOnPatientArea) return isLoggedIn
-      if (isOnAdminArea) return auth?.user?.role === 'admin'
-      return true
-    },
-    jwt({ token, user }) {
-      if (user) token.role = user.role // persist role in JWT
-      return token
-    },
-    session({ session, token }) {
-      session.user.role = token.role as string
-      return session
-    },
-  },
-  pages: {
-    signIn: '/bejelentkezes',
-  },
-}
-```
-
-```typescript
-// auth.ts — full instance, NOT used in middleware
-import NextAuth from 'next-auth'
-import { authConfig } from './auth.config'
-
-export const { auth, handlers, signIn, signOut } = NextAuth({
-  ...authConfig,
-  session: { strategy: 'jwt' },
-})
-```
-
-```typescript
-// middleware.ts
-import NextAuth from 'next-auth'
-import { authConfig } from '@/auth.config'
-
-export const { auth: middleware } = NextAuth(authConfig)
-
-export const config = {
-  matcher: ['/fiokom/:path*', '/admin/:path*'],
-}
-```
-
-### Where Sessions Are Read
-
-| Context | How to access session |
-|---------|----------------------|
-| Server Component | `const session = await auth()` |
-| Server Action | `const session = await auth()` |
-| Route Handler | `const session = await auth()` |
-| Middleware | Via `authorized` callback in auth.config.ts |
-| Client Component | `useSession()` from `next-auth/react` (wrap in `<SessionProvider>`) |
-
-### Patient User Data in Sanity
-
-Auth.js JWT stores: `id`, `email`, `name`, `image`, `role`. On first booking, create or upsert a `patient` Sanity document keyed by email. This keeps auth decoupled from CMS — auth handles identity, Sanity handles medical/booking data.
-
----
-
-## Integration: Booking Calendar
-
-### Route: `/idopontfoglalas`
-
-This is a new standalone page inside the existing public layout (Header + Footer visible). The URL `/idopontfoglalas` (Hungarian for "appointment booking") is entered directly in the App Router without a route group.
-
-**Data flow for the booking page:**
-
-```
-Patient visits /idopontfoglalas
-    ↓
-idopontfoglalas/page.tsx  [Server Component]
-    ├── sanityFetch({ query: doctorScheduleQuery })    — weekly hours + blocked dates
-    ├── sanityFetch({ query: allServicesQuery })        — services patient can book
-    └── renders <BookingCalendar> (Client Component 'use client')
-            ↓ receives: schedule, services as props (no Sanity calls from client)
-            ├── Step 1: patient picks service
-            ├── Step 2: patient picks date (calendar, blocked dates from props)
-            ├── Step 3: patient picks time slot
-            │         ↓ fetch('/api/booking/availability?date=YYYY-MM-DD')
-            │         — real-time check: which slots already booked
-            └── Step 4: patient confirms (form submit → Server Action)
-```
-
-**Why a Route Handler for availability, not a Server Action:**
-Server Actions use POST only. Slot availability is a read (GET), must be pollable without form submission, and needs to refresh periodically while the patient deliberates. Route Handler at `GET /api/booking/availability` is correct here.
-
----
-
-## Integration: Booking Server Actions
-
-### Decision: Server Actions for all mutations
-
-Creating, canceling, and rescheduling a booking are mutations within the Next.js app, called from Client Components. Server Actions are the right choice:
-- No separate API endpoint needed
-- Built-in CSRF protection
-- Direct access to session via `auth()`
-- Automatic cache revalidation with `revalidatePath` / `revalidateTag`
-
-```typescript
-// src/lib/actions/booking.actions.ts
-'use server'
-
-import { auth } from '@/auth'
-import { sanityWriteClient } from '@/sanity/lib/client'
-import { sendConfirmationEmail } from '@/lib/email'
-import { revalidateTag } from 'next/cache'
-
-export async function createBooking(formData: FormData) {
-  const session = await auth()
-  if (!session?.user) throw new Error('Bejelentkezés szükséges')
-
-  const serviceId = formData.get('serviceId') as string
-  const date = formData.get('date') as string
-  const time = formData.get('time') as string
-
-  // 1. Check slot still available (guard against race condition)
-  const existingBooking = await checkSlotAvailability(date, time)
-  if (!existingBooking.available) {
-    return { error: 'Ez az időpont már foglalt. Kérjük, válasszon másikat.' }
-  }
-
-  // 2. Create booking document in Sanity
-  const booking = await sanityWriteClient.create({
-    _type: 'booking',
-    patient: { email: session.user.email, name: session.user.name },
-    service: { _type: 'reference', _ref: serviceId },
-    date,
-    time,
-    status: 'confirmed',
-    createdAt: new Date().toISOString(),
-  })
-
-  // 3. Send confirmation email
-  await sendConfirmationEmail({
-    to: session.user.email!,
-    patientName: session.user.name!,
-    date,
-    time,
-  })
-
-  revalidateTag('booking')
-  return { success: true, bookingId: booking._id }
-}
-```
-
-**Note on double-booking:** Sanity does not support database-level row locking. The protection strategy is:
-1. Check availability in the Server Action before writing (read → validate → write)
-2. Store a composite key field (`dateTime: "2026-03-15T10:00"`) on the booking document
-3. Use Sanity's `ifRevisionID` optimistic locking on the slot document if using a slot-based model
-4. At this scale (single practice, low concurrency), the read-then-write pattern with immediate status check is sufficient
-
----
-
-## Sanity Schema: Availability Modeling
-
-### Recommended Schema Design
-
-Three new document types cover the booking domain:
-
-**1. `doctorSchedule` (singleton document)**
-
-Defines the weekly repeating schedule and one-off blocked dates. The doctor edits this in Studio.
-
-```typescript
-// Conceptual schema — actual file: src/sanity/schemaTypes/doctorScheduleType.ts
-{
-  name: 'doctorSchedule',
-  type: 'document',
-  fields: [
-    {
-      name: 'weeklySlots',
-      type: 'array',
-      of: [{
-        type: 'object',
-        fields: [
-          { name: 'dayOfWeek', type: 'number' },        // 1=Monday, 7=Sunday
-          { name: 'startTime', type: 'string' },        // "09:00"
-          { name: 'endTime', type: 'string' },          // "17:00"
-          { name: 'slotDurationMinutes', type: 'number' }, // 30
-          { name: 'breakStart', type: 'string' },       // "12:00" optional
-          { name: 'breakEnd', type: 'string' },         // "13:00" optional
-        ]
-      }]
-    },
-    {
-      name: 'blockedDates',
-      type: 'array',
-      of: [{
-        type: 'object',
-        fields: [
-          { name: 'date', type: 'date' },                // "2026-08-20"
-          { name: 'reason', type: 'string' },            // "Szabadság"
-        ]
-      }]
-    },
-    {
-      name: 'bookingWindowDays',
-      type: 'number',
-      // How far in advance patients can book (e.g., 60 days)
-    }
-  ]
-}
-```
-
-**2. `booking` (many documents, one per appointment)**
-
-```typescript
-// Conceptual schema — actual file: src/sanity/schemaTypes/bookingType.ts
-{
-  name: 'booking',
-  type: 'document',
-  fields: [
-    { name: 'patientName', type: 'string' },
-    { name: 'patientEmail', type: 'string' },
-    { name: 'patientPhone', type: 'string' },
-    { name: 'service', type: 'reference', to: [{ type: 'service' }] },
-    { name: 'date', type: 'date' },                     // "2026-03-15"
-    { name: 'time', type: 'string' },                   // "10:00"
-    { name: 'dateTime', type: 'string' },               // "2026-03-15T10:00" — composite key for conflict detection
-    { name: 'status', type: 'string' },                 // 'confirmed' | 'cancelled' | 'completed'
-    { name: 'notes', type: 'text' },                    // optional patient note
-    { name: 'createdAt', type: 'datetime' },
-    { name: 'cancelledAt', type: 'datetime' },
-    { name: 'authUserId', type: 'string' },             // Auth.js user identifier
-  ]
-}
-```
-
-**3. Slot generation strategy: compute in code, not Sanity**
-
-Do NOT store individual time slots as Sanity documents. That would create hundreds of documents per week. Instead:
-- `doctorSchedule` defines the rules (weekly template + blocked dates)
-- The booking calendar page fetches the schedule + existing bookings for a date range
-- Slot generation is a pure function that takes schedule rules + booked slots → available slots
-
-```typescript
-// src/lib/booking/slots.ts
-export function generateAvailableSlots(
-  schedule: DoctorSchedule,
-  existingBookings: Booking[],
-  date: string, // "YYYY-MM-DD"
-): TimeSlot[] {
-  // 1. Find the weeklySlot for this day of week
-  // 2. Generate all slots between startTime and endTime, skipping break
-  // 3. Filter out slots that have a matching booking with status !== 'cancelled'
-  // 4. Return available slots
-}
-```
-
----
-
-## Integration: Email Sending
-
-### Decision: Resend via Server Action (inline, not background job)
-
-For a single-practice site with low booking volume, send email synchronously inside the Server Action after the booking is created. No background job infrastructure (Inngest, QStash) needed at this scale.
-
-```typescript
-// src/lib/email.ts
-import { Resend } from 'resend'
-
-const resend = new Resend(process.env.RESEND_API_KEY)
-
-export async function sendConfirmationEmail(params: {
-  to: string
-  patientName: string
-  date: string
-  time: string
-  serviceName: string
-}) {
-  await resend.emails.send({
-    from: 'Mórocz Medical <idopont@drmoroczangela.hu>',
-    to: params.to,
-    subject: 'Időpont-visszaigazolás — Mórocz Medical',
-    // Use React Email component or plain HTML
-    html: buildConfirmationEmailHtml(params),
-  })
-}
-```
-
-**Reminder emails:** At this scale, send reminders as a separate Vercel Cron job (one function, runs daily, queries upcoming bookings from Sanity and sends reminders for tomorrow's appointments). Do not require real-time event triggers.
-
----
-
-## Integration: Admin Dashboard
-
-### Decision: Route group `(admin)` with its own layout
-
-The admin dashboard needs:
-- No public Header/Footer (different shell entirely)
-- Separate authentication check (role = 'admin')
-- Different visual design (data-dense, not patient-facing)
-
-Route groups make this clean without polluting the URL:
-
-```
-src/app/
-├── layout.tsx                    — public root layout (Header + Footer)
-├── (admin)/
-│   ├── layout.tsx                — admin root layout (admin shell, role guard)
-│   └── admin/
-│       ├── page.tsx              — today's appointments + calendar
-│       └── foglalas/[id]/
-│           └── page.tsx          — booking detail
-```
-
-The URL is `/admin/...` — the route group `(admin)` is invisible in URLs.
-
-**Admin layout pattern:**
-```typescript
-// src/app/(admin)/layout.tsx
-import { auth } from '@/auth'
-import { redirect } from 'next/navigation'
-
-export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const session = await auth()
-
-  if (!session?.user || session.user.role !== 'admin') {
-    redirect('/bejelentkezes?callbackUrl=/admin')
-  }
-
-  return (
-    <div className="admin-shell">
-      <AdminSidebar />
-      <main>{children}</main>
-    </div>
-  )
-}
-```
-
-**Admin login:** The admin uses the same Auth.js login page (`/bejelentkezes`) but with the `Credentials` provider (email + password). The admin user document in Sanity has `role: 'admin'` — the JWT callback reads this and stores it in the token. Middleware and the admin layout both check this role.
-
-There is no separate admin auth system — one auth stack, role-based access control.
+### Component Responsibilities — v2.1 Additions
+
+| Layer | Tool | Responsibility | What It Tests |
+|-------|------|----------------|---------------|
+| Unit | Vitest + RTL | Isolated pure functions and Client Components | `generateAvailableSlots`, `getAvailableDatesInRange`, email builders, form validation logic |
+| Integration | NTARH + Vitest | API Route Handlers with mocked external deps | `/api/slots`, `/api/booking`, `/api/booking-cancel`, `/api/booking-reschedule` |
+| E2E | Playwright | Full user journeys in real browser | Booking flow 4 steps, admin login, accessibility violations via axe |
+| Performance | @next/bundle-analyzer | Bundle size visibility | Chunk sizes, large deps, unnecessary client JS |
+| Image | next/image | LCP optimization, Sanity CDN | Doctor photo, service icons, lab test images |
+| Accessibility | @axe-core/playwright | WCAG 2.2 AA automated scan | Booking form, admin dashboard, homepage |
+| Motion a11y | MotionConfig reducedMotion="user" | Already implemented — verify works | System reduced-motion preference respected |
 
 ---
 
 ## Recommended Project Structure (additions only)
 
 ```
-src/
-├── app/
-│   ├── (admin)/                      # NEW — route group, invisible in URL
-│   │   ├── layout.tsx                # Admin shell + role guard
-│   │   └── admin/
-│   │       ├── page.tsx              # Today's appointments
-│   │       └── foglalas/[id]/
-│   │           └── page.tsx          # Booking detail / manage
-│   │
-│   ├── idopontfoglalas/              # NEW — public booking page
-│   │   └── page.tsx
-│   │
-│   ├── fiokom/                       # NEW — patient account area
-│   │   ├── page.tsx                  # Upcoming / past bookings
-│   │   └── foglalas/[id]/
-│   │       └── page.tsx              # Cancel / reschedule
-│   │
-│   ├── bejelentkezes/                # NEW — login page
-│   │   └── page.tsx
-│   │
+morocz/
+├── __tests__/                    # NEW — unit and integration tests
+│   ├── lib/
+│   │   ├── slots.test.ts         # generateAvailableSlots, getAvailableDatesInRange
+│   │   └── booking-email.test.ts # buildConfirmationEmail, buildReminderEmail
 │   └── api/
-│       ├── auth/
-│       │   └── [...nextauth]/
-│       │       └── route.ts          # Auth.js handler
-│       └── booking/
-│           └── availability/
-│               └── route.ts          # GET — slot availability for date
-│
-├── auth.config.ts                    # NEW — edge-safe provider config
-├── auth.ts                           # NEW — full Auth.js instance
-├── middleware.ts                     # NEW — route protection
-│
-├── components/
-│   └── booking/                      # NEW — booking UI components
-│       ├── BookingCalendar.tsx        # 'use client' — multi-step booking flow
-│       ├── ServicePicker.tsx          # 'use client' — service selection step
-│       ├── DatePicker.tsx             # 'use client' — calendar date selection
-│       ├── TimePicker.tsx             # 'use client' — time slot grid
-│       ├── BookingConfirmDialog.tsx   # 'use client' — confirm modal
-│       └── PatientBookingList.tsx     # 'use client' — patient's bookings list
-│
-├── sanity/
-│   └── schemaTypes/
-│       ├── bookingType.ts            # NEW — appointment document
-│       ├── doctorScheduleType.ts     # NEW — weekly schedule + blocked dates
-│       └── patientType.ts            # NEW — patient profile (optional)
-│
-└── lib/
-    ├── actions/
-    │   ├── booking.actions.ts        # NEW — Server Actions: create, cancel, reschedule
-    │   └── auth.actions.ts           # NEW — signIn/signOut wrappers if needed
-    ├── booking/
-    │   └── slots.ts                  # NEW — slot generation pure function
-    └── email.ts                      # NEW — Resend email helpers
+│       ├── slots.test.ts         # GET /api/slots via NTARH
+│       ├── booking.test.ts       # POST /api/booking via NTARH
+│       ├── booking-cancel.test.ts
+│       └── booking-reschedule.test.ts
+├── e2e/                          # NEW — Playwright E2E tests
+│   ├── booking-flow.spec.ts      # Full 4-step booking wizard
+│   ├── admin-login.spec.ts       # Admin authentication
+│   ├── accessibility.spec.ts     # axe scans on key pages
+│   └── auth/
+│       └── setup.ts              # Auth state setup (storageState)
+├── playwright.config.ts          # NEW — Playwright config
+├── vitest.config.mts             # NEW — Vitest config
+└── src/
+    └── (all existing files, no structure change)
 ```
+
+### Structure Rationale
+
+- **`__tests__/`:** Mirrors `src/` directory structure. Vitest is configured to look here plus any `*.test.ts` files colocated in `src/`. Co-location is valid but top-level `__tests__/` keeps test files visually separate from production code — preferred for this project size.
+- **`e2e/`:** Playwright tests at root level, separate from unit tests. Different runner, different config, different CI step.
+- **`e2e/auth/setup.ts`:** Playwright auth state setup runs once before tests that need a logged-in user, saving cookies to a file. Tests that need auth depend on this setup project. Tests that do not need auth run without it.
 
 ---
 
 ## Architectural Patterns
 
-### Pattern 1: JWT Auth with Split Config for Edge Middleware
+### Pattern 1: Three-Layer Test Strategy
 
-**What:** Auth.js v5 requires splitting configuration into `auth.config.ts` (edge-safe, no adapter, used in middleware) and `auth.ts` (full instance with any heavy dependencies, used everywhere else). The session is a signed JWT stored in an HTTP-only cookie — no database session table needed.
+**What:** Unit tests for pure functions, integration tests for API routes, E2E tests for async Server Components and full user flows. Never try to unit test async Server Components — use E2E.
 
-**When to use:** Whenever middleware runs auth checks and the project uses an adapter or ORM that is not edge-compatible. This is the recommended pattern in Auth.js v5 docs for Vercel deployments.
+**When to use:** The only viable strategy for Next.js 15 App Router. Vitest cannot execute async Server Components (they use RSC wire format); Playwright runs a real browser against a real Next.js dev server.
 
-**Trade-offs:** Slightly more files than a single `auth.ts` approach. Worth it to avoid the "adapter not compatible with edge" error that breaks middleware deployment.
+**Trade-offs:** More infrastructure than a single test runner. Worth it because each layer tests what it can test best. Playwright is slower but covers the async server layer that no other tool can reach.
 
-**Example:** See "Integration: Patient Auth" section above.
+**Mapping to this codebase:**
 
-### Pattern 2: Sanity as Source of Truth for Schedule, Not Slots
+```
+src/lib/slots.ts                 → Vitest unit tests (pure functions, no deps)
+src/lib/booking-email.ts         → Vitest unit tests (string-building functions)
+src/app/api/slots/route.ts       → NTARH integration tests (mocks sanityFetch)
+src/app/api/booking/route.ts     → NTARH integration tests (mocks auth, sanityFetch, Sanity write client)
+src/app/idopontfoglalas/page.tsx → Playwright E2E (async Server Component — no unit test possible)
+src/components/booking/BookingWizard.tsx → Playwright E2E preferred; RTL unit possible for step logic
+```
 
-**What:** Only the schedule rules (weekly template, blocked dates) live in Sanity. Individual time slots are generated on-demand in a pure TypeScript function. Booked slots are Sanity `booking` documents queried by date range.
+### Pattern 2: Module Mocking Strategy for API Route Tests
 
-**When to use:** Any calendar booking system where storing every possible slot would create an unwieldy number of documents.
+**What:** Use `vi.mock()` to replace external dependencies (sanityFetch, Sanity write client, Better Auth, email) with deterministic stubs. API routes are tested in isolation from Sanity and Gmail.
 
-**Trade-offs:** Slot generation logic must be correct and well-tested. The upside is the admin only manages the schedule template — not individual slots — which is a far better CMS editing experience.
+**When to use:** All integration tests via NTARH. Mocking lets tests run without real Sanity credentials, run fast, and produce consistent results.
 
-### Pattern 3: Server Action Mutations + Route Handler for Live Reads
+**Trade-offs:** Mocks can drift from real behavior. Mitigate by keeping mocks minimal — only stub what the test cannot control (external HTTP calls, auth sessions), not internal logic.
 
-**What:** All state-changing operations (create booking, cancel, reschedule) use Server Actions. The single live-read operation (checking which slots are still available while the patient is choosing) uses a Route Handler (`GET /api/booking/availability`) because Server Actions are POST-only and not suitable for polled reads.
+**Pattern:**
 
-**When to use:** This hybrid is the correct default. Server Actions for mutations (form submissions, data writes). Route Handlers for read-only endpoints that need to be called repeatedly, cached, or accessed outside of form context.
+```typescript
+// __tests__/api/slots.test.ts
+import { vi, describe, it, expect, beforeEach } from 'vitest'
+import { testApiHandler } from 'next-test-api-route-handler'
 
-### Pattern 4: Route Group for Admin Isolation
+// Hoist mocks before imports (required by Vitest)
+const mockSanityFetch = vi.hoisted(() => vi.fn())
 
-**What:** `(admin)` route group with its own `layout.tsx` gives the admin dashboard a completely different shell (no public Header/Footer) without affecting URLs. The role check lives in the layout — a single, authoritative gate for all admin routes.
+vi.mock('@/sanity/lib/fetch', () => ({
+  sanityFetch: mockSanityFetch,
+}))
 
-**When to use:** Any time a portion of the app needs fundamentally different chrome and access rules from the public site. Do not use the public root layout for admin — it fetches site settings, shows the marketing nav, and is wrong for admin UX.
+// Import handler AFTER vi.mock calls
+import * as handler from '@/app/api/slots/route'
+
+describe('GET /api/slots', () => {
+  beforeEach(() => vi.clearAllMocks())
+
+  it('returns 400 when date param is missing', async () => {
+    await testApiHandler({
+      appHandler: handler,
+      url: '/api/slots?serviceId=abc123',
+      async test({ fetch }) {
+        const res = await fetch({ method: 'GET' })
+        expect(res.status).toBe(400)
+      },
+    })
+  })
+
+  it('returns available slots for a valid working day', async () => {
+    mockSanityFetch
+      .mockResolvedValueOnce(mockSchedule)   // weeklyScheduleQuery
+      .mockResolvedValueOnce(mockBlocked)    // blockedDatesQuery
+      .mockResolvedValueOnce([])             // bookingsForDateQuery
+      .mockResolvedValueOnce([])             // slotLocksForDateQuery
+      .mockResolvedValueOnce(mockService)    // serviceByIdQuery
+
+    await testApiHandler({
+      appHandler: handler,
+      url: '/api/slots?date=2026-03-16&serviceId=service-123',
+      async test({ fetch }) {
+        const res = await fetch({ method: 'GET' })
+        expect(res.status).toBe(200)
+        const body = await res.json()
+        expect(body.slots).toBeInstanceOf(Array)
+        expect(body.slots.length).toBeGreaterThan(0)
+      },
+    })
+  })
+})
+```
+
+### Pattern 3: Playwright Auth State Reuse
+
+**What:** Log in once during a Playwright "setup" project, save the session cookie to a JSON file, and load that file as storageState in tests that require authentication. Tests that test public pages don't load any auth state.
+
+**When to use:** Any E2E test touching `/admin`, `/foglalas/:token`, or the confirmation step of the booking wizard (which requires auth).
+
+**Trade-offs:** Setup adds ~5 seconds once per test run. Dramatically faster than logging in inside every test. Auth state file must be gitignored.
+
+**Config:**
+
+```typescript
+// playwright.config.ts
+import { defineConfig, devices } from '@playwright/test'
+
+export default defineConfig({
+  testDir: './e2e',
+  fullyParallel: true,
+  retries: process.env.CI ? 2 : 0,
+  workers: process.env.CI ? 1 : undefined,
+  webServer: {
+    command: 'npm run build && npm run start',
+    url: 'http://localhost:3000',
+    reuseExistingServer: !process.env.CI,
+  },
+  projects: [
+    // Setup: log in once, save session
+    {
+      name: 'setup',
+      testMatch: /.*\.setup\.ts/,
+    },
+    // Admin tests reuse auth state
+    {
+      name: 'admin-chromium',
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: 'e2e/auth/.admin-auth.json',
+      },
+      dependencies: ['setup'],
+      testMatch: /admin.*.spec.ts/,
+    },
+    // Public tests run without auth
+    {
+      name: 'public-chromium',
+      use: { ...devices['Desktop Chrome'] },
+      testMatch: /(?!admin).*.spec.ts/,
+    },
+  ],
+})
+```
+
+```typescript
+// e2e/auth/setup.ts
+import { test as setup } from '@playwright/test'
+
+setup('authenticate as admin', async ({ page }) => {
+  await page.goto('/admin')
+  await page.getByLabel('E-mail').fill(process.env.ADMIN_EMAIL!)
+  await page.getByLabel('Jelszó').fill(process.env.ADMIN_PASSWORD!)
+  await page.getByRole('button', { name: 'Bejelentkezés' }).click()
+  await page.waitForURL('/admin')
+  await page.context().storageState({ path: 'e2e/auth/.admin-auth.json' })
+})
+```
+
+### Pattern 4: Accessibility Scanning with axe + Playwright
+
+**What:** Add `@axe-core/playwright` to Playwright E2E tests. Scan critical pages after navigation and assert that violations array is empty. Run alongside functional tests, not as a separate suite.
+
+**When to use:** Every route that has user-facing HTML. Priority: homepage, booking wizard (all 4 steps), admin dashboard, booking management page.
+
+**Trade-offs:** axe catches ~30-40% of WCAG issues automatically. Manual testing is still needed for focus order, screen reader announcements, and color contrast edge cases. axe is a floor, not a ceiling.
+
+**Pattern:**
+
+```typescript
+// e2e/accessibility.spec.ts
+import { test, expect } from '@playwright/test'
+import AxeBuilder from '@axe-core/playwright'
+
+test.describe('Accessibility — homepage', () => {
+  test('no WCAG 2.2 AA violations', async ({ page }) => {
+    await page.goto('/')
+    const results = await new AxeBuilder({ page })
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
+      .analyze()
+    expect(results.violations).toEqual([])
+  })
+})
+
+test.describe('Accessibility — booking wizard step 1', () => {
+  test('service selection step is accessible', async ({ page }) => {
+    await page.goto('/idopontfoglalas')
+    const results = await new AxeBuilder({ page })
+      .withTags(['wcag2a', 'wcag2aa'])
+      .analyze()
+    expect(results.violations).toEqual([])
+  })
+})
+```
+
+### Pattern 5: Sanity CDN + next/image for LCP
+
+**What:** All Sanity-hosted images go through next/image with explicit `width`, `height`, `sizes`, and `priority` on the LCP image (the doctor photo in the hero). next/image handles AVIF/WebP negotiation and serves from Vercel's image optimization CDN.
+
+**When to use:** Every `<img>` tag sourcing from `cdn.sanity.io`. Currently the project uses `imageUrlBuilder` from `@sanity/image-url` to generate URLs — pass those URLs as `src` to `next/image`.
+
+**Trade-offs:** next/image requires explicit `width` and `height` props to prevent CLS. For Sanity images, get these from `@sanity/asset-utils` `getImageDimensions()`. The LCP image must have `priority` — without it, Next.js lazy-loads it, tanking LCP score.
+
+**Pattern:**
+
+```typescript
+// src/components/sections/HeroSection.tsx (modified)
+import Image from 'next/image'
+import imageUrlBuilder from '@sanity/image-url'
+import { getImageDimensions } from '@sanity/asset-utils'
+import { client } from '@/sanity/lib/client'
+
+const builder = imageUrlBuilder(client)
+
+export function SanityImage({
+  asset,
+  alt,
+  priority = false,
+  sizes = '100vw',
+  className,
+}: {
+  asset: SanityImageAsset
+  alt: string
+  priority?: boolean
+  sizes?: string
+  className?: string
+}) {
+  const { width, height } = getImageDimensions(asset)
+  const url = builder.image(asset).auto('format').fit('max').url()
+
+  return (
+    <Image
+      src={url}
+      alt={alt}
+      width={width}
+      height={height}
+      sizes={sizes}
+      priority={priority}
+      className={className}
+    />
+  )
+}
+```
+
+### Pattern 6: Bundle Analysis Workflow
+
+**What:** `@next/bundle-analyzer` wraps the Next.js webpack config. Run with `ANALYZE=true npm run build` to generate interactive treemaps of the client, server, and edge bundles. Identify Client Components pulling in large dependencies unnecessarily.
+
+**When to use:** As a diagnostic step at the start of performance work, then again after each optimization to verify improvement.
+
+**Trade-offs:** Adds a dev dependency and a wrapper in `next.config.ts`. Zero runtime overhead — analyzer only runs when `ANALYZE=true`. Output files go to `.next/analyze/` — gitignore these.
+
+**Config:**
+
+```typescript
+// next.config.ts
+import withBundleAnalyzer from '@next/bundle-analyzer'
+
+const bundleAnalyzer = withBundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+})
+
+const nextConfig: NextConfig = {
+  images: {
+    remotePatterns: [{ protocol: 'https', hostname: 'cdn.sanity.io' }],
+    formats: ['image/avif', 'image/webp'], // add AVIF support
+  },
+}
+
+export default bundleAnalyzer(nextConfig)
+```
 
 ---
 
 ## Data Flow
 
-### Booking Creation Flow
+### Test Execution Flow
 
 ```
-Patient fills booking form (Client Component)
-    ↓ clicks "Foglalás megerősítése"
-createBooking(formData) [Server Action]
-    ├── await auth()                        → verify patient is logged in
-    ├── checkSlotAvailability(date, time)   → GROQ query: existing bookings for this dateTime
-    │       ↓ slot already taken?
-    │       return { error: '...' }         → show error to patient, no write
-    │       ↓ slot available?
-    ├── sanityWriteClient.create(booking)   → write booking to Sanity Content Lake
-    ├── sendConfirmationEmail(...)          → Resend API call
-    ├── revalidateTag('booking')            → invalidate patient dashboard cache
-    └── return { success: true, bookingId }
-            ↓
-Client Component receives result
-    → redirect to /fiokom (patient dashboard) or show success message
+npm run test (Vitest)
+    ├── __tests__/lib/slots.test.ts
+    │       └── imports generateAvailableSlots directly — no mocks needed (pure function)
+    │
+    └── __tests__/api/booking.test.ts
+            ├── vi.mock('@/sanity/lib/fetch') → stub returns deterministic data
+            ├── vi.mock('@/lib/auth') → stub returns logged-in session or null
+            ├── vi.mock('@/lib/sanity-write-client') → stub .create(), .patch(), .commit()
+            ├── vi.mock('@/lib/email') → stub sendEmail (no real Gmail calls)
+            └── testApiHandler({ appHandler: handler, ... })
+                    → executes the real route handler with real Zod validation
+                    → external calls go to stubs
+                    → assertions on HTTP status + response body
 ```
 
-### Slot Availability Flow (live check during booking)
+```
+npm run test:e2e (Playwright)
+    ├── [setup] e2e/auth/setup.ts
+    │       └── real browser logs in → saves .admin-auth.json cookie state
+    │
+    ├── [public-chromium] e2e/booking-flow.spec.ts
+    │       └── real browser → real Next.js dev server → real Sanity read API
+    │           (booking wizard steps; does NOT create real bookings — uses test service)
+    │
+    └── [admin-chromium] e2e/accessibility.spec.ts
+            └── loads admin auth state → navigates pages → axe scans
+```
+
+### Performance Optimization Flow
 
 ```
-Patient selects a date in BookingCalendar (Client Component)
+ANALYZE=true npm run build
     ↓
-fetch('/api/booking/availability?date=2026-03-15')
+Browser opens .next/analyze/client.html
     ↓
-GET /api/booking/availability/route.ts  [Route Handler]
-    ├── parse date param
-    ├── sanityFetch(doctorScheduleQuery)   — get schedule rules (cached 60s)
-    ├── sanityFetch(bookingsForDateQuery)  — get existing bookings for this date (no-cache)
-    ├── generateAvailableSlots(schedule, bookings, date)  — pure function
-    └── return JSON: [{ time: '09:00', available: true }, ...]
-            ↓
-Client Component renders available/unavailable time slots
-```
-
-### Admin Dashboard Flow
-
-```
-Admin visits /admin
+Identify: large Client Component chunks, Sanity Studio leaking into public bundle,
+          motion/react unnecessarily bundled in Server Components, googleapis client-side
     ↓
-(admin)/layout.tsx  [Server Component]
-    ├── await auth()
-    ├── role !== 'admin' → redirect('/bejelentkezes')
-    └── render admin shell
-            ↓
-admin/page.tsx  [Server Component]
-    ├── sanityFetch(todaysBookingsQuery, { revalidate: 0 }) — always fresh
-    ├── sanityFetch(doctorScheduleQuery, tags: ['doctorSchedule'])
-    └── render <AdminCalendarView> + <TodayAppointmentsList>
-```
-
-### Patient Account Flow
-
-```
-Patient visits /fiokom
+Apply fixes:
+    ├── dynamic import heavy Client Components (AdminCalendar, ReschedulePanel)
+    ├── mark MotionProvider as 'use client' if not already
+    └── verify googleapis only in server-side code
     ↓
-middleware.ts checks JWT cookie
-    ├── no session → redirect('/bejelentkezes?callbackUrl=/fiokom')
-    └── session valid → allow
-            ↓
-fiokom/page.tsx  [Server Component]
-    ├── await auth()                        — get session
-    ├── sanityFetch(patientBookingsQuery, { params: { email: session.user.email } })
-    └── render <PatientBookingList> with upcoming + past bookings
+Re-run: ANALYZE=true npm run build → confirm chunk sizes reduced
+    ↓
+Lighthouse / Vercel Speed Insights: verify Core Web Vitals improvement
 ```
 
----
+### Key Data Flows
 
-## Existing Code: What Changes vs What Stays
+1. **Slot generation test:** Pure function → Vitest → no I/O. Input: schedule object + booked slots + date. Output: string array. 100% deterministic.
 
-### Unchanged
+2. **API route integration test:** NTARH creates a test server → real Next.js route handler runs → `sanityFetch` calls hit mocks → response asserted. Tests auth checks, Zod validation, business logic — everything except real Sanity/Gmail.
 
-| File | Status |
-|------|--------|
-| `src/app/layout.tsx` | Unchanged — public layout stays as is |
-| `src/app/page.tsx` | Unchanged |
-| `src/app/blog/[slug]/page.tsx` | Unchanged |
-| `src/sanity/lib/fetch.ts` | Unchanged — sanityFetch works for reads |
-| `src/sanity/lib/queries.ts` | Append-only — new queries added, none modified |
-| `src/sanity/lib/client.ts` | Minor addition: export a write client with API token |
-| `src/app/api/revalidate/route.ts` | Add new type mappings: `booking`, `doctorSchedule` |
-| `src/sanity/schemaTypes/index.ts` | Add new schema imports |
-| `src/components/layout/Header.tsx` | Add "Bejelentkezés" / "Fiókom" nav item (minor) |
+3. **Booking E2E test:** Playwright controls real Chrome → navigates to `/idopontfoglalas` → interacts with real BookingWizard → reads real Sanity slots data. Tests the full Server Component + Client Component + API Route stack together.
 
-### New Files (all additive, nothing deleted)
-
-| File | Purpose |
-|------|---------|
-| `auth.config.ts` | Edge-safe auth config |
-| `auth.ts` | Full Auth.js instance |
-| `middleware.ts` | Route protection |
-| `src/app/(admin)/layout.tsx` | Admin shell |
-| `src/app/(admin)/admin/page.tsx` | Admin dashboard |
-| `src/app/idopontfoglalas/page.tsx` | Booking calendar page |
-| `src/app/fiokom/page.tsx` | Patient account |
-| `src/app/bejelentkezes/page.tsx` | Login page |
-| `src/app/api/auth/[...nextauth]/route.ts` | Auth.js API handler |
-| `src/app/api/booking/availability/route.ts` | Slot availability endpoint |
-| `src/lib/actions/booking.actions.ts` | Booking Server Actions |
-| `src/lib/booking/slots.ts` | Slot generation logic |
-| `src/lib/email.ts` | Resend email helpers |
-| `src/components/booking/*.tsx` | Booking UI components |
-| `src/sanity/schemaTypes/bookingType.ts` | Booking schema |
-| `src/sanity/schemaTypes/doctorScheduleType.ts` | Schedule schema |
-
----
-
-## Build Order (considering hard dependencies)
-
-The booking module has clear dependency chains. Build in this order to avoid blockers:
-
-**Phase 1: Foundation (no user-facing output yet)**
-1. New Sanity schemas: `doctorSchedule`, `booking` — establishes data contracts
-2. Run `sanity typegen generate` — all subsequent TS work is type-safe
-3. Add `GROQ queries` for schedule and bookings to `queries.ts`
-4. Export Sanity write client from `client.ts` — needed by Server Actions
-5. Update `api/revalidate/route.ts` with new document type mappings
-
-**Phase 2: Auth (blocks all protected pages)**
-6. `auth.config.ts` — Google provider + Credentials provider + callbacks
-7. `auth.ts` — full Auth.js instance, JWT strategy
-8. `middleware.ts` — route protection for `/fiokom` and `/admin`
-9. `app/api/auth/[...nextauth]/route.ts` — Auth.js API route
-10. `app/bejelentkezes/page.tsx` — login page (sign in form)
-11. Header update — "Bejelentkezés" link
-
-**Phase 3: Core booking (depends on auth + schemas)**
-12. `lib/booking/slots.ts` — slot generation pure function (testable in isolation)
-13. `api/booking/availability/route.ts` — slot availability endpoint
-14. `lib/email.ts` — Resend email helpers
-15. `lib/actions/booking.actions.ts` — createBooking, cancelBooking Server Actions
-16. `components/booking/BookingCalendar.tsx` — multi-step booking UI (Client Component)
-17. `app/idopontfoglalas/page.tsx` — booking page (fetches schedule, renders BookingCalendar)
-
-**Phase 4: Patient account (depends on auth + booking)**
-18. `app/fiokom/page.tsx` — patient dashboard
-19. `app/fiokom/foglalas/[id]/page.tsx` — booking detail + cancel
-
-**Phase 5: Admin dashboard (depends on auth + booking data)**
-20. `app/(admin)/layout.tsx` — admin shell + role guard
-21. `app/(admin)/admin/page.tsx` — admin calendar/today view
-22. Admin booking management UI
-
-**Phase 6: Reminder emails (can be added later, independent)**
-23. Vercel Cron function — daily reminder emails
+4. **Accessibility scan:** Playwright navigates to page → waits for network idle → AxeBuilder injects axe-core → scans DOM → returns violations array → test fails if any violation found.
 
 ---
 
@@ -715,95 +409,164 @@ The booking module has clear dependency chains. Build in this order to avoid blo
 
 | Scale | Architecture Adjustments |
 |-------|--------------------------|
-| 0-100 bookings/month | Current architecture handles this trivially. Single practice, one doctor. |
-| 100-1k bookings/month | Add indexing on `dateTime` composite field. Monitor Sanity API usage (free tier: 500k requests/month). |
-| 1k+ bookings/month | This is not realistic for a single-practice clinic. If it were: move to a proper relational DB (Postgres) for booking data; keep Sanity for CMS content only. |
+| Current (single practice) | All three test layers as described; Playwright runs against `npm run start` (production build) in CI |
+| Growing team | Add test fixtures/factories for Sanity mock data; increase Playwright parallelism |
+| Multiple practices | Extract slot generator to a tested npm package; E2E tests per tenant environment |
 
 ### Scaling Priorities
 
-1. **First concern — double-booking at peak times:** Read-then-write pattern in Server Actions is safe for this practice's volume. Implement `dateTime` composite field uniqueness check. For higher volume, use Sanity's `ifRevisionID` optimistic locking on a slot document.
-2. **Second concern — Sanity write API costs:** Bookings use the write API (mutations), which counts against the plan. At a single practice's volume (maybe 20 bookings/day), this is negligible on the free/growth tier.
+1. **First bottleneck — slow E2E suite:** Playwright tests against `npm start` are slow because they need a build. Use `npm run dev` for local runs with `reuseExistingServer: true`. CI always uses production build.
+2. **Second bottleneck — flaky auth in E2E:** Auth state cookies expire. Set `ADMIN_EMAIL` and `ADMIN_PASSWORD` as CI environment variables; the setup project re-authenticates on every CI run.
 
 ---
 
 ## Anti-Patterns
 
-### Anti-Pattern 1: Storing Every Possible Time Slot as a Sanity Document
+### Anti-Pattern 1: Unit Testing Async Server Components
 
-**What people do:** Create a `timeSlot` document type with a document per slot (09:00, 09:30, 10:00 ... for each day). Mark as `available: true/false`.
+**What people do:** Try to import and `render()` an async Server Component with React Testing Library or Vitest.
 
-**Why it's wrong:** 30-minute slots, 5 days/week, 8 hours/day = 80 slots/week = 4,160/year. Plus Sanity document limits and query overhead. The editor experience for "blocking Christmas week" becomes painful. Schema changes break all slot documents.
+**Why it's wrong:** Async Server Components return RSC payloads, not standard React trees. Vitest's jsdom environment cannot execute them. Tests will fail with cryptic errors about async generators or missing RSC context.
 
-**Do this instead:** Store schedule rules (template) in one `doctorSchedule` document. Generate slots as a pure function at query time. Store only actual bookings as documents.
+**Do this instead:** Use Playwright E2E tests for any component that is `async function Page()` or `async function Layout()`. Unit test the underlying data-fetching functions and pure functions they use — not the component itself.
 
-### Anti-Pattern 2: Using the Database Session Strategy with Sanity
+### Anti-Pattern 2: Skipping the NTARH Library for Route Handler Tests
 
-**What people do:** Configure Auth.js with `session: { strategy: 'database' }` and the `next-auth-sanity` adapter, expecting Sanity to store sessions.
+**What people do:** Try to manually construct `Request` objects and call route handler functions directly with `handler.GET(new Request(...))`.
 
-**Why it's wrong:** The `next-auth-sanity` package was archived in September 2025 with no v5 support. Database sessions require an adapter that can run outside edge runtime, which means middleware cannot use it without the config split — adding complexity. Sessions stored in Sanity add write API calls on every request.
+**Why it's wrong:** Next.js Route Handlers use `next/headers` (cookies, headers functions) that require Next.js internal context. Direct calls fail because that context is not set up. Mock setup becomes complex.
 
-**Do this instead:** Use JWT sessions (`strategy: 'jwt'`). No adapter needed for auth itself. Patient profile data lives separately in Sanity `patient` or `booking` documents, not in Auth.js session tables.
+**Do this instead:** Use `next-test-api-route-handler`. It wraps Next.js internals to provide the correct context, handles `headers()` / `cookies()` out of the box, and makes mocking auth much simpler.
 
-### Anti-Pattern 3: Admin Dashboard Sharing the Public Root Layout
+### Anti-Pattern 3: AVIF-Only in next.config.ts Without WebP Fallback
 
-**What people do:** Put the admin at `/admin` without a route group, inheriting the public root layout with `sanityFetch` for site settings, Header, Footer, CookieNotice, GA4, MotionProvider.
+**What people do:** Set `formats: ['image/avif']` expecting maximum compression without understanding browser support.
 
-**Why it's wrong:** Admin gets the patient-facing chrome (hero nav, marketing footer), the layout calls `sanityFetch(siteSettingsQuery)` on every admin page load unnecessarily, and animations fire on dashboard pages. Conceptually wrong — admin is an internal tool, not a public page.
+**Why it's wrong:** AVIF is not supported in all browsers (notably older Safari). Without the WebP fallback, those users receive the original format from the Sanity CDN (likely JPEG), losing all optimization.
 
-**Do this instead:** Route group `(admin)` with its own `layout.tsx`. Admin layout has its own HTML structure: sidebar, data tables, no animations. Public layout unchanged and unaware of admin.
+**Do this instead:** `formats: ['image/avif', 'image/webp']` — Next.js serves AVIF to browsers that accept it, WebP to the rest, and the original as a last resort. This is the correct order.
 
-### Anti-Pattern 4: Fetching Slot Availability Inside a Server Action for Display
+### Anti-Pattern 4: Running axe on Animated Pages Before Animation Settles
 
-**What people do:** Create a Server Action to "get available slots" and call it from a Client Component to show the time picker.
+**What people do:** Navigate to a page with Motion animations and immediately run axe, getting false positives because animated elements are mid-transition (wrong opacity, off-screen transforms).
 
-**Why it's wrong:** Server Actions use POST requests and are designed for mutations. They cannot be called with GET semantics, cannot be cached by the browser, and are awkward to call reactively as the user browses dates. Using them for reads bypasses Next.js fetch caching.
+**Why it's wrong:** Elements being animated may temporarily have accessibility violations that disappear when animation completes (e.g., opacity 0 elements still in DOM). axe may flag them.
 
-**Do this instead:** Route Handler (`GET /api/booking/availability?date=...`) for the live availability read. Server Actions exclusively for mutations (create, cancel, reschedule).
+**Do this instead:** Wait for network idle and add a short explicit wait after navigation before running axe scan. Use `await page.waitForLoadState('networkidle')` then optionally `await page.waitForTimeout(500)` for animations to settle.
+
+### Anti-Pattern 5: Forgetting `priority` on the LCP Image
+
+**What people do:** Use `next/image` on all images but omit `priority` on the hero doctor photo, not realizing it defaults to lazy loading.
+
+**Why it's wrong:** The hero doctor image is typically the Largest Contentful Paint element. Lazy loading it causes Next.js to defer its fetch until the image enters the viewport — for a hero image this means LCP triggers only after the initial render, dramatically hurting the LCP score.
+
+**Do this instead:** Add `priority` prop to exactly one image per page — the one that is the LCP element. For the homepage, that is the hero doctor photo. For service detail pages, it would be the first image in the hero.
 
 ---
 
 ## Integration Points
 
+### New vs. Existing — What Changes
+
+| File | Status | Change |
+|------|--------|--------|
+| `next.config.ts` | Modified | Add `@next/bundle-analyzer` wrapper + `formats: ['image/avif', 'image/webp']` |
+| `src/components/sections/HeroSection.tsx` | Modified | Add `priority` to LCP image; use `<Image>` from `next/image` if not already |
+| `src/components/motion/MotionProvider.tsx` | Unchanged | Already has `reducedMotion="user"` — correct |
+| `package.json` | Modified | Add test scripts: `"test": "vitest"`, `"test:e2e": "playwright test"` |
+| `vitest.config.mts` | New | Vitest config with jsdom environment, `vite-tsconfig-paths` for `@/` aliases |
+| `playwright.config.ts` | New | Playwright config with webServer, projects (setup + admin + public) |
+| `__tests__/lib/slots.test.ts` | New | Unit tests for `generateAvailableSlots` and `getAvailableDatesInRange` |
+| `__tests__/api/slots.test.ts` | New | Integration tests for GET /api/slots via NTARH |
+| `__tests__/api/booking.test.ts` | New | Integration tests for POST /api/booking via NTARH |
+| `e2e/booking-flow.spec.ts` | New | Playwright E2E for booking wizard |
+| `e2e/accessibility.spec.ts` | New | Playwright axe scans for all major pages |
+| `e2e/auth/setup.ts` | New | Admin auth setup (storageState) |
+
 ### External Services
 
 | Service | Integration Pattern | Notes |
 |---------|---------------------|-------|
-| Auth.js v5 (next-auth@5) | `auth()` in Server Components + Server Actions; `useSession()` in Client Components | JWT strategy; no adapter needed |
-| Google OAuth | Via Auth.js Google provider | Configure in Google Cloud Console; `AUTH_GOOGLE_ID` + `AUTH_GOOGLE_SECRET` env vars |
-| Sanity Content Lake (read) | Existing `sanityFetch()` wrapper — unchanged | Add new queries to `queries.ts` |
-| Sanity Content Lake (write) | New write client: `createClient({ token: process.env.SANITY_API_WRITE_TOKEN })` | Write token needs `editor` or `developer` role in Sanity project settings |
-| Resend | `resend.emails.send()` inside Server Actions and Cron | Verify sending domain in Resend dashboard; `RESEND_API_KEY` env var |
-| Vercel Cron | `vercel.json` cron config + `app/api/cron/reminders/route.ts` | For daily reminder emails; use `CRON_SECRET` env var to secure the endpoint |
+| Sanity Content Lake | Mocked in unit/integration tests via `vi.mock('@/sanity/lib/fetch')` | Real Sanity calls only in E2E tests |
+| Better Auth | Mocked in API route tests via `vi.mock('@/lib/auth')` returning stub session | E2E tests use real Better Auth with storageState |
+| Gmail API | Mocked in API route tests via `vi.mock('@/lib/email')` | Never call real Gmail in tests |
+| Vercel Speed Insights | No test changes — passive monitoring in production | Check post-deployment via Vercel dashboard |
+| Vercel Image CDN | No mock needed — `next/image` with `cdn.sanity.io` remotePattern already configured | E2E tests load optimized images from Vercel |
 
 ### Internal Boundaries
 
 | Boundary | Communication | Notes |
 |----------|---------------|-------|
-| Auth layer → booking pages | `auth()` session object | Session carries `email`, `name`, `role` — all that's needed |
-| Booking page → slot availability | REST: `GET /api/booking/availability` | Client Component fetches; Route Handler queries Sanity + runs slot generator |
-| Booking form → Sanity | Server Action → Sanity write client | Server Action reads session, validates, writes, sends email |
-| Admin layout → admin pages | Role check in layout protects subtree | No per-page role check needed if layout gate is correct |
-| `doctorSchedule` Sanity doc → slot generator | TypeScript function call | Schedule document queried server-side; slots generated in `lib/booking/slots.ts` |
-| Sanity schemas → revalidation | Add `booking` + `doctorSchedule` to `typeToTags` in `/api/revalidate/route.ts` | Ensures admin dashboard refreshes when bookings change in Studio |
+| `__tests__/` ↔ `src/lib/slots.ts` | Direct TypeScript import | No mocking needed — pure functions |
+| `__tests__/api/` ↔ route handlers | Via NTARH `testApiHandler` | NTARH provides Next.js runtime context |
+| `e2e/` ↔ Next.js dev server | HTTP via Playwright browser | Playwright config starts the server automatically |
+| Vitest config ↔ `tsconfig.json` | `vite-tsconfig-paths` plugin reads existing tsconfig | No duplicate alias config needed |
+| Biome v2 ↔ test files | Biome's test domain auto-detects Vitest from `package.json` deps | No extra Biome config needed for test files |
+
+---
+
+## Build Order (considering hard dependencies)
+
+Test infrastructure has clear dependency chains. Build in this order:
+
+**Phase A: Unit test foundation (no server needed)**
+
+1. Install Vitest dependencies: `vitest @vitejs/plugin-react jsdom @testing-library/react @testing-library/dom vite-tsconfig-paths`
+2. Create `vitest.config.mts` with jsdom environment and `vite-tsconfig-paths` plugin
+3. Add `"test": "vitest"` and `"test:ci": "vitest run"` scripts to `package.json`
+4. Write `__tests__/lib/slots.test.ts` — tests for `generateAvailableSlots` and `getAvailableDatesInRange`
+5. Write `__tests__/lib/booking-email.test.ts` — tests for email HTML builder functions
+6. Run `npm test` — these should pass immediately (pure functions, no mocks)
+
+**Phase B: API route integration tests (depends on Phase A)**
+
+7. Install NTARH: `next-test-api-route-handler`
+8. Write `__tests__/api/slots.test.ts` — mock `sanityFetch`, test GET /api/slots validation + response
+9. Write `__tests__/api/booking.test.ts` — mock `auth`, `sanityFetch`, write client, `email`; test POST /api/booking
+10. Write `__tests__/api/booking-cancel.test.ts` and `booking-reschedule.test.ts`
+11. Run `npm test` — all unit + integration pass
+
+**Phase C: Performance audit (independent of testing)**
+
+12. Install `@next/bundle-analyzer`
+13. Update `next.config.ts` with analyzer wrapper + AVIF format
+14. Run `ANALYZE=true npm run build` — study client bundle, identify issues
+15. Apply targeted optimizations (images, dynamic imports if needed)
+16. Add `priority` prop to hero doctor image in HeroSection
+
+**Phase D: E2E + accessibility (depends on Phase C — needs a runnable server)**
+
+17. Install Playwright: `npx playwright install --with-deps`
+18. Install `@axe-core/playwright`
+19. Create `playwright.config.ts` with webServer, setup project, public + admin projects
+20. Write `e2e/auth/setup.ts` — admin storageState
+21. Write `e2e/booking-flow.spec.ts` — happy path booking wizard (Steps 1-4)
+22. Write `e2e/accessibility.spec.ts` — axe scans on homepage, booking page, admin
+23. Run `npx playwright test` — fix any axe violations before marking done
+
+**Phase E: Biome config verification (depends on Phase A)**
+
+24. Run `npm run lint:biome` — Biome v2 auto-detects Vitest from `package.json` and enables test domain rules
+25. Fix any lint issues in test files (unused `vi` imports, etc.)
 
 ---
 
 ## Sources
 
-- Auth.js v5 migration guide — edge compatibility, split config, JWT strategy (HIGH confidence): https://authjs.dev/getting-started/migrating-to-v5
-- Auth.js edge compatibility documentation (HIGH confidence): https://authjs.dev/guides/edge-compatibility
-- next-auth-sanity GitHub archived September 2025, v1.5.3 last update August 2023 (verified): https://github.com/fedeya/next-auth-sanity
-- Custom Sanity Auth.js adapter article (MEDIUM confidence): https://medium.com/@stanykhay29/how-to-create-and-integrate-a-custom-auth-js-database-adapter-compatible-with-sanity-cms-a63a7b4ad316
-- Next.js Server Actions vs Route Handlers (HIGH confidence — official Next.js docs): https://nextjs.org/docs/app/building-your-application/data-fetching/server-actions-and-mutations
-- makerkit.dev Server Actions vs Route Handlers comparison (MEDIUM confidence): https://makerkit.dev/blog/tutorials/server-actions-vs-route-handlers
-- Sanity transactions + ifRevisionID optimistic locking (HIGH confidence — official Sanity docs): https://www.sanity.io/docs/transactions
-- Double-booking problem, optimistic locking patterns (MEDIUM confidence): https://itnext.io/solving-double-booking-at-scale-system-design-patterns-from-top-tech-companies-4c5a3311d8ea
-- Resend Next.js integration (HIGH confidence — official Resend docs): https://resend.com/docs/send-with-nextjs
-- Next.js route groups for separate layouts (HIGH confidence — official Next.js docs): https://nextjs.org/docs/app/api-reference/file-conventions/route-groups
-- Role-based access control in Next.js App Router middleware (MEDIUM confidence): https://www.jigz.dev/blogs/how-to-use-middleware-for-role-based-access-control-in-next-js-15-app-router
-- Medical appointment booking data model (MEDIUM confidence): https://www.red-gate.com/blog/the-doctor-will-see-you-soon-a-data-model-for-a-medical-appointment-booking-app
+- Next.js 15 official testing guide — Vitest setup, async Server Component limitation (HIGH confidence): https://nextjs.org/docs/app/guides/testing/vitest
+- Next.js 15 testing overview — categories and recommended tools per category (HIGH confidence): https://nextjs.org/docs/app/guides/testing
+- next-test-api-route-handler — supports App Router since v4.0.0, tested against each Next.js release (HIGH confidence): https://github.com/Xunnamius/next-test-api-route-handler
+- Playwright accessibility testing with @axe-core/playwright (HIGH confidence — official Playwright docs): https://playwright.dev/docs/accessibility-testing
+- Playwright authentication storageState pattern (HIGH confidence — official Playwright docs): https://playwright.dev/docs/auth
+- @next/bundle-analyzer — official Next.js bundle analysis plugin (HIGH confidence): https://nextjs.org/docs/app/guides/package-bundling
+- next/image `priority` prop and LCP optimization (HIGH confidence — official Next.js docs): https://nextjs.org/docs/app/api-reference/components/image
+- next/image AVIF + WebP format configuration (HIGH confidence — official Next.js docs): https://nextjs.org/docs/app/api-reference/components/image
+- Motion v12 `reducedMotion="user"` on MotionConfig — already implemented in `src/components/motion/MotionProvider.tsx` (HIGH confidence — code verified)
+- Biome v2 test domain — auto-detects Vitest from package.json (MEDIUM confidence): https://biomejs.dev/linter/domains/
+- Sanity image URL builder with next/image pattern (MEDIUM confidence): https://www.sanity.io/recipes/the-best-next-js-and-sanity-less-than-image-greater-than-component-afe973cc
+- WCAG 2.2 focus appearance requirements (HIGH confidence — official W3C): https://www.w3.org/WAI/standards-guidelines/wcag/new-in-22/
 
 ---
 
-*Architecture research for: Morocz Medical v2.0 — Booking module integration into Next.js 15 App Router + Sanity v4*
-*Researched: 2026-02-21*
+*Architecture research for: Morocz Medical v2.1 — Testing, performance, and accessibility hardening*
+*Researched: 2026-02-23*

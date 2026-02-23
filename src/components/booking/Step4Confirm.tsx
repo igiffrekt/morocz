@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { z } from "zod";
 import { useSession } from "@/lib/auth-client";
+import { CONSENT_LABEL, PRIVACY_POLICY_URL, CONSENT_LINK_TEXT } from "@/lib/consent-text";
 
 interface Step4Props {
   selections: {
@@ -48,6 +49,8 @@ export function Step4Confirm({ selections, onBack, onSuccess, onConflict }: Step
     if (session?.user?.email && !patientEmail) setPatientEmail(session.user.email);
   }, [session]);
   const [patientPhone, setPatientPhone] = useState("");
+  const [consentChecked, setConsentChecked] = useState(false);
+  const [consentError, setConsentError] = useState<string | null>(null);
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
   const [globalError, setGlobalError] = useState<string | null>(null);
@@ -76,6 +79,12 @@ export function Step4Confirm({ selections, onBack, onSuccess, onConflict }: Step
     setGlobalError(null);
 
     if (!validate()) return;
+
+    if (!consentChecked) {
+      setConsentError("Az adatkezelési hozzájárulás elfogadása kötelező.");
+      return;
+    }
+    setConsentError(null);
 
     setSubmitting(true);
 
@@ -222,6 +231,33 @@ export function Step4Confirm({ selections, onBack, onSuccess, onConflict }: Step
           {errors.patientPhone && (
             <p className="mt-1 text-xs text-red-600">{errors.patientPhone}</p>
           )}
+        </div>
+
+        {/* Consent checkbox */}
+        <div>
+          <label className="flex items-start gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={consentChecked}
+              onChange={(e) => {
+                setConsentChecked(e.target.checked);
+                if (e.target.checked) setConsentError(null);
+              }}
+              className="mt-0.5 h-4 w-4 rounded border-gray-300 text-[var(--color-primary)] focus:ring-[var(--color-primary)]/30"
+            />
+            <span className="text-xs text-gray-600">
+              {CONSENT_LABEL} —{" "}
+              <a
+                href={PRIVACY_POLICY_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[var(--color-primary)] underline hover:no-underline"
+              >
+                {CONSENT_LINK_TEXT}
+              </a>
+            </span>
+          </label>
+          {consentError && <p className="mt-1 text-xs text-red-600">{consentError}</p>}
         </div>
 
         {/* Navigation buttons */}

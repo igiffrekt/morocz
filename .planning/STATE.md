@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-22)
 
 ## Current Position
 
-Phase: 13 of 14 (Admin Dashboard) — complete
-Plan: 3 of 3 complete
-Status: Phase 13 complete — full admin dashboard with calendar (month/week), day panel, patient modal, cancel flow, brand-themed UI
-Last activity: 2026-02-23 — 13-03 complete: AdminPatientModal, light theme, brand design, overlap layout, human verified
+Phase: 14 of 14 (Reminder Emails and Cron) — in progress
+Plan: 1 of 1 complete
+Status: Phase 14 plan 01 complete — reminder email cron endpoint, cronRunLog audit table, combined appointment emails, vercel.json cron registration
+Last activity: 2026-02-23 — 14-01 complete: cron endpoint, CRON_SECRET auth, Budapest DST-safe timezone, Sanity query, idempotent reminders, audit logging
 
-Progress: [█████████░] 90%
+Progress: [██████████] 95%
 
 ## Performance Metrics
 
@@ -31,6 +31,7 @@ Progress: [█████████░] 90%
 | 10-authentication | 3 | ~30 min | ~10 min |
 | 11-booking-core | 4/4 | ~25 min | ~6 min |
 | 13-admin-dashboard | 3/3 | ~55 min | ~18 min |
+| 14-reminder-emails-and-cron | 1/1 | ~5 min | ~5 min |
 
 *Updated after each plan completion*
 
@@ -56,10 +57,15 @@ Recent decisions affecting current work:
 - [Phase 13-admin-dashboard]: 13-03: Draft filter !(_id in path("drafts.**")) required on all getWriteClient() queries
 - [Phase 13-admin-dashboard]: 13-03: Light theme with brand design system (Plus Jakarta Sans, #242a5f, #99CEB7, #F4DCD6, #F2F4F8)
 - [Phase 13-admin-dashboard]: 13-03: Week view overlap layout via layoutOverlappingBookings() greedy column algorithm
+- [Phase 14-reminder-emails-and-cron]: 14-01: Intl.DateTimeFormat longOffset used for Budapest CET/CEST detection — no hardcoded UTC offsets
+- [Phase 14-reminder-emails-and-cron]: 14-01: Hybrid GROQ broad filter + app-side precise UTC window filtering for 20-28h reminder window
+- [Phase 14-reminder-emails-and-cron]: 14-01: reminderSent=true only patched after confirmed sendEmail() success — failed sends retryable next run
+- [Phase 14-reminder-emails-and-cron]: 14-01: buildReminderEmail now accepts appointments array (singular/plural Hungarian magázó tone)
 
 ### Pending Todos
 
-- Confirm Vercel plan tier (free = daily cron, Pro = hourly cron) before Phase 14
+- Deploy and set CRON_SECRET env var in Vercel Dashboard
+- Confirm Vercel Pro plan is active (hourly cron requires Pro)
 
 ### Blockers/Concerns
 
@@ -68,5 +74,5 @@ None currently blocking.
 ## Session Continuity
 
 Last session: 2026-02-23
-Stopped at: Phase 13 complete. Phase 14 (Reminder Emails and Cron) is next — needs planning.
+Stopped at: Completed 14-01-PLAN.md — reminder email cron system complete. Phase 14 is the final phase.
 Resume file: none

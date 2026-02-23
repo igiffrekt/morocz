@@ -19,7 +19,7 @@
 - [x] **Phase 11: Booking Core** - Slot generation, calendar UI, booking creation, and confirmation email (completed 2026-02-22)
 - [x] **Phase 12: Patient Account** - /fiokom dashboard, appointment management, and cancellation (completed 2026-02-22)
 - [x] **Phase 13: Admin Dashboard** - Admin-only calendar view, daily appointments, and manual cancellation (completed 2026-02-23)
-- [ ] **Phase 14: Reminder Emails and Cron** - 24h pre-appointment reminders via Vercel Cron
+- [x] **Phase 14: Reminder Emails and Cron** - 24h pre-appointment reminders via Vercel Cron (completed 2026-02-23)
 
 ## Phase Details
 
@@ -133,4 +133,4 @@ Phases execute in numeric order: 9 → 10 → 11 → 12 → 13 → 14
 | 11. Booking Core | 4/4 | Complete   | 2026-02-22 |
 | 12. Patient Account | 3/3 | Complete | 2026-02-22 |
 | 13. Admin Dashboard | 3/3 | Complete | 2026-02-23 |
-| 14. Reminder Emails and Cron | 0/1 | Not started | - |
+| 14. Reminder Emails and Cron | 1/1 | Complete   | 2026-02-23 |

@@ -35,7 +35,7 @@ Requirements for the booking module. Each maps to roadmap phases.
 ### Notifications
 
 - [x] **NOTIF-01**: Patient receives confirmation email immediately after booking
-- [ ] **NOTIF-02**: Patient receives reminder email 24 hours before appointment
+- [x] **NOTIF-02**: Patient receives reminder email 24 hours before appointment
 - [x] **NOTIF-03**: Patient receives cancellation confirmation email
 
 ### Patient Account
@@ -114,7 +114,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | BOOK-06 | Phase 11 | Complete (11-01) |
 | BOOK-07 | Phase 11 | Complete |
 | NOTIF-01 | Phase 11 | Complete |
-| NOTIF-02 | Phase 14 | Pending |
+| NOTIF-02 | Phase 14 | Complete |
 | NOTIF-03 | Phase 12 | Complete |
 | ACCT-01 | Phase 12 | Complete |
 | ACCT-02 | Phase 12 | Complete |

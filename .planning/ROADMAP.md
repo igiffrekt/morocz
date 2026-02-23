@@ -18,7 +18,7 @@
 - [x] **Phase 10: Authentication** - Patient and admin auth with Better Auth, role separation, and route protection (completed 2026-02-22)
 - [x] **Phase 11: Booking Core** - Slot generation, calendar UI, booking creation, and confirmation email (completed 2026-02-22)
 - [x] **Phase 12: Patient Account** - /fiokom dashboard, appointment management, and cancellation (completed 2026-02-22)
-- [ ] **Phase 13: Admin Dashboard** - Admin-only calendar view, daily appointments, and manual cancellation
+- [x] **Phase 13: Admin Dashboard** - Admin-only calendar view, daily appointments, and manual cancellation (completed 2026-02-23)
 - [ ] **Phase 14: Reminder Emails and Cron** - 24h pre-appointment reminders via Vercel Cron
 
 ## Phase Details
@@ -104,9 +104,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 13-01-PLAN.md — Admin API routes (GET bookings, POST cancel) and admin cancellation email template
-- [ ] 13-02-PLAN.md — Dashboard shell, AdminCalendar (month/week views), AdminDayPanel
-- [ ] 13-03-PLAN.md — Patient detail modal with booking history, three-dot cancel menu, human verification
+- [x] 13-01-PLAN.md — Admin API routes (GET bookings, POST cancel) and admin cancellation email template
+- [x] 13-02-PLAN.md — Dashboard shell, AdminCalendar (month/week views), AdminDayPanel
+- [x] 13-03-PLAN.md — Patient detail modal with booking history, three-dot cancel menu, human verification
 
 ### Phase 14: Reminder Emails and Cron
 **Goal**: Patients automatically receive a reminder email approximately 24 hours before their appointment, sent once per booking via a secured Vercel Cron job with no duplicates.
@@ -116,10 +116,10 @@ Plans:
   1. Patient receives exactly one Hungarian reminder email approximately 24 hours before their appointment
   2. If the cron job runs multiple times, a patient never receives more than one reminder for the same booking
   3. The cron endpoint rejects requests that do not include the correct CRON_SECRET header
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 14-01: TBD
+- [ ] 14-01-PLAN.md — Cron endpoint, combined reminder email, DB audit log, vercel.json config
 
 ## Progress
 
@@ -132,5 +132,5 @@ Phases execute in numeric order: 9 → 10 → 11 → 12 → 13 → 14
 | 10. Authentication | 3/3 | Complete    | 2026-02-22 |
 | 11. Booking Core | 4/4 | Complete   | 2026-02-22 |
 | 12. Patient Account | 3/3 | Complete | 2026-02-22 |
-| 13. Admin Dashboard | 2/3 | In Progress|  |
-| 14. Reminder Emails and Cron | 0/? | Not started | - |
+| 13. Admin Dashboard | 3/3 | Complete | 2026-02-23 |
+| 14. Reminder Emails and Cron | 0/1 | Not started | - |

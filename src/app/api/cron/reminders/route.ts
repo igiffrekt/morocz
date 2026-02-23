@@ -147,8 +147,8 @@ export async function GET(request: NextRequest) {
       const html = buildReminderEmail({
         patientName: group[0].patientName,
         appointments,
-        clinicPhone: "+36 33 888 8888",
-        clinicAddress: "2500 Esztergom, Simor János u. 36.",
+        clinicPhone: "+36 70 639 5239",
+        clinicAddress: "2500 Esztergom, Martsa Alajos utca 6/c.",
       });
 
       try {

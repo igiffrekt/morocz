@@ -101,10 +101,12 @@ Plans:
   2. Admin can browse a weekly calendar view showing booked and free slots
   3. Admin can click any booking to see the patient's name, email, and phone number
   4. Admin can cancel a booking from the dashboard; patient receives a cancellation email
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 13-01: TBD
+- [ ] 13-01-PLAN.md — Admin API routes (GET bookings, POST cancel) and admin cancellation email template
+- [ ] 13-02-PLAN.md — Dashboard shell, AdminCalendar (month/week views), AdminDayPanel
+- [ ] 13-03-PLAN.md — Patient detail modal with booking history, three-dot cancel menu, human verification
 
 ### Phase 14: Reminder Emails and Cron
 **Goal**: Patients automatically receive a reminder email approximately 24 hours before their appointment, sent once per booking via a secured Vercel Cron job with no duplicates.

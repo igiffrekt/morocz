@@ -100,13 +100,31 @@ export function generateAvailableSlots(input: SlotGenerationInput): string[] {
   const startMinutes = timeToMinutes(dayConfig.startTime);
   const endMinutes = timeToMinutes(dayConfig.endTime);
 
-  // Build a set of occupied 20-minute sub-slots for fast lookup
+  const bufferMinutes = schedule.bufferMinutes ?? 0;
+
+  // Build a set of occupied 20-minute sub-slots (including buffer) for fast lookup
   const occupiedTimes = new Set<string>([...bookedSlots, ...heldSlots]);
+
+  const BASE_GRANULARITY = 20;
+
+  // Expand occupied times to include buffer zones before and after each booking
+  if (bufferMinutes > 0) {
+    for (const slot of [...bookedSlots, ...heldSlots]) {
+      const slotMin = timeToMinutes(slot);
+      // Add buffer sub-slots before the booking
+      for (let b = BASE_GRANULARITY; b <= bufferMinutes; b += BASE_GRANULARITY) {
+        occupiedTimes.add(minutesToTime(slotMin - b));
+      }
+      // Add buffer sub-slots after the booking (serviceDuration + buffer)
+      for (let b = 0; b < bufferMinutes; b += BASE_GRANULARITY) {
+        occupiedTimes.add(minutesToTime(slotMin + serviceDurationMinutes + b));
+      }
+    }
+  }
 
   const availableSlots: string[] = [];
 
   // 5 & 6. Step through in 20-minute increments
-  const BASE_GRANULARITY = 20;
   for (
     let currentMinutes = startMinutes;
     currentMinutes + serviceDurationMinutes <= endMinutes;

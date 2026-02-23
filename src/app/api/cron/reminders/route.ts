@@ -18,36 +18,16 @@ interface BookingForReminder {
 }
 
 /**
- * Converts a Budapest local date+time string to UTC milliseconds.
- * Uses Intl API to dynamically resolve the Budapest offset (CET +01:00 or CEST +02:00),
- * handling DST automatically without any hardcoded offset values.
+ * Returns tomorrow's date in Budapest timezone as "YYYY-MM-DD".
  */
-function appointmentToUtcMs(slotDate: string, slotTime: string): number {
-  const [year, month, day] = slotDate.split("-").map(Number);
-  const [hour, minute] = slotTime.split(":").map(Number);
-
-  // Use a UTC reference date at this local time to probe the Budapest offset via Intl
-  const probeUtc = new Date(Date.UTC(year, month - 1, day, hour, minute));
-
-  const parts = new Intl.DateTimeFormat("en-GB", {
+function getTomorrowBudapest(): string {
+  const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
+  return new Intl.DateTimeFormat("en-CA", {
     timeZone: "Europe/Budapest",
-    timeZoneName: "longOffset",
-  }).formatToParts(probeUtc);
-
-  const offsetPart = parts.find((p) => p.type === "timeZoneName")?.value ?? "GMT+01:00";
-  // offsetPart is e.g. "GMT+02:00" or "GMT+01:00"
-  const match = offsetPart.match(/GMT([+-])(\d{2}):(\d{2})/);
-  if (!match) {
-    // Fallback to CET (+1h) if parsing fails
-    return Date.UTC(year, month - 1, day, hour - 1, minute);
-  }
-
-  const sign = match[1] === "+" ? 1 : -1;
-  const offsetHours = Number(match[2]) * sign;
-  const offsetMinutes = Number(match[3]) * sign;
-
-  // Budapest local time minus offset = UTC
-  return Date.UTC(year, month - 1, day, hour - offsetHours, minute - offsetMinutes);
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(tomorrow);
 }
 
 /**
@@ -80,10 +60,10 @@ function mapServiceName(name: string): string {
 /**
  * GET /api/cron/reminders
  *
- * Secured Vercel Cron endpoint. Runs hourly (0 * * * *).
- * Queries Sanity for bookings in the 20-28 hour window, groups by patient email,
- * sends combined Hungarian reminder emails via Gmail API, marks bookings as
- * reminderSent=true for idempotency, and logs each run to the cron_run_log table.
+ * Secured Vercel Cron endpoint. Runs daily at 06:00 UTC (~07/08 Budapest).
+ * Queries Sanity for all confirmed bookings scheduled for tomorrow (Budapest time),
+ * groups by patient email, sends combined Hungarian reminder emails via Gmail API,
+ * marks bookings as reminderSent=true for idempotency, and logs each run to cron_run_log.
  *
  * Auth: Bearer ${CRON_SECRET} required in Authorization header.
  * Vercel automatically sends this header for registered cron jobs.
@@ -123,43 +103,23 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // --- Compute 20-28 hour window in UTC ---
-    const now = Date.now();
-    const windowStart = new Date(now + 20 * 60 * 60 * 1000);
-    const windowEnd = new Date(now + 28 * 60 * 60 * 1000);
+    // --- Get tomorrow's date in Budapest timezone ---
+    const tomorrowDate = getTomorrowBudapest();
 
-    // Derive the Budapest date strings that could contain bookings in this window.
-    // The window spans at most 8 hours so it covers at most 2 calendar dates in Budapest.
-    const budaFormatter = new Intl.DateTimeFormat("en-CA", {
-      timeZone: "Europe/Budapest",
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    });
-    const dateFrom = budaFormatter.format(windowStart); // "YYYY-MM-DD"
-    const dateTo = budaFormatter.format(windowEnd);     // "YYYY-MM-DD"
-
-    // --- Query Sanity (write client for real-time, no CDN) ---
-    const bookings = await getWriteClient().fetch<BookingForReminder[]>(
+    // --- Query Sanity for all confirmed bookings tomorrow (write client, no CDN) ---
+    const filteredBookings = await getWriteClient().fetch<BookingForReminder[]>(
       `*[
         _type == "booking"
         && !(_id in path("drafts.**"))
         && status == "confirmed"
         && reminderSent != true
-        && slotDate >= $dateFrom
-        && slotDate <= $dateTo
+        && slotDate == $tomorrowDate
       ]{
         _id, patientName, patientEmail, slotDate, slotTime,
         service->{name}
       }`,
-      { dateFrom, dateTo },
+      { tomorrowDate },
     );
-
-    // --- Filter in app code: only bookings in the precise 20-28h UTC window ---
-    const filteredBookings = bookings.filter((booking) => {
-      const apptUtcMs = appointmentToUtcMs(booking.slotDate, booking.slotTime);
-      return apptUtcMs >= windowStart.getTime() && apptUtcMs < windowEnd.getTime();
-    });
 
     // --- Group by patient email ---
     const grouped = new Map<string, BookingForReminder[]>();

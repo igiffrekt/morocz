@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import AdminCalendar from "@/components/admin/AdminCalendar";
 import AdminDayPanel from "@/components/admin/AdminDayPanel";
 import { AdminSignOut } from "@/components/admin/AdminLogin";
+import AdminPatientModal from "@/components/admin/AdminPatientModal";
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
@@ -82,6 +83,7 @@ export default function AdminDashboard({
   const [monthBookings, setMonthBookings] = useState<AdminBooking[]>(initialMonthBookings);
   const [weekBookings, setWeekBookings] = useState<AdminBooking[]>([]);
   const [isDayLoading, setIsDayLoading] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState<AdminBooking | null>(null);
 
   // ── Fetch helpers ────────────────────────────────────────────────────────────
 
@@ -134,10 +136,36 @@ export default function AdminDashboard({
     void fetchBookings(startDate, endDate).then(setMonthBookings);
   }
 
-  // ── Booking click (wired in Plan 03) ─────────────────────────────────────────
+  // ── Booking click: open patient detail modal ──────────────────────────────────
 
-  function handleBookingClick(_booking: AdminBooking) {
-    // Plan 03 will wire the detail modal here
+  function handleBookingClick(booking: AdminBooking) {
+    setSelectedBooking(booking);
+  }
+
+  // ── Cancel refresh: refetch day, month, and week bookings ─────────────────────
+
+  async function handleCancelRefresh() {
+    setSelectedBooking(null);
+
+    // Refetch day bookings
+    const updatedDay = await fetchBookings(selectedDate, selectedDate);
+    setDayBookings(updatedDay);
+
+    // Refetch month bookings
+    const currentDate = new Date(selectedDate);
+    const { startDate: mStart, endDate: mEnd } = getMonthRange(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+    );
+    const updatedMonth = await fetchBookings(mStart, mEnd);
+    setMonthBookings(updatedMonth);
+
+    // Refetch week bookings (if in week mode)
+    if (viewMode === "week") {
+      const { startDate: wStart, endDate: wEnd } = getWeekRange(selectedDate);
+      const updatedWeek = await fetchBookings(wStart, wEnd);
+      setWeekBookings(updatedWeek);
+    }
   }
 
   return (
@@ -231,6 +259,15 @@ export default function AdminDashboard({
           />
         </div>
       </div>
+
+      {/* ── Patient detail modal ─────────────────────────────────────────────── */}
+      {selectedBooking && (
+        <AdminPatientModal
+          booking={selectedBooking}
+          onClose={() => setSelectedBooking(null)}
+          onCancelled={() => void handleCancelRefresh()}
+        />
+      )}
     </div>
   );
 }

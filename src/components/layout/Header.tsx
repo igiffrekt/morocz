@@ -21,6 +21,8 @@ export function Header({ clinicName, navigationLinks, phone, address }: HeaderPr
   const [phoneDialogOpen, setPhoneDialogOpen] = useState(false);
   const lastScrollY = useRef(0);
   const ticking = useRef(false);
+  const upAccumulated = useRef(0);
+  const SHOW_THRESHOLD = 80; // px felfelé kell görgetni mielőtt nav visszajön
 
   const handleScroll = useCallback(() => {
     if (ticking.current) return;
@@ -28,16 +30,30 @@ export function Header({ clinicName, navigationLinks, phone, address }: HeaderPr
 
     requestAnimationFrame(() => {
       const currentY = window.scrollY;
+      const delta = currentY - lastScrollY.current;
       const atTop = currentY < 50;
-      const scrollingDown = currentY > lastScrollY.current;
+      const atBottom =
+        currentY + window.innerHeight >= document.documentElement.scrollHeight - 60;
 
       if (atTop) {
+        upAccumulated.current = 0;
         setNavState("default");
-      } else if (scrollingDown) {
+      } else if (atBottom) {
+        // Oldal aljánál marad hidden (iOS browser UI jitter)
+        upAccumulated.current = 0;
         setNavState("hidden");
-      } else {
-        setNavState("compact");
+      } else if (delta > 4) {
+        // Lefelé görgetés: azonnal elrejt, reset accumulator
+        upAccumulated.current = 0;
+        setNavState("hidden");
+      } else if (delta < 0) {
+        // Felfelé görgetés: csak SHOW_THRESHOLD px után jelenik meg
+        upAccumulated.current += Math.abs(delta);
+        if (upAccumulated.current >= SHOW_THRESHOLD) {
+          setNavState("compact");
+        }
       }
+      // delta 0–4 között: browser jitter, ignorál
 
       lastScrollY.current = currentY;
       ticking.current = false;
@@ -58,11 +74,13 @@ export function Header({ clinicName, navigationLinks, phone, address }: HeaderPr
       {/* Default header */}
       <header
         className={[
-          "w-full bg-background-light rounded-3xl flex items-center justify-between transition-all duration-500 ease-in-out",
+          "w-full bg-background-light rounded-xl flex items-center justify-between transition-all duration-500 ease-in-out",
           "px-8 py-5 shadow-sm",
           navState === "default"
             ? "opacity-100 translate-y-0"
-            : "opacity-0 -translate-y-full pointer-events-none absolute",
+            : navState === "hidden"
+              ? "opacity-0 -translate-y-full pointer-events-none absolute"
+              : "opacity-100 translate-y-0 md:opacity-0 md:-translate-y-full md:pointer-events-none md:absolute",
         ].join(" ")}
       >
         {/* Left: logo + address */}
@@ -118,9 +136,8 @@ export function Header({ clinicName, navigationLinks, phone, address }: HeaderPr
 
         {/* Right: CTA button (desktop) */}
         <div className="hidden md:block">
-          <button
-            type="button"
-            onClick={() => setPhoneDialogOpen(true)}
+          <Link
+            href="/idopontfoglalas"
             className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#a3dac2] hover:bg-[#8fcdb3] transition-colors text-sm font-bold text-primary"
           >
             Időpontfoglalás
@@ -136,7 +153,7 @@ export function Header({ clinicName, navigationLinks, phone, address }: HeaderPr
             >
               <path d="M5 12h14M12 5l7 7-7 7" />
             </svg>
-          </button>
+          </Link>
         </div>
 
         {/* Mobile hamburger */}
@@ -183,7 +200,7 @@ export function Header({ clinicName, navigationLinks, phone, address }: HeaderPr
       <header
         className={[
           "fixed top-3 left-1/2 -translate-x-1/2 w-[70%] max-w-[61.6rem]",
-          "rounded-2xl flex items-center justify-between px-5 py-2.5",
+          "rounded-2xl hidden md:flex items-center justify-between px-5 py-2.5",
           "backdrop-blur-xl bg-white/60 border border-white/30 shadow-lg",
           "transition-all duration-500 ease-in-out",
           isCompact ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4 pointer-events-none",
@@ -221,9 +238,8 @@ export function Header({ clinicName, navigationLinks, phone, address }: HeaderPr
 
         {/* Right: CTA */}
         <div className="hidden md:block">
-          <button
-            type="button"
-            onClick={() => setPhoneDialogOpen(true)}
+          <Link
+            href="/idopontfoglalas"
             className="flex items-center gap-2 px-5 py-2 rounded-full bg-[#a3dac2] hover:bg-[#8fcdb3] transition-colors text-sm font-bold text-primary"
           >
             Időpontfoglalás
@@ -239,7 +255,7 @@ export function Header({ clinicName, navigationLinks, phone, address }: HeaderPr
             >
               <path d="M5 12h14M12 5l7 7-7 7" />
             </svg>
-          </button>
+          </Link>
         </div>
 
         {/* Mobile hamburger */}

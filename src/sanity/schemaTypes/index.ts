@@ -5,6 +5,7 @@ import { blogPostType } from "./blogPostType";
 import { bookingType } from "./bookingType";
 import { homepageType } from "./homepageType";
 import { labTestType } from "./labTestType";
+import { patientType } from "./patientType";
 import { privacyPolicyType } from "./privacyPolicyType";
 import { serviceCategoryType } from "./serviceCategoryType";
 import { serviceType } from "./serviceType";
@@ -27,4 +28,5 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   blockedDateType,
   bookingType,
   slotLockType,
+  patientType,
 ];

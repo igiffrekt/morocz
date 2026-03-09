@@ -85,6 +85,12 @@ export const homepageType = defineType({
               title: "Ikon",
               type: "image",
             }),
+            defineField({
+              name: "href",
+              title: "Link",
+              type: "string",
+              description: "Belső hivatkozás, pl. /nogyogyaszat",
+            }),
           ],
           preview: {
             select: {

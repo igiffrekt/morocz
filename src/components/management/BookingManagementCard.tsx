@@ -103,7 +103,10 @@ export function BookingManagementCard({ booking, scheduleData }: BookingManageme
           Visszaigazoló e-mailt küldtünk az új időpontról.
         </p>
         <button
-          onClick={() => router.refresh()}
+          onClick={() => {
+            console.log("[BookingManagementCard] Refresh clicked");
+            router.refresh();
+          }}
           className="inline-block rounded-lg bg-[#99CEB7] px-6 py-3 text-sm font-semibold text-[#23264F] transition hover:bg-[#80bea6]"
         >
           Foglalás megtekintése

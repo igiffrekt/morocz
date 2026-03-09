@@ -15,6 +15,7 @@ interface FieldErrors {
   name?: string;
   email?: string;
   password?: string;
+  phoneNumber?: string;
 }
 
 function GoogleIcon() {
@@ -52,6 +53,7 @@ export default function AuthStep({ onSuccess, defaultTab = "belepes" }: AuthStep
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [errors, setErrors] = useState<FieldErrors>({});
   const [loading, setLoading] = useState(false);
   const [globalError, setGlobalError] = useState("");
@@ -84,6 +86,9 @@ export default function AuthStep({ onSuccess, defaultTab = "belepes" }: AuthStep
     if (tab === "regisztracio") {
       if (!name.trim()) {
         newErrors.name = "A név megadása kötelező";
+      }
+      if (!phoneNumber || phoneNumber.replace(/\D/g, "").length < 10) {
+        newErrors.phoneNumber = "A telefonszámnak legalább 10 számjegyből kell állnia";
       }
     }
 
@@ -166,11 +171,24 @@ export default function AuthStep({ onSuccess, defaultTab = "belepes" }: AuthStep
         onSuccess();
       } else {
         const result = await signUp.email({
-          email,
-          password,
-          name,
-          callbackURL: "/idopontfoglalas",
-        });
+            email,
+            password,
+            name,
+            callbackURL: "/idopontfoglalas",
+          });
+
+          // Save phoneNumber separately (Better Auth doesn't support custom fields)
+          if (result?.user?.id && phoneNumber.trim()) {
+            try {
+              await fetch('/api/user/phone', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phoneNumber: phoneNumber.trim() }),
+              });
+            } catch (err) {
+              console.error('[AuthStep] Phone save failed:', err);
+            }
+          }
 
         if (result.error) {
           setGlobalError(mapErrorMessage(result.error));
@@ -215,6 +233,7 @@ export default function AuthStep({ onSuccess, defaultTab = "belepes" }: AuthStep
             type="button"
             onClick={() => {
               setTab("belepes");
+              setPhoneNumber("");
               setErrors({});
               setGlobalError("");
             }}
@@ -230,6 +249,7 @@ export default function AuthStep({ onSuccess, defaultTab = "belepes" }: AuthStep
             type="button"
             onClick={() => {
               setTab("regisztracio");
+              setPhoneNumber("");
               setErrors({});
               setGlobalError("");
             }}
@@ -272,23 +292,44 @@ export default function AuthStep({ onSuccess, defaultTab = "belepes" }: AuthStep
         <form onSubmit={handleSubmit} noValidate className="space-y-4">
           {/* Name field — registration only */}
           {tab === "regisztracio" && (
-            <div>
-              <label htmlFor="auth-name" className="block text-sm font-medium text-gray-700 mb-1">
-                Teljes név
-              </label>
-              <input
-                id="auth-name"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Kovács János"
-                autoComplete="name"
-                className={`w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors ${
-                  errors.name ? "border-red-400" : "border-gray-300"
-                }`}
-              />
-              {errors.name && <p className="mt-1 text-xs text-red-600">{errors.name}</p>}
-            </div>
+            <>
+              <div>
+                <label htmlFor="auth-name" className="block text-sm font-medium text-gray-700 mb-1">
+                  Teljes név
+                </label>
+                <input
+                  id="auth-name"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Kovács János"
+                  autoComplete="name"
+                  className={`w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors ${
+                    errors.name ? "border-red-400" : "border-gray-300"
+                  }`}
+                />
+                {errors.name && <p className="mt-1 text-xs text-red-600">{errors.name}</p>}
+              </div>
+
+              {/* Phone field — registration only */}
+              <div>
+                <label htmlFor="auth-phone" className="block text-sm font-medium text-gray-700 mb-1">
+                  Telefonszám
+                </label>
+                <input
+                  id="auth-phone"
+                  type="tel"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  placeholder="+36 70 000 0000"
+                  autoComplete="tel"
+                  className={`w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors ${
+                    errors.phoneNumber ? "border-red-400" : "border-gray-300"
+                  }`}
+                />
+                {errors.phoneNumber && <p className="mt-1 text-xs text-red-600">{errors.phoneNumber}</p>}
+              </div>
+            </>
           )}
 
           {/* Email field */}

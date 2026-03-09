@@ -98,6 +98,13 @@ export const bookingType = defineType({
       description: "Igaz, ha a 24 órás emlékeztető e-mail már ki lett küldve",
       initialValue: false,
     }),
+    defineField({
+      name: "googleCalendarEventId",
+      title: "Google Naptár esemény ID",
+      type: "string",
+      description: "A Google Calendar esemény azonosítója — automatikusan töltődik ki",
+      readOnly: true,
+    }),
   ],
   preview: {
     select: {

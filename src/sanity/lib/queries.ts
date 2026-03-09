@@ -16,7 +16,8 @@ export const homepageQuery = defineQuery(`*[_type == "homepage" && _id == "homep
     _key,
     title,
     subtitle,
-    icon
+    icon,
+    href
   },
   servicesHeadline,
   servicesSubtitle,

@@ -44,11 +44,16 @@ export function Step4Confirm({ selections, onBack, onSuccess, onConflict }: Step
   const [patientName, setPatientName] = useState("");
   const [patientEmail, setPatientEmail] = useState("");
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (session?.user?.name && !patientName) setPatientName(session.user.name);
     if (session?.user?.email && !patientEmail) setPatientEmail(session.user.email);
+    // Pre-fill phone from user profile if available (e.g., from registration)
+    if (session?.user?.phoneNumber && !patientPhone) setPatientPhone(session.user.phoneNumber);
   }, [session]);
+  
   const [patientPhone, setPatientPhone] = useState("");
+  const [showPhoneModal, setShowPhoneModal] = useState(false);
   const [consentChecked, setConsentChecked] = useState(false);
   const [consentError, setConsentError] = useState<string | null>(null);
   const [errors, setErrors] = useState<FormErrors>({});
@@ -77,6 +82,15 @@ export function Step4Confirm({ selections, onBack, onSuccess, onConflict }: Step
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setGlobalError(null);
+
+    // Check if phone is required but empty (Google Sign-Up users)
+    if (!patientPhone || patientPhone.length < 7) {
+      if (!session?.user?.phoneNumber) {
+        // Google Sign-Up user without phone - show modal
+        setShowPhoneModal(true);
+        return;
+      }
+    }
 
     if (!validate()) return;
 
@@ -134,6 +148,62 @@ export function Step4Confirm({ selections, onBack, onSuccess, onConflict }: Step
 
   return (
     <div>
+      {/* Phone Modal for Google Sign-Up users */}
+      {showPhoneModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
+            <h3 className="text-lg font-bold text-[var(--color-primary)] mb-2">Telefonszám megadása</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Az időpontfoglalás véglegesítéséhez szükséges a telefonszáma.
+            </p>
+            <div className="mb-4">
+              <input
+                type="tel"
+                value={patientPhone}
+                onChange={(e) => setPatientPhone(e.target.value)}
+                placeholder="+36 70 000 0000"
+                autoComplete="tel"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30 focus:border-[var(--color-primary)] transition-colors"
+              />
+              {patientPhone.length < 10 && patientPhone.length > 0 && (
+                <p className="mt-1 text-xs text-red-600">Legalább 10 szám szükséges</p>
+              )}
+            </div>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setShowPhoneModal(false)}
+                className="flex-1 px-4 py-3 text-sm font-medium text-gray-700 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
+              >
+                Mégsem
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  if (patientPhone.length >= 10) {
+                    // Save phone to user profile
+                    try {
+                      await fetch("/api/user/phone", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ phoneNumber: patientPhone }),
+                      });
+                    } catch (err) {
+                      console.error("Failed to save phone number:", err);
+                      // Non-critical — continue anyway
+                    }
+                    setShowPhoneModal(false);
+                  }
+                }}
+                className="flex-1 px-4 py-3 text-sm font-medium text-white bg-[var(--color-primary)] rounded-xl hover:bg-[var(--color-primary)]/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                Folytatás
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <h2 className="text-xl font-bold text-[var(--color-primary)] mb-6">Megerősítés</h2>
 
       {/* Booking summary card */}

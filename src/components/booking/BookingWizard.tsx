@@ -224,7 +224,9 @@ export function BookingWizard({ services, scheduleData }: BookingWizardProps) {
         <BookingSuccess
           serviceName={selections.serviceName ?? ""}
           date={selections.selectedDate ? formatDateHungarian(selections.selectedDate) : ""}
+          rawDate={selections.selectedDate ?? ""}
           time={selections.selectedTime ?? ""}
+          durationMinutes={selections.serviceDuration ?? 30}
           reservationNumber={bookingResult.reservationNumber}
           patientName={bookingResult.patientName}
           patientEmail={bookingResult.patientEmail}

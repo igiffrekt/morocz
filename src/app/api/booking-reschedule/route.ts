@@ -1,7 +1,9 @@
 import { z } from "zod";
+import { createCalendarEvent } from "@/lib/google-calendar";
 import { buildRescheduleEmail } from "@/lib/booking-email";
 import { isEmailConfigured, sendEmail } from "@/lib/email";
 import { getWriteClient } from "@/lib/sanity-write-client";
+import { google } from "googleapis";
 
 export const dynamic = "force-dynamic";
 
@@ -11,6 +13,30 @@ const RescheduleSchema = z.object({
   newDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Érvénytelen dátum."),
   newTime: z.string().regex(/^\d{2}:\d{2}$/, "Érvénytelen időpont."),
 });
+
+// ── Delete Google Calendar event ──────────────────────────────────────────────
+async function deleteCalendarEvent(eventId: string | null): Promise<void> {
+  if (!eventId) return;
+  
+  try {
+    const auth = new google.auth.JWT({
+      email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+      key: (process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY ?? "").replace(/\\n/g, "\n"),
+      scopes: ["https://www.googleapis.com/auth/calendar"],
+    });
+    
+    const calendar = google.calendar({ version: "v3", auth });
+    await calendar.events.delete({
+      calendarId: process.env.GOOGLE_CALENDAR_ID,
+      eventId,
+    });
+    
+    console.log(`[booking-reschedule] Deleted old calendar event: ${eventId}`);
+  } catch (err) {
+    console.error(`[booking-reschedule] Failed to delete calendar event ${eventId}:`, err);
+    // Don't fail reschedule if event delete fails
+  }
+}
 
 // ── 24h window enforcement ─────────────────────────────────────────────────────
 function isWithin24Hours(slotDate: string, slotTime: string): boolean {
@@ -52,12 +78,13 @@ export async function POST(request: Request): Promise<Response> {
       slotTime: string;
       managementToken: string;
       serviceId: string;
+      googleCalendarEventId?: string | null;
     };
 
     const booking = await getWriteClient().fetch<BookingForReschedule | null>(
       `*[_type == "booking" && managementToken == $manageToken && status == "confirmed"][0]{
         _id, patientName, patientEmail, reservationNumber, service->{name, appointmentDuration},
-        slotDate, slotTime, managementToken, "serviceId": service._ref
+        slotDate, slotTime, managementToken, "serviceId": service._ref, googleCalendarEventId
       }`,
       { manageToken: token },
     );
@@ -166,7 +193,39 @@ export async function POST(request: Request): Promise<Response> {
       .set({ slotDate: newDate, slotTime: newTime, reminderSent: false })
       .commit();
 
-    // ── 7. Send reschedule email (fire-and-forget) ─────────────────────────────
+    // ── 7. Update Google Calendar event ───────────────────────────────────────
+    // Delete old event and create new event (fire-and-forget, don't block reschedule)
+    void (async () => {
+      try {
+        // Delete old event
+        if (booking.googleCalendarEventId) {
+          await deleteCalendarEvent(booking.googleCalendarEventId);
+        }
+        
+        // Create new event
+        const newEventId = await createCalendarEvent({
+          summary: `${booking.service?.name?.startsWith("Nőgyógyász") ? "Nőgyógyászati vizsgálat" : (booking.service?.name ?? "Foglalt szolgáltatás")} — ${booking.patientName}`,
+          description: `Foglalási szám: ${booking.reservationNumber}\nPáciens: ${booking.patientName}\nTelefon: ${booking.patientEmail}`,
+          date: newDate,
+          startTime: newTime,
+          durationMinutes: booking.service?.appointmentDuration ?? 30,
+        });
+        
+        // Update booking with new eventId
+        if (newEventId) {
+          await getWriteClient()
+            .patch(booking._id)
+            .set({ googleCalendarEventId: newEventId })
+            .commit();
+          console.log(`[booking-reschedule] Created new calendar event: ${newEventId}`);
+        }
+      } catch (err) {
+        console.error("[booking-reschedule] Calendar update failed:", err);
+        // Don't block reschedule if calendar update fails
+      }
+    })();
+
+    // ── 8. Send reschedule email (fire-and-forget) ─────────────────────────────
     if (isEmailConfigured()) {
       void sendRescheduleEmailAsync({
         patientName: booking.patientName,
@@ -181,7 +240,7 @@ export async function POST(request: Request): Promise<Response> {
       });
     }
 
-    // ── 8. Return success ──────────────────────────────────────────────────────
+    // ── 9. Return success ──────────────────────────────────────────────────────
     return Response.json(
       { success: true, message: "Az időpont sikeresen áthelyezve." },
       { status: 200 },

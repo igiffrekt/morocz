@@ -1,12 +1,16 @@
 import { headers } from "next/headers";
 import { defineQuery } from "next-sanity";
 import { z } from "zod";
+import { eq } from "drizzle-orm";
 import { auth } from "@/lib/auth";
+import { createCalendarEvent } from "@/lib/google-calendar";
 import { buildConfirmationEmail } from "@/lib/booking-email";
 import { isEmailConfigured, sendEmail } from "@/lib/email";
 import { getWriteClient } from "@/lib/sanity-write-client";
 import { generateAvailableSlots } from "@/lib/slots";
 import { sanityFetch } from "@/sanity/lib/fetch";
+import { db } from "@/lib/db";
+import { user } from "@/lib/db/schema";
 import {
   blockedDatesQuery,
   bookingsForDateQuery,
@@ -161,7 +165,47 @@ export async function POST(request: Request): Promise<Response> {
     .set({ bookingRef: { _type: "reference", _ref: booking._id } })
     .commit();
 
-  // ── 9. Send confirmation email (fire-and-forget) ───────────────────────────
+  // ── 8.5 Update user's phoneNumber if not already set ──────────────────────
+  if (!session.user.phoneNumber && patientPhone) {
+    try {
+      await db
+        .update(user)
+        .set({ phoneNumber: patientPhone })
+        .where(eq(user.id, session.user.id));
+      console.log(`[booking] Updated user phone for ${session.user.id}`);
+    } catch (err) {
+      console.error("[booking] Failed to update user phone:", err);
+      // Non-critical error — don't fail the booking
+    }
+  }
+
+  // ── 9. Google Calendar event (fire-and-forget) ────────────────────────────
+  void (async () => {
+    try {
+      const svc = await getWriteClient().fetch<{ name: string; appointmentDuration: number } | null>(
+        `*[_type == "service" && _id == $id][0]{name, appointmentDuration}`,
+        { id: serviceId },
+      );
+      const eventId = await createCalendarEvent({
+        summary: `${svc?.name ?? "Foglalás"} — ${patientName}`,
+        description: `Páciens: ${patientName}\nE-mail: ${patientEmail}\nTelefon: ${patientPhone}\nFoglalási szám: ${reservationNumber}`,
+        date: slotDate,
+        startTime: slotTime,
+        durationMinutes: svc?.appointmentDuration ?? 30,
+      });
+      if (eventId) {
+        await getWriteClient()
+          .patch(booking._id)
+          .set({ googleCalendarEventId: eventId })
+          .commit();
+        console.log(`[booking] Google Calendar event created: ${eventId}`);
+      }
+    } catch (err) {
+      console.error("[booking] Google Calendar sync failed:", err);
+    }
+  })();
+
+  // ── 10. Send confirmation email (fire-and-forget) ──────────────────────────
   if (isEmailConfigured()) {
     void sendConfirmationEmail({
       booking: { _id: booking._id, managementToken },
@@ -174,7 +218,7 @@ export async function POST(request: Request): Promise<Response> {
     });
   }
 
-  // ── 10. Return success ─────────────────────────────────────────────────────
+  // ── 11. Return success ─────────────────────────────────────────────────────
   return Response.json(
     { bookingId: booking._id, reservationNumber, message: "Időpont sikeresen lefoglalva." },
     { status: 201 },
@@ -304,11 +348,16 @@ async function sendConfirmationEmail({
       clinicAddress: "2500 Esztergom, Martsa Alajos utca 6/c.",
     });
 
+    console.log("[api/booking] Email configured:", isEmailConfigured());
+    console.log("[api/booking] Sending email to:", patientEmail);
+    
     await sendEmail({
       to: patientEmail,
       subject: "Időpontfoglalás visszaigazolása — Mórocz Medical",
       html,
     });
+    
+    console.log("[api/booking] Email sent successfully!");
   } catch (err) {
     // Fire-and-forget: log but never throw — booking is already confirmed
     console.error("[api/booking] Failed to send confirmation email:", err);

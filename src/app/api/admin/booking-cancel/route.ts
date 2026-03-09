@@ -2,6 +2,7 @@ import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { buildAdminCancellationEmail } from "@/lib/booking-email";
 import { isEmailConfigured, sendEmail } from "@/lib/email";
+import { deleteCalendarEvent } from "@/lib/google-calendar";
 import { getWriteClient } from "@/lib/sanity-write-client";
 
 export const dynamic = "force-dynamic";
@@ -63,12 +64,13 @@ export async function POST(request: Request): Promise<Response> {
       slotDate: string;
       slotTime: string;
       status: string;
+      googleCalendarEventId?: string | null;
     };
 
     const booking = await getWriteClient().fetch<BookingForAdminCancel | null>(
       `*[_type == "booking" && _id == $bookingId][0]{
         _id, patientName, patientEmail, patientPhone, reservationNumber,
-        service->{name}, slotDate, slotTime, status
+        service->{name}, slotDate, slotTime, status, googleCalendarEventId
       }`,
       { bookingId },
     );
@@ -94,6 +96,11 @@ export async function POST(request: Request): Promise<Response> {
 
     // ── 6. Patch booking status to "cancelled" ─────────────────────────────────
     await getWriteClient().patch(booking._id).set({ status: "cancelled" }).commit();
+
+    // ── 6b. Delete Google Calendar event (fire-and-forget) ───────────────────
+    if (booking.googleCalendarEventId) {
+      void deleteCalendarEvent(booking.googleCalendarEventId);
+    }
 
     // ── 7. Release the slot — patch slotLock to available ─────────────────────
     const slotLockDocId = `slotLock-${booking.slotDate}-${booking.slotTime.replace(":", "-")}`;

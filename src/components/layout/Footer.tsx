@@ -33,87 +33,100 @@ export default function Footer({
 }: FooterProps) {
   const displayName = clinicName ?? "Mórocz Medical";
 
-  // Filter to only social links with both platform and url defined
   const activeSocials = (socialLinks ?? []).filter(
     (s): s is { _key: string; platform: NonNullable<(typeof s)["platform"]>; url: string } =>
       s.platform != null && s.url != null,
   );
 
   return (
-    <footer className="bg-primary text-white rounded-t-[3rem] lg:rounded-[3rem] pt-20 pb-10 px-8 md:px-16 overflow-hidden relative">
+    <footer className="bg-[#0d112f] rounded-t-[3rem] lg:rounded-[3rem] overflow-hidden">
       <FadeIn viewport>
-        <div>
-          {/* Navigation columns — 3 columns as per locked decision */}
-          <nav
-            aria-label="Lábléc navigáció"
-            className="grid grid-cols-2 md:grid-cols-3 gap-12 mb-20 relative z-10"
-          >
-            {footerColumns?.slice(0, 3).map((col) => (
-              <div key={col._key}>
-                {col.heading && <h4 className="font-bold mb-8 text-lg">{col.heading}</h4>}
-                <ul className="space-y-4 text-sm text-gray-300 font-medium">
-                  {col.links?.map((link) => (
-                    <li key={link._key}>
-                      <a
-                        href={link.href ?? "#"}
-                        className="hover:text-white hover:underline transition-all"
-                      >
-                        {link.label}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </nav>
+        <div className="px-5 pt-5 pb-0 md:px-10 md:pt-10">
 
-          {/* Logo + Social icons row */}
-          <div className="flex items-center justify-between mb-12 relative z-10">
-            <Image
-              src="/mm-logo-web.svg"
-              alt={displayName}
-              width={530}
-              height={130}
-              className="h-10 md:h-14 w-auto object-contain"
-            />
+          {/* ── White card ───────────────────────────────────────────── */}
+          <div className="bg-white rounded-[2rem] px-8 py-10 md:px-12 md:py-12">
+
+            {/* Navigation columns */}
+            {footerColumns && footerColumns.length > 0 && (
+              <nav
+                aria-label="Lábléc navigáció"
+                className="grid grid-cols-2 md:grid-cols-3 gap-10 mb-10"
+              >
+                {footerColumns.slice(0, 3).map((col) => (
+                  <div key={col._key}>
+                    {col.heading && (
+                      <h4 className="font-bold mb-5 text-lg text-primary">{col.heading}</h4>
+                    )}
+                    <ul className="space-y-5 text-base text-gray-700 font-medium">
+                      {col.links?.map((link) => (
+                        <li key={link._key}>
+                          <a
+                            href={link.href ?? "#"}
+                            className="hover:text-primary hover:underline transition-all"
+                          >
+                            {link.label}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </nav>
+            )}
+
+            {/* Divider */}
+            <div className="border-t border-gray-100 mb-8" />
+
+            {/* Contact info */}
+            {(phone || address) && (
+              <div className="flex flex-col gap-2 mb-6 text-base text-gray-600 md:flex-row md:gap-6">
+                {phone && (
+                  <a href={`tel:${phone}`} className="hover:text-primary transition-colors">
+                    {phone}
+                  </a>
+                )}
+                {address && <span>{address}</span>}
+              </div>
+            )}
+
+            {/* Social icons */}
             {activeSocials.length > 0 && (
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
                 {activeSocials.map((social) => (
                   <SocialIcon
                     key={social._key}
                     platform={social.platform}
                     url={social.url}
-                    className="w-12 h-12 rounded-full bg-[#2A2D40] border border-white/10 flex items-center justify-center text-white hover:bg-white hover:text-primary transition-all duration-300"
+                    className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all duration-300"
                   />
                 ))}
               </div>
             )}
           </div>
+          {/* ── End white card ───────────────────────────────────────── */}
 
-          {/* Contact info */}
-          {(phone || address) && (
-            <div className="flex flex-col gap-2 mb-8 text-sm text-gray-300 relative z-10 md:flex-row md:gap-6">
-              {phone && (
-                <a href={`tel:${phone}`} className="hover:text-white transition-colors">
-                  {phone}
-                </a>
-              )}
-              {address && <span>{address}</span>}
+          {/* ── Logo + copyright row (dark background) ───────────────── */}
+          <div className="px-4 md:px-8 py-8 md:py-10 flex flex-col md:flex-row items-center justify-between gap-6">
+            <Image
+              src="/mm-logo-web.svg"
+              alt={displayName}
+              width={530}
+              height={130}
+              className="h-8 md:h-12 w-auto object-contain brightness-0 invert"
+            />
+            <div className="flex flex-col md:flex-row items-center gap-4 text-sm text-white/50">
+              <p>
+                &copy;{new Date().getFullYear()} {displayName}. Minden jog fenntartva.
+              </p>
+              <Link
+                href={privacyPolicyUrl ?? "/adatkezelesi-tajekoztato"}
+                className="hover:text-white transition-colors"
+              >
+                Adatkezelési tájékoztató
+              </Link>
             </div>
-          )}
-
-          {/* Copyright line */}
-          <div className="flex flex-col md:flex-row justify-between items-center text-sm text-white/60 pt-8 border-t border-white/15">
-            <p>
-              &copy;{new Date().getFullYear()} {displayName}. Minden jog fenntartva.
-            </p>
-            <Link
-              href={privacyPolicyUrl ?? "/adatkezelesi-tajekoztato"}
-              className="hover:text-white transition-colors mt-2 md:mt-0"
-            >
-              Adatkezelési tájékoztató
-            </Link>
           </div>
+
         </div>
       </FadeIn>
     </footer>

@@ -3,8 +3,10 @@
 import { useCallback, useEffect, useState } from "react";
 import AdminCalendar from "@/components/admin/AdminCalendar";
 import AdminDayPanel from "@/components/admin/AdminDayPanel";
+import AdminFinanceView from "@/components/admin/AdminFinanceView";
 import { AdminSignOut } from "@/components/admin/AdminLogin";
 import AdminPatientModal from "@/components/admin/AdminPatientModal";
+import AdminPatientsView from "@/components/admin/AdminPatientsView";
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
@@ -20,6 +22,8 @@ export type AdminBooking = {
   status: string;
   managementToken: string;
 };
+
+type NavTab = "calendar" | "patients" | "finance";
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -41,7 +45,7 @@ function getMonthRange(year: number, month: number): { startDate: string; endDat
 
 function getWeekRange(dateStr: string): { startDate: string; endDate: string } {
   const date = new Date(dateStr);
-  const dow = date.getDay(); // 0=Sun
+  const dow = date.getDay();
   const mondayOffset = dow === 0 ? -6 : 1 - dow;
   const monday = new Date(date);
   monday.setDate(date.getDate() + mondayOffset);
@@ -50,6 +54,44 @@ function getWeekRange(dateStr: string): { startDate: string; endDate: string } {
   const fmt = (d: Date) =>
     `${String(d.getFullYear())}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
   return { startDate: fmt(monday), endDate: fmt(sunday) };
+}
+
+// ─── Nav tab button ────────────────────────────────────────────────────────────
+
+function NavTabBtn({
+  id,
+  active,
+  onClick,
+  children,
+}: {
+  id: NavTab;
+  active: boolean;
+  onClick: (id: NavTab) => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => onClick(id)}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "0.4rem",
+        padding: "0.375rem 0.875rem",
+        borderRadius: "9999px",
+        border: "none",
+        cursor: "pointer",
+        fontSize: "0.8125rem",
+        fontWeight: active ? 600 : 500,
+        backgroundColor: active ? "rgba(255,255,255,0.18)" : "transparent",
+        color: active ? "#ffffff" : "rgba(255,255,255,0.55)",
+        transition: "all 0.15s",
+        letterSpacing: "0.01em",
+      }}
+    >
+      {children}
+    </button>
+  );
 }
 
 // ─── Component ─────────────────────────────────────────────────────────────────
@@ -77,6 +119,7 @@ export default function AdminDashboard({
   const todayStr = getTodayString();
   const today = new Date(todayStr);
 
+  const [activeTab, setActiveTab] = useState<NavTab>("calendar");
   const [selectedDate, setSelectedDate] = useState<string>(todayStr);
   const [viewMode, setViewMode] = useState<"month" | "week">("month");
   const [dayBookings, setDayBookings] = useState<AdminBooking[]>(initialDayBookings);
@@ -115,7 +158,7 @@ export default function AdminDashboard({
     };
   }, [selectedDate, fetchBookings]);
 
-  // ── Fetch week bookings when viewMode is week or selectedDate changes in week mode ──
+  // ── Fetch week bookings ────────────────────────────────────────────────────────
 
   useEffect(() => {
     if (viewMode !== "week") return;
@@ -129,29 +172,21 @@ export default function AdminDashboard({
     };
   }, [viewMode, selectedDate, fetchBookings]);
 
-  // ── Month navigation handler ──────────────────────────────────────────────────
+  // ── Month navigation ──────────────────────────────────────────────────────────
 
   function handleMonthChange(year: number, month: number) {
     const { startDate, endDate } = getMonthRange(year, month);
     void fetchBookings(startDate, endDate).then(setMonthBookings);
   }
 
-  // ── Booking click: open patient detail modal ──────────────────────────────────
-
   function handleBookingClick(booking: AdminBooking) {
     setSelectedBooking(booking);
   }
 
-  // ── Cancel refresh: refetch day, month, and week bookings ─────────────────────
-
   async function handleCancelRefresh() {
     setSelectedBooking(null);
-
-    // Refetch day bookings
     const updatedDay = await fetchBookings(selectedDate, selectedDate);
     setDayBookings(updatedDay);
-
-    // Refetch month bookings
     const currentDate = new Date(selectedDate);
     const { startDate: mStart, endDate: mEnd } = getMonthRange(
       currentDate.getFullYear(),
@@ -159,16 +194,12 @@ export default function AdminDashboard({
     );
     const updatedMonth = await fetchBookings(mStart, mEnd);
     setMonthBookings(updatedMonth);
-
-    // Refetch week bookings (if in week mode)
     if (viewMode === "week") {
       const { startDate: wStart, endDate: wEnd } = getWeekRange(selectedDate);
       const updatedWeek = await fetchBookings(wStart, wEnd);
       setWeekBookings(updatedWeek);
     }
   }
-
-  // ── Compute stats from dayBookings ────────────────────────────────────────────
 
   const confirmedCount = dayBookings.filter((b) => b.status === "confirmed").length;
   const cancelledCount = dayBookings.filter((b) => b.status === "cancelled").length;
@@ -191,30 +222,60 @@ export default function AdminDashboard({
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          padding: "0.75rem 1.5rem",
+          padding: "0.625rem 1.5rem",
           backgroundColor: "#242a5f",
           flexShrink: 0,
+          gap: "1rem",
         }}
       >
+        {/* Left: Brand */}
         <h1
           style={{
             margin: 0,
-            fontSize: "1rem",
+            fontSize: "0.9375rem",
             fontWeight: 700,
             color: "#ffffff",
             letterSpacing: "-0.01em",
+            flexShrink: 0,
           }}
         >
-          Admin felület
+          Mórocz Medical
         </h1>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "0.5rem",
-            }}
-          >
+
+        {/* Center: Navigation tabs */}
+        <nav style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
+          <NavTabBtn id="calendar" active={activeTab === "calendar"} onClick={setActiveTab}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+              <line x1="16" y1="2" x2="16" y2="6" />
+              <line x1="8" y1="2" x2="8" y2="6" />
+              <line x1="3" y1="10" x2="21" y2="10" />
+            </svg>
+            Naptár
+          </NavTabBtn>
+
+          <NavTabBtn id="patients" active={activeTab === "patients"} onClick={setActiveTab}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+            Páciensek
+          </NavTabBtn>
+
+          <NavTabBtn id="finance" active={activeTab === "finance"} onClick={setActiveTab}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+              <polyline points="17 6 23 6 23 12" />
+            </svg>
+            Pénzügyek
+          </NavTabBtn>
+        </nav>
+
+        {/* Right: User + sign out */}
+        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", flexShrink: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
             <div
               style={{
                 width: "1.75rem",
@@ -231,13 +292,7 @@ export default function AdminDashboard({
             >
               {session.user.name.charAt(0).toUpperCase()}
             </div>
-            <span
-              style={{
-                fontSize: "0.8125rem",
-                color: "rgba(255,255,255,0.7)",
-                fontWeight: 500,
-              }}
-            >
+            <span style={{ fontSize: "0.8125rem", color: "rgba(255,255,255,0.7)", fontWeight: 500 }}>
               {session.user.name}
             </span>
           </div>
@@ -245,276 +300,96 @@ export default function AdminDashboard({
         </div>
       </header>
 
-      {/* ── Stats summary row ────────────────────────────────────────────────── */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(3, 1fr)",
-          gap: "0.75rem",
-          padding: "1.25rem 1.5rem 0",
-          flexShrink: 0,
-        }}
-      >
-        {/* Today's appointments */}
-        <div
-          style={{
-            backgroundColor: "#ffffff",
-            borderRadius: "1rem",
-            padding: "1rem 1.25rem",
-            border: "1px solid #e8eaf0",
-            borderLeft: "4px solid #242a5f",
-            boxShadow: "0 1px 3px rgba(36,42,95,0.06)",
-            minHeight: "5rem",
-            display: "flex",
-            alignItems: "center",
-            gap: "0.875rem",
-          }}
-        >
+      {/* ── Calendar view ────────────────────────────────────────────────────── */}
+      {activeTab === "calendar" && (
+        <>
+          {/* Stats summary */}
           <div
             style={{
-              width: "2.5rem",
-              height: "2.5rem",
-              borderRadius: "50%",
-              backgroundColor: "rgba(36,42,95,0.1)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+              display: "grid",
+              gridTemplateColumns: "repeat(3, 1fr)",
+              gap: "0.75rem",
+              padding: "1.25rem 1.5rem 0",
               flexShrink: 0,
             }}
           >
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#242a5f"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              role="img"
-              aria-label="Naptár"
-            >
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-              <line x1="16" y1="2" x2="16" y2="6" />
-              <line x1="8" y1="2" x2="8" y2="6" />
-              <line x1="3" y1="10" x2="21" y2="10" />
-            </svg>
+            <StatBox
+              label="Mai foglalások"
+              value={totalToday}
+              accent="#242a5f"
+              iconStroke="#242a5f"
+              iconPath={<><rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></>}
+              iconLabel="Naptár"
+            />
+            <StatBox
+              label="Visszaigazolva"
+              value={confirmedCount}
+              accent="#99CEB7"
+              iconStroke="#099268"
+              iconPath={<polyline points="20 6 9 17 4 12" />}
+              iconLabel="Visszaigazolva"
+              valueColor="#242a5f"
+            />
+            <StatBox
+              label="Lemondva"
+              value={cancelledCount}
+              accent="#e7c1d3"
+              iconStroke="#9f1239"
+              iconPath={<><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></>}
+              iconLabel="Lemondva"
+              valueColor={cancelledCount > 0 ? "#9f1239" : "#94a3b8"}
+            />
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
-            <div
-              style={{
-                fontSize: "0.6875rem",
-                fontWeight: 600,
-                color: "#64748b",
-                textTransform: "uppercase",
-                letterSpacing: "0.05em",
-              }}
-            >
-              Mai foglalások
-            </div>
-            <div
-              style={{
-                fontSize: "1.75rem",
-                fontWeight: 700,
-                color: "#242a5f",
-                lineHeight: 1,
-                fontVariantNumeric: "tabular-nums",
-              }}
-            >
-              {totalToday}
-            </div>
-          </div>
-        </div>
 
-        {/* Confirmed */}
-        <div
-          style={{
-            backgroundColor: "#ffffff",
-            borderRadius: "1rem",
-            padding: "1rem 1.25rem",
-            border: "1px solid #e8eaf0",
-            borderLeft: "4px solid #99CEB7",
-            boxShadow: "0 1px 3px rgba(36,42,95,0.06)",
-            minHeight: "5rem",
-            display: "flex",
-            alignItems: "center",
-            gap: "0.875rem",
-          }}
-        >
+          {/* Two-panel layout */}
           <div
             style={{
-              width: "2.5rem",
-              height: "2.5rem",
-              borderRadius: "50%",
-              backgroundColor: "rgba(153,206,183,0.15)",
               display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexShrink: 0,
+              flex: 1,
+              gap: "1rem",
+              padding: "1.25rem 1.5rem 1.5rem",
+              minHeight: 0,
+              overflow: "hidden",
             }}
           >
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#099268"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              role="img"
-              aria-label="Visszaigazolva"
-            >
-              <polyline points="20 6 9 17 4 12" />
-            </svg>
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
-            <div
-              style={{
-                fontSize: "0.6875rem",
-                fontWeight: 600,
-                color: "#64748b",
-                textTransform: "uppercase",
-                letterSpacing: "0.05em",
-              }}
-            >
-              Visszaigazolva
+            <div style={{ flex: "0 0 50%", minWidth: 0, display: "flex", flexDirection: "column" }}>
+              <AdminCalendar
+                selectedDate={selectedDate}
+                onSelectDate={setSelectedDate}
+                monthBookings={monthBookings}
+                viewMode={viewMode}
+                onViewModeChange={setViewMode}
+                onMonthChange={handleMonthChange}
+                initialYear={today.getFullYear()}
+                initialMonth={today.getMonth()}
+                weekBookings={weekBookings}
+                onBookingClick={handleBookingClick}
+              />
             </div>
             <div
               style={{
-                fontSize: "1.75rem",
-                fontWeight: 700,
-                color: "#242a5f",
-                lineHeight: 1,
-                fontVariantNumeric: "tabular-nums",
+                flex: "0 0 calc(50% - 1rem)",
+                minWidth: 0,
+                display: "flex",
+                flexDirection: "column",
               }}
             >
-              {confirmedCount}
+              <AdminDayPanel
+                bookings={dayBookings}
+                selectedDate={selectedDate}
+                isLoading={isDayLoading}
+                onBookingClick={handleBookingClick}
+              />
             </div>
           </div>
-        </div>
+        </>
+      )}
 
-        {/* Cancelled */}
-        <div
-          style={{
-            backgroundColor: "#ffffff",
-            borderRadius: "1rem",
-            padding: "1rem 1.25rem",
-            border: "1px solid #e8eaf0",
-            borderLeft: "4px solid #e7c1d3",
-            boxShadow: "0 1px 3px rgba(36,42,95,0.06)",
-            minHeight: "5rem",
-            display: "flex",
-            alignItems: "center",
-            gap: "0.875rem",
-          }}
-        >
-          <div
-            style={{
-              width: "2.5rem",
-              height: "2.5rem",
-              borderRadius: "50%",
-              backgroundColor: "rgba(231,193,211,0.3)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexShrink: 0,
-            }}
-          >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#9f1239"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              role="img"
-              aria-label="Lemondva"
-            >
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
-            <div
-              style={{
-                fontSize: "0.6875rem",
-                fontWeight: 600,
-                color: "#64748b",
-                textTransform: "uppercase",
-                letterSpacing: "0.05em",
-              }}
-            >
-              Lemondva
-            </div>
-            <div
-              style={{
-                fontSize: "1.75rem",
-                fontWeight: 700,
-                color: cancelledCount > 0 ? "#9f1239" : "#94a3b8",
-                lineHeight: 1,
-                fontVariantNumeric: "tabular-nums",
-              }}
-            >
-              {cancelledCount}
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* ── Patients view ────────────────────────────────────────────────────── */}
+      {activeTab === "patients" && <AdminPatientsView />}
 
-      {/* ── Two-panel dashboard ──────────────────────────────────────────────── */}
-      <div
-        style={{
-          display: "flex",
-          flex: 1,
-          gap: "1rem",
-          padding: "1.25rem 1.5rem 1.5rem",
-          minHeight: 0,
-          overflow: "hidden",
-        }}
-      >
-        {/* ── Left panel: Calendar (50%) ───────────────────────────────────── */}
-        <div
-          style={{
-            flex: "0 0 50%",
-            minWidth: 0,
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          <AdminCalendar
-            selectedDate={selectedDate}
-            onSelectDate={setSelectedDate}
-            monthBookings={monthBookings}
-            viewMode={viewMode}
-            onViewModeChange={setViewMode}
-            onMonthChange={handleMonthChange}
-            initialYear={today.getFullYear()}
-            initialMonth={today.getMonth()}
-            weekBookings={weekBookings}
-            onBookingClick={handleBookingClick}
-          />
-        </div>
-
-        {/* ── Right panel: Day appointments (50%) ─────────────────────────── */}
-        <div
-          style={{
-            flex: "0 0 calc(50% - 1rem)",
-            minWidth: 0,
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          <AdminDayPanel
-            bookings={dayBookings}
-            selectedDate={selectedDate}
-            isLoading={isDayLoading}
-            onBookingClick={handleBookingClick}
-          />
-        </div>
-      </div>
+      {/* ── Finance view ─────────────────────────────────────────────────────── */}
+      {activeTab === "finance" && <AdminFinanceView />}
 
       {/* ── Patient detail modal ─────────────────────────────────────────────── */}
       {selectedBooking && (
@@ -524,6 +399,95 @@ export default function AdminDashboard({
           onCancelled={() => void handleCancelRefresh()}
         />
       )}
+    </div>
+  );
+}
+
+// ─── Inline stat box (calendar view) ───────────────────────────────────────────
+
+function StatBox({
+  label,
+  value,
+  accent,
+  iconStroke,
+  iconPath,
+  iconLabel,
+  valueColor = "#242a5f",
+}: {
+  label: string;
+  value: number;
+  accent: string;
+  iconStroke: string;
+  iconPath: React.ReactNode;
+  iconLabel: string;
+  valueColor?: string;
+}) {
+  return (
+    <div
+      style={{
+        backgroundColor: "#ffffff",
+        borderRadius: "1rem",
+        padding: "1rem 1.25rem",
+        border: "1px solid #e8eaf0",
+        borderLeft: `4px solid ${accent}`,
+        boxShadow: "0 1px 3px rgba(36,42,95,0.06)",
+        minHeight: "5rem",
+        display: "flex",
+        alignItems: "center",
+        gap: "0.875rem",
+      }}
+    >
+      <div
+        style={{
+          width: "2.5rem",
+          height: "2.5rem",
+          borderRadius: "50%",
+          backgroundColor: `${accent}28`,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexShrink: 0,
+        }}
+      >
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke={iconStroke}
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          role="img"
+          aria-label={iconLabel}
+        >
+          {iconPath}
+        </svg>
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
+        <div
+          style={{
+            fontSize: "0.6875rem",
+            fontWeight: 600,
+            color: "#64748b",
+            textTransform: "uppercase",
+            letterSpacing: "0.05em",
+          }}
+        >
+          {label}
+        </div>
+        <div
+          style={{
+            fontSize: "1.75rem",
+            fontWeight: 700,
+            color: valueColor,
+            lineHeight: 1,
+            fontVariantNumeric: "tabular-nums",
+          }}
+        >
+          {value}
+        </div>
+      </div>
     </div>
   );
 }

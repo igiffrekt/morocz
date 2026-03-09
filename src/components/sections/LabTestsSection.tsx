@@ -3,7 +3,7 @@
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FadeIn } from "@/components/motion/FadeIn";
 import { urlFor } from "@/sanity/lib/image";
 import type { SanityImageObject, Slug } from "../../../sanity.types";
@@ -37,12 +37,29 @@ function formatPrice(price: number): string {
   return `${price.toLocaleString("hu-HU")} Ft`;
 }
 
-const PER_PAGE = 9; // 3 columns × 3 rows
-
 export function LabTestsSection({ heading, labTests }: LabTestsSectionProps) {
   const [page, setPage] = useState(0);
   const direction = useRef(0);
-  const totalPages = Math.ceil(labTests.length / PER_PAGE);
+
+  // Responsive: mobilon 3, desktopon 9 (3×3)
+  const [perPage, setPerPage] = useState(9);
+
+  useEffect(() => {
+    function update() {
+      const isMobile = window.innerWidth < 640;
+      setPerPage(isMobile ? 3 : 9);
+    }
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
+  // Ha perPage változik, oldalszám resetelése
+  useEffect(() => {
+    setPage(0);
+  }, [perPage]);
+
+  const totalPages = Math.ceil(labTests.length / perPage);
 
   function goToPage(index: number) {
     const clamped = Math.max(0, Math.min(index, totalPages - 1));
@@ -55,7 +72,7 @@ export function LabTestsSection({ heading, labTests }: LabTestsSectionProps) {
     else if (info.offset.x > 50) goToPage(page - 1);
   }
 
-  const visibleTests = labTests.slice(page * PER_PAGE, page * PER_PAGE + PER_PAGE);
+  const visibleTests = labTests.slice(page * perPage, page * perPage + perPage);
 
   const slideVariants = {
     enter: (dir: number) => ({ x: dir > 0 ? 300 : -300, opacity: 0 }),
@@ -66,13 +83,13 @@ export function LabTestsSection({ heading, labTests }: LabTestsSectionProps) {
   return (
     <section
       aria-labelledby="laborvizsgalatok-cim"
-      className="bg-[#0d112f] rounded-3xl px-6 py-12 md:px-10 md:py-16"
+      className="bg-[#0d112f] rounded-3xl px-6 py-12 md:px-10 md:py-16 mb-4"
     >
       {heading && (
         <FadeIn viewport>
           <h2
             id="laborvizsgalatok-cim"
-            className="text-3xl md:text-4xl font-extrabold text-white mb-8"
+            className="text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight text-white mb-8"
           >
             {heading}
           </h2>

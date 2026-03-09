@@ -1,49 +1,10 @@
-import { google } from "googleapis";
-
 /**
- * Shared email sending via Gmail API (OAuth2).
+ * Email sending via Brevo (Sendinblue) API v3
  *
  * Required env vars:
- *   GOOGLE_CLIENT_ID      — OAuth2 client ID (same as auth)
- *   GOOGLE_CLIENT_SECRET   — OAuth2 client secret (same as auth)
- *   GMAIL_REFRESH_TOKEN    — Refresh token with gmail.send scope
- *   GMAIL_SENDER_EMAIL     — "From" address (optional, defaults to authenticated user)
+ *   BREVO_API_KEY          — Brevo API v3 key
+ *   GMAIL_SENDER_EMAIL     — From address
  */
-
-function getGmailClient() {
-  const oauth2Client = new google.auth.OAuth2(
-    process.env.GOOGLE_CLIENT_ID,
-    process.env.GOOGLE_CLIENT_SECRET,
-  );
-  oauth2Client.setCredentials({
-    refresh_token: process.env.GMAIL_REFRESH_TOKEN,
-  });
-
-  return google.gmail({ version: "v1", auth: oauth2Client });
-}
-
-function createRawMessage(params: {
-  from: string;
-  to: string;
-  subject: string;
-  html: string;
-}): string {
-  // Encode subject with RFC 2047 for UTF-8 support (Hungarian characters)
-  const encodedSubject = `=?UTF-8?B?${Buffer.from(params.subject).toString("base64")}?=`;
-
-  const messageParts = [
-    `From: ${params.from}`,
-    `To: ${params.to}`,
-    `Subject: ${encodedSubject}`,
-    "MIME-Version: 1.0",
-    'Content-Type: text/html; charset="UTF-8"',
-    "Content-Transfer-Encoding: base64",
-    "",
-    Buffer.from(params.html).toString("base64"),
-  ];
-
-  return Buffer.from(messageParts.join("\r\n")).toString("base64url");
-}
 
 export async function sendEmail(params: {
   to: string;
@@ -51,27 +12,66 @@ export async function sendEmail(params: {
   html: string;
   from?: string;
 }): Promise<void> {
+  const apiKey = process.env.BREVO_API_KEY;
   const senderEmail = params.from ?? process.env.GMAIL_SENDER_EMAIL;
 
-  const raw = createRawMessage({
-    from: senderEmail ?? "me",
+  if (!apiKey) {
+    throw new Error("BREVO_API_KEY is not configured");
+  }
+
+  if (!senderEmail) {
+    throw new Error("GMAIL_SENDER_EMAIL is not configured");
+  }
+
+  const payload = {
+    sender: {
+      name: "Mórocz Medical",
+      email: senderEmail,
+    },
+    to: [
+      {
+        email: params.to,
+      },
+    ],
+    subject: params.subject,
+    htmlContent: params.html,
+  };
+
+  console.log("[email] Sending via Brevo:", {
+    from: senderEmail,
     to: params.to,
     subject: params.subject,
-    html: params.html,
   });
 
-  const gmail = getGmailClient();
-  await gmail.users.messages.send({
-    userId: "me",
-    requestBody: { raw },
+  const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+    method: "POST",
+    headers: {
+      "api-key": apiKey,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
   });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    console.error("[email] Brevo API error:", {
+      status: response.status,
+      statusText: response.statusText,
+      error: errorData,
+    });
+    throw new Error(
+      `Brevo API error: ${response.status} ${response.statusText}`,
+    );
+  }
+
+  const result = await response.json();
+  console.log("[email] Email sent successfully! Message ID:", result.messageId);
 }
 
-/** Check whether Gmail API credentials are configured. */
+/** Check whether email is configured. */
 export function isEmailConfigured(): boolean {
   return !!(
-    process.env.GOOGLE_CLIENT_ID &&
-    process.env.GOOGLE_CLIENT_SECRET &&
-    process.env.GMAIL_REFRESH_TOKEN
+    process.env.BREVO_API_KEY &&
+    process.env.GMAIL_SENDER_EMAIL
   );
 }

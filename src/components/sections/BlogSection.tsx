@@ -37,7 +37,7 @@ export function BlogSection({ heading, posts }: BlogSectionProps) {
           {heading && (
             <h2
               id="blog-cim"
-              className="max-w-md text-3xl font-extrabold leading-tight text-primary md:text-4xl"
+              className="max-w-md text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight text-primary"
             >
               {heading}
             </h2>

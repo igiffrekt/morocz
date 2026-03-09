@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__Sanity__search_docs",
+      "WebSearch",
+      "WebFetch(domain:www.sanity.io)",
+      "Bash(ls:*)",
+      "Bash(node:*)"
+    ]
+  }
+}

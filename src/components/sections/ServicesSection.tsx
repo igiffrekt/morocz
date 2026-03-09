@@ -130,7 +130,7 @@ export function ServicesSection({ heading, categories, services }: ServicesSecti
             {heading && (
               <h2
                 id="szolgaltatasok-cim"
-                className="text-3xl md:text-4xl font-extrabold text-primary mb-6"
+                className="text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight text-primary mb-6"
               >
                 {heading}
               </h2>
@@ -188,7 +188,7 @@ export function ServicesSection({ heading, categories, services }: ServicesSecti
                     />
                   )}
                   {service.name && (
-                    <h3 className="text-base font-bold text-primary">{service.name}</h3>
+                    <h3 className="text-lg md:text-xl font-bold text-primary leading-snug">{service.name}</h3>
                   )}
                   {service.description && (
                     <p className="text-sm text-gray-600 line-clamp-2">{service.description}</p>

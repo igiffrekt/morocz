@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, motion } from "motion/react";
+import { motion, type PanInfo } from "motion/react";
 import Image from "next/image";
 import { useState } from "react";
 import { FadeIn } from "@/components/motion/FadeIn";
@@ -19,8 +19,6 @@ function PlaceholderAvatar() {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
-      role="img"
-      aria-label="Névtelen páciens"
       className="h-16 w-16 rounded-full"
     >
       <circle cx="40" cy="40" r="40" fill="#d1d5db" />
@@ -31,73 +29,93 @@ function PlaceholderAvatar() {
 }
 
 export function TestimonialsSection({ heading, testimonials }: TestimonialsSectionProps) {
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [exitX, setExitX] = useState(0);
 
   if (testimonials.length === 0) return null;
 
-  const single = testimonials.length === 1;
-  const active = testimonials[activeIndex];
-
-  function goNext() {
-    setActiveIndex((i) => (i + 1) % testimonials.length);
-  }
-
-  function goPrev() {
-    setActiveIndex((i) => (i - 1 + testimonials.length) % testimonials.length);
-  }
-
-  function handleKeyDown(e: React.KeyboardEvent<HTMLFieldSetElement>) {
-    if (e.key === "ArrowLeft") goPrev();
-    else if (e.key === "ArrowRight") goNext();
-  }
-
-  function handleDragEnd(_: unknown, info: { offset: { x: number } }) {
-    if (info.offset.x < -50) goNext();
-    else if (info.offset.x > 50) goPrev();
-  }
+  const handleDragEnd = (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    if (Math.abs(info.offset.x) > 80) {
+      setExitX(info.offset.x);
+      setTimeout(() => {
+        setCurrentIndex((prev) =>
+          info.offset.x < 0
+            ? (prev + 1) % testimonials.length
+            : (prev - 1 + testimonials.length) % testimonials.length,
+        );
+        setExitX(0);
+      }, 200);
+    }
+  };
 
   return (
-    <section aria-labelledby="velemenyek-cim" className="px-4 py-12 md:py-20">
+    <section aria-labelledby="velemenyek-cim" className="p-6 md:p-10 lg:p-14 bg-[#efda67] rounded-3xl">
       {heading && (
         <FadeIn viewport>
-          <h2 id="velemenyek-cim" className="mb-8 text-3xl font-extrabold text-primary md:text-4xl">
-            {heading}
-          </h2>
+          <div className="mb-12">
+            <motion.span
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+              className="inline-flex items-center gap-3 text-xs font-semibold tracking-[0.2em] uppercase text-primary/40 mb-4"
+            >
+              <span className="w-8 h-px bg-primary/20" />
+              Rólunk mondták
+            </motion.span>
+            <motion.h2
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0 }}
+              transition={{ duration: 0.7, delay: 0.1, ease: "easeOut" }}
+              id="velemenyek-cim"
+              className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-primary leading-tight"
+            >
+              {heading}
+            </motion.h2>
+          </div>
         </FadeIn>
       )}
 
       <FadeIn viewport delay={0.15}>
-        <fieldset
-          aria-label="Vélemények körhinta"
-          // biome-ignore lint/a11y/noNoninteractiveTabindex: carousel keyboard navigation (WCAG carousel pattern) requires tabIndex so arrow keys work
-          tabIndex={0}
-          onKeyDown={handleKeyDown}
-          className="m-0 border-0 p-0 outline-none focus-visible:rounded-2xl focus-visible:ring-2 focus-visible:ring-primary/40"
-        >
-          <motion.div
-            drag={single ? false : "x"}
-            dragConstraints={{ left: 0, right: 0 }}
-            dragElastic={0.1}
-            onDragEnd={single ? undefined : handleDragEnd}
-            className="cursor-grab select-none active:cursor-grabbing"
-          >
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={active._id}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.4 }}
-                aria-live="polite"
-                className="rounded-2xl border border-gray-200 px-10 py-12 md:px-32 md:py-16"
-              >
-                <div className="flex flex-col items-start gap-8 md:flex-row md:items-center md:gap-0">
-                  {/* Left: photo + name row */}
-                  <div className="flex shrink-0 items-center gap-4">
-                    {active.photo?.asset ? (
+        <div className="flex items-center justify-center min-h-[22rem]">
+          <div className="relative w-full max-w-xs h-72">
+            {testimonials.map((t, index) => {
+              const isCurrent = index === currentIndex;
+              const isNext = index === (currentIndex + 1) % testimonials.length;
+              const isPrev = index === (currentIndex + 2) % testimonials.length;
+
+              if (!isCurrent && !isNext && !isPrev) return null;
+
+              return (
+                <motion.div
+                  key={t._id}
+                  className="absolute inset-0 rounded-2xl bg-white shadow-xl cursor-grab active:cursor-grabbing"
+                  style={{ zIndex: isCurrent ? 3 : isNext ? 2 : 1 }}
+                  drag={isCurrent ? "x" : false}
+                  dragConstraints={{ left: 0, right: 0 }}
+                  dragElastic={0.7}
+                  onDragEnd={isCurrent ? handleDragEnd : undefined}
+                  initial={{
+                    scale: 0.95,
+                    opacity: 0,
+                    y: isCurrent ? 0 : isNext ? 8 : 16,
+                    rotate: isCurrent ? 0 : isNext ? -2 : -4,
+                  }}
+                  animate={{
+                    scale: isCurrent ? 1 : 0.95,
+                    opacity: isCurrent ? 1 : isNext ? 0.6 : 0.3,
+                    x: isCurrent ? exitX : 0,
+                    y: isCurrent ? 0 : isNext ? 8 : 16,
+                    rotate: isCurrent ? exitX / 20 : isNext ? -2 : -4,
+                  }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                >
+                  <div className="p-8 flex flex-col items-center gap-4 h-full justify-center">
+                    {t.photo?.asset ? (
                       <Image
-                        src={urlFor(active.photo).width(128).height(128).url()}
-                        alt={active.patientName ?? "Páciens"}
+                        src={urlFor(t.photo).width(128).height(128).url()}
+                        alt={t.patientName ?? "Páciens"}
                         width={64}
                         height={64}
                         className="h-16 w-16 rounded-full object-cover"
@@ -105,52 +123,40 @@ export function TestimonialsSection({ heading, testimonials }: TestimonialsSecti
                     ) : (
                       <PlaceholderAvatar />
                     )}
-                    {active.patientName && (
-                      <div>
-                        <p className="text-base font-extrabold text-primary">
-                          {active.patientName}
-                        </p>
-                        <p className="text-sm font-medium text-primary/50">Páciens</p>
-                      </div>
+                    {t.patientName && (
+                      <h3 className="text-lg font-bold text-primary">{t.patientName}</h3>
+                    )}
+                    {t.text && (
+                      <p className="text-center text-sm text-gray-600 leading-relaxed line-clamp-4">
+                        {t.text}
+                      </p>
                     )}
                   </div>
+                </motion.div>
+              );
+            })}
 
-                  {/* Separator */}
-                  <div className="hidden h-20 w-px bg-gray-200 md:block md:mx-12" />
-
-                  {/* Right: quote */}
-                  {active.text && (
-                    <p className="text-lg font-medium leading-relaxed text-primary/80 md:text-xl">
-                      {active.text}
-                    </p>
-                  )}
-                </div>
-              </motion.div>
-            </AnimatePresence>
-          </motion.div>
-
-          {/* Dot navigation */}
-          {!single && (
-            <nav aria-label="Vélemény navigáció" className="mt-8 flex justify-center">
-              <div className="inline-flex items-center gap-2 rounded-full bg-[#f2f6fa] px-8 py-3.5">
-                {testimonials.map((t, i) => (
+            {/* Dots */}
+            {testimonials.length > 1 && (
+              <div className="absolute -bottom-10 left-0 right-0 flex justify-center gap-2">
+                {testimonials.map((t, index) => (
                   <button
                     key={t._id}
                     type="button"
-                    aria-label={t.patientName ?? `${i + 1}. vélemény`}
-                    onClick={() => setActiveIndex(i)}
+                    aria-label={t.patientName ?? `${index + 1}. vélemény`}
+                    onClick={() => setCurrentIndex(index)}
                     className={[
                       "rounded-full transition-all duration-300",
-                      i === activeIndex
-                        ? "h-2 w-2 bg-primary"
-                        : "h-1.5 w-1.5 bg-primary/25 hover:bg-primary/40",
+                      index === currentIndex
+                        ? "w-2 h-2 bg-primary"
+                        : "w-1.5 h-1.5 bg-primary/25 hover:bg-primary/40",
                     ].join(" ")}
                   />
                 ))}
               </div>
-            </nav>
-          )}
-        </fieldset>
+            )}
+          </div>
+        </div>
       </FadeIn>
     </section>
   );

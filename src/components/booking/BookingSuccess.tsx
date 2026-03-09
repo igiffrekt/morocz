@@ -4,23 +4,61 @@ import Link from "next/link";
 
 interface SuccessProps {
   serviceName: string;
-  date: string; // Pre-formatted Hungarian date
-  time: string; // "09:20"
+  date: string;           // Pre-formatted Hungarian date
+  rawDate: string;        // YYYY-MM-DD
+  time: string;           // "09:20"
+  durationMinutes: number;
   reservationNumber: string;
   patientName: string;
   patientEmail: string;
   onNewBooking: () => void;
 }
 
+function buildGoogleCalendarUrl(
+  title: string,
+  rawDate: string,
+  startTime: string,
+  durationMinutes: number,
+  description: string,
+): string {
+  const [hStr, mStr] = startTime.split(":");
+  const h = parseInt(hStr ?? "0", 10);
+  const m = parseInt(mStr ?? "0", 10);
+  const totalEnd = h * 60 + m + durationMinutes;
+  const endH = String(Math.floor(totalEnd / 60) % 24).padStart(2, "0");
+  const endM = String(totalEnd % 60).padStart(2, "0");
+  const dateCompact = rawDate.replace(/-/g, "");
+  const startStr = `${dateCompact}T${startTime.replace(":", "")}00`;
+  const endStr   = `${dateCompact}T${endH}${endM}00`;
+  const params = new URLSearchParams({
+    action: "TEMPLATE",
+    text: title,
+    dates: `${startStr}/${endStr}`,
+    ctz: "Europe/Budapest",
+    details: description,
+    location: "2500 Esztergom, Martsa Alajos utca 6/c.",
+  });
+  return `https://calendar.google.com/calendar/render?${params.toString()}`;
+}
+
 export function BookingSuccess({
   serviceName,
   date,
+  rawDate,
   time,
+  durationMinutes,
   reservationNumber,
   patientName,
   patientEmail,
   onNewBooking,
 }: SuccessProps) {
+  const calendarUrl = buildGoogleCalendarUrl(
+    `${serviceName} — Mórocz Medical`,
+    rawDate,
+    time,
+    durationMinutes,
+    `Foglalási szám: ${reservationNumber}\nHelyszín: 2500 Esztergom, Martsa Alajos utca 6/c.\nTelefon: +36 70 639 5239`,
+  );
   return (
     <div className="py-6 text-center">
       {/* Green checkmark icon */}
@@ -120,6 +158,30 @@ export function BookingSuccess({
               />
               Hozza magával a TAJ kártyáját és a személyi igazolványát.
             </li>
+            <li className="flex items-start gap-2 text-sm">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#99CEB7"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="mt-0.5 w-3.5 h-3.5 shrink-0"
+                aria-hidden="true"
+              >
+                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+                <circle cx="12" cy="10" r="3" />
+              </svg>
+              <a
+                href="https://www.google.com/maps/place/47%C2%B048'02.9%22N+18%C2%B044'44.4%22E/@47.8007963,18.7430918,17z/data=!3m1!4b1!4m4!3m3!8m2!3d47.8007927!4d18.7456667?entry=ttu&g_ep=EgoyMDI1MDkyOC4wIKXMDSoASAFQAw%3D%3D"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[var(--color-primary)] underline underline-offset-2 hover:opacity-70 transition-opacity"
+              >
+                2500 Esztergom, Martsa Alajos utca 6/c.
+              </a>
+            </li>
           </ul>
         </div>
 
@@ -165,6 +227,18 @@ export function BookingSuccess({
         >
           Vissza a főoldalra
         </Link>
+        <a
+          href={calendarUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center justify-center gap-2 px-6 py-3 text-sm font-semibold text-white rounded-xl transition-all duration-200 shadow-md hover:shadow-lg"
+          style={{ backgroundColor: "#4285F4" }}
+        >
+          <svg viewBox="0 0 24 24" className="w-4 h-4 shrink-0" fill="currentColor" aria-hidden="true">
+            <path d="M19.5 3h-2.25V1.5h-1.5V3H8.25V1.5h-1.5V3H4.5A2.25 2.25 0 0 0 2.25 5.25v15A2.25 2.25 0 0 0 4.5 22.5h15a2.25 2.25 0 0 0 2.25-2.25v-15A2.25 2.25 0 0 0 19.5 3Zm.75 17.25a.75.75 0 0 1-.75.75h-15a.75.75 0 0 1-.75-.75V9h16.5v11.25ZM3.75 7.5V5.25A.75.75 0 0 1 4.5 4.5h1.25V6h1.5V4.5h7.5V6h1.5V4.5H17.25a.75.75 0 0 1 .75.75V7.5H3.75Z"/>
+          </svg>
+          Mentés Google Naptárba
+        </a>
         <button
           type="button"
           onClick={onNewBooking}

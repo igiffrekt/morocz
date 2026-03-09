@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { BlogSection } from "@/components/sections/BlogSection";
 import { HeroSection } from "@/components/sections/HeroSection";
 import { HeroServiceCards } from "@/components/sections/HeroServiceCards";
+import { ImportantInfoSection } from "@/components/sections/ImportantInfoSection";
 import { LabTestsSection } from "@/components/sections/LabTestsSection";
 import { ServicesSection } from "@/components/sections/ServicesSection";
 import { TestimonialsSection } from "@/components/sections/TestimonialsSection";
@@ -171,10 +172,17 @@ export default async function Home() {
         services={services ?? []}
       />
       <LabTestsSection heading={homepage?.labTestsHeadline} labTests={labTests ?? []} />
-      <TestimonialsSection
-        heading={homepage?.testimonialsHeadline}
-        testimonials={testimonials ?? []}
-      />
+      <div className="flex flex-col lg:flex-row lg:gap-3 lg:items-center">
+        <div className="lg:w-[65%]">
+          <ImportantInfoSection />
+        </div>
+        <div className="lg:w-[35%]">
+          <TestimonialsSection
+            heading={homepage?.testimonialsHeadline}
+            testimonials={testimonials ?? []}
+          />
+        </div>
+      </div>
       <BlogSection heading={homepage?.blogHeadline} posts={latestPosts ?? []} />
       <JsonLd data={clinicJsonLd} />
     </>

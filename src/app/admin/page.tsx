@@ -53,6 +53,13 @@ const BOOKINGS_QUERY = `*[_type == "booking" && !(_id in path("drafts.**")) && s
 
 export default async function AdminPage() {
   const session = await auth.api.getSession({ headers: await headers() });
+  
+  // Hide website navbar on admin page
+  const navbarHideStyle = `
+    nav { display: none !important; }
+    header:not(.admin-header) { display: none !important; }
+    body > header { display: none !important; }
+  `;
 
   // ── No session → show login form ─────────────────────────────────────────
   if (!session) {
@@ -153,10 +160,24 @@ export default async function AdminPage() {
   }
 
   return (
-    <AdminDashboard
-      session={session}
-      initialDayBookings={todayBookings}
-      initialMonthBookings={monthBookings}
-    />
+    <>
+      <style>{`
+        /* Hide website navbar/header but NOT the admin header */
+        header:not([data-admin-header="true"]),
+        body > nav:first-of-type,
+        footer {
+          display: none !important;
+          visibility: hidden !important;
+          height: 0 !important;
+          margin: 0 !important;
+          padding: 0 !important;
+        }
+      `}</style>
+      <AdminDashboard
+        session={session}
+        initialDayBookings={todayBookings}
+        initialMonthBookings={monthBookings}
+      />
+    </>
   );
 }

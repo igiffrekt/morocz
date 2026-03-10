@@ -339,6 +339,7 @@ export default function AdminPatientsView() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<FilterMode>("all");
   const [searchFocused, setSearchFocused] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     void fetch("/api/admin/patients")
@@ -348,7 +349,11 @@ export default function AdminPatientsView() {
           if (data.error) {
             setError(data.error);
           } else {
-            setPatients(data.patients ?? []);
+            // Sort by name (A-Z) by default
+            const sorted = (data.patients ?? []).sort((a, b) =>
+              (a.name || "").localeCompare(b.name || "", "hu")
+            );
+            setPatients(sorted);
             setTotal(data.total ?? data.patients?.length ?? 0);
           }
           setLoading(false);
@@ -359,6 +364,11 @@ export default function AdminPatientsView() {
         setLoading(false);
       });
   }, []);
+
+  // Reset to page 1 when search or filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, filter]);
 
   const filtered = patients.filter((p) => {
     const matchSearch =
@@ -371,18 +381,56 @@ export default function AdminPatientsView() {
 
   const bookingCount = patients.filter((p) => p.totalBookings > 0).length;
 
+  // Pagination
+  const ITEMS_PER_PAGE = 10;
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+  const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIdx = startIdx + ITEMS_PER_PAGE;
+  const currentPagePatients = filtered.slice(startIdx, endIdx);
+
   return (
     <div
       style={{
-        padding: "1.5rem 1.75rem",
-        flex: 1,
-        overflow: "auto",
+        padding: "1.5rem 1rem",
+        flex: "none",
+        overflow: "visible",
         display: "flex",
         flexDirection: "column",
         gap: "1rem",
         minHeight: 0,
       }}
     >
+      <style>{`
+        /* Mobile-first responsive for patients view */
+        @media (max-width: 768px) {
+          /* Tighten padding */
+          [style*="padding: \"1.5rem"] {
+            padding: 0.75rem !important;
+          }
+          
+          /* Search input — full width */
+          input[type="text"] {
+            width: 100% !important;
+          }
+          
+          /* Table header — hide some columns on mobile */
+          [style*="gridTemplateColumns: \"1.6fr"] {
+            grid-template-columns: 2fr 1fr 100px !important;
+            gap: 0.5rem !important;
+          }
+          
+          /* Table cell padding */
+          [style*="padding: \"0.75rem"] {
+            padding: 0.5rem !important;
+          }
+          
+          /* Pagination controls — stack */
+          [style*="justifyContent: \"space-between"] {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+          }
+        }
+      `}</style>
       {/* ── Header ──────────────────────────────────────────────────────────── */}
       <div
         style={{
@@ -547,13 +595,13 @@ export default function AdminPatientsView() {
           backgroundColor: "#ffffff",
           borderRadius: "1.125rem",
           border: "1px solid rgba(228,232,240,0.8)",
-          overflow: "hidden",
-          flex: 1,
+          overflow: "visible",
+          flex: "none",
           display: "flex",
           flexDirection: "column",
           boxShadow:
             "0 1px 3px rgba(36,42,95,0.05), 0 4px 16px rgba(36,42,95,0.06), 0 0 0 1px rgba(255,255,255,0.5) inset",
-          minHeight: 0,
+          minHeight: "auto",
         }}
       >
         {/* Table header */}
@@ -584,7 +632,7 @@ export default function AdminPatientsView() {
         </div>
 
         {/* Rows area */}
-        <div style={{ overflow: "auto", flex: 1 }}>
+        <div style={{ overflow: "visible", flex: "none" }}>
           {loading ? (
             <div
               style={{
@@ -622,7 +670,7 @@ export default function AdminPatientsView() {
           ) : filtered.length === 0 ? (
             <EmptyState search={search} />
           ) : (
-            filtered.map((p, i) => (
+            currentPagePatients.map((p, i) => (
               <PatientRow
                 key={p.email || `${p.name}-${i}`}
                 p={p}
@@ -633,22 +681,70 @@ export default function AdminPatientsView() {
           )}
         </div>
 
-        {/* Footer — result count when searching */}
-        {!loading && !error && search && filtered.length > 0 && (
+        {/* Footer — pagination controls */}
+        {!loading && !error && filtered.length > 0 && (
           <div
             style={{
-              padding: "0.625rem 1.5rem",
+              padding: "1rem 1.5rem",
               borderTop: "1px solid rgba(228,232,240,0.7)",
               background: "rgba(248,249,253,0.8)",
-              fontSize: "0.75rem",
-              color: "#94a3b8",
               display: "flex",
               alignItems: "center",
-              gap: "0.25rem",
+              justifyContent: "space-between",
+              gap: "1rem",
+              fontSize: "0.875rem",
+              color: "#64748b",
             }}
           >
-            <span style={{ fontWeight: 600, color: "#475569" }}>{filtered.length}</span>
-            találat &nbsp;„{search}"&nbsp; keresésre
+            {/* Result count */}
+            <div>
+              <span style={{ fontWeight: 600, color: "#475569" }}>
+                {startIdx + 1}–{Math.min(endIdx, filtered.length)}
+              </span>
+              &nbsp;/&nbsp;
+              <span>{filtered.length}</span>
+            </div>
+
+            {/* Pagination buttons */}
+            <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+              <button
+                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                disabled={currentPage === 1}
+                style={{
+                  padding: "0.375rem 0.75rem",
+                  border: "1px solid #e4e8f0",
+                  borderRadius: "0.5rem",
+                  backgroundColor: currentPage === 1 ? "#f3f5fb" : "#ffffff",
+                  color: currentPage === 1 ? "#cbd5e1" : "#64748b",
+                  cursor: currentPage === 1 ? "not-allowed" : "pointer",
+                  fontSize: "0.8125rem",
+                  fontWeight: 500,
+                }}
+              >
+                ← Előző
+              </button>
+
+              <span style={{ padding: "0 0.5rem", fontWeight: 500, color: "#242a5f" }}>
+                {currentPage} / {totalPages}
+              </span>
+
+              <button
+                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                disabled={currentPage === totalPages}
+                style={{
+                  padding: "0.375rem 0.75rem",
+                  border: "1px solid #e4e8f0",
+                  borderRadius: "0.5rem",
+                  backgroundColor: currentPage === totalPages ? "#f3f5fb" : "#ffffff",
+                  color: currentPage === totalPages ? "#cbd5e1" : "#64748b",
+                  cursor: currentPage === totalPages ? "not-allowed" : "pointer",
+                  fontSize: "0.8125rem",
+                  fontWeight: 500,
+                }}
+              >
+                Következő →
+              </button>
+            </div>
           </div>
         )}
       </div>

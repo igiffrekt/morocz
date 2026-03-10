@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Image from "next/image";
 import AdminCalendar from "@/components/admin/AdminCalendar";
 import AdminDayPanel from "@/components/admin/AdminDayPanel";
 import AdminFinanceView from "@/components/admin/AdminFinanceView";
@@ -43,18 +44,7 @@ function getMonthRange(year: number, month: number): { startDate: string; endDat
   return { startDate: fmt(start), endDate: fmt(end) };
 }
 
-function getWeekRange(dateStr: string): { startDate: string; endDate: string } {
-  const date = new Date(dateStr);
-  const dow = date.getDay();
-  const mondayOffset = dow === 0 ? -6 : 1 - dow;
-  const monday = new Date(date);
-  monday.setDate(date.getDate() + mondayOffset);
-  const sunday = new Date(monday);
-  sunday.setDate(monday.getDate() + 6);
-  const fmt = (d: Date) =>
-    `${String(d.getFullYear())}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-  return { startDate: fmt(monday), endDate: fmt(sunday) };
-}
+
 
 // ─── Nav tab button ────────────────────────────────────────────────────────────
 
@@ -73,20 +63,24 @@ function NavTabBtn({
     <button
       type="button"
       onClick={() => onClick(id)}
+      className="admin-nav-tab"
       style={{
         display: "flex",
         alignItems: "center",
-        gap: "0.4rem",
-        padding: "0.375rem 0.875rem",
+        justifyContent: "center",
+        gap: "0.375rem",
+        padding: "0.5rem 1rem",
         borderRadius: "9999px",
         border: "none",
         cursor: "pointer",
         fontSize: "0.8125rem",
         fontWeight: active ? 600 : 500,
         backgroundColor: active ? "rgba(255,255,255,0.18)" : "transparent",
-        color: active ? "#ffffff" : "rgba(255,255,255,0.55)",
-        transition: "all 0.15s",
+        color: active ? "#ffffff" : "rgba(255,255,255,0.6)",
+        transition: "all 0.15s ease",
         letterSpacing: "0.01em",
+        whiteSpace: "nowrap",
+        lineHeight: 1.4,
       }}
     >
       {children}
@@ -121,10 +115,8 @@ export default function AdminDashboard({
 
   const [activeTab, setActiveTab] = useState<NavTab>("calendar");
   const [selectedDate, setSelectedDate] = useState<string>(todayStr);
-  const [viewMode, setViewMode] = useState<"month" | "week">("month");
   const [dayBookings, setDayBookings] = useState<AdminBooking[]>(initialDayBookings);
   const [monthBookings, setMonthBookings] = useState<AdminBooking[]>(initialMonthBookings);
-  const [weekBookings, setWeekBookings] = useState<AdminBooking[]>([]);
   const [isDayLoading, setIsDayLoading] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState<AdminBooking | null>(null);
 
@@ -158,19 +150,7 @@ export default function AdminDashboard({
     };
   }, [selectedDate, fetchBookings]);
 
-  // ── Fetch week bookings ────────────────────────────────────────────────────────
 
-  useEffect(() => {
-    if (viewMode !== "week") return;
-    let cancelled = false;
-    const { startDate, endDate } = getWeekRange(selectedDate);
-    void fetchBookings(startDate, endDate).then((bookings) => {
-      if (!cancelled) setWeekBookings(bookings);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [viewMode, selectedDate, fetchBookings]);
 
   // ── Month navigation ──────────────────────────────────────────────────────────
 
@@ -194,11 +174,7 @@ export default function AdminDashboard({
     );
     const updatedMonth = await fetchBookings(mStart, mEnd);
     setMonthBookings(updatedMonth);
-    if (viewMode === "week") {
-      const { startDate: wStart, endDate: wEnd } = getWeekRange(selectedDate);
-      const updatedWeek = await fetchBookings(wStart, wEnd);
-      setWeekBookings(updatedWeek);
-    }
+
   }
 
   const confirmedCount = dayBookings.filter((b) => b.status === "confirmed").length;
@@ -208,92 +184,302 @@ export default function AdminDashboard({
   return (
     <div
       style={{
-        minHeight: "100vh",
+        minHeight: "auto",
         backgroundColor: "#F2F4F8",
         color: "#1A1D2D",
         fontFamily: "var(--font-plus-jakarta-sans), 'Plus Jakarta Sans', sans-serif",
         display: "flex",
         flexDirection: "column",
+        overflow: "hidden",
+        width: "100%",
+        maxWidth: "100vw",
       }}
     >
+      <style>{`
+        /* ─── Header responsive strategy ─────────────────────────────── */
+        /* Mobile: stacked layout — nav always visible */
+        /* Desktop: single row — [logo] [nav] [user] */
+
+        .admin-header {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          justify-content: center;
+          padding: 0.75rem 1rem;
+          background-color: #242a5f;
+          border-radius: 0 0 1rem 1rem;
+          margin-bottom: 1rem;
+          gap: 0.75rem;
+          width: 100%;
+          box-sizing: border-box;
+          overflow: hidden;
+        }
+
+        .admin-header-logo {
+          flex-shrink: 0;
+          order: 1;
+        }
+
+        .admin-header-nav {
+          display: flex !important;
+          align-items: center;
+          justify-content: center;
+          gap: 0.375rem;
+          flex-wrap: wrap;
+          visibility: visible;
+          opacity: 1;
+          height: auto;
+          width: 100%;
+          order: 3;
+          padding-top: 0.25rem;
+        }
+
+        .admin-header-user {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          flex-shrink: 0;
+          order: 2;
+        }
+
+        .admin-nav-tab:hover {
+          background-color: rgba(255,255,255,0.15) !important;
+          color: #ffffff !important;
+          transform: translateY(-1px);
+        }
+
+        /* Desktop: single row */
+        @media (min-width: 769px) {
+          .admin-header {
+            flex-wrap: nowrap;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            gap: 1.5rem;
+          }
+
+          .admin-header-logo {
+            flex-shrink: 0;
+            order: 1;
+          }
+
+          .admin-header-nav {
+            flex: 1 1 auto;
+            justify-content: center;
+            order: 2;
+            gap: 0.5rem;
+            flex-wrap: nowrap;
+            width: auto;
+            padding-top: 0;
+          }
+
+          .admin-header-user {
+            order: 3;
+            flex-shrink: 0;
+            margin-left: auto;
+          }
+        }
+
+        /* ─── Mobile responsive layout ───────────────────────────────── */
+        @media (max-width: 768px) {
+          /* Two-panel layout — single column on mobile */
+          [data-admin-two-panel] {
+            flex-direction: column !important;
+          }
+
+          [data-admin-two-panel] > div {
+            flex: 0 0 100% !important;
+          }
+
+          /* Stats grid — scrollable horizontally on mobile */
+          .admin-stats-grid {
+            grid-template-columns: repeat(3, minmax(100px, 1fr)) !important;
+            gap: 0.375rem !important;
+            padding: 0.75rem 0.75rem 0 !important;
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth;
+          }
+
+          /* Stat box — mobile optimized */
+          .stat-box-label {
+            font-size: 0.65rem !important;
+            letter-spacing: 0.02em !important;
+          }
+
+          .stat-box-value {
+            font-size: 1.625rem !important;
+          }
+
+          /* Table — compact on mobile */
+          table {
+            font-size: 0.7rem !important;
+          }
+        }
+
+        @media (max-width: 400px) {
+          .admin-stats-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 0.25rem !important;
+          }
+
+          .stat-box-label {
+            font-size: 0.6rem !important;
+          }
+
+          .stat-box-value {
+            font-size: 1.5rem !important;
+          }
+
+          .admin-header {
+            gap: 0.5rem;
+          }
+
+          .admin-header-nav {
+            gap: 0.125rem;
+            padding-top: 0.375rem;
+          }
+
+          .admin-nav-tab {
+            font-size: 0.75rem !important;
+            padding: 0.4rem 0.75rem !important;
+          }
+        }
+
+        @media (min-width: 1024px) {
+          [data-admin-two-panel] {
+            flex-direction: row !important;
+          }
+
+          [data-admin-two-panel] > div {
+            flex: 0 0 50% !important;
+          }
+        }
+      `}</style>
+
       {/* ── Header ──────────────────────────────────────────────────────────── */}
-      <header
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "0.625rem 1.5rem",
-          backgroundColor: "#242a5f",
-          flexShrink: 0,
-          gap: "1rem",
-        }}
-      >
-        {/* Left: Brand */}
-        <h1
-          style={{
-            margin: 0,
-            fontSize: "0.9375rem",
-            fontWeight: 700,
-            color: "#ffffff",
-            letterSpacing: "-0.01em",
-            flexShrink: 0,
-          }}
-        >
-          Mórocz Medical
-        </h1>
+      <header className="admin-header" data-admin-header="true">
+        {/* Left: Logo */}
+        <div className="admin-header-logo">
+          <Image
+            src="/mm-logo-square.svg"
+            alt="Mórocz Medical"
+            width={32}
+            height={32}
+          />
+        </div>
 
         {/* Center: Navigation tabs */}
-        <nav style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
-          <NavTabBtn id="calendar" active={activeTab === "calendar"} onClick={setActiveTab}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-              <line x1="16" y1="2" x2="16" y2="6" />
-              <line x1="8" y1="2" x2="8" y2="6" />
-              <line x1="3" y1="10" x2="21" y2="10" />
-            </svg>
-            Naptár
-          </NavTabBtn>
+        <nav className="admin-header-nav">
+          <button
+            type="button"
+            onClick={() => setActiveTab("calendar")}
+            className="admin-nav-tab"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "0.375rem",
+              padding: "0.5rem 1rem",
+              borderRadius: "9999px",
+              border: "none",
+              cursor: "pointer",
+              fontSize: "0.8125rem",
+              fontWeight: activeTab === "calendar" ? 600 : 500,
+              backgroundColor: activeTab === "calendar" ? "rgba(255,255,255,0.18)" : "transparent",
+              color: activeTab === "calendar" ? "#ffffff" : "rgba(255,255,255,0.6)",
+              transition: "all 0.15s ease",
+              letterSpacing: "0.01em",
+              whiteSpace: "nowrap",
+              lineHeight: 1.4,
+            }}
+          >
+            📅 Naptár
+          </button>
 
-          <NavTabBtn id="patients" active={activeTab === "patients"} onClick={setActiveTab}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-              <circle cx="9" cy="7" r="4" />
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-            </svg>
-            Páciensek
-          </NavTabBtn>
+          <button
+            type="button"
+            onClick={() => setActiveTab("patients")}
+            className="admin-nav-tab"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "0.375rem",
+              padding: "0.5rem 1rem",
+              borderRadius: "9999px",
+              border: "none",
+              cursor: "pointer",
+              fontSize: "0.8125rem",
+              fontWeight: activeTab === "patients" ? 600 : 500,
+              backgroundColor: activeTab === "patients" ? "rgba(255,255,255,0.18)" : "transparent",
+              color: activeTab === "patients" ? "#ffffff" : "rgba(255,255,255,0.6)",
+              transition: "all 0.15s ease",
+              letterSpacing: "0.01em",
+              whiteSpace: "nowrap",
+              lineHeight: 1.4,
+            }}
+          >
+            👥 Páciensek
+          </button>
 
-          <NavTabBtn id="finance" active={activeTab === "finance"} onClick={setActiveTab}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
-              <polyline points="17 6 23 6 23 12" />
-            </svg>
-            Pénzügyek
-          </NavTabBtn>
+          <button
+            type="button"
+            onClick={() => setActiveTab("finance")}
+            className="admin-nav-tab"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "0.375rem",
+              padding: "0.5rem 1rem",
+              borderRadius: "9999px",
+              border: "none",
+              cursor: "pointer",
+              fontSize: "0.8125rem",
+              fontWeight: activeTab === "finance" ? 600 : 500,
+              backgroundColor: activeTab === "finance" ? "rgba(255,255,255,0.18)" : "transparent",
+              color: activeTab === "finance" ? "#ffffff" : "rgba(255,255,255,0.6)",
+              transition: "all 0.15s ease",
+              letterSpacing: "0.01em",
+              whiteSpace: "nowrap",
+              lineHeight: 1.4,
+            }}
+          >
+            💰 Pénzügyek
+          </button>
         </nav>
 
         {/* Right: User + sign out */}
-        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", flexShrink: 0 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+        <div className="admin-header-user">
+          <div style={{ display: "flex", alignItems: "center", gap: "0.375rem" }}>
             <div
               style={{
-                width: "1.75rem",
-                height: "1.75rem",
+                width: "1.625rem",
+                height: "1.625rem",
                 borderRadius: "50%",
                 backgroundColor: "#99CEB7",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                fontSize: "0.6875rem",
-                fontWeight: 600,
+                fontSize: "0.65rem",
+                fontWeight: 700,
                 color: "#242a5f",
+                flexShrink: 0,
               }}
             >
               {session.user.name.charAt(0).toUpperCase()}
             </div>
-            <span style={{ fontSize: "0.8125rem", color: "rgba(255,255,255,0.7)", fontWeight: 500 }}>
-              {session.user.name}
+            <span
+              style={{
+                fontSize: "0.8125rem",
+                color: "rgba(255,255,255,0.8)",
+                fontWeight: 500,
+                whiteSpace: "nowrap",
+              }}
+            >
+              {session.user.name.split(" ")[0]}
             </span>
           </div>
           <AdminSignOut />
@@ -305,6 +491,7 @@ export default function AdminDashboard({
         <>
           {/* Stats summary */}
           <div
+            className="admin-stats-grid"
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(3, 1fr)",
@@ -320,15 +507,17 @@ export default function AdminDashboard({
               iconStroke="#242a5f"
               iconPath={<><rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></>}
               iconLabel="Naptár"
+              labelColor="#242a5f"
             />
             <StatBox
-              label="Visszaigazolva"
+              label="Aktív"
               value={confirmedCount}
               accent="#99CEB7"
               iconStroke="#099268"
               iconPath={<polyline points="20 6 9 17 4 12" />}
-              iconLabel="Visszaigazolva"
-              valueColor="#242a5f"
+              iconLabel="Aktív"
+              valueColor="#099268"
+              labelColor="#099268"
             />
             <StatBox
               label="Lemondva"
@@ -337,49 +526,50 @@ export default function AdminDashboard({
               iconStroke="#9f1239"
               iconPath={<><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></>}
               iconLabel="Lemondva"
-              valueColor={cancelledCount > 0 ? "#9f1239" : "#94a3b8"}
+              valueColor="#9f1239"
+              labelColor="#9f1239"
             />
           </div>
 
-          {/* Two-panel layout */}
+          {/* Two-panel layout — responsive */}
           <div
             style={{
               display: "flex",
-              flex: 1,
+              flex: "none",
               gap: "1rem",
-              padding: "1.25rem 1.5rem 1.5rem",
+              padding: "1.25rem 1rem 1.5rem",
               minHeight: 0,
-              overflow: "hidden",
+              overflow: "visible",
+              flexDirection: "column",
             }}
           >
-            <div style={{ flex: "0 0 50%", minWidth: 0, display: "flex", flexDirection: "column" }}>
-              <AdminCalendar
-                selectedDate={selectedDate}
-                onSelectDate={setSelectedDate}
-                monthBookings={monthBookings}
-                viewMode={viewMode}
-                onViewModeChange={setViewMode}
-                onMonthChange={handleMonthChange}
-                initialYear={today.getFullYear()}
-                initialMonth={today.getMonth()}
-                weekBookings={weekBookings}
-                onBookingClick={handleBookingClick}
-              />
-            </div>
-            <div
-              style={{
-                flex: "0 0 calc(50% - 1rem)",
-                minWidth: 0,
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              <AdminDayPanel
-                bookings={dayBookings}
-                selectedDate={selectedDate}
-                isLoading={isDayLoading}
-                onBookingClick={handleBookingClick}
-              />
+            <div data-admin-two-panel style={{ display: "flex", flex: "none", gap: "1rem", flexDirection: "column" }}>
+              <div style={{ flex: "0 0 100%", minWidth: 0, display: "flex", flexDirection: "column", maxHeight: "fit-content" }}>
+                <AdminCalendar
+                  selectedDate={selectedDate}
+                  onSelectDate={setSelectedDate}
+                  monthBookings={monthBookings}
+                  onMonthChange={handleMonthChange}
+                  initialYear={today.getFullYear()}
+                  initialMonth={today.getMonth()}
+                  onBookingClick={handleBookingClick}
+                />
+              </div>
+              <div
+                style={{
+                  flex: "0 0 100%",
+                  minWidth: 0,
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                <AdminDayPanel
+                  bookings={dayBookings}
+                  selectedDate={selectedDate}
+                  isLoading={isDayLoading}
+                  onBookingClick={handleBookingClick}
+                />
+              </div>
             </div>
           </div>
         </>
@@ -413,6 +603,7 @@ function StatBox({
   iconPath,
   iconLabel,
   valueColor = "#242a5f",
+  labelColor = "#242a5f",
 }: {
   label: string;
   value: number;
@@ -421,64 +612,49 @@ function StatBox({
   iconPath: React.ReactNode;
   iconLabel: string;
   valueColor?: string;
+  labelColor?: string;
 }) {
   return (
     <div
       style={{
         backgroundColor: "#ffffff",
         borderRadius: "1rem",
-        padding: "1rem 1.25rem",
+        padding: "0.875rem 1rem",
         border: "1px solid #e8eaf0",
         borderLeft: `4px solid ${accent}`,
         boxShadow: "0 1px 3px rgba(36,42,95,0.06)",
-        minHeight: "5rem",
+        minHeight: "auto",
         display: "flex",
+        flexDirection: "column",
         alignItems: "center",
-        gap: "0.875rem",
+        justifyContent: "center",
+        gap: "0.375rem",
+        textAlign: "center",
       }}
     >
-      <div
-        style={{
-          width: "2.5rem",
-          height: "2.5rem",
-          borderRadius: "50%",
-          backgroundColor: `${accent}28`,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexShrink: 0,
-        }}
-      >
-        <svg
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke={iconStroke}
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          role="img"
-          aria-label={iconLabel}
-        >
-          {iconPath}
-        </svg>
-      </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem", width: "100%" }}>
         <div
+          className="stat-box-label"
           style={{
-            fontSize: "0.6875rem",
-            fontWeight: 600,
-            color: "#64748b",
+            fontSize: "0.75rem",
+            fontWeight: 800,
+            color: labelColor,
             textTransform: "uppercase",
-            letterSpacing: "0.05em",
+            letterSpacing: "0.03em",
+            lineHeight: 1.3,
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
           }}
         >
           {label}
         </div>
         <div
+          className="stat-box-value"
           style={{
-            fontSize: "1.75rem",
+            fontSize: "1.875rem",
             fontWeight: 700,
             color: valueColor,
             lineHeight: 1,

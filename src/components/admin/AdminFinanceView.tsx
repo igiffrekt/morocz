@@ -153,7 +153,9 @@ function StatCard({
 // ─── Custom tooltip for area chart ─────────────────────────────────────────────
 
 // biome-ignore lint/suspicious/noExplicitAny: recharts tooltip payload is untyped
-function RevenueTooltip({ active, payload, label }: any) {
+// @ts-expect-error recharts tooltip props are untyped
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function RevenueTooltip({ active, payload, label }: any) { // biome-ignore lint/suspicious/noExplicitAny: recharts tooltips are untyped
   if (!active || !payload?.length) return null;
   return (
     <div
@@ -178,7 +180,9 @@ function RevenueTooltip({ active, payload, label }: any) {
 }
 
 // biome-ignore lint/suspicious/noExplicitAny: recharts tooltip payload is untyped
-function ServiceTooltip({ active, payload }: any) {
+// @ts-expect-error recharts tooltip props are untyped
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function ServiceTooltip({ active, payload }: any) { // biome-ignore lint/suspicious/noExplicitAny: recharts tooltips are untyped
   if (!active || !payload?.length) return null;
   return (
     <div
@@ -276,8 +280,8 @@ export default function AdminFinanceView() {
     <div
       style={{
         padding: "1.25rem 1.5rem",
-        flex: 1,
-        overflow: "auto",
+        flex: "none",
+        overflow: "visible",
         display: "flex",
         flexDirection: "column",
         gap: "1.25rem",

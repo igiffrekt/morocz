@@ -209,3 +209,29 @@ export const privacyPolicyQuery = defineQuery(
   lastUpdated
 }`,
 );
+
+// ─── Scheduling & Booking Queries ─────────────────────────────────────────────
+
+export const weeklyScheduleQuery = defineQuery(`*[_type == "weeklySchedule" && _id == "weeklySchedule"][0]{
+  monday, tuesday, wednesday, thursday, friday, saturday, sunday
+}`);
+
+export const blockedDatesQuery = defineQuery(`*[_type == "blockedDate"] | order(startDate asc){
+  _id, startDate, endDate, reason
+}`);
+
+export const slotLockByIdQuery = defineQuery(`*[_type == "slotLock" && _id == $slotLockId][0]{
+  _id, dateTime, status
+}`);
+
+export const bookingsForDateQuery = defineQuery(`*[_type == "booking" && dateTime >= $startDate && dateTime < $endDate]{
+  _id, dateTime, patientEmail, serviceId
+}`);
+
+export const slotLocksForDateQuery = defineQuery(`*[_type == "slotLock" && dateTime >= $startDate && dateTime < $endDate]{
+  _id, dateTime, status
+}`);
+
+export const servicesForBookingQuery = defineQuery(`*[_type == "service"] | order(order asc){
+  _id, name, duration, price
+}`);

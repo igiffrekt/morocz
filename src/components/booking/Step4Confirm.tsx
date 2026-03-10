@@ -45,7 +45,7 @@ export function Step4Confirm({ selections, onBack, onSuccess, onConflict }: Step
   const [patientName, setPatientName] = useState("");
   const [patientEmail, setPatientEmail] = useState("");
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   useEffect(() => {
     if (session?.user?.name && !patientName) setPatientName(session.user.name);
     if (session?.user?.email && !patientEmail) setPatientEmail(session.user.email);

@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { AdminBooking } from "@/components/admin/AdminDashboard";
-import AdminWeekView from "@/components/admin/AdminWeekView";
+
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -38,12 +38,9 @@ interface AdminCalendarProps {
   selectedDate: string;
   onSelectDate: (date: string) => void;
   monthBookings: AdminBooking[];
-  viewMode: "month" | "week";
-  onViewModeChange: (mode: "month" | "week") => void;
   onMonthChange: (year: number, month: number) => void;
   initialYear: number;
   initialMonth: number;
-  weekBookings: AdminBooking[];
   onBookingClick: (booking: AdminBooking) => void;
 }
 
@@ -133,12 +130,34 @@ export default function AdminCalendar({
         padding: "0",
         display: "flex",
         flexDirection: "column",
-        height: "100%",
+        height: "auto",
         overflow: "hidden",
         border: "1px solid #e8eaf0",
         boxShadow: "0 1px 3px rgba(36,42,95,0.06)",
       }}
     >
+      <style>{`
+        /* Mobile-first responsive for calendar */
+        @media (max-width: 768px) {
+          /* Smaller padding inside calendar */
+          [style*="padding: \"0.75rem"] {
+            padding: 0.5rem !important;
+          }
+          
+          /* Smaller day cells */
+          [style*="height: \"2.5rem"] {
+            height: 2rem !important;
+            font-size: 0.75rem !important;
+          }
+          
+          /* Smaller month nav buttons */
+          [style*="width: \"2.25rem"] {
+            width: 1.75rem !important;
+            height: 1.75rem !important;
+            font-size: 1rem !important;
+          }
+        }
+      `}</style>
       {/* ── Toggle bar ────────────────────────────────────────────────────── */}
       <div
         style={{
@@ -171,40 +190,21 @@ export default function AdminCalendar({
             gap: "0.125rem",
           }}
         >
-          {(["month", "week"] as const).map((mode) => (
-            <button
-              key={mode}
-              type="button"
-              onClick={() => onViewModeChange(mode)}
-              style={{
-                padding: "0.3125rem 0.875rem",
-                borderRadius: "9999px",
-                border: "none",
-                fontSize: "0.75rem",
-                fontWeight: 600,
-                cursor: "pointer",
-                transition: "all 0.15s",
-                backgroundColor: viewMode === mode ? "#242a5f" : "transparent",
-                color: viewMode === mode ? "#ffffff" : "#64748b",
-              }}
-            >
-              {mode === "month" ? "Hónap" : "Hét"}
-            </button>
-          ))}
+
         </div>
       </div>
 
       {/* ── Month view ───────────────────────────────────────────────────────── */}
       {viewMode === "month" && (
-        <div style={{ flex: 1, overflow: "auto", padding: "1rem 1.25rem 1.25rem" }}>
+        <div style={{ flex: 1, overflow: "auto", padding: "0.75rem 0.875rem 0.875rem" }}>
           {/* Month navigation header */}
           <div
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              gap: "1.25rem",
-              marginBottom: "1rem",
+              gap: "0.75rem",
+              marginBottom: "0.75rem",
             }}
           >
             <button
@@ -319,7 +319,7 @@ export default function AdminCalendar({
                         <div
                           key={`empty-r${String(rowIdx)}c${String(colIdx)}`}
                           style={{
-                            height: "3rem",
+                            height: "2.5rem",
                             backgroundColor: isWeekendCol ? "rgba(0,0,0,0.02)" : "transparent",
                             borderRadius: "0.5rem",
                           }}
@@ -351,7 +351,7 @@ export default function AdminCalendar({
                         aria-pressed={isSelected}
                         aria-current={isToday ? "date" : undefined}
                         style={{
-                          height: "3rem",
+                          height: "2.5rem",
                           width: "100%",
                           borderRadius: "0.5rem",
                           border: "1px solid transparent",
@@ -416,17 +416,7 @@ export default function AdminCalendar({
         </div>
       )}
 
-      {/* ── Week view ─────────────────────────────────────────────────────────── */}
-      {viewMode === "week" && (
-        <div style={{ flex: 1, overflow: "auto", minHeight: 0, padding: "0.75rem" }}>
-          <AdminWeekView
-            selectedDate={selectedDate}
-            bookings={weekBookings}
-            onSelectDate={onSelectDate}
-            onBookingClick={onBookingClick}
-          />
-        </div>
-      )}
+
     </div>
   );
 }

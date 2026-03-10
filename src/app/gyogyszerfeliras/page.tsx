@@ -154,7 +154,7 @@ export default function GyogyszerfelirasPage() {
           </p>
           <p>
             Rendelőmben a receptfelírás a konzultáció és — szükség esetén — a vizsgálat szerves
-            része. Nem írok fel gyógyszert „vakon": a cél, hogy a páciens pontosan értse, miért
+            része. Nem írok fel gyógyszert „vakon&quot;: a cél, hogy a páciens pontosan értse, miért
             kapja az adott készítményt, milyen hatást várhat, és mire figyeljen a szedés során.
           </p>
         </div>
@@ -176,7 +176,7 @@ export default function GyogyszerfelirasPage() {
               <li className="flex items-start gap-2">
                 <span className="text-accent mt-1.5 shrink-0">&#9679;</span>
                 <span>
-                  <strong>Kombinált orális fogamzásgátló</strong> — a hagyományos „tabletta", amely
+                  <strong>Kombinált orális fogamzásgátló</strong> — a hagyományos „tabletta&quot;, amely
                   ösztrogént és progesztint tartalmaz. Hatékonysága megfelelő szedés mellett
                   kiemelkedő.
                 </span>

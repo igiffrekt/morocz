@@ -40,7 +40,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "drizzle-kit": "^0.31.9",
+    "drizzle-kit": "^0.18.1",
     "eslint": "^9",
     "eslint-config-next": "^15.2.0",
     "tailwindcss": "^4.0.0",

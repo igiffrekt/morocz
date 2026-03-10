@@ -304,7 +304,7 @@ export default function SzuleszetPage() {
             </ul>
             <p>
               A gyermekágy nem csupán fizikai felépülés. A szülés utáni hangulati változások — a
-              „baby blues"-tól a szülés utáni depresszióig — gyakoriak és kezelhetők. Ha tartós
+              „baby blues&quot;-tól a szülés utáni depresszióig — gyakoriak és kezelhetők. Ha tartós
               szomorúság, szorongás vagy az újszülöttel kapcsolatos érzelmi nehézségek merülnek fel,
               erről is nyíltan beszélhetünk a vizsgálat során.
             </p>

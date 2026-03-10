@@ -75,6 +75,21 @@ export default function AdminLogin() {
     return valid;
   }
 
+  async function handleGoogleSignIn() {
+    setFormError("");
+    setLoading(true);
+    try {
+      await signIn.social({
+        provider: "google",
+        callbackURL: "/admin",
+      });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) { // biome-ignore lint/suspicious/noExplicitAny: error type depends on signIn provider
+      setFormError(err.message || "Google sign-in failed");
+      setLoading(false);
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setFormError("");
@@ -177,6 +192,48 @@ export default function AdminLogin() {
         >
           Kérjük, jelentkezzen be az admin fiókjával.
         </p>
+
+        {/* Google Sign-In Button */}
+        <button
+          type="button"
+          onClick={handleGoogleSignIn}
+          disabled={loading}
+          style={{
+            width: "100%",
+            padding: "0.625rem 1rem",
+            marginBottom: "1rem",
+            backgroundColor: "#ffffff",
+            border: "1px solid #e8eaf0",
+            borderRadius: "0.75rem",
+            cursor: loading ? "not-allowed" : "pointer",
+            fontSize: "0.875rem",
+            fontWeight: 500,
+            color: "#242a5f",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "0.5rem",
+          }}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="1" /><path d="M12 2v6M12 16v6M2 12h6M16 12h6M4.22 4.22l4.24 4.24M15.54 15.54l4.24 4.24M4.22 19.78l4.24-4.24M15.54 8.46l4.24-4.24" />
+          </svg>
+          {loading ? "Bejelentkezés..." : "Google-lel bejelentkezni"}
+        </button>
+
+        {/* Divider */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "1rem",
+            marginBottom: "1rem",
+          }}
+        >
+          <div style={{ flex: 1, height: "1px", backgroundColor: "#e8eaf0" }} />
+          <span style={{ fontSize: "0.75rem", color: "#94a3b8" }}>VAGY</span>
+          <div style={{ flex: 1, height: "1px", backgroundColor: "#e8eaf0" }} />
+        </div>
 
         {/* Login Form */}
         <form onSubmit={handleSubmit} noValidate>

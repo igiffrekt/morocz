@@ -227,7 +227,7 @@ export default function VarandosgondozasPage() {
                 <span className="text-accent mt-1.5 shrink-0">&#9679;</span>
                 <span>
                   <strong>Részletes magzati ultrahang</strong> (18–22. hét) — az úgynevezett „nagy
-                  ultrahang", amelyen a magzat szerveit, végtagjait, gerincét és arcstruktúráját
+                  ultrahang&quot;, amelyen a magzat szerveit, végtagjait, gerincét és arcstruktúráját
                   vizsgáljuk. Ekkor állapítható meg a placenta elhelyezkedése és a magzatvíz
                   mennyisége is.
                 </span>

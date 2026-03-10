@@ -83,6 +83,12 @@ function layoutOverlappingBookings(
   return result;
 }
 
+function parseLocalDate(dateStr: string): Date {
+  // Parse YYYY-MM-DD as local date, not UTC
+  const [year, month, day] = dateStr.split("-").map(Number);
+  return new Date(year!, month! - 1, day!);
+}
+
 function toDateString(d: Date): string {
   return `${String(d.getFullYear())}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
@@ -93,12 +99,18 @@ function getTodayString(): string {
 
 /** Returns an array of 7 date strings (Mon..Sun) for the week containing dateStr */
 function getWeekDays(dateStr: string): string[] {
-  const date = new Date(dateStr);
-  const dow = date.getDay(); // 0=Sun
+  const date = parseLocalDate(dateStr);
+  const dow = date.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
+  // Calculate offset to Monday: if Sunday (0), go back 6 days to get Monday of same week
+  // Otherwise, go back (dow-1) days to get Monday
   const mondayOffset = dow === 0 ? -6 : 1 - dow;
   const monday = new Date(date);
   monday.setDate(date.getDate() + mondayOffset);
 
+  // Verify Monday is in the correct week (not off by timezone/DST)
+  // If dow was 0 (Sunday), we want Monday of that same week (6 days prior)
+  // If dow was 1+ (Mon-Sat), we want that week's Monday (0 to 5 days prior)
+  
   return Array.from({ length: 7 }, (_, i) => {
     const d = new Date(monday);
     d.setDate(monday.getDate() + i);
@@ -195,8 +207,8 @@ export default function AdminWeekView({
               <span
                 style={{
                   fontSize: "0.875rem",
-                  fontWeight: isToday || isSelected ? 700 : 500,
-                  color: isSelected ? "#ffffff" : isToday ? "#99CEB7" : "#1A1D2D",
+                  fontWeight: isSelected ? 700 : isToday ? 600 : 500,
+                  color: isSelected ? "#ffffff" : isToday ? "#099268" : "#1A1D2D",
                   width: "1.75rem",
                   height: "1.75rem",
                   display: "flex",
@@ -206,9 +218,10 @@ export default function AdminWeekView({
                   backgroundColor: isSelected
                     ? "#242a5f"
                     : isToday
-                      ? "rgba(153,206,183,0.12)"
+                      ? "rgba(153,206,183,0.2)"
                       : "transparent",
-                  transition: "all 0.12s",
+                  transition: "all 0.15s ease",
+                  border: isSelected ? "2px solid #242a5f" : "2px solid transparent",
                 }}
               >
                 {dayNum}

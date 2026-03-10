@@ -509,9 +509,19 @@ export default function AdminPatientModal({
             patientHistory.length > 0 &&
             !(patientHistory.length === 1 && patientHistory[0]?._id === booking._id) && (
               <div style={{ display: "flex", flexDirection: "column", gap: "0.375rem" }}>
-                {patientHistory.map((h) => {
-                  const isCurrent = h._id === booking._id;
-                  const hCancelled = h.status === "cancelled";
+                {(() => {
+                  // Find next upcoming booking (closest future date, confirmed status)
+                  const today = new Date();
+                  today.setHours(0, 0, 0, 0);
+                  
+                  const nextBooking = patientHistory
+                    .filter(b => b.status === "confirmed")
+                    .sort((a, b) => new Date(a.slotDate).getTime() - new Date(b.slotDate).getTime())
+                    .find(b => new Date(b.slotDate) >= today);
+                  
+                  return patientHistory.map((h) => {
+                    const isNext = h._id === nextBooking?._id;
+                    const hCancelled = h.status === "cancelled";
                   return (
                     <div
                       key={h._id}
@@ -520,8 +530,8 @@ export default function AdminPatientModal({
                         alignItems: "center",
                         justifyContent: "space-between",
                         padding: "0.5rem 0.625rem",
-                        backgroundColor: isCurrent ? "rgba(153,206,183,0.06)" : "#F2F4F8",
-                        border: `1px solid ${isCurrent ? "#99CEB7" : "#e8eaf0"}`,
+                        backgroundColor: isNext ? "rgba(153,206,183,0.06)" : "#F2F4F8",
+                        border: `1px solid ${isNext ? "#99CEB7" : "#e8eaf0"}`,
                         borderRadius: "0.75rem",
                         gap: "0.5rem",
                       }}
@@ -537,13 +547,13 @@ export default function AdminPatientModal({
                         <span
                           style={{
                             fontSize: "0.8125rem",
-                            fontWeight: isCurrent ? 700 : 400,
-                            color: isCurrent ? "#099268" : "#64748b",
+                            fontWeight: isNext ? 700 : 400,
+                            color: isNext ? "#099268" : "#64748b",
                             whiteSpace: "nowrap",
                           }}
                         >
                           {formatHungarianDate(h.slotDate)}, {h.slotTime}
-                          {isCurrent && (
+                          {isNext && (
                             <span
                               style={{
                                 marginLeft: "0.375rem",
@@ -552,7 +562,7 @@ export default function AdminPatientModal({
                                 opacity: 0.75,
                               }}
                             >
-                              (jelenlegi)
+                              (következő)
                             </span>
                           )}
                         </span>
@@ -589,7 +599,8 @@ export default function AdminPatientModal({
                       </span>
                     </div>
                   );
-                })}
+                  });
+                })()}
               </div>
             )}
         </div>

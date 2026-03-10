@@ -114,7 +114,7 @@ export default function AdminDayPanel({
       </div>
 
       {/* ── Content ─────────────────────────────────────────────────────────── */}
-      <div style={{ flex: 1, overflowY: "auto", minHeight: 0, padding: "0.5rem 0" }}>
+      <div style={{ flex: "none", overflowY: "visible", minHeight: "auto", padding: "0.5rem 0" }}>
         {/* Loading state */}
         {isLoading && (
           <div

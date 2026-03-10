@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { z } from "zod";
 import { useSession } from "@/lib/auth-client";
+import { PhoneModal } from "@/components/auth/PhoneModal";
 import { CONSENT_LABEL, PRIVACY_POLICY_URL, CONSENT_LINK_TEXT } from "@/lib/consent-text";
 
 interface Step4Props {
@@ -48,8 +49,18 @@ export function Step4Confirm({ selections, onBack, onSuccess, onConflict }: Step
   useEffect(() => {
     if (session?.user?.name && !patientName) setPatientName(session.user.name);
     if (session?.user?.email && !patientEmail) setPatientEmail(session.user.email);
-    // Pre-fill phone from user profile if available (e.g., from registration)
-    if (session?.user?.phoneNumber && !patientPhone) setPatientPhone(session.user.phoneNumber);
+    
+    // Fetch fresh user data from API to get phone_number from database
+    if (session?.user?.id && !patientPhone) {
+      fetch("/api/user/profile")
+        .then((res) => res.json())
+        .then((user) => {
+          if (user.phone_number) {
+            setPatientPhone(user.phone_number);
+          }
+        })
+        .catch((err) => console.error("Failed to fetch user profile:", err));
+    }
   }, [session]);
   
   const [patientPhone, setPatientPhone] = useState("");

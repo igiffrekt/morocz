@@ -1,54 +1,53 @@
+import { auth } from "@/lib/auth";
+import { getWriteClient } from "@/lib/sanity-write-client";
 import { headers } from "next/headers";
 import { z } from "zod";
-import { eq } from "drizzle-orm";
-import { auth } from "@/lib/auth";
-import { db } from "@/lib/db";
-import { user } from "@/lib/db/schema";
 
-const UpdatePhoneSchema = z.object({
-  phoneNumber: z.string().min(10, "Telefonszám legalább 10 számjegy"),
+export const dynamic = "force-dynamic";
+
+const phoneSchema = z.object({
+  phoneNumber: z.string().regex(/^\d{10,}$/, "Telefonszám: minimum 10 számjegy"),
 });
 
-export async function POST(request: Request): Promise<Response> {
-  // Auth check
-  const session = await auth.api.getSession({ headers: await headers() });
-
-  if (!session) {
-    return Response.json({ error: "Kérjük, jelentkezzen be." }, { status: 401 });
-  }
-
-  // Parse and validate request body
-  let body: unknown;
+export async function POST(request: Request) {
   try {
-    body = await request.json();
-  } catch {
-    return Response.json({ error: "Érvénytelen kérés törzs." }, { status: 400 });
-  }
+    const session = await auth.api.getSession({ headers: await headers() });
 
-  const parsed = UpdatePhoneSchema.safeParse(body);
-  if (!parsed.success) {
-    const firstError = parsed.error.issues[0]?.message ?? "Érvénytelen kérés.";
-    return Response.json({ error: firstError }, { status: 400 });
-  }
+    if (!session?.user) {
+      return Response.json({ error: "Nincs hitelesítve" }, { status: 401 });
+    }
 
-  const { phoneNumber } = parsed.data;
+    const body = await request.json();
+    const parsed = phoneSchema.safeParse(body);
 
-  try {
-    // Update user's phoneNumber in database
-    await db
-      .update(user)
-      .set({ phoneNumber: phoneNumber.trim() })
-      .where(eq(user.id, session.user.id));
+    if (!parsed.success) {
+      return Response.json(
+        { error: parsed.error.issues[0]?.message ?? "Érvénytelen telefonszám" },
+        { status: 400 }
+      );
+    }
+
+    // Update user in Sanity (if user document exists there)
+    // Also update in Better Auth if needed
+    const { phoneNumber } = parsed.data;
+
+    // Update Better Auth user
+    await auth.api.updateUser({
+      body: JSON.stringify({
+        phoneNumber,
+      }),
+      headers: await headers(),
+    });
 
     return Response.json(
-      { success: true, message: "Telefonszám sikeresen mentve." },
-      { status: 200 },
+      { success: true, phoneNumber },
+      { status: 200 }
     );
   } catch (err) {
-    console.error("[api/user/phone] Update failed:", err);
+    console.error("[api/user/phone] Error:", err);
     return Response.json(
-      { error: "Hiba történt a telefonszám mentésekor." },
-      { status: 500 },
+      { error: "Hiba történt a telefon mentésekor" },
+      { status: 500 }
     );
   }
 }

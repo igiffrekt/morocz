@@ -85,12 +85,6 @@ export const homepageType = defineType({
               title: "Ikon",
               type: "image",
             }),
-            defineField({
-              name: "href",
-              title: "Link",
-              type: "string",
-              description: "Belső hivatkozás, pl. /nogyogyaszat",
-            }),
           ],
           preview: {
             select: {
@@ -135,6 +129,30 @@ export const homepageType = defineType({
       name: "testimonialsHeadline",
       title: "Vélemények cím",
       type: "string",
+    }),
+    defineField({
+      name: "testimonialsCtaText",
+      title: "Vélemények CTA szöveg",
+      type: "string",
+      description: 'Pl. "Összes vélemény ->"',
+    }),
+    defineField({
+      name: "testimonialsCtaUrl",
+      title: "Vélemények CTA link",
+      type: "url",
+      description: "Az összes véleményre mutató URL",
+    }),
+    defineField({
+      name: "testimonials",
+      title: "Megjelenítendő vélemények",
+      type: "array",
+      description: "Válaszd ki mely vélemények jelenjenek meg a főoldalon",
+      of: [
+        {
+          type: "reference",
+          to: { type: "testimonial" },
+        },
+      ],
     }),
 
     // Blog section

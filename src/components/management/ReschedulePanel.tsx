@@ -201,15 +201,12 @@ export function ReschedulePanel({
 
       const data = (await res.json()) as { error?: string };
       if (res.status === 409) {
-        setSubmitError(
-          data.error ?? "Ez az időpont már foglalt. Kérjük, válasszon másikat.",
-        );
+        setSubmitError(data.error ?? "Ez az időpont már foglalt. Kérjük, válasszon másikat.");
         // Keep picker open so patient can try another slot
         setSelectedTime(null);
       } else if (res.status === 403) {
         setSubmitError(
-          data.error ??
-            "Az időpont már nem módosítható (kevesebb mint 24 óra van hátra).",
+          data.error ?? "Az időpont már nem módosítható (kevesebb mint 24 óra van hátra).",
         );
       } else {
         setSubmitError(data.error ?? "Hiba történt. Kérjük, próbálja újra.");
@@ -367,9 +364,7 @@ export function ReschedulePanel({
         <div className="sm:w-[35%]">
           {!selectedDate && (
             <div className="flex h-full items-center justify-center rounded-2xl bg-white px-4 py-8">
-              <p className="text-center text-sm text-gray-400">
-                Válasszon egy napot a naptárból
-              </p>
+              <p className="text-center text-sm text-gray-400">Válasszon egy napot a naptárból</p>
             </div>
           )}
 

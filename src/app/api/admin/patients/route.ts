@@ -35,7 +35,8 @@ export async function GET(request: Request): Promise<Response> {
   try {
     const session = await auth.api.getSession({ headers: request.headers });
     if (!session) return Response.json({ error: "Bejelentkezés szükséges." }, { status: 401 });
-    if (session.user.role !== "admin") return Response.json({ error: "Jogosulatlan." }, { status: 403 });
+    if (session.user.role !== "admin")
+      return Response.json({ error: "Jogosulatlan." }, { status: 403 });
 
     const client = getWriteClient();
 

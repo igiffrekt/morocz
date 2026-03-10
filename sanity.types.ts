@@ -109,7 +109,7 @@ export type Homepage = {
   servicesSubtitle?: string;
   labTestsHeadline?: string;
   labTestsSubtitle?: string;
-  testimonialsHeadline?: string;
+  testimonialsHeadline?: string; testimonialsCtaText?: string; testimonialsCtaUrl?: string; testimonials?: Array<{ _id: string; patientName?: string; photo?: SanityImageObject; text?: string; condition?: string; order?: number; }>;
   blogHeadline?: string;
   ctaHeadline?: string;
   ctaDescription?: string;
@@ -456,3 +456,4 @@ export type ServicesForBookingQueryResult = Array<{
   appointmentDuration?: number;
   icon?: SanityImageObject;
 }>;
+

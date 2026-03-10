@@ -63,10 +63,7 @@ export async function POST(request: Request): Promise<Response> {
     );
 
     if (!booking) {
-      return Response.json(
-        { error: "Érvénytelen vagy lejárt hivatkozás." },
-        { status: 404 },
-      );
+      return Response.json({ error: "Érvénytelen vagy lejárt hivatkozás." }, { status: 404 });
     }
 
     // ── 3. Enforce 24h window server-side ──────────────────────────────────────
@@ -107,7 +104,9 @@ export async function POST(request: Request): Promise<Response> {
         patientName: booking.patientName,
         patientEmail: booking.patientEmail,
         reservationNumber: booking.reservationNumber,
-        serviceName: booking.service?.name?.startsWith("Nőgyógyász") ? "Nőgyógyászati vizsgálat" : (booking.service?.name ?? "Foglalt szolgáltatás"),
+        serviceName: booking.service?.name?.startsWith("Nőgyógyász")
+          ? "Nőgyógyászati vizsgálat"
+          : (booking.service?.name ?? "Foglalt szolgáltatás"),
         slotDate: booking.slotDate,
         slotTime: booking.slotTime,
       });
@@ -120,10 +119,7 @@ export async function POST(request: Request): Promise<Response> {
     );
   } catch (err) {
     console.error("[api/booking-cancel] Unexpected error:", err);
-    return Response.json(
-      { error: "Hiba történt. Kérjük, próbálja újra." },
-      { status: 500 },
-    );
+    return Response.json({ error: "Hiba történt. Kérjük, próbálja újra." }, { status: 500 });
   }
 }
 

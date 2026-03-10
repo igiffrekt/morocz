@@ -4,9 +4,9 @@ import Link from "next/link";
 
 interface SuccessProps {
   serviceName: string;
-  date: string;           // Pre-formatted Hungarian date
-  rawDate: string;        // YYYY-MM-DD
-  time: string;           // "09:20"
+  date: string; // Pre-formatted Hungarian date
+  rawDate: string; // YYYY-MM-DD
+  time: string; // "09:20"
   durationMinutes: number;
   reservationNumber: string;
   patientName: string;
@@ -29,7 +29,7 @@ function buildGoogleCalendarUrl(
   const endM = String(totalEnd % 60).padStart(2, "0");
   const dateCompact = rawDate.replace(/-/g, "");
   const startStr = `${dateCompact}T${startTime.replace(":", "")}00`;
-  const endStr   = `${dateCompact}T${endH}${endM}00`;
+  const endStr = `${dateCompact}T${endH}${endM}00`;
   const params = new URLSearchParams({
     action: "TEMPLATE",
     text: title,
@@ -89,7 +89,9 @@ export function BookingSuccess({
       <div className="bg-gray-50 rounded-2xl p-5 text-left max-w-sm mx-auto space-y-3 mb-6 shadow-sm">
         <div className="flex items-start gap-3">
           <span className="text-xs text-gray-500 w-24 shrink-0 pt-0.5">Foglalási szám:</span>
-          <span className="text-sm font-bold tracking-wider text-[var(--color-primary)]">{reservationNumber}</span>
+          <span className="text-sm font-bold tracking-wider text-[var(--color-primary)]">
+            {reservationNumber}
+          </span>
         </div>
         <div className="flex items-start gap-3">
           <span className="text-xs text-gray-500 w-24 shrink-0 pt-0.5">Szolgáltatás:</span>
@@ -130,9 +132,10 @@ export function BookingSuccess({
                 <span className="font-medium text-gray-900">{patientEmail}</span> címre.
               </p>
               <p className="text-xs text-gray-500 mt-1.5">
-                A Google ezt általában a <span className="font-medium text-gray-600">Promóciók</span>{" "}
-                kategóriába helyezi — kérjük, ott is nézze meg. A lemondással kapcsolatos
-                információkat is ebben az e-mailben találja.
+                A Google ezt általában a{" "}
+                <span className="font-medium text-gray-600">Promóciók</span> kategóriába helyezi —
+                kérjük, ott is nézze meg. A lemondással kapcsolatos információkat is ebben az
+                e-mailben találja.
               </p>
             </div>
           </div>
@@ -187,35 +190,35 @@ export function BookingSuccess({
 
         {/* Cancellation policy */}
         <div className="bg-amber-50 border border-amber-100 rounded-2xl p-5 md:col-span-2">
-        <div className="flex items-start gap-3">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="#d97706"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="w-5 h-5 mt-0.5 shrink-0"
-            aria-hidden="true"
-          >
-            <circle cx="12" cy="12" r="10" />
-            <line x1="12" y1="8" x2="12" y2="12" />
-            <line x1="12" y1="16" x2="12.01" y2="16" />
-          </svg>
-          <div>
-            <h3 className="text-sm font-semibold text-amber-800 mb-1.5">
-              Időpontfoglalás lemondása
-            </h3>
-            <p className="text-sm text-gray-700">
-              Lemondani a foglalt időpontot maximum <span className="font-medium">24 órával</span> a
-              rendelés előtt lehetséges a visszaigazoló e-mailben található linkre kattintva.
-            </p>
-            <p className="text-xs text-amber-700 mt-2 font-medium">
-              A 24 órán belüli lemondásért készenléti díjat számolunk fel: 10.000 Ft / alkalom.
-            </p>
+          <div className="flex items-start gap-3">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#d97706"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="w-5 h-5 mt-0.5 shrink-0"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            <div>
+              <h3 className="text-sm font-semibold text-amber-800 mb-1.5">
+                Időpontfoglalás lemondása
+              </h3>
+              <p className="text-sm text-gray-700">
+                Lemondani a foglalt időpontot maximum <span className="font-medium">24 órával</span>{" "}
+                a rendelés előtt lehetséges a visszaigazoló e-mailben található linkre kattintva.
+              </p>
+              <p className="text-xs text-amber-700 mt-2 font-medium">
+                A 24 órán belüli lemondásért készenléti díjat számolunk fel: 10.000 Ft / alkalom.
+              </p>
+            </div>
           </div>
-        </div>
         </div>
       </div>
 
@@ -234,8 +237,13 @@ export function BookingSuccess({
           className="inline-flex items-center justify-center gap-2 px-6 py-3 text-sm font-semibold text-white rounded-xl transition-all duration-200 shadow-md hover:shadow-lg"
           style={{ backgroundColor: "#4285F4" }}
         >
-          <svg viewBox="0 0 24 24" className="w-4 h-4 shrink-0" fill="currentColor" aria-hidden="true">
-            <path d="M19.5 3h-2.25V1.5h-1.5V3H8.25V1.5h-1.5V3H4.5A2.25 2.25 0 0 0 2.25 5.25v15A2.25 2.25 0 0 0 4.5 22.5h15a2.25 2.25 0 0 0 2.25-2.25v-15A2.25 2.25 0 0 0 19.5 3Zm.75 17.25a.75.75 0 0 1-.75.75h-15a.75.75 0 0 1-.75-.75V9h16.5v11.25ZM3.75 7.5V5.25A.75.75 0 0 1 4.5 4.5h1.25V6h1.5V4.5h7.5V6h1.5V4.5H17.25a.75.75 0 0 1 .75.75V7.5H3.75Z"/>
+          <svg
+            viewBox="0 0 24 24"
+            className="w-4 h-4 shrink-0"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <path d="M19.5 3h-2.25V1.5h-1.5V3H8.25V1.5h-1.5V3H4.5A2.25 2.25 0 0 0 2.25 5.25v15A2.25 2.25 0 0 0 4.5 22.5h15a2.25 2.25 0 0 0 2.25-2.25v-15A2.25 2.25 0 0 0 19.5 3Zm.75 17.25a.75.75 0 0 1-.75.75h-15a.75.75 0 0 1-.75-.75V9h16.5v11.25ZM3.75 7.5V5.25A.75.75 0 0 1 4.5 4.5h1.25V6h1.5V4.5h7.5V6h1.5V4.5H17.25a.75.75 0 0 1 .75.75V7.5H3.75Z" />
           </svg>
           Mentés Google Naptárba
         </a>

@@ -53,7 +53,7 @@ const BOOKINGS_QUERY = `*[_type == "booking" && !(_id in path("drafts.**")) && s
 
 export default async function AdminPage() {
   const session = await auth.api.getSession({ headers: await headers() });
-  
+
   // Hide website navbar on admin page
   const navbarHideStyle = `
     nav { display: none !important; }

@@ -165,7 +165,12 @@ export function BookingWizard({ services, scheduleData }: BookingWizardProps) {
     setSelections((prev) => ({ ...prev, selectedTime: time }));
   }
 
-  function handleBookingSuccess(bookingId: string, reservationNumber: string, patientName: string, patientEmail: string) {
+  function handleBookingSuccess(
+    bookingId: string,
+    reservationNumber: string,
+    patientName: string,
+    patientEmail: string,
+  ) {
     sessionStorage.removeItem(STORAGE_KEY);
     if (holdTimerRef.current) clearTimeout(holdTimerRef.current);
     setBookingResult({ bookingId, reservationNumber, patientName, patientEmail });

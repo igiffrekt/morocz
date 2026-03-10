@@ -114,7 +114,9 @@ export const bookingType = defineType({
       reservationNumber: "reservationNumber",
     },
     prepare({ title, date, time, reservationNumber }) {
-      const sub = [reservationNumber, date && time ? `${date} ${time}` : date].filter(Boolean).join(" — ");
+      const sub = [reservationNumber, date && time ? `${date} ${time}` : date]
+        .filter(Boolean)
+        .join(" — ");
       return {
         title: title ?? "Ismeretlen páciens",
         subtitle: sub || "Dátum nincs beállítva",

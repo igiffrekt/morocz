@@ -32,7 +32,12 @@ function PlaceholderAvatar() {
   );
 }
 
-export function TestimonialsSection({ heading, ctaText, ctaUrl, testimonials }: TestimonialsSectionProps) {
+export function TestimonialsSection({
+  heading,
+  ctaText,
+  ctaUrl,
+  testimonials,
+}: TestimonialsSectionProps) {
   const [activeIndex, setActiveIndex] = useState(0);
 
   if (testimonials.length === 0) return null;
@@ -90,13 +95,13 @@ export function TestimonialsSection({ heading, ctaText, ctaUrl, testimonials }: 
               aria-label="Előző vélemény"
               className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-12 rounded-full p-2 text-primary hover:bg-yellow-200/50 transition-colors md:left-auto md:translate-x-0"
             >
-              <svg
-                className="h-8 w-8"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
               </svg>
             </button>
           )}
@@ -108,60 +113,60 @@ export function TestimonialsSection({ heading, ctaText, ctaUrl, testimonials }: 
             onKeyDown={handleKeyDown}
             className="m-0 border-0 p-0 outline-none focus-visible:rounded-2xl focus-visible:ring-2 focus-visible:ring-primary/40"
           >
-          <motion.div
-            drag={single ? false : "x"}
-            dragConstraints={{ left: 0, right: 0 }}
-            dragElastic={0.1}
-            onDragEnd={single ? undefined : handleDragEnd}
-            className="cursor-grab select-none active:cursor-grabbing"
-          >
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={active._id}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.4 }}
-                aria-live="polite"
-                className="rounded-2xl border border-gray-200 px-10 py-12 md:px-32 md:py-16"
-              >
-                <div className="flex flex-col items-start gap-8 md:flex-row md:items-center md:gap-0">
-                  {/* Left: photo + name row */}
-                  <div className="flex shrink-0 items-center gap-4">
-                    {active.photo?.asset ? (
-                      <Image
-                        src={urlFor(active.photo).width(128).height(128).url()}
-                        alt={active.patientName ?? "Páciens"}
-                        width={64}
-                        height={64}
-                        className="h-16 w-16 rounded-full object-cover"
-                      />
-                    ) : (
-                      <PlaceholderAvatar />
-                    )}
-                    {active.patientName && (
-                      <div>
-                        <p className="text-base font-extrabold text-primary">
-                          {active.patientName}
-                        </p>
-                        <p className="text-sm font-medium text-primary/50">Páciens</p>
-                      </div>
+            <motion.div
+              drag={single ? false : "x"}
+              dragConstraints={{ left: 0, right: 0 }}
+              dragElastic={0.1}
+              onDragEnd={single ? undefined : handleDragEnd}
+              className="cursor-grab select-none active:cursor-grabbing"
+            >
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={active._id}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.4 }}
+                  aria-live="polite"
+                  className="rounded-2xl border border-gray-200 px-10 py-12 md:px-32 md:py-16"
+                >
+                  <div className="flex flex-col items-start gap-8 md:flex-row md:items-center md:gap-0">
+                    {/* Left: photo + name row */}
+                    <div className="flex shrink-0 items-center gap-4">
+                      {active.photo?.asset ? (
+                        <Image
+                          src={urlFor(active.photo).width(128).height(128).url()}
+                          alt={active.patientName ?? "Páciens"}
+                          width={64}
+                          height={64}
+                          className="h-16 w-16 rounded-full object-cover"
+                        />
+                      ) : (
+                        <PlaceholderAvatar />
+                      )}
+                      {active.patientName && (
+                        <div>
+                          <p className="text-base font-extrabold text-primary">
+                            {active.patientName}
+                          </p>
+                          <p className="text-sm font-medium text-primary/50">Páciens</p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Separator */}
+                    <div className="hidden h-20 w-px bg-gray-200 md:block md:mx-12" />
+
+                    {/* Right: quote */}
+                    {active.text && (
+                      <p className="text-lg font-medium leading-relaxed text-primary/80 md:text-xl">
+                        {active.text}
+                      </p>
                     )}
                   </div>
-
-                  {/* Separator */}
-                  <div className="hidden h-20 w-px bg-gray-200 md:block md:mx-12" />
-
-                  {/* Right: quote */}
-                  {active.text && (
-                    <p className="text-lg font-medium leading-relaxed text-primary/80 md:text-xl">
-                      {active.text}
-                    </p>
-                  )}
-                </div>
-              </motion.div>
-            </AnimatePresence>
-          </motion.div>
+                </motion.div>
+              </AnimatePresence>
+            </motion.div>
 
             {/* Dot navigation */}
             {!single && (
@@ -193,13 +198,13 @@ export function TestimonialsSection({ heading, ctaText, ctaUrl, testimonials }: 
               aria-label="Következő vélemény"
               className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-12 rounded-full p-2 text-primary hover:bg-yellow-200/50 transition-colors md:right-auto md:translate-x-0"
             >
-              <svg
-                className="h-8 w-8"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
               </svg>
             </button>
           )}

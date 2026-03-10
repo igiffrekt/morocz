@@ -23,18 +23,13 @@ export function HeroSection({ headline, subtitle, badges, doctorImage, phone }: 
 
   // Mobil: 480px — elég a ~80vw megjelenítéshez (max 430px eszközök),
   // drop-shadow eltávolítva (CSS filter nagyon drága mobilon)
-  const mobileDoctorImageUrl = doctorImage
-    ? urlFor(doctorImage).width(480).url()
-    : null;
+  const mobileDoctorImageUrl = doctorImage ? urlFor(doctorImage).width(480).url() : null;
 
   const leftBadge = badges?.[0];
   const rightBadge = badges?.[1];
 
   const ctaButton = (
-    <a
-      href="/idopontfoglalas"
-      className="group relative inline-flex items-center"
-    >
+    <a href="/idopontfoglalas" className="group relative inline-flex items-center">
       {/* Left circle — hidden by default, scales in on hover */}
       <span className="absolute left-0 top-1/2 -translate-y-1/2 w-14 h-14 flex items-center justify-center bg-[#e1bbcd] text-primary rounded-full scale-0 group-hover:scale-100 transition-transform duration-500 ease-[cubic-bezier(0.25,0.46,0.45,0.94)]">
         <svg
@@ -171,7 +166,12 @@ export function HeroSection({ headline, subtitle, badges, doctorImage, phone }: 
                 viewBox="0 0 24 24"
                 aria-hidden="true"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 12h14m0 0l-5-5m5 5l-5 5" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2.5}
+                  d="M5 12h14m0 0l-5-5m5 5l-5 5"
+                />
               </svg>
             </span>
           </a>
@@ -211,9 +211,7 @@ export function HeroSection({ headline, subtitle, badges, doctorImage, phone }: 
 
         {/* Bottom-right: CTA pill button */}
         <FadeIn direction="up" delay={0.8}>
-          <div className="flex justify-end mb-16">
-            {ctaButton}
-          </div>
+          <div className="flex justify-end mb-16">{ctaButton}</div>
         </FadeIn>
       </div>
     </section>

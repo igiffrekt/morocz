@@ -171,24 +171,24 @@ export default function AuthStep({ onSuccess, defaultTab = "belepes" }: AuthStep
         onSuccess();
       } else {
         const result = await signUp.email({
-            email,
-            password,
-            name,
-            callbackURL: "/idopontfoglalas",
-          });
+          email,
+          password,
+          name,
+          callbackURL: "/idopontfoglalas",
+        });
 
-          // Save phoneNumber separately (Better Auth doesn't support custom fields)
-          if (result?.user?.id && phoneNumber.trim()) {
-            try {
-              await fetch('/api/user/phone', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ phoneNumber: phoneNumber.trim() }),
-              });
-            } catch (err) {
-              console.error('[AuthStep] Phone save failed:', err);
-            }
+        // Save phoneNumber separately (Better Auth doesn't support custom fields)
+        if (result?.data?.user?.id && phoneNumber.trim()) {
+          try {
+            await fetch("/api/user/phone", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ phoneNumber: phoneNumber.trim() }),
+            });
+          } catch (err) {
+            console.error("[AuthStep] Phone save failed:", err);
           }
+        }
 
         if (result.error) {
           setGlobalError(mapErrorMessage(result.error));
@@ -313,7 +313,10 @@ export default function AuthStep({ onSuccess, defaultTab = "belepes" }: AuthStep
 
               {/* Phone field — registration only */}
               <div>
-                <label htmlFor="auth-phone" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="auth-phone"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   Telefonszám
                 </label>
                 <input
@@ -327,7 +330,9 @@ export default function AuthStep({ onSuccess, defaultTab = "belepes" }: AuthStep
                     errors.phoneNumber ? "border-red-400" : "border-gray-300"
                   }`}
                 />
-                {errors.phoneNumber && <p className="mt-1 text-xs text-red-600">{errors.phoneNumber}</p>}
+                {errors.phoneNumber && (
+                  <p className="mt-1 text-xs text-red-600">{errors.phoneNumber}</p>
+                )}
               </div>
             </>
           )}
@@ -396,3 +401,5 @@ export default function AuthStep({ onSuccess, defaultTab = "belepes" }: AuthStep
     </div>
   );
 }
+
+

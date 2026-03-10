@@ -77,11 +77,7 @@ export function CancelDialog({ booking, onCancelled, onClose }: CancelDialogProp
         </div>
       </div>
 
-      {error && (
-        <div className="mb-4 rounded-lg bg-red-100 p-3 text-sm text-red-700">
-          {error}
-        </div>
-      )}
+      {error && <div className="mb-4 rounded-lg bg-red-100 p-3 text-sm text-red-700">{error}</div>}
 
       <div className="flex gap-3">
         <button

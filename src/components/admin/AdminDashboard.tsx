@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
+import { useCallback, useEffect, useState } from "react";
 import AdminCalendar from "@/components/admin/AdminCalendar";
 import AdminDayPanel from "@/components/admin/AdminDayPanel";
 import AdminFinanceView from "@/components/admin/AdminFinanceView";
@@ -43,8 +43,6 @@ function getMonthRange(year: number, month: number): { startDate: string; endDat
     `${String(d.getFullYear())}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
   return { startDate: fmt(start), endDate: fmt(end) };
 }
-
-
 
 // ─── Nav tab button ────────────────────────────────────────────────────────────
 
@@ -150,8 +148,6 @@ export default function AdminDashboard({
     };
   }, [selectedDate, fetchBookings]);
 
-
-
   // ── Month navigation ──────────────────────────────────────────────────────────
 
   function handleMonthChange(year: number, month: number) {
@@ -174,7 +170,6 @@ export default function AdminDashboard({
     );
     const updatedMonth = await fetchBookings(mStart, mEnd);
     setMonthBookings(updatedMonth);
-
   }
 
   const confirmedCount = dayBookings.filter((b) => b.status === "confirmed").length;
@@ -362,12 +357,7 @@ export default function AdminDashboard({
       <header className="admin-header" data-admin-header="true">
         {/* Left: Logo */}
         <div className="admin-header-logo">
-          <Image
-            src="/mm-logo-square.svg"
-            alt="Mórocz Medical"
-            width={32}
-            height={32}
-          />
+          <Image src="/mm-logo-square.svg" alt="Mórocz Medical" width={32} height={32} />
         </div>
 
         {/* Center: Navigation tabs */}
@@ -505,7 +495,14 @@ export default function AdminDashboard({
               value={totalToday}
               accent="#242a5f"
               iconStroke="#242a5f"
-              iconPath={<><rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></>}
+              iconPath={
+                <>
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                  <line x1="16" y1="2" x2="16" y2="6" />
+                  <line x1="8" y1="2" x2="8" y2="6" />
+                  <line x1="3" y1="10" x2="21" y2="10" />
+                </>
+              }
               iconLabel="Naptár"
               labelColor="#242a5f"
             />
@@ -524,7 +521,12 @@ export default function AdminDashboard({
               value={cancelledCount}
               accent="#e7c1d3"
               iconStroke="#9f1239"
-              iconPath={<><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></>}
+              iconPath={
+                <>
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </>
+              }
               iconLabel="Lemondva"
               valueColor="#9f1239"
               labelColor="#9f1239"
@@ -543,8 +545,19 @@ export default function AdminDashboard({
               flexDirection: "column",
             }}
           >
-            <div data-admin-two-panel style={{ display: "flex", flex: "none", gap: "1rem", flexDirection: "column" }}>
-              <div style={{ flex: "0 0 100%", minWidth: 0, display: "flex", flexDirection: "column", maxHeight: "fit-content" }}>
+            <div
+              data-admin-two-panel
+              style={{ display: "flex", flex: "none", gap: "1rem", flexDirection: "column" }}
+            >
+              <div
+                style={{
+                  flex: "0 0 100%",
+                  minWidth: 0,
+                  display: "flex",
+                  flexDirection: "column",
+                  maxHeight: "fit-content",
+                }}
+              >
                 <AdminCalendar
                   selectedDate={selectedDate}
                   onSelectDate={setSelectedDate}

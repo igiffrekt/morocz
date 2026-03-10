@@ -344,21 +344,19 @@ export default function AdminPatientsView() {
   useEffect(() => {
     void fetch("/api/admin/patients")
       .then((r) => r.json())
-      .then(
-        (data: { patients?: PatientRow[]; total?: number; error?: string }) => {
-          if (data.error) {
-            setError(data.error);
-          } else {
-            // Sort by name (A-Z) by default
-            const sorted = (data.patients ?? []).sort((a, b) =>
-              (a.name || "").localeCompare(b.name || "", "hu")
-            );
-            setPatients(sorted);
-            setTotal(data.total ?? data.patients?.length ?? 0);
-          }
-          setLoading(false);
-        },
-      )
+      .then((data: { patients?: PatientRow[]; total?: number; error?: string }) => {
+        if (data.error) {
+          setError(data.error);
+        } else {
+          // Sort by name (A-Z) by default
+          const sorted = (data.patients ?? []).sort((a, b) =>
+            (a.name || "").localeCompare(b.name || "", "hu"),
+          );
+          setPatients(sorted);
+          setTotal(data.total ?? data.patients?.length ?? 0);
+        }
+        setLoading(false);
+      })
       .catch(() => {
         setError("Nem sikerült betölteni a páciens adatokat.");
         setLoading(false);
@@ -374,8 +372,7 @@ export default function AdminPatientsView() {
     const matchSearch =
       p.name.toLowerCase().includes(search.toLowerCase()) ||
       p.email.toLowerCase().includes(search.toLowerCase());
-    const matchFilter =
-      filter === "all" || (filter === "with-bookings" && p.totalBookings > 0);
+    const matchFilter = filter === "all" || (filter === "with-bookings" && p.totalBookings > 0);
     return matchSearch && matchFilter;
   });
 
@@ -404,7 +401,7 @@ export default function AdminPatientsView() {
         /* Mobile-first responsive for patients view */
         @media (max-width: 768px) {
           /* Tighten padding */
-          [style*="padding: \"1.5rem"] {
+          [style*="padding: "1.5rem"] {
             padding: 0.75rem !important;
           }
           
@@ -414,18 +411,18 @@ export default function AdminPatientsView() {
           }
           
           /* Table header — hide some columns on mobile */
-          [style*="gridTemplateColumns: \"1.6fr"] {
+          [style*="gridTemplateColumns: "1.6fr"] {
             grid-template-columns: 2fr 1fr 100px !important;
             gap: 0.5rem !important;
           }
           
           /* Table cell padding */
-          [style*="padding: \"0.75rem"] {
+          [style*="padding: "0.75rem"] {
             padding: 0.5rem !important;
           }
           
           /* Pagination controls — stack */
-          [style*="justifyContent: \"space-between"] {
+          [style*="justifyContent: "space-between"] {
             flex-direction: column !important;
             align-items: flex-start !important;
           }
@@ -507,9 +504,7 @@ export default function AdminPatientsView() {
               paddingRight: "1rem",
               paddingTop: "0.5625rem",
               paddingBottom: "0.5625rem",
-              border: searchFocused
-                ? "1.5px solid #4f6ef7"
-                : "1.5px solid rgba(228,232,240,0.9)",
+              border: searchFocused ? "1.5px solid #4f6ef7" : "1.5px solid rgba(228,232,240,0.9)",
               borderRadius: "9999px",
               fontSize: "0.8125rem",
               color: "#1a1d2d",
@@ -546,12 +541,8 @@ export default function AdminPatientsView() {
                 gap: "0.375rem",
                 padding: "0.375rem 0.875rem",
                 borderRadius: "9999px",
-                border: active
-                  ? "1.5px solid #242a5f"
-                  : "1.5px solid rgba(228,232,240,0.9)",
-                backgroundColor: active
-                  ? "#242a5f"
-                  : "rgba(255,255,255,0.75)",
+                border: active ? "1.5px solid #242a5f" : "1.5px solid rgba(228,232,240,0.9)",
+                backgroundColor: active ? "#242a5f" : "rgba(255,255,255,0.75)",
                 backdropFilter: active ? "none" : "blur(8px)",
                 color: active ? "#ffffff" : "#64748b",
                 fontSize: "0.8125rem",
@@ -575,9 +566,7 @@ export default function AdminPatientsView() {
                   borderRadius: "9999px",
                   fontSize: "0.6875rem",
                   fontWeight: 600,
-                  backgroundColor: active
-                    ? "rgba(255,255,255,0.2)"
-                    : "rgba(36,42,95,0.08)",
+                  backgroundColor: active ? "rgba(255,255,255,0.2)" : "rgba(36,42,95,0.08)",
                   color: active ? "#ffffff" : "#475569",
                   lineHeight: 1,
                 }}
@@ -671,12 +660,7 @@ export default function AdminPatientsView() {
             <EmptyState search={search} />
           ) : (
             currentPagePatients.map((p, i) => (
-              <PatientRow
-                key={p.email || `${p.name}-${i}`}
-                p={p}
-                i={i}
-                total={filtered.length}
-              />
+              <PatientRow key={p.email || `${p.name}-${i}`} p={p} i={i} total={filtered.length} />
             ))
           )}
         </div>

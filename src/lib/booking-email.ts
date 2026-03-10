@@ -802,9 +802,7 @@ export function buildReminderEmail(params: {
   const { patientName, appointments, clinicPhone, clinicAddress } = params;
   const isPlural = appointments.length > 1;
 
-  const titleText = isPlural
-    ? "Emlékeztető: holnapi időpontjai"
-    : "Emlékeztető: holnapi időpontja";
+  const titleText = isPlural ? "Emlékeztető: holnapi időpontjai" : "Emlékeztető: holnapi időpontja";
 
   const greetingText = isPlural
     ? "Tisztelt Páciensünk, emlékeztetjük, hogy holnap időpontjai vannak nálunk."

@@ -32,8 +32,7 @@ export function Header({ clinicName, navigationLinks, phone, address }: HeaderPr
       const currentY = window.scrollY;
       const delta = currentY - lastScrollY.current;
       const atTop = currentY < 50;
-      const atBottom =
-        currentY + window.innerHeight >= document.documentElement.scrollHeight - 60;
+      const atBottom = currentY + window.innerHeight >= document.documentElement.scrollHeight - 60;
 
       if (atTop) {
         upAccumulated.current = 0;

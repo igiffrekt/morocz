@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { z } from "zod";
+
 import { useSession } from "@/lib/auth-client";
-import { PhoneModal } from "@/components/auth/PhoneModal";
-import { CONSENT_LABEL, PRIVACY_POLICY_URL, CONSENT_LINK_TEXT } from "@/lib/consent-text";
+import { CONSENT_LABEL, CONSENT_LINK_TEXT, PRIVACY_POLICY_URL } from "@/lib/consent-text";
 
 interface Step4Props {
   selections: {
@@ -15,7 +15,12 @@ interface Step4Props {
     selectedTime: string;
   };
   onBack: () => void;
-  onSuccess: (bookingId: string, reservationNumber: string, patientName: string, patientEmail: string) => void;
+  onSuccess: (
+    bookingId: string,
+    reservationNumber: string,
+    patientName: string,
+    patientEmail: string,
+  ) => void;
   onConflict: (alternatives: string[]) => void;
 }
 
@@ -45,11 +50,10 @@ export function Step4Confirm({ selections, onBack, onSuccess, onConflict }: Step
   const [patientName, setPatientName] = useState("");
   const [patientEmail, setPatientEmail] = useState("");
 
-   
   useEffect(() => {
     if (session?.user?.name && !patientName) setPatientName(session.user.name);
     if (session?.user?.email && !patientEmail) setPatientEmail(session.user.email);
-    
+
     // Fetch fresh user data from API to get phone_number from database
     if (session?.user?.id && !patientPhone) {
       fetch("/api/user/profile")
@@ -62,7 +66,7 @@ export function Step4Confirm({ selections, onBack, onSuccess, onConflict }: Step
         .catch((err) => console.error("Failed to fetch user profile:", err));
     }
   }, [session]);
-  
+
   const [patientPhone, setPatientPhone] = useState("");
   const [showPhoneModal, setShowPhoneModal] = useState(false);
   const [consentChecked, setConsentChecked] = useState(false);
@@ -96,7 +100,7 @@ export function Step4Confirm({ selections, onBack, onSuccess, onConflict }: Step
 
     // Check if phone is required but empty (Google Sign-Up users)
     if (!patientPhone || patientPhone.length < 7) {
-      if (!session?.user?.phoneNumber) {
+      if (true) { // phoneNumber is stored separately
         // Google Sign-Up user without phone - show modal
         setShowPhoneModal(true);
         return;
@@ -163,7 +167,9 @@ export function Step4Confirm({ selections, onBack, onSuccess, onConflict }: Step
       {showPhoneModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
-            <h3 className="text-lg font-bold text-[var(--color-primary)] mb-2">Telefonszám megadása</h3>
+            <h3 className="text-lg font-bold text-[var(--color-primary)] mb-2">
+              Telefonszám megadása
+            </h3>
             <p className="text-sm text-gray-600 mb-4">
               Az időpontfoglalás véglegesítéséhez szükséges a telefonszáma.
             </p>
@@ -364,3 +370,5 @@ export function Step4Confirm({ selections, onBack, onSuccess, onConflict }: Step
     </div>
   );
 }
+
+

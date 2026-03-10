@@ -103,8 +103,18 @@ export default async function FoglalasTokenPage({
         <div className="rounded-xl bg-white p-8 shadow-md text-center">
           <div className="mb-4 flex justify-center">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
-              <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+              <svg
+                className="h-6 w-6 text-gray-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"
+                />
               </svg>
             </div>
           </div>
@@ -178,9 +188,7 @@ export default async function FoglalasTokenPage({
     return (
       <PageWrapper>
         <div className="rounded-xl bg-white p-8 shadow-md">
-          <h1 className="mb-3 text-xl font-bold text-[#23264F]">
-            Ez az időpont már lezajlott
-          </h1>
+          <h1 className="mb-3 text-xl font-bold text-[#23264F]">Ez az időpont már lezajlott</h1>
           <p className="mb-6 text-gray-600">
             A foglalt időpontja már elmúlt. Ha új időpontot szeretne foglalni, kattintson az alábbi
             gombra.

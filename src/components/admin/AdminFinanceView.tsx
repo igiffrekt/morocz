@@ -153,9 +153,9 @@ function StatCard({
 // ─── Custom tooltip for area chart ─────────────────────────────────────────────
 
 // biome-ignore lint/suspicious/noExplicitAny: recharts tooltip payload is untyped
-// @ts-expect-error recharts tooltip props are untyped
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  function RevenueTooltip({ active, payload, label }: any) { // biome-ignore lint/suspicious/noExplicitAny: recharts tooltips are untyped
+function RevenueTooltip({ active, payload, label }: any) {
+  // biome-ignore lint/suspicious/noExplicitAny: recharts tooltips are untyped
   if (!active || !payload?.length) return null;
   return (
     <div
@@ -180,9 +180,9 @@ function StatCard({
 }
 
 // biome-ignore lint/suspicious/noExplicitAny: recharts tooltip payload is untyped
-// @ts-expect-error recharts tooltip props are untyped
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  function ServiceTooltip({ active, payload }: any) { // biome-ignore lint/suspicious/noExplicitAny: recharts tooltips are untyped
+function ServiceTooltip({ active, payload }: any) {
+  // biome-ignore lint/suspicious/noExplicitAny: recharts tooltips are untyped
   if (!active || !payload?.length) return null;
   return (
     <div
@@ -311,7 +311,18 @@ export default function AdminFinanceView() {
           sub={`${data.totalConfirmed} visszaigazolt foglalás`}
           accent="#242a5f"
           icon={
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#242a5f" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" role="img" aria-label="Pénz">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#242a5f"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              role="img"
+              aria-label="Pénz"
+            >
               <line x1="12" y1="1" x2="12" y2="23" />
               <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
             </svg>
@@ -323,7 +334,18 @@ export default function AdminFinanceView() {
           sub="Folyó havi bevétel"
           accent="#99CEB7"
           icon={
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#099268" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" role="img" aria-label="Naptár">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#099268"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              role="img"
+              aria-label="Naptár"
+            >
               <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
               <line x1="16" y1="2" x2="16" y2="6" />
               <line x1="8" y1="2" x2="8" y2="6" />
@@ -337,7 +359,18 @@ export default function AdminFinanceView() {
           sub="Átlagos bevétel/foglalás"
           accent="#e1bbcd"
           icon={
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9f1239" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" role="img" aria-label="Diagram">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#9f1239"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              role="img"
+              aria-label="Diagram"
+            >
               <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
             </svg>
           }
@@ -348,7 +381,18 @@ export default function AdminFinanceView() {
           sub={bestMonth?.label ?? "—"}
           accent="#7c83cc"
           icon={
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c83cc" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" role="img" aria-label="Trend">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#7c83cc"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              role="img"
+              aria-label="Trend"
+            >
               <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
               <polyline points="17 6 23 6 23 12" />
             </svg>
@@ -377,7 +421,10 @@ export default function AdminFinanceView() {
             </div>
           </div>
           <ResponsiveContainer width="100%" height={200}>
-            <AreaChart data={data.monthlyRevenue} margin={{ top: 4, right: 4, left: -10, bottom: 0 }}>
+            <AreaChart
+              data={data.monthlyRevenue}
+              margin={{ top: 4, right: 4, left: -10, bottom: 0 }}
+            >
               <defs>
                 <linearGradient id="revenueGrad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#242a5f" stopOpacity={0.15} />
@@ -395,9 +442,7 @@ export default function AdminFinanceView() {
                 tick={{ fontSize: 11, fill: "#94a3b8" }}
                 axisLine={false}
                 tickLine={false}
-                tickFormatter={(v: number) =>
-                  v >= 1000 ? `${Math.round(v / 1000)}e` : String(v)
-                }
+                tickFormatter={(v: number) => (v >= 1000 ? `${Math.round(v / 1000)}e` : String(v))}
               />
               <Tooltip content={<RevenueTooltip />} />
               <Area
@@ -443,9 +488,7 @@ export default function AdminFinanceView() {
                 tick={{ fontSize: 10, fill: "#94a3b8" }}
                 axisLine={false}
                 tickLine={false}
-                tickFormatter={(v: number) =>
-                  v >= 1000 ? `${Math.round(v / 1000)}e` : String(v)
-                }
+                tickFormatter={(v: number) => (v >= 1000 ? `${Math.round(v / 1000)}e` : String(v))}
               />
               <YAxis
                 dataKey="shortName"
@@ -543,8 +586,7 @@ export default function AdminFinanceView() {
                 display: "grid",
                 gridTemplateColumns: "1.5fr 1.5fr 80px 90px",
                 padding: "0.75rem 1.25rem",
-                borderBottom:
-                  i < data.recentTransactions.length - 1 ? "1px solid #f1f3f7" : "none",
+                borderBottom: i < data.recentTransactions.length - 1 ? "1px solid #f1f3f7" : "none",
                 gap: "1rem",
                 alignItems: "center",
               }}
@@ -592,3 +634,4 @@ export default function AdminFinanceView() {
     </div>
   );
 }
+

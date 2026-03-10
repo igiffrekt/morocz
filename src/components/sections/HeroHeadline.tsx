@@ -40,16 +40,10 @@ export function HeroHeadline({ text, id }: HeroHeadlineProps) {
     >
       {words.map((w, wi) => (
         // biome-ignore lint/suspicious/noArrayIndexKey: word position is stable
-        <motion.span
-          key={wi}
-          variants={wordVariant}
-          className="block md:inline leading-none"
-        >
+        <motion.span key={wi} variants={wordVariant} className="block md:inline leading-none">
           {w}
           {/* Desktop: szóköz a szavak között */}
-          {wi < words.length - 1 && (
-            <span className="hidden md:inline">&nbsp;</span>
-          )}
+          {wi < words.length - 1 && <span className="hidden md:inline">&nbsp;</span>}
         </motion.span>
       ))}
     </motion.h1>

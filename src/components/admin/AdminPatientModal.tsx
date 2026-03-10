@@ -513,92 +513,92 @@ export default function AdminPatientModal({
                   // Find next upcoming booking (closest future date, confirmed status)
                   const today = new Date();
                   today.setHours(0, 0, 0, 0);
-                  
+
                   const nextBooking = patientHistory
-                    .filter(b => b.status === "confirmed")
+                    .filter((b) => b.status === "confirmed")
                     .sort((a, b) => new Date(a.slotDate).getTime() - new Date(b.slotDate).getTime())
-                    .find(b => new Date(b.slotDate) >= today);
-                  
+                    .find((b) => new Date(b.slotDate) >= today);
+
                   return patientHistory.map((h) => {
                     const isNext = h._id === nextBooking?._id;
                     const hCancelled = h.status === "cancelled";
-                  return (
-                    <div
-                      key={h._id}
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        padding: "0.5rem 0.625rem",
-                        backgroundColor: isNext ? "rgba(153,206,183,0.06)" : "#F2F4F8",
-                        border: `1px solid ${isNext ? "#99CEB7" : "#e8eaf0"}`,
-                        borderRadius: "0.75rem",
-                        gap: "0.5rem",
-                      }}
-                    >
+                    return (
                       <div
+                        key={h._id}
                         style={{
                           display: "flex",
-                          flexDirection: "column",
-                          gap: "0.125rem",
-                          minWidth: 0,
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          padding: "0.5rem 0.625rem",
+                          backgroundColor: isNext ? "rgba(153,206,183,0.06)" : "#F2F4F8",
+                          border: `1px solid ${isNext ? "#99CEB7" : "#e8eaf0"}`,
+                          borderRadius: "0.75rem",
+                          gap: "0.5rem",
                         }}
                       >
-                        <span
+                        <div
                           style={{
-                            fontSize: "0.8125rem",
-                            fontWeight: isNext ? 700 : 400,
-                            color: isNext ? "#099268" : "#64748b",
-                            whiteSpace: "nowrap",
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: "0.125rem",
+                            minWidth: 0,
                           }}
                         >
-                          {formatHungarianDate(h.slotDate)}, {h.slotTime}
-                          {isNext && (
-                            <span
-                              style={{
-                                marginLeft: "0.375rem",
-                                fontSize: "0.6875rem",
-                                color: "#099268",
-                                opacity: 0.75,
-                              }}
-                            >
-                              (következő)
-                            </span>
-                          )}
-                        </span>
-                        {h.service && (
                           <span
                             style={{
-                              fontSize: "0.75rem",
-                              color: "#64748b",
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
+                              fontSize: "0.8125rem",
+                              fontWeight: isNext ? 700 : 400,
+                              color: isNext ? "#099268" : "#64748b",
                               whiteSpace: "nowrap",
                             }}
                           >
-                            {h.service.name}
+                            {formatHungarianDate(h.slotDate)}, {h.slotTime}
+                            {isNext && (
+                              <span
+                                style={{
+                                  marginLeft: "0.375rem",
+                                  fontSize: "0.6875rem",
+                                  color: "#099268",
+                                  opacity: 0.75,
+                                }}
+                              >
+                                (következő)
+                              </span>
+                            )}
                           </span>
-                        )}
+                          {h.service && (
+                            <span
+                              style={{
+                                fontSize: "0.75rem",
+                                color: "#64748b",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                whiteSpace: "nowrap",
+                              }}
+                            >
+                              {h.service.name}
+                            </span>
+                          )}
+                        </div>
+                        <span
+                          style={{
+                            fontSize: "0.6875rem",
+                            fontWeight: 600,
+                            padding: "0.15rem 0.4rem",
+                            borderRadius: "9999px",
+                            backgroundColor: hCancelled
+                              ? "rgba(231,193,211,0.15)"
+                              : "rgba(153,206,183,0.15)",
+                            color: hCancelled ? "#9f1239" : "#099268",
+                            textTransform: "uppercase" as const,
+                            letterSpacing: "0.04em",
+                            flexShrink: 0,
+                          }}
+                        >
+                          {hCancelled ? "Lemondva" : "Visszaigazolva"}
+                        </span>
                       </div>
-                      <span
-                        style={{
-                          fontSize: "0.6875rem",
-                          fontWeight: 600,
-                          padding: "0.15rem 0.4rem",
-                          borderRadius: "9999px",
-                          backgroundColor: hCancelled
-                            ? "rgba(231,193,211,0.15)"
-                            : "rgba(153,206,183,0.15)",
-                          color: hCancelled ? "#9f1239" : "#099268",
-                          textTransform: "uppercase" as const,
-                          letterSpacing: "0.04em",
-                          flexShrink: 0,
-                        }}
-                      >
-                        {hCancelled ? "Lemondva" : "Visszaigazolva"}
-                      </span>
-                    </div>
-                  );
+                    );
                   });
                 })()}
               </div>

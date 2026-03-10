@@ -15,8 +15,8 @@ function getCalendarClient() {
 export interface CalendarEventInput {
   summary: string;
   description: string;
-  date: string;       // YYYY-MM-DD
-  startTime: string;  // HH:MM
+  date: string; // YYYY-MM-DD
+  startTime: string; // HH:MM
   durationMinutes: number;
 }
 
@@ -36,7 +36,7 @@ export async function createCalendarEvent(input: CalendarEventInput): Promise<st
         summary: input.summary,
         description: input.description,
         start: { dateTime: fmt(start), timeZone: TIMEZONE },
-        end:   { dateTime: fmt(end),   timeZone: TIMEZONE },
+        end: { dateTime: fmt(end), timeZone: TIMEZONE },
       },
     });
 
@@ -75,7 +75,7 @@ export async function updateCalendarEvent(
         summary: input.summary,
         description: input.description,
         start: { dateTime: fmt(start), timeZone: TIMEZONE },
-        end:   { dateTime: fmt(end),   timeZone: TIMEZONE },
+        end: { dateTime: fmt(end), timeZone: TIMEZONE },
       },
     });
   } catch (err) {

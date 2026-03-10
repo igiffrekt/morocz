@@ -176,8 +176,8 @@ export default function GyogyszerfelirasPage() {
               <li className="flex items-start gap-2">
                 <span className="text-accent mt-1.5 shrink-0">&#9679;</span>
                 <span>
-                  <strong>Kombinált orális fogamzásgátló</strong> — a hagyományos „tabletta&quot;, amely
-                  ösztrogént és progesztint tartalmaz. Hatékonysága megfelelő szedés mellett
+                  <strong>Kombinált orális fogamzásgátló</strong> — a hagyományos „tabletta&quot;,
+                  amely ösztrogént és progesztint tartalmaz. Hatékonysága megfelelő szedés mellett
                   kiemelkedő.
                 </span>
               </li>

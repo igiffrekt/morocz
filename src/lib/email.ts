@@ -59,9 +59,7 @@ export async function sendEmail(params: {
       statusText: response.statusText,
       error: errorData,
     });
-    throw new Error(
-      `Brevo API error: ${response.status} ${response.statusText}`,
-    );
+    throw new Error(`Brevo API error: ${response.status} ${response.statusText}`);
   }
 
   const result = await response.json();
@@ -70,8 +68,5 @@ export async function sendEmail(params: {
 
 /** Check whether email is configured. */
 export function isEmailConfigured(): boolean {
-  return !!(
-    process.env.BREVO_API_KEY &&
-    process.env.GMAIL_SENDER_EMAIL
-  );
+  return !!(process.env.BREVO_API_KEY && process.env.GMAIL_SENDER_EMAIL);
 }

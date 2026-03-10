@@ -3,7 +3,6 @@
 import { useMemo, useState } from "react";
 import type { AdminBooking } from "@/components/admin/AdminDashboard";
 
-
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 
 const HU_WEEKDAYS = ["H", "K", "Sze", "Cs", "P", "Szo", "V"];
@@ -34,15 +33,7 @@ function getTodayString(): string {
 
 // ─── Props ─────────────────────────────────────────────────────────────────────
 
-interface AdminCalendarProps {
-  selectedDate: string;
-  onSelectDate: (date: string) => void;
-  monthBookings: AdminBooking[];
-  onMonthChange: (year: number, month: number) => void;
-  initialYear: number;
-  initialMonth: number;
-  onBookingClick: (booking: AdminBooking) => void;
-}
+interface AdminCalendarProps { selectedDate: string; onSelectDate: (date: string) => void; monthBookings: AdminBooking[]; viewMode?: string; onViewModeChange?: (mode: string) => void; onMonthChange: (year: number, month: number) => void; initialYear: number; initialMonth: number; onBookingClick: (booking: AdminBooking) => void; weekBookings?: AdminBooking[]; }
 
 // ─── Component ─────────────────────────────────────────────────────────────────
 
@@ -140,18 +131,18 @@ export default function AdminCalendar({
         /* Mobile-first responsive for calendar */
         @media (max-width: 768px) {
           /* Smaller padding inside calendar */
-          [style*="padding: \"0.75rem"] {
+          [style*="padding: "0.75rem"] {
             padding: 0.5rem !important;
           }
           
           /* Smaller day cells */
-          [style*="height: \"2.5rem"] {
+          [style*="height: "2.5rem"] {
             height: 2rem !important;
             font-size: 0.75rem !important;
           }
           
           /* Smaller month nav buttons */
-          [style*="width: \"2.25rem"] {
+          [style*="width: "2.25rem"] {
             width: 1.75rem !important;
             height: 1.75rem !important;
             font-size: 1rem !important;
@@ -189,9 +180,7 @@ export default function AdminCalendar({
             padding: "0.1875rem",
             gap: "0.125rem",
           }}
-        >
-
-        </div>
+        ></div>
       </div>
 
       {/* ── Month view ───────────────────────────────────────────────────────── */}
@@ -415,8 +404,8 @@ export default function AdminCalendar({
           </div>
         </div>
       )}
-
-
     </div>
   );
 }
+
+

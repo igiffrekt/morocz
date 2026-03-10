@@ -1,7 +1,7 @@
-import { auth } from "@/lib/auth";
-import { getWriteClient } from "@/lib/sanity-write-client";
 import { headers } from "next/headers";
 import { z } from "zod";
+import { auth } from "@/lib/auth";
+import { getWriteClient } from "@/lib/sanity-write-client";
 
 export const dynamic = "force-dynamic";
 
@@ -23,7 +23,7 @@ export async function POST(request: Request) {
     if (!parsed.success) {
       return Response.json(
         { error: parsed.error.issues[0]?.message ?? "Érvénytelen telefonszám" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -39,15 +39,9 @@ export async function POST(request: Request) {
       headers: await headers(),
     });
 
-    return Response.json(
-      { success: true, phoneNumber },
-      { status: 200 }
-    );
+    return Response.json({ success: true, phoneNumber }, { status: 200 });
   } catch (err) {
     console.error("[api/user/phone] Error:", err);
-    return Response.json(
-      { error: "Hiba történt a telefon mentésekor" },
-      { status: 500 }
-    );
+    return Response.json({ error: "Hiba történt a telefon mentésekor" }, { status: 500 });
   }
 }

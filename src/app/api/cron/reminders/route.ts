@@ -1,9 +1,9 @@
 import type { NextRequest } from "next/server";
-import { getWriteClient } from "@/lib/sanity-write-client";
 import { buildReminderEmail } from "@/lib/booking-email";
-import { sendEmail, isEmailConfigured } from "@/lib/email";
 import { db } from "@/lib/db";
 import { cronRunLog } from "@/lib/db/schema";
+import { isEmailConfigured, sendEmail } from "@/lib/email";
+import { getWriteClient } from "@/lib/sanity-write-client";
 
 export const dynamic = "force-dynamic";
 
@@ -198,9 +198,9 @@ export async function GET(request: NextRequest) {
     } catch {
       // If DB logging also fails, proceed to return 500 anyway
     }
-    return new Response(
-      JSON.stringify({ ok: false, error: errorMessage }),
-      { status: 500, headers: { "Content-Type": "application/json" } },
-    );
+    return new Response(JSON.stringify({ ok: false, error: errorMessage }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 }

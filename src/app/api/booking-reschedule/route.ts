@@ -1,9 +1,9 @@
+import { google } from "googleapis";
 import { z } from "zod";
-import { createCalendarEvent } from "@/lib/google-calendar";
 import { buildRescheduleEmail } from "@/lib/booking-email";
 import { isEmailConfigured, sendEmail } from "@/lib/email";
+import { createCalendarEvent } from "@/lib/google-calendar";
 import { getWriteClient } from "@/lib/sanity-write-client";
-import { google } from "googleapis";
 
 export const dynamic = "force-dynamic";
 
@@ -17,20 +17,20 @@ const RescheduleSchema = z.object({
 // ── Delete Google Calendar event ──────────────────────────────────────────────
 async function deleteCalendarEvent(eventId: string | null): Promise<void> {
   if (!eventId) return;
-  
+
   try {
     const auth = new google.auth.JWT({
       email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
       key: (process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY ?? "").replace(/\\n/g, "\n"),
       scopes: ["https://www.googleapis.com/auth/calendar"],
     });
-    
+
     const calendar = google.calendar({ version: "v3", auth });
     await calendar.events.delete({
       calendarId: process.env.GOOGLE_CALENDAR_ID,
       eventId,
     });
-    
+
     console.log(`[booking-reschedule] Deleted old calendar event: ${eventId}`);
   } catch (err) {
     console.error(`[booking-reschedule] Failed to delete calendar event ${eventId}:`, err);
@@ -90,10 +90,7 @@ export async function POST(request: Request): Promise<Response> {
     );
 
     if (!booking) {
-      return Response.json(
-        { error: "Érvénytelen vagy lejárt hivatkozás." },
-        { status: 404 },
-      );
+      return Response.json({ error: "Érvénytelen vagy lejárt hivatkozás." }, { status: 404 });
     }
 
     // ── 3. Enforce 24h window server-side ──────────────────────────────────────
@@ -111,8 +108,7 @@ export async function POST(request: Request): Promise<Response> {
     if (newDate === booking.slotDate && newTime === booking.slotTime) {
       return Response.json(
         {
-          error:
-            "Ez a jelenlegi időpont. Kérjük, válasszon másik időpontot.",
+          error: "Ez a jelenlegi időpont. Kérjük, válasszon másik időpontot.",
         },
         { status: 400 },
       );
@@ -138,10 +134,7 @@ export async function POST(request: Request): Promise<Response> {
     );
 
     if (!newSlotLock) {
-      return Response.json(
-        { error: "Hiba történt. Kérjük, próbálja újra." },
-        { status: 500 },
-      );
+      return Response.json({ error: "Hiba történt. Kérjük, próbálja újra." }, { status: 500 });
     }
 
     // Check if already booked before attempting optimistic lock
@@ -201,7 +194,7 @@ export async function POST(request: Request): Promise<Response> {
         if (booking.googleCalendarEventId) {
           await deleteCalendarEvent(booking.googleCalendarEventId);
         }
-        
+
         // Create new event
         const newEventId = await createCalendarEvent({
           summary: `${booking.service?.name?.startsWith("Nőgyógyász") ? "Nőgyógyászati vizsgálat" : (booking.service?.name ?? "Foglalt szolgáltatás")} — ${booking.patientName}`,
@@ -210,7 +203,7 @@ export async function POST(request: Request): Promise<Response> {
           startTime: newTime,
           durationMinutes: booking.service?.appointmentDuration ?? 30,
         });
-        
+
         // Update booking with new eventId
         if (newEventId) {
           await getWriteClient()
@@ -231,7 +224,9 @@ export async function POST(request: Request): Promise<Response> {
         patientName: booking.patientName,
         patientEmail: booking.patientEmail,
         reservationNumber: booking.reservationNumber,
-        serviceName: booking.service?.name?.startsWith("Nőgyógyász") ? "Nőgyógyászati vizsgálat" : (booking.service?.name ?? "Szolgáltatás"),
+        serviceName: booking.service?.name?.startsWith("Nőgyógyász")
+          ? "Nőgyógyászati vizsgálat"
+          : (booking.service?.name ?? "Szolgáltatás"),
         oldDate: booking.slotDate,
         oldTime: booking.slotTime,
         newDate,
@@ -247,10 +242,7 @@ export async function POST(request: Request): Promise<Response> {
     );
   } catch (err) {
     console.error("[api/booking-reschedule] Unexpected error:", err);
-    return Response.json(
-      { error: "Hiba történt. Kérjük, próbálja újra." },
-      { status: 500 },
-    );
+    return Response.json({ error: "Hiba történt. Kérjük, próbálja újra." }, { status: 500 });
   }
 }
 

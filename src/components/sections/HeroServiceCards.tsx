@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { motion } from "motion/react";
+import Link from "next/link";
 import type { SanityImageObject } from "../../../sanity.types";
 
 interface HeroServiceCardsProps {
@@ -80,7 +80,9 @@ export function HeroServiceCards({ cards }: HeroServiceCardsProps) {
                   </h3>
                 )}
                 {card.subtitle && (
-                  <p className="text-sm md:text-base font-medium text-gray-800/80">{card.subtitle}</p>
+                  <p className="text-sm md:text-base font-medium text-gray-800/80">
+                    {card.subtitle}
+                  </p>
                 )}
               </div>
 

@@ -6,11 +6,11 @@
  * Duplikátumokat email alapján kizárja (első bejegyzés nyer).
  */
 
-import { createClient } from "@sanity/client";
 import fs from "node:fs";
 import path from "node:path";
 import readline from "node:readline";
 import { fileURLToPath } from "node:url";
+import { createClient } from "@sanity/client";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -50,7 +50,7 @@ function cleanPhone(raw) {
   let s = raw.trim();
 
   // Handle scientific notation strings like "3.58403E+11"
-  if (/^\d+\.?\d*[Ee][+\-]?\d+$/.test(s)) {
+  if (/^\d+\.?\d*[Ee][+-]?\d+$/.test(s)) {
     try {
       const num = Number(s);
       if (!Number.isNaN(num) && num < 1e14) {
@@ -65,7 +65,7 @@ function cleanPhone(raw) {
   }
 
   // Remove common formatting chars (spaces, dashes, parens)
-  s = s.replace(/[\s\-\(\)]/g, "");
+  s = s.replace(/[\s\-()]/g, "");
 
   // Remove leading +
   if (s.startsWith("+")) s = s.slice(1);

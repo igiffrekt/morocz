@@ -1,6 +1,6 @@
 /**
  * Mórocz Medical — Páciens TÖRLÉS + Újraimport
- * 
+ *
  * CSV formátum (Tom leírása szerint):
  *   A: vezetéknév (family name)
  *   B: keresztnév (first name)
@@ -11,10 +11,10 @@
  *   G: megjegyzés (notes mezőbe)
  */
 
-import { createClient } from "@sanity/client";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { createClient } from "@sanity/client";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -54,7 +54,7 @@ function formatPhone(raw) {
   let s = raw.trim();
 
   // Excel scientific notation (pl. 3.6302E+10)
-  if (/^\d+\.?\d*[Ee][+\-]?\d+$/i.test(s)) {
+  if (/^\d+\.?\d*[Ee][+-]?\d+$/i.test(s)) {
     try {
       const num = Number(s);
       if (!Number.isNaN(num) && num < 1e15) {
@@ -68,7 +68,7 @@ function formatPhone(raw) {
   }
 
   // Szóközök, kötőjelek eltávolítása
-  s = s.replace(/[\s\-\(\)]/g, "");
+  s = s.replace(/[\s\-()]/g, "");
   // Vezető + eltávolítása (majd visszatesszük)
   s = s.replace(/^\+/, "");
 
@@ -187,7 +187,7 @@ function parseCSV(filePath) {
   }
 
   console.log(
-    `\n📋 CSV feldolgozva: ${patients.length} páciens, ${skippedTest} teszt kizárva, ${skippedEmpty} üres sor`
+    `\n📋 CSV feldolgozva: ${patients.length} páciens, ${skippedTest} teszt kizárva, ${skippedEmpty} üres sor`,
   );
   return patients;
 }
@@ -224,7 +224,9 @@ async function importPatients(patients) {
   let imported = 0;
   const now = new Date().toISOString();
 
-  console.log(`\n📤 Import indul: ${patients.length} páciens, ${Math.ceil(patients.length / BATCH_SIZE)} batch...\n`);
+  console.log(
+    `\n📤 Import indul: ${patients.length} páciens, ${Math.ceil(patients.length / BATCH_SIZE)} batch...\n`,
+  );
 
   for (let i = 0; i < patients.length; i += BATCH_SIZE) {
     const batch = patients.slice(i, i + BATCH_SIZE);
@@ -282,7 +284,9 @@ async function main() {
   await importPatients(deduped);
 
   console.log("\n🎉 Minden kész!");
-  console.log(`\nEllenőrzés: https://www.sanity.io/manage → project l5qdfoyx → Vision → *[_type == "patient"] | count`);
+  console.log(
+    `\nEllenőrzés: https://www.sanity.io/manage → project l5qdfoyx → Vision → *[_type == "patient"] | count`,
+  );
 }
 
 main().catch((err) => {

@@ -110,7 +110,7 @@ function getWeekDays(dateStr: string): string[] {
   // Verify Monday is in the correct week (not off by timezone/DST)
   // If dow was 0 (Sunday), we want Monday of that same week (6 days prior)
   // If dow was 1+ (Mon-Sat), we want that week's Monday (0 to 5 days prior)
-  
+
   return Array.from({ length: 7 }, (_, i) => {
     const d = new Date(monday);
     d.setDate(monday.getDate() + i);
@@ -309,84 +309,85 @@ export default function AdminWeekView({
                 {(() => {
                   const layoutMap = layoutOverlappingBookings(dayBookings);
                   return dayBookings.map((booking) => {
-                  const isCancelled = booking.status === "cancelled";
-                  const topPct = timeToTopPercent(booking.slotTime);
-                  const duration = booking.service?.appointmentDuration ?? 20;
-                  const heightPct = durationToHeightPercent(duration);
+                    const isCancelled = booking.status === "cancelled";
+                    const topPct = timeToTopPercent(booking.slotTime);
+                    const duration = booking.service?.appointmentDuration ?? 20;
+                    const heightPct = durationToHeightPercent(duration);
 
-                  // Calculate end time for display
-                  const [startH, startM] = booking.slotTime.split(":").map(Number);
-                  const startTotalMin = (startH ?? 0) * 60 + (startM ?? 0);
-                  const endTotalMin = startTotalMin + duration;
-                  const endH = Math.floor(endTotalMin / 60);
-                  const endM = endTotalMin % 60;
-                  const endTimeStr = `${String(endH).padStart(2, "0")}:${String(endM).padStart(2, "0")}`;
+                    // Calculate end time for display
+                    const [startH, startM] = booking.slotTime.split(":").map(Number);
+                    const startTotalMin = (startH ?? 0) * 60 + (startM ?? 0);
+                    const endTotalMin = startTotalMin + duration;
+                    const endH = Math.floor(endTotalMin / 60);
+                    const endM = endTotalMin % 60;
+                    const endTimeStr = `${String(endH).padStart(2, "0")}:${String(endM).padStart(2, "0")}`;
 
-                  // Clamp to visible range
-                  const clampedTop = Math.max(0, Math.min(topPct, 100));
-                  const clampedHeight = Math.min(heightPct, 100 - clampedTop);
+                    // Clamp to visible range
+                    const clampedTop = Math.max(0, Math.min(topPct, 100));
+                    const clampedHeight = Math.min(heightPct, 100 - clampedTop);
 
-                  // Overlap layout positioning
-                  const layout = layoutMap.get(booking._id);
-                  const totalCols = layout?.totalCols ?? 1;
-                  const colIndex = layout?.colIndex ?? 0;
-                  const colWidthPct = 100 / totalCols;
+                    // Overlap layout positioning
+                    const layout = layoutMap.get(booking._id);
+                    const totalCols = layout?.totalCols ?? 1;
+                    const colIndex = layout?.colIndex ?? 0;
+                    const colWidthPct = 100 / totalCols;
 
-                  return (
-                    <button
-                      key={booking._id}
-                      type="button"
-                      onClick={() => onBookingClick(booking)}
-                      title={`${booking.slotTime} ${booking.patientName}`}
-                      style={{
-                        position: "absolute",
-                        top: `${clampedTop}%`,
-                        left: totalCols === 1 ? "2px" : `calc(${colIndex * colWidthPct}% + 1px)`,
-                        width: totalCols === 1 ? "calc(100% - 4px)" : `calc(${colWidthPct}% - 2px)`,
-                        height: `${clampedHeight}%`,
-                        minHeight: "1.25rem",
-                        backgroundColor: isCancelled ? "#F4DCD6" : "#99CEB7",
-                        color: isCancelled ? "#9f1239" : "#0f172a",
-                        borderRadius: "0.25rem",
-                        padding: "0.125rem 0.25rem",
-                        fontSize: "0.625rem",
-                        fontWeight: 600,
-                        cursor: "pointer",
-                        border: "none",
-                        textAlign: "left",
-                        overflow: "hidden",
-                        boxShadow: isCancelled ? "none" : "0 1px 3px rgba(0,0,0,0.08)",
-                        lineHeight: 1.3,
-                        display: "flex",
-                        flexDirection: "column",
-                        justifyContent: "flex-start",
-                        zIndex: 1,
-                        transition: "opacity 0.1s",
-                      }}
-                    >
-                      <span
+                    return (
+                      <button
+                        key={booking._id}
+                        type="button"
+                        onClick={() => onBookingClick(booking)}
+                        title={`${booking.slotTime} ${booking.patientName}`}
                         style={{
-                          whiteSpace: "nowrap",
+                          position: "absolute",
+                          top: `${clampedTop}%`,
+                          left: totalCols === 1 ? "2px" : `calc(${colIndex * colWidthPct}% + 1px)`,
+                          width:
+                            totalCols === 1 ? "calc(100% - 4px)" : `calc(${colWidthPct}% - 2px)`,
+                          height: `${clampedHeight}%`,
+                          minHeight: "1.25rem",
+                          backgroundColor: isCancelled ? "#F4DCD6" : "#99CEB7",
+                          color: isCancelled ? "#9f1239" : "#0f172a",
+                          borderRadius: "0.25rem",
+                          padding: "0.125rem 0.25rem",
+                          fontSize: "0.625rem",
+                          fontWeight: 600,
+                          cursor: "pointer",
+                          border: "none",
+                          textAlign: "left",
                           overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          display: "block",
+                          boxShadow: isCancelled ? "none" : "0 1px 3px rgba(0,0,0,0.08)",
+                          lineHeight: 1.3,
+                          display: "flex",
+                          flexDirection: "column",
+                          justifyContent: "flex-start",
+                          zIndex: 1,
+                          transition: "opacity 0.1s",
                         }}
                       >
-                        {booking.patientName}
-                      </span>
-                      <span
-                        style={{
-                          whiteSpace: "nowrap",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          display: "block",
-                          opacity: 0.75,
-                        }}
-                      >
-                        {booking.slotTime} – {endTimeStr}
-                      </span>
-                    </button>
-                  );
+                        <span
+                          style={{
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            display: "block",
+                          }}
+                        >
+                          {booking.patientName}
+                        </span>
+                        <span
+                          style={{
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            display: "block",
+                            opacity: 0.75,
+                          }}
+                        >
+                          {booking.slotTime} – {endTimeStr}
+                        </span>
+                      </button>
+                    );
                   });
                 })()}
               </div>

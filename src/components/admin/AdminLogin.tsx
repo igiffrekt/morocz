@@ -83,8 +83,9 @@ export default function AdminLogin() {
         provider: "google",
         callbackURL: "/admin",
       });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (err: any) { // biome-ignore lint/suspicious/noExplicitAny: error type depends on signIn provider
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      // biome-ignore lint/suspicious/noExplicitAny: error type depends on signIn provider
       setFormError(err.message || "Google sign-in failed");
       setLoading(false);
     }
@@ -215,8 +216,16 @@ export default function AdminLogin() {
             gap: "0.5rem",
           }}
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="12" cy="12" r="1" /><path d="M12 2v6M12 16v6M2 12h6M16 12h6M4.22 4.22l4.24 4.24M15.54 15.54l4.24 4.24M4.22 19.78l4.24-4.24M15.54 8.46l4.24-4.24" />
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <circle cx="12" cy="12" r="1" />
+            <path d="M12 2v6M12 16v6M2 12h6M16 12h6M4.22 4.22l4.24 4.24M15.54 15.54l4.24 4.24M4.22 19.78l4.24-4.24M15.54 8.46l4.24-4.24" />
           </svg>
           {loading ? "Bejelentkezés..." : "Google-lel bejelentkezni"}
         </button>

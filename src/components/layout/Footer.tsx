@@ -42,10 +42,8 @@ export default function Footer({
     <footer className="bg-[#0d112f] rounded-t-[3rem] lg:rounded-[3rem] overflow-hidden">
       <FadeIn viewport>
         <div className="px-5 pt-5 pb-0 md:px-10 md:pt-10">
-
           {/* ── White card ───────────────────────────────────────────── */}
           <div className="bg-white rounded-[2rem] px-8 py-10 md:px-12 md:py-12">
-
             {/* Navigation columns */}
             {footerColumns && footerColumns.length > 0 && (
               <nav
@@ -126,7 +124,6 @@ export default function Footer({
               </Link>
             </div>
           </div>
-
         </div>
       </FadeIn>
     </footer>

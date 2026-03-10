@@ -28,10 +28,6 @@ import type {
   TestimonialQueryResult,
 } from "../../sanity.types";
 
-// ─── ISR Configuration ────────────────────────────────────────────────────────
-// Revalidate every 30 seconds with webhook-based on-demand revalidation
-export const revalidate = 30;
-
 // ─── Homepage Metadata ────────────────────────────────────────────────────────
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -182,7 +178,6 @@ export default async function Home() {
           </div>
           
           {/* 30% - Testimonials */}
-          {homepage?.testimonialsHeadline && homepage?.testimonials && (homepage.testimonials as TestimonialQueryResult[]).length > 0 && (
             <div className="relative overflow-hidden rounded-3xl bg-secondary">
               {/* Decorative blobs (matching ImportantInfoSection style) */}
               <div

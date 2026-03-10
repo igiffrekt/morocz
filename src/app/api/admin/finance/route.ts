@@ -12,8 +12,8 @@ type FinanceBooking = {
 };
 
 export type MonthlyRevenue = {
-  month: string;  // "2026-01"
-  label: string;  // "Jan 2026"
+  month: string; // "2026-01"
+  label: string; // "Jan 2026"
   revenue: number;
   count: number;
 };
@@ -44,13 +44,27 @@ export type FinanceResponse = {
   recentTransactions: RecentTransaction[];
 };
 
-const HU_MONTHS = ["Jan", "Feb", "Már", "Ápr", "Máj", "Jún", "Júl", "Aug", "Szep", "Okt", "Nov", "Dec"];
+const HU_MONTHS = [
+  "Jan",
+  "Feb",
+  "Már",
+  "Ápr",
+  "Máj",
+  "Jún",
+  "Júl",
+  "Aug",
+  "Szep",
+  "Okt",
+  "Nov",
+  "Dec",
+];
 
 export async function GET(request: Request): Promise<Response> {
   try {
     const session = await auth.api.getSession({ headers: request.headers });
     if (!session) return Response.json({ error: "Bejelentkezés szükséges." }, { status: 401 });
-    if (session.user.role !== "admin") return Response.json({ error: "Jogosulatlan." }, { status: 403 });
+    if (session.user.role !== "admin")
+      return Response.json({ error: "Jogosulatlan." }, { status: 403 });
 
     const bookings = await getWriteClient().fetch<FinanceBooking[]>(
       `*[_type == "booking" && !(_id in path("drafts.**"))] | order(slotDate desc) {

@@ -6,7 +6,9 @@ export function getWriteClient() {
   if (!_writeClient) {
     const token = process.env.SANITY_WRITE_TOKEN ?? process.env.SANITY_API_TOKEN;
     if (!token) {
-      throw new Error("[sanity-write-client] Missing SANITY_WRITE_TOKEN or SANITY_API_TOKEN env var");
+      throw new Error(
+        "[sanity-write-client] Missing SANITY_WRITE_TOKEN or SANITY_API_TOKEN env var",
+      );
     }
     _writeClient = createClient({
       // biome-ignore lint/style/noNonNullAssertion: Required at runtime

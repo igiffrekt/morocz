@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import type { ScheduleForAvailability } from "@/lib/slots";
 import { CancelDialog } from "./CancelDialog";
 import { ReschedulePanel } from "./ReschedulePanel";
@@ -56,7 +56,13 @@ export function BookingManagementCard({ booking, scheduleData }: BookingManageme
       <div className="rounded-xl bg-white p-8 shadow-md">
         <div className="mb-4 flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#99CEB7]">
-            <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+            <svg
+              className="h-5 w-5 text-white"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="currentColor"
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
             </svg>
           </div>
@@ -87,21 +93,27 @@ export function BookingManagementCard({ booking, scheduleData }: BookingManageme
       <div className="rounded-xl bg-white p-8 shadow-md">
         <div className="mb-4 flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#99CEB7]">
-            <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+            <svg
+              className="h-5 w-5 text-white"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="currentColor"
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
             </svg>
           </div>
           <h2 className="text-xl font-bold text-[#23264F]">Időpont sikeresen áthelyezve</h2>
         </div>
         <div className="mb-6 rounded-lg border-l-4 border-[#99CEB7] bg-gray-50 p-5">
-          <p className="mb-1 text-xs font-bold uppercase tracking-wider text-gray-500">Új időpont</p>
+          <p className="mb-1 text-xs font-bold uppercase tracking-wider text-gray-500">
+            Új időpont
+          </p>
           <p className="text-base font-semibold text-[#23264F]">
             {newFormattedDate}, {rescheduledTo.time}
           </p>
         </div>
-        <p className="mb-6 text-gray-600">
-          Visszaigazoló e-mailt küldtünk az új időpontról.
-        </p>
+        <p className="mb-6 text-gray-600">Visszaigazoló e-mailt küldtünk az új időpontról.</p>
         <button
           onClick={() => {
             console.log("[BookingManagementCard] Refresh clicked");

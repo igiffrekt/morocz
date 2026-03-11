@@ -227,7 +227,7 @@ export function AccordionWrapper({
           title={leftTitle}
           subtitle={leftSubtitle}
           items={leftItems}
-          isMobile={true}
+          isMobile={false}
         />
       </div>
 
@@ -238,7 +238,7 @@ export function AccordionWrapper({
           title={rightTitle}
           subtitle={rightSubtitle}
           items={rightItems}
-          isMobile={true}
+          isMobile={false}
         />
       </div>
     </section>

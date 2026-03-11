@@ -422,13 +422,13 @@ export default async function KapcsolatPage() {
       />
 
       {/* CTA */}
-      <section className="bg-navy relative overflow-hidden py-12 sm:py-20 md:py-24">
+      <section style={{ background: "#1e2952" }} className="relative overflow-hidden py-12 sm:py-20 md:py-24">
         <div style={{ position: "absolute", left: 0, bottom: 0, width: "256px", height: "256px", background: "#a8d5ba", opacity: 0.1, borderRadius: "9999px", transform: "translate(-50%, 50%)" }} />
         <div className="relative z-10 max-w-2xl mx-auto px-4 sm:px-6 text-center">
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-black mb-3 md:mb-6 text-white">
             {data.ctaTitle}
           </h2>
-          <p style={{ color: "#1e2952" }} className="text-sm sm:text-base md:text-lg mb-6 md:mb-8 font-medium">
+          <p className="text-white text-sm sm:text-base md:text-lg mb-6 md:mb-8 font-medium">
             Foglaljon időpontot az elérhető időpontok közül.
           </p>
           <CTAButton text={data.ctaButtonText} href={data.ctaButtonUrl} />

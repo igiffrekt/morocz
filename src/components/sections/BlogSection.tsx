@@ -53,7 +53,7 @@ export function BlogSection({ heading, posts }: BlogSectionProps) {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0 }}
             transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
-            className="text-3xl md:text-4xl font-extrabold text-primary mb-4"
+            className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-primary leading-tight mb-4"
           >
             {heading}
           </motion.h2>

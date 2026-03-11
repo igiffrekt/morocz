@@ -175,13 +175,17 @@ export const blogPostBySlugQuery = defineQuery(`*[_type == "blogPost" && slug.cu
 // Revalidation tag: "blogPost"
 
 export const latestBlogPostsQuery = defineQuery(
-  `*[_type == "blogPost"] | order(publishedAt desc)[0...2]{
+  `*[_type == "blogPost"] | order(publishedAt desc)[0...5]{
   _id,
   title,
   slug,
   category->{_id, name},
-  featuredImage,
-  excerpt
+  featuredImage{
+    asset->{url, alt},
+    ...
+  },
+  excerpt,
+  content
 }`,
 );
 
@@ -212,8 +216,7 @@ export const privacyPolicyQuery = defineQuery(
 
 // ─── Scheduling & Booking Queries ─────────────────────────────────────────────
 
-export const weeklyScheduleQuery =
-  defineQuery(`*[_type == "weeklySchedule" && _id == "weeklySchedule"][0]{
+export const weeklyScheduleQuery = defineQuery(`*[_type == "weeklySchedule" && _id == "weeklySchedule"][0]{
   monday, tuesday, wednesday, thursday, friday, saturday, sunday
 }`);
 
@@ -225,13 +228,11 @@ export const slotLockByIdQuery = defineQuery(`*[_type == "slotLock" && _id == $s
   _id, dateTime, status
 }`);
 
-export const bookingsForDateQuery =
-  defineQuery(`*[_type == "booking" && dateTime >= $startDate && dateTime < $endDate]{
+export const bookingsForDateQuery = defineQuery(`*[_type == "booking" && dateTime >= $startDate && dateTime < $endDate]{
   _id, dateTime, patientEmail, serviceId
 }`);
 
-export const slotLocksForDateQuery =
-  defineQuery(`*[_type == "slotLock" && dateTime >= $startDate && dateTime < $endDate]{
+export const slotLocksForDateQuery = defineQuery(`*[_type == "slotLock" && dateTime >= $startDate && dateTime < $endDate]{
   _id, dateTime, status
 }`);
 

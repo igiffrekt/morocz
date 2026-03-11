@@ -262,12 +262,12 @@ export default async function KapcsolatPage() {
           borderBottomRightRadius: "40px",
           position: "relative",
           overflow: "hidden",
-          paddingTop: "32px",
+          paddingTop: "56px",
           paddingBottom: "64px",
           marginTop: "-40px",
           color: "white",
         }}
-        className="sm:pb-96 md:pb-32 lg:pb-40"
+        className="sm:pb-96 md:pb-32 lg:pb-40 sm:pt-16 md:pt-20"
       >
         <div style={{ position: "absolute", right: "-80px", top: "-80px", width: "384px", height: "384px", background: "#a8d5ba", opacity: 0.05, borderRadius: "9999px", filter: "blur(48px)" }} />
 
@@ -428,7 +428,7 @@ export default async function KapcsolatPage() {
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-black mb-3 md:mb-6 text-white">
             {data.ctaTitle}
           </h2>
-          <p className="text-white/80 text-sm sm:text-base md:text-lg mb-6 md:mb-8">
+          <p className="text-white text-sm sm:text-base md:text-lg mb-6 md:mb-8 font-medium">
             Foglaljon időpontot az elérhető időpontok közül.
           </p>
           <CTAButton text={data.ctaButtonText} href={data.ctaButtonUrl} />

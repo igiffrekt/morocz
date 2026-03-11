@@ -428,7 +428,7 @@ export default async function KapcsolatPage() {
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-black mb-3 md:mb-6 text-white">
             {data.ctaTitle}
           </h2>
-          <p className="text-blue-200 text-sm sm:text-base md:text-lg mb-6 md:mb-8">
+          <p className="text-white/80 text-sm sm:text-base md:text-lg mb-6 md:mb-8">
             Foglaljon időpontot az elérhető időpontok közül.
           </p>
           <CTAButton text={data.ctaButtonText} href={data.ctaButtonUrl} />

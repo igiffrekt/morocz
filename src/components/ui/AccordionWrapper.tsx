@@ -218,10 +218,10 @@ export function AccordionWrapper({
 }: AccordionWrapperProps) {
   return (
     <section
-      className="max-w-6xl mx-auto px-4 sm:px-6 mb-16 sm:mb-20 md:mb-24 grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 lg:gap-8"
+      className="w-full px-4 sm:px-6 mb-16 sm:mb-20 md:mb-24 grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 lg:gap-6"
     >
       {/* Left: Hasznos - Mint background */}
-      <div className="bg-green-100 rounded-2xl sm:rounded-3xl lg:rounded-4xl p-6 sm:p-8 md:p-12 lg:p-20">
+      <div className="bg-green-100 rounded-2xl sm:rounded-3xl lg:rounded-4xl p-5 sm:p-6 md:p-8">
         <ColumnSection
           label={leftLabel}
           title={leftTitle}
@@ -232,7 +232,7 @@ export function AccordionWrapper({
       </div>
 
       {/* Right: Fontos - White card */}
-      <div className="bg-white rounded-2xl sm:rounded-3xl lg:rounded-4xl p-6 sm:p-8 md:p-12 lg:p-20 shadow-md md:shadow-lg">
+      <div className="bg-white rounded-2xl sm:rounded-3xl lg:rounded-4xl p-5 sm:p-6 md:p-8 shadow-md md:shadow-lg">
         <ColumnSection
           label={rightLabel}
           title={rightTitle}

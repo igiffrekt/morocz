@@ -373,7 +373,7 @@ export default async function KapcsolatPage() {
               {data.emailAddresses.map((e, i) => (
                 <div key={i} className="text-xs sm:text-sm">
                   <p className="text-gray-600 text-xs uppercase tracking-wide">{e.label}</p>
-                  <a href={`mailto:${e.email}`} className="text-green-600 font-semibold hover:underline break-all">
+                  <a href={`mailto:${e.email}`} className="text-primary font-semibold hover:underline break-all">
                     {e.email}
                   </a>
                 </div>

@@ -18,7 +18,7 @@ function SectionHeader({ label, title, subtitle }: { label: string; title: strin
   return (
     <div style={{ marginBottom: "24px" }}>
       <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-        <div style={{ width: "25px", height: "2.5px", background: "#2daa6d", borderRadius: "9999px", flexShrink: 0 }} />
+        <div style={{ width: "25px", height: "2.5px", background: "rgba(139,152,184,1)", borderRadius: "9999px", flexShrink: 0 }} />
         <p style={{ fontSize: "0.7rem", fontWeight: 600, color: "rgba(139,152,184,1)", textTransform: "uppercase", letterSpacing: "0.1em", margin: 0 }}>
           {label}
         </p>

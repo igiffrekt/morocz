@@ -251,3 +251,16 @@ export const slotLocksForDateQuery = defineQuery(`*[_type == "slotLock" && dateT
 export const servicesForBookingQuery = defineQuery(`*[_type == "service"] | order(order asc){
   _id, name, duration, price
 }`);
+
+export const KAPCSOLAT_QUERY = defineQuery(`*[_type == "kapcsolat"][0]{
+  heroTitle,
+  heroDescription,
+  phoneNumbers,
+  emailAddresses,
+  address,
+  officeHours,
+  informationCards,
+  importantNotices,
+  ctaButtonText,
+  ctaButtonUrl
+}`);

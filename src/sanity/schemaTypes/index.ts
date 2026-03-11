@@ -4,6 +4,7 @@ import { blogCategoryType } from "./blogCategoryType";
 import { blogPostType } from "./blogPostType";
 import { bookingType } from "./bookingType";
 import { homepageType } from "./homepageType";
+import { kapcsolatType } from "./kapcsolatType";
 import { labTestType } from "./labTestType";
 import { patientType } from "./patientType";
 import { privacyPolicyType } from "./privacyPolicyType";
@@ -16,6 +17,7 @@ import { weeklyScheduleType } from "./weeklyScheduleType";
 
 export const schemaTypes: SchemaTypeDefinition[] = [
   homepageType,
+  kapcsolatType,
   siteSettingsType,
   serviceCategoryType,
   serviceType,

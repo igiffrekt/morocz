@@ -17,6 +17,7 @@ interface Step2DateTimeProps {
   scheduleData: ScheduleData;
   onSelectDate: (date: string) => void;
   onSelectTime: (time: string) => void;
+  onSlotHold: (slotDate: string, slotTime: string, slotLockId: string, heldUntil: string) => void;
   onNext: () => void;
   onBack: () => void;
 }
@@ -63,6 +64,7 @@ export function Step2DateTime({
   scheduleData,
   onSelectDate,
   onSelectTime,
+  onSlotHold,
   onNext,
   onBack,
 }: Step2DateTimeProps) {
@@ -74,6 +76,7 @@ export function Step2DateTime({
   const [slotsLoading, setSlotsLoading] = useState(false);
   const [slotsError, setSlotsError] = useState<string | null>(null);
   const [dayAvailability, setDayAvailability] = useState<Record<string, DayAvailability>>({});
+  const [holdingSlot, setHoldingSlot] = useState<string | null>(null);
 
   const todayStr = getTodayString();
   const maxDateStr = getMaxDateString();
@@ -186,6 +189,38 @@ export function Step2DateTime({
     if (dateStr < todayStr || dateStr > maxDateStr) return;
     if (!availableDatesSet.has(dateStr)) return;
     onSelectDate(dateStr);
+  }
+
+  async function handleTimeSelect(time: string) {
+    if (!selectedDate) return;
+    
+    setHoldingSlot(time);
+    try {
+      const res = await fetch("/api/slot-hold", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slotDate: selectedDate, slotTime: time }),
+      });
+      
+      if (!res.ok) {
+        const error = await res.json() as { error?: string };
+        setSlotsError(error.error ?? "Nem sikerült az időpont megtartása.");
+        setHoldingSlot(null);
+        return;
+      }
+      
+      const data = await res.json() as { slotLockId?: string; heldUntil?: string };
+      if (data.slotLockId && data.heldUntil) {
+        // Notify parent wizard about the hold
+        onSlotHold(selectedDate, time, data.slotLockId, data.heldUntil);
+        onSelectTime(time);
+      }
+    } catch (err) {
+      setSlotsError("Hálózati hiba. Kérjük, próbálja újra.");
+      console.error("[Step2DateTime] Slot hold error:", err);
+    } finally {
+      setHoldingSlot(null);
+    }
   }
 
   function formatSelectedDate(dateStr: string): string {
@@ -406,14 +441,17 @@ export function Step2DateTime({
                       <button
                         key={time}
                         type="button"
-                        onClick={() => onSelectTime(time)}
+                        onClick={() => void handleTimeSelect(time)}
+                        disabled={holdingSlot === time}
                         className={[
                           "h-10 rounded-lg text-sm font-semibold transition-all duration-150",
                           isTimeSelected
                             ? "bg-[var(--color-primary)] text-white shadow-md"
                             : "bg-white border border-gray-200 text-gray-700 hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] shadow-sm",
+                          holdingSlot === time ? "opacity-50 cursor-wait" : "",
                         ].join(" ")}
                         aria-pressed={isTimeSelected}
+                        aria-busy={holdingSlot === time}
                       >
                         {time}
                       </button>

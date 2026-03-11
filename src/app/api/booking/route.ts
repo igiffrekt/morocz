@@ -34,6 +34,7 @@ const BookingSchema = z.object({
   patientName: z.string().min(2, "A név megadása kötelező."),
   patientEmail: z.string().email("Érvénytelen e-mail cím."),
   patientPhone: z.string().min(7, "Kérjük, adja meg telefonszámát."),
+  slotLockId: z.string().optional(),
 });
 
 type SlotLock = {
@@ -44,12 +45,13 @@ type SlotLock = {
 };
 
 export async function POST(request: Request): Promise<Response> {
-  // ── 1. Auth check ──────────────────────────────────────────────────────────
-  const session = await auth.api.getSession({ headers: await headers() });
+  try {
+    // ── 1. Auth check ──────────────────────────────────────────────────────────
+    const session = await auth.api.getSession({ headers: await headers() });
 
-  if (!session) {
-    return Response.json({ error: "Kérjük, jelentkezzen be." }, { status: 401 });
-  }
+    if (!session) {
+      return Response.json({ error: "Kérjük, jelentkezzen be." }, { status: 401 });
+    }
 
   // ── 2. Validate request body ───────────────────────────────────────────────
   let body: unknown;
@@ -65,35 +67,37 @@ export async function POST(request: Request): Promise<Response> {
     return Response.json({ error: firstError }, { status: 400 });
   }
 
-  const { serviceId, slotDate, slotTime, patientName, patientEmail, patientPhone } = parsed.data;
+  const { serviceId, slotDate, slotTime, patientName, patientEmail, patientPhone, slotLockId: providedSlotLockId } = parsed.data;
 
-  // ── 3. Verify slot availability ────────────────────────────────────────────
-  const currentBookings = await getWriteClient().fetch<Array<{ _id: string; slotTime: string }>>(
-    `*[_type == "booking" && slotDate == $date && status == "confirmed"]{_id, slotTime}`,
-    { date: slotDate },
-  );
-
-  const isAlreadyBooked = currentBookings.some((b) => b.slotTime === slotTime);
-  if (isAlreadyBooked) {
-    const alternatives = await getAlternativeSlots(slotDate, slotTime, serviceId);
-    return Response.json(
-      {
-        error: "Ez az időpont sajnos már foglalt. Kérjük, válasszon másik időpontot.",
-        alternatives,
-      },
-      { status: 409 },
-    );
-  }
-
-  // ── 4. Get or create slotLock document ────────────────────────────────────
+  // ── 3. Get slotLock — it's the source of truth for availability ──────────────
   const slotId = `${slotDate}T${slotTime}:00`;
-  const slotLockDocId = `slotLock-${slotDate}-${slotTime.replace(":", "-")}`;
+  const slotLockDocId = providedSlotLockId ?? `slotLock-${slotDate}-${slotTime.replace(":", "-")}`;
 
   // Try to fetch existing lock
-  let slotLock = await getWriteClient().fetch<SlotLock | null>(slotLockByIdQuery, { slotId });
+  let slotLock = await getWriteClient().fetch<SlotLock | null>(slotLockByIdQuery, { slotLockId: slotLockDocId });
 
-  // If it exists and is already booked, go straight to conflict response
-  if (slotLock && slotLock.status === "booked") {
+  // If no lock exists, create one with "available" status (for non-held slots)
+  if (!slotLock) {
+    await getWriteClient().createIfNotExists({
+      _id: slotLockDocId,
+      _type: "slotLock",
+      slotId,
+      status: "available",
+    });
+
+    slotLock = await getWriteClient().fetch<SlotLock | null>(slotLockByIdQuery, { slotLockId: slotLockDocId });
+
+    if (!slotLock) {
+      return Response.json(
+        { error: "Hiba történt az időpont lefoglalásakor. Kérjük, próbálja újra." },
+        { status: 500 },
+      );
+    }
+  }
+
+  // ── 4. Check slot lock status ──────────────────────────────────────────────
+  // If already booked, it's taken
+  if (slotLock.status === "booked") {
     const alternatives = await getAlternativeSlots(slotDate, slotTime, serviceId);
     return Response.json(
       {
@@ -104,22 +108,19 @@ export async function POST(request: Request): Promise<Response> {
     );
   }
 
-  // Create if not exists
-  await getWriteClient().createIfNotExists({
-    _id: slotLockDocId,
-    _type: "slotLock",
-    slotId,
-    status: "available",
-  });
-
-  // Re-fetch to get current _rev for optimistic locking
-  slotLock = await getWriteClient().fetch<SlotLock | null>(slotLockByIdQuery, { slotId });
-
-  if (!slotLock) {
-    return Response.json(
-      { error: "Hiba történt az időpont lefoglalásakor. Kérjük, próbálja újra." },
-      { status: 500 },
-    );
+  // If held and expired, user lost the hold
+  if (slotLock.status === "held" && slotLock.heldUntil) {
+    if (new Date(slotLock.heldUntil) < new Date()) {
+      const alternatives = await getAlternativeSlots(slotDate, slotTime, serviceId);
+      return Response.json(
+        {
+          error: "Az időpontfoglalásra fordított idő lejárt. Kérjük, válasszon új időpontot.",
+          alternatives,
+        },
+        { status: 410 },
+      );
+    }
+    // Hold is still valid - we can book with it
   }
 
   // ── 5. Optimistic lock — patch with ifRevisionID ───────────────────────────
@@ -205,11 +206,19 @@ export async function POST(request: Request): Promise<Response> {
     });
   }
 
-  // ── 11. Return success ─────────────────────────────────────────────────────
-  return Response.json(
-    { bookingId: booking._id, reservationNumber, message: "Időpont sikeresen lefoglalva." },
-    { status: 201 },
-  );
+    // ── 11. Return success ─────────────────────────────────────────────────────
+    return Response.json(
+      { bookingId: booking._id, reservationNumber, message: "Időpont sikeresen lefoglalva." },
+      { status: 201 },
+    );
+  } catch (err) {
+    console.error("[api/booking] Unhandled error:", err);
+    const message = err instanceof Error ? err.message : "Ismeretlen hiba történt.";
+    return Response.json(
+      { error: `Hiba az időpontfoglalás során: ${message}` },
+      { status: 500 },
+    );
+  }
 }
 
 // ── Helper: get alternative slots near the requested time ─────────────────────
@@ -274,7 +283,7 @@ async function getAlternativeSlots(
     const [reqH, reqM] = slotTime.split(":").map(Number);
     const reqMinutes = (reqH ?? 0) * 60 + (reqM ?? 0);
 
-    return available
+    const alternatives = available
       .filter((t) => t !== slotTime)
       .sort((a, b) => {
         const [aH, aM] = a.split(":").map(Number);
@@ -284,7 +293,11 @@ async function getAlternativeSlots(
         return Math.abs(aMin - reqMinutes) - Math.abs(bMin - reqMinutes);
       })
       .slice(0, 5);
-  } catch {
+
+    console.log(`[booking] getAlternativeSlots(${slotDate}, ${slotTime}): found ${alternatives.length} alternatives`);
+    return alternatives;
+  } catch (err) {
+    console.error("[booking] getAlternativeSlots error:", err);
     return [];
   }
 }

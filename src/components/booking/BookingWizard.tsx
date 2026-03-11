@@ -23,6 +23,8 @@ interface BookingSelections {
   serviceDuration: number | null;
   selectedDate: string | null;
   selectedTime: string | null;
+  slotLockId?: string | null;
+  heldUntil?: string | null;
 }
 
 interface BookingResult {
@@ -44,7 +46,6 @@ interface BookingWizardProps {
 
 const STEP_LABELS = ["Szolgáltatás", "Időpont", "Bejelentkezés", "Megerősítés"];
 const STORAGE_KEY = "morocz-booking-wizard";
-const HOLD_DURATION_MS = 5 * 60 * 1000; // 5 minutes
 
 const slideVariants = {
   enter: (dir: number) => ({ x: dir > 0 ? 300 : -300, opacity: 0 }),
@@ -66,7 +67,6 @@ function formatDateHungarian(dateStr: string): string {
 export function BookingWizard({ services, scheduleData }: BookingWizardProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const direction = useRef<number>(0);
-  const holdTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [selections, setSelections] = useState<BookingSelections>({
     serviceId: null,
@@ -74,6 +74,8 @@ export function BookingWizard({ services, scheduleData }: BookingWizardProps) {
     serviceDuration: null,
     selectedDate: null,
     selectedTime: null,
+    slotLockId: null,
+    heldUntil: null,
   });
 
   const [bookingResult, setBookingResult] = useState<BookingResult | null>(null);
@@ -82,8 +84,10 @@ export function BookingWizard({ services, scheduleData }: BookingWizardProps) {
   const [alternativeSlots, setAlternativeSlots] = useState<string[] | null>(null);
   const [conflictMessage, setConflictMessage] = useState<string | null>(null);
 
-  // Hold timer expiry
+  // Hold expiration check
   const [holdExpired, setHoldExpired] = useState(false);
+
+
 
   // ── Restore wizard state from sessionStorage on mount ──────────────────────
   useEffect(() => {
@@ -111,6 +115,28 @@ export function BookingWizard({ services, scheduleData }: BookingWizardProps) {
     }
   }, []); // Only on mount
 
+  // ── Check if hold has expired ──────────────────────────────────────────────
+  useEffect(() => {
+    if (!selections.heldUntil) {
+      setHoldExpired(false);
+      return;
+    }
+
+    // Check immediately
+    const checkExpiry = () => {
+      const now = new Date().getTime();
+      const expiresAt = new Date(selections.heldUntil).getTime();
+      setHoldExpired(now > expiresAt);
+    };
+
+    checkExpiry();
+
+    // Check every 5 seconds
+    const interval = setInterval(checkExpiry, 5000);
+
+    return () => clearInterval(interval);
+  }, [selections.heldUntil]);
+
   // ── Persist wizard state to sessionStorage on every change ────────────────
   useEffect(() => {
     // Don't persist success state
@@ -125,19 +151,7 @@ export function BookingWizard({ services, scheduleData }: BookingWizardProps) {
     );
   }, [currentStep, selections, bookingResult]);
 
-  // ── 5-minute hold timer starting from step 3 ──────────────────────────────
-  useEffect(() => {
-    if (currentStep >= 3 && currentStep <= 4 && selections.selectedTime) {
-      setHoldExpired(false);
-      holdTimerRef.current = setTimeout(() => {
-        setHoldExpired(true);
-      }, HOLD_DURATION_MS);
-      return () => {
-        if (holdTimerRef.current) clearTimeout(holdTimerRef.current);
-      };
-    }
-    return undefined;
-  }, [currentStep, selections.selectedTime]);
+
 
   function goToStep(next: number) {
     direction.current = next > currentStep ? 1 : -1;
@@ -165,6 +179,17 @@ export function BookingWizard({ services, scheduleData }: BookingWizardProps) {
     setSelections((prev) => ({ ...prev, selectedTime: time }));
   }
 
+  function handleSlotHold(slotDate: string, slotTime: string, slotLockId: string, heldUntil: string) {
+    // Store the hold info (API will check expiration on booking)
+    setSelections((prev) => ({
+      ...prev,
+      selectedDate: slotDate,
+      selectedTime: slotTime,
+      slotLockId,
+      heldUntil,
+    }));
+  }
+
   function handleBookingSuccess(
     bookingId: string,
     reservationNumber: string,
@@ -172,7 +197,6 @@ export function BookingWizard({ services, scheduleData }: BookingWizardProps) {
     patientEmail: string,
   ) {
     sessionStorage.removeItem(STORAGE_KEY);
-    if (holdTimerRef.current) clearTimeout(holdTimerRef.current);
     setBookingResult({ bookingId, reservationNumber, patientName, patientEmail });
     setCurrentStep(5); // Show success
   }
@@ -188,19 +212,19 @@ export function BookingWizard({ services, scheduleData }: BookingWizardProps) {
     setSelections((prev) => ({ ...prev, selectedTime: time }));
     setAlternativeSlots(null);
     setConflictMessage(null);
-    // Reset hold timer
     setHoldExpired(false);
   }
 
   function resetWizard() {
     sessionStorage.removeItem(STORAGE_KEY);
-    if (holdTimerRef.current) clearTimeout(holdTimerRef.current);
     setSelections({
       serviceId: null,
       serviceName: null,
       serviceDuration: null,
       selectedDate: null,
       selectedTime: null,
+      slotLockId: null,
+      heldUntil: null,
     });
     setBookingResult(null);
     setAlternativeSlots(null);
@@ -245,45 +269,46 @@ export function BookingWizard({ services, scheduleData }: BookingWizardProps) {
     <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 md:p-8">
       <StepIndicator currentStep={currentStep} steps={STEP_LABELS} />
 
-      {/* Hold timer expiry banner */}
-      {holdExpired && (
-        <div className="mb-4 px-4 py-3 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-3">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            className="w-5 h-5 text-amber-600 shrink-0 mt-0.5"
-            aria-hidden="true"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
-            />
-          </svg>
-          <div className="flex-1">
-            <p className="text-sm text-amber-800 font-medium">Az időpont foglalása lejárt</p>
-            <p className="text-xs text-amber-700 mt-0.5">
-              Az Ön által kiválasztott időpont foglalása lejárt. Kérjük, válasszon új időpontot.
-            </p>
+      {/* Show ONLY expiration banner when hold expires — hide everything else */}
+      {holdExpired ? (
+        <div className="mt-6 px-4 py-6 bg-amber-50 border border-amber-200 rounded-xl">
+          <div className="flex items-start gap-3 mb-4">
+            <svg
+              className="w-6 h-6 text-amber-600 shrink-0 mt-0.5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <div className="flex-1">
+              <h3 className="text-base font-semibold text-amber-900">Az időpont foglalása lejárt</h3>
+              <p className="text-sm text-amber-700 mt-1">
+                Az Ön által kiválasztott időpont foglalásának ideje (5 perc) lejárt. Kérjük, válasszon új időpontot.
+              </p>
+            </div>
           </div>
           <button
             type="button"
             onClick={() => {
               setHoldExpired(false);
-              setSelections((prev) => ({ ...prev, selectedTime: null }));
+              setSelections((prev) => ({ ...prev, selectedTime: null, slotLockId: null, heldUntil: null }));
               goToStep(2);
             }}
-            className="px-3 py-1.5 text-xs font-medium bg-amber-100 text-amber-800 rounded-lg hover:bg-amber-200 transition-colors shrink-0"
+            className="w-full px-4 py-2.5 text-sm font-semibold bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors"
           >
             Vissza az időpontokhoz
           </button>
         </div>
-      )}
-
-      {/* Conflict panel */}
+      ) : (
+        <>
+          {/* Conflict panel */}
       {conflictMessage && alternativeSlots && (
         <div className="mb-4 px-4 py-4 bg-red-50 border border-red-200 rounded-xl">
           <p className="text-sm text-red-700 font-medium mb-3">{conflictMessage}</p>
@@ -313,6 +338,8 @@ export function BookingWizard({ services, scheduleData }: BookingWizardProps) {
         </div>
       )}
 
+
+
       <div className="overflow-hidden">
         <AnimatePresence mode="wait" custom={direction.current}>
           <motion.div
@@ -328,6 +355,8 @@ export function BookingWizard({ services, scheduleData }: BookingWizardProps) {
           </motion.div>
         </AnimatePresence>
       </div>
+        </>
+      )}
     </div>
   );
 
@@ -352,6 +381,7 @@ export function BookingWizard({ services, scheduleData }: BookingWizardProps) {
             scheduleData={scheduleData}
             onSelectDate={handleDateSelect}
             onSelectTime={handleTimeSelect}
+            onSlotHold={handleSlotHold}
             onNext={() => goToStep(3)}
             onBack={() => goToStep(1)}
           />

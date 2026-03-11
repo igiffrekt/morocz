@@ -13,6 +13,7 @@ interface Step4Props {
     serviceDuration: number;
     selectedDate: string;
     selectedTime: string;
+    slotLockId?: string | null;
   };
   onBack: () => void;
   onSuccess: (
@@ -128,6 +129,7 @@ export function Step4Confirm({ selections, onBack, onSuccess, onConflict }: Step
           patientName,
           patientEmail,
           patientPhone,
+          ...(selections.slotLockId && { slotLockId: selections.slotLockId }),
         }),
       });
 

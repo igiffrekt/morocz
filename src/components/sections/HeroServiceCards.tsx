@@ -62,16 +62,15 @@ export function HeroServiceCards({ cards }: HeroServiceCardsProps) {
     >
       {cards.map((card, index) => {
         const deco = cardDecorations[index % cardDecorations.length];
-        const Wrapper = card.href ? Link : "div";
+        const cardClass = [
+          cardColors[index % cardColors.length],
+          "block p-5 md:p-8 rounded-[2rem] relative overflow-hidden h-[280px] md:h-[330px] flex flex-col justify-between group cursor-pointer hover:shadow-xl transition-all duration-700 ease-out",
+        ].join(" ");
+        
         return (
           <motion.div key={card._key} variants={item}>
-            <Wrapper
-              {...(card.href ? { href: card.href } : {})}
-              className={[
-                cardColors[index % cardColors.length],
-                "block p-5 md:p-8 rounded-[2rem] relative overflow-hidden h-[280px] md:h-[330px] flex flex-col justify-between group cursor-pointer hover:shadow-xl transition-all duration-700 ease-out",
-              ].join(" ")}
-            >
+            {card.href ? (
+              <Link href={card.href} className={cardClass}>
               {/* Top: title + subtitle */}
               <div>
                 {card.title && (
@@ -121,7 +120,60 @@ export function HeroServiceCards({ cards }: HeroServiceCardsProps) {
               >
                 {deco.emoji}
               </span>
-            </Wrapper>
+              </Link>
+            ) : (
+              <div className={cardClass}>
+                {/* Top: title + subtitle */}
+                <div>
+                  {card.title && (
+                    <h3 className="text-lg md:text-2xl lg:text-3xl font-extrabold text-primary leading-tight mb-2 whitespace-pre-line">
+                      {formatCardTitle(card.title)}
+                    </h3>
+                  )}
+                  {card.subtitle && (
+                    <p className="text-sm md:text-base font-medium text-gray-800/80">
+                      {card.subtitle}
+                    </p>
+                  )}
+                </div>
+
+                {/* Bottom-left: arrow button */}
+                <div className="flex justify-between items-end relative z-10">
+                  <span
+                    className="relative w-10 h-10 md:w-12 md:h-12 bg-primary rounded-full flex items-center justify-center overflow-hidden transition-all duration-700 ease-out group-hover:scale-110 group-hover:rotate-[45deg]"
+                    aria-hidden="true"
+                  >
+                    {/* White fill expanding from center */}
+                    <span className="absolute -inset-3 bg-white rounded-full scale-0 group-hover:scale-100 transition-transform duration-300 ease-out" />
+                    <svg
+                      className="relative z-10 w-4 h-4 md:w-5 md:h-5 text-white transition-colors duration-700 ease-out group-hover:text-primary"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M7 17L17 7M17 7H7M17 7v10"
+                      />
+                    </svg>
+                  </span>
+                </div>
+
+                {/* Background decorative element */}
+                <span
+                  className={[
+                    "absolute -right-8 -bottom-8 text-[8rem] md:text-[10rem] pointer-events-none select-none group-hover:scale-110 transition-transform duration-700 ease-out opacity-[0.12]",
+                    deco.rotation,
+                  ].join(" ")}
+                  aria-hidden="true"
+                >
+                  {deco.emoji}
+                </span>
+              </div>
+            )}
           </motion.div>
         );
       })}

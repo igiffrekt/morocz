@@ -217,11 +217,23 @@ export const privacyPolicyQuery = defineQuery(
 // ─── Scheduling & Booking Queries ─────────────────────────────────────────────
 
 export const weeklyScheduleQuery = defineQuery(`*[_type == "weeklySchedule" && _id == "weeklySchedule"][0]{
-  monday, tuesday, wednesday, thursday, friday, saturday, sunday
+  defaultSlotDuration,
+  bufferMinutes,
+  days[]{
+    _key,
+    dayOfWeek,
+    isDayOff,
+    startTime,
+    endTime
+  }
 }`);
 
-export const blockedDatesQuery = defineQuery(`*[_type == "blockedDate"] | order(startDate asc){
-  _id, startDate, endDate, reason
+export const blockedDatesQuery = defineQuery(`*[_type == "blockedDate" && _id == "blockedDate"][0]{
+  dates[]{
+    _key,
+    date,
+    isHoliday
+  }
 }`);
 
 export const slotLockByIdQuery = defineQuery(`*[_type == "slotLock" && _id == $slotLockId][0]{

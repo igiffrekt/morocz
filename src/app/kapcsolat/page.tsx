@@ -226,10 +226,12 @@ const fallbackData: KapcsolatData = {
 function SectionHeader({ label, title, subtitle }: { label: string; title: string; subtitle: string }) {
   return (
     <div style={{ marginBottom: "48px" }}>
-      <div style={{ width: "40px", height: "4px", background: "#a8d5ba", borderRadius: "9999px", marginBottom: "12px" }} />
-      <p style={{ fontSize: "0.75rem", fontWeight: 600, color: "#8B98B8", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "8px" }}>
-        {label}
-      </p>
+      <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
+        <div style={{ width: "30px", height: "3px", background: "#a8d5ba", borderRadius: "9999px", flexShrink: 0 }} />
+        <p style={{ fontSize: "0.75rem", fontWeight: 600, color: "#8B98B8", textTransform: "uppercase", letterSpacing: "0.1em", margin: 0 }}>
+          {label}
+        </p>
+      </div>
       <h2 style={{ fontSize: "clamp(1.75rem, 5vw, 2.75rem)", fontWeight: 800, color: "#1e2952", lineHeight: 1.2, margin: 0, marginBottom: "12px" }}>
         {title}
       </h2>

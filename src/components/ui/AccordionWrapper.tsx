@@ -17,10 +17,12 @@ interface AccordionWrapperProps {
 function SectionHeader({ label, title, subtitle }: { label: string; title: string; subtitle: string }) {
   return (
     <div style={{ marginBottom: "24px" }}>
-      <div style={{ width: "32px", height: "3px", background: "#a8d5ba", borderRadius: "9999px", marginBottom: "8px" }} />
-      <p style={{ fontSize: "0.7rem", fontWeight: 600, color: "rgba(139,152,184,1)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "6px" }}>
-        {label}
-      </p>
+      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+        <div style={{ width: "25px", height: "2.5px", background: "#a8d5ba", borderRadius: "9999px", flexShrink: 0 }} />
+        <p style={{ fontSize: "0.7rem", fontWeight: 600, color: "rgba(139,152,184,1)", textTransform: "uppercase", letterSpacing: "0.1em", margin: 0 }}>
+          {label}
+        </p>
+      </div>
       <h2 style={{ fontSize: "clamp(1.25rem, 5vw, 2.75rem)", fontWeight: 800, color: "#1e2952", lineHeight: 1.2, margin: 0, marginBottom: "8px" }}>
         {title}
       </h2>

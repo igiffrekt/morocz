@@ -16,17 +16,17 @@ interface AccordionWrapperProps {
 
 function SectionHeader({ label, title, subtitle }: { label: string; title: string; subtitle: string }) {
   return (
-    <div style={{ marginBottom: "48px" }}>
-      <p style={{ fontSize: "0.75rem", fontWeight: 600, color: "rgba(139,152,184,1)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "8px" }}>
+    <div style={{ marginBottom: "32px" }}>
+      <p style={{ fontSize: "0.7rem", fontWeight: 600, color: "rgba(139,152,184,1)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "6px" }}>
         {label}
       </p>
-      <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px", flexWrap: "wrap" }}>
-        <h2 style={{ fontSize: "clamp(1.75rem, 5vw, 2.75rem)", fontWeight: 800, color: "#1e2952", lineHeight: 1.2, margin: 0 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px", flexWrap: "wrap" }}>
+        <h2 style={{ fontSize: "clamp(1.25rem, 4vw, 2.75rem)", fontWeight: 800, color: "#1e2952", lineHeight: 1.2, margin: 0 }}>
           {title}
         </h2>
-        <div style={{ width: "40px", height: "4px", background: "#a8d5ba", borderRadius: "9999px", marginTop: "4px" }} />
+        <div style={{ width: "32px", height: "3px", background: "#a8d5ba", borderRadius: "9999px", marginTop: "4px" }} />
       </div>
-      <p style={{ fontSize: "0.875rem", color: "rgba(139,152,184,1)", maxWidth: "600px", lineHeight: 1.6 }}>
+      <p style={{ fontSize: "0.8rem", color: "rgba(139,152,184,1)", maxWidth: "600px", lineHeight: 1.5 }}>
         {subtitle}
       </p>
     </div>
@@ -38,6 +38,7 @@ interface ColumnSectionProps {
   subtitle: string;
   label: string;
   items: AccordionItemProps[];
+  isMobile?: boolean;
 }
 
 function ColumnSection({
@@ -45,6 +46,7 @@ function ColumnSection({
   subtitle,
   label,
   items,
+  isMobile = false,
 }: ColumnSectionProps) {
   const [openCardId, setOpenCardId] = useState<string | null>(null);
   const [expandedCol, setExpandedCol] = useState(-1);
@@ -55,74 +57,77 @@ function ColumnSection({
     if (busyRef.current) return;
 
     if (openCardId === cardId) {
-      // Closing: content collapses first, THEN column shrinks
       busyRef.current = true;
       setOpenCardId(null);
       
-      // Wait for accordion content to collapse (350ms from homepage)
-      setTimeout(() => {
-        setAnimateFlex(true);
-        setExpandedCol(-1);
-        
-        // Wait for flex animation
-        setTimeout(() => {
-          setAnimateFlex(false);
-          busyRef.current = false;
-        }, 350);
-      }, 350);
-      return;
-    }
-
-    // Opening: column expands FIRST, THEN content opens
-    const itemsPerColumn = Math.ceil(items.length / 2);
-    const newCol = cardIndex < itemsPerColumn ? 0 : 1;
-    
-    if (openCardId !== null) {
-      const oldIndex = items.findIndex(item => item.id === openCardId);
-      const oldCol = oldIndex < itemsPerColumn ? 0 : 1;
-
-      if (newCol === oldCol) {
-        // Same column: just swap content (no flex change)
-        busyRef.current = true;
-        setOpenCardId(null);
-        setTimeout(() => {
-          setOpenCardId(cardId);
-          busyRef.current = false;
-        }, 300);
-      } else {
-        // Different column: column shrinks → flex expands → content opens
-        busyRef.current = true;
-        setOpenCardId(null);
-        
-        // Content collapses
+      if (!isMobile) {
         setTimeout(() => {
           setAnimateFlex(true);
           setExpandedCol(-1);
           
-          // Flex animation completes, then open new
           setTimeout(() => {
             setAnimateFlex(false);
-            setExpandedCol(newCol);
-            setOpenCardId(cardId);
             busyRef.current = false;
           }, 350);
-        }, 300);
+        }, 350);
+      } else {
+        busyRef.current = false;
       }
       return;
     }
 
-    // Fresh open: column expands, THEN content opens
-    busyRef.current = true;
-    setExpandedCol(newCol);
-    
-    // Let flex animation start, then open accordion
-    setTimeout(() => {
+    if (!isMobile) {
+      // Desktop: expand column
+      const itemsPerColumn = Math.ceil(items.length / 2);
+      const newCol = cardIndex < itemsPerColumn ? 0 : 1;
+      
+      if (openCardId !== null) {
+        const oldIndex = items.findIndex(item => item.id === openCardId);
+        const oldCol = oldIndex < itemsPerColumn ? 0 : 1;
+
+        if (newCol === oldCol) {
+          busyRef.current = true;
+          setOpenCardId(null);
+          setTimeout(() => {
+            setOpenCardId(cardId);
+            busyRef.current = false;
+          }, 300);
+        } else {
+          busyRef.current = true;
+          setOpenCardId(null);
+          
+          setTimeout(() => {
+            setAnimateFlex(true);
+            setExpandedCol(-1);
+            
+            setTimeout(() => {
+              setAnimateFlex(false);
+              setExpandedCol(newCol);
+              setOpenCardId(cardId);
+              busyRef.current = false;
+            }, 350);
+          }, 300);
+        }
+      } else {
+        busyRef.current = true;
+        setExpandedCol(newCol);
+        
+        setTimeout(() => {
+          setOpenCardId(cardId);
+          busyRef.current = false;
+        }, 150);
+      }
+    } else {
+      // Mobile: just open/close without column expansion
+      busyRef.current = true;
       setOpenCardId(cardId);
-      busyRef.current = false;
-    }, 150);
+      setTimeout(() => {
+        busyRef.current = false;
+      }, 350);
+    }
   };
 
-  // Split into 2 columns within this section
+  // Split into 2 columns within this section (desktop only)
   const itemsPerColumn = Math.ceil(items.length / 2);
   const column1 = items.slice(0, itemsPerColumn);
   const column2 = items.slice(itemsPerColumn);
@@ -136,20 +141,10 @@ function ColumnSection({
     <>
       <SectionHeader label={label} title={title} subtitle={subtitle} />
 
-      {/* 2-column accordion grid with SEQUENTIAL flex animation */}
-      <div style={{ display: "flex", gap: "16px" }}>
-        {/* Column 1 */}
-        <div
-          style={{
-            flex: getColFlex(0),
-            display: "flex",
-            flexDirection: "column",
-            gap: "16px",
-            minWidth: 0,
-            transition: animateFlex ? "flex 0.35s cubic-bezier(0.25, 1, 0.5, 1)" : "none",
-          }}
-        >
-          {column1.map((item, idx) => (
+      {/* Mobile: single column */}
+      {isMobile && (
+        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+          {items.map((item, idx) => (
             <AccordionCard
               key={item.id}
               card={item}
@@ -159,29 +154,54 @@ function ColumnSection({
             />
           ))}
         </div>
+      )}
 
-        {/* Column 2 */}
-        <div
-          style={{
-            flex: getColFlex(1),
-            display: "flex",
-            flexDirection: "column",
-            gap: "16px",
-            minWidth: 0,
-            transition: animateFlex ? "flex 0.35s cubic-bezier(0.25, 1, 0.5, 1)" : "none",
-          }}
-        >
-          {column2.map((item, idx) => (
-            <AccordionCard
-              key={item.id}
-              card={item}
-              index={itemsPerColumn + idx}
-              isOpen={openCardId === item.id}
-              onToggle={() => handleToggle(item.id, itemsPerColumn + idx)}
-            />
-          ))}
+      {/* Desktop: 2-column with flex expansion */}
+      {!isMobile && (
+        <div style={{ display: "flex", gap: "16px" }}>
+          <div
+            style={{
+              flex: getColFlex(0),
+              display: "flex",
+              flexDirection: "column",
+              gap: "16px",
+              minWidth: 0,
+              transition: animateFlex ? "flex 0.35s cubic-bezier(0.25, 1, 0.5, 1)" : "none",
+            }}
+          >
+            {column1.map((item, idx) => (
+              <AccordionCard
+                key={item.id}
+                card={item}
+                index={idx}
+                isOpen={openCardId === item.id}
+                onToggle={() => handleToggle(item.id, idx)}
+              />
+            ))}
+          </div>
+
+          <div
+            style={{
+              flex: getColFlex(1),
+              display: "flex",
+              flexDirection: "column",
+              gap: "16px",
+              minWidth: 0,
+              transition: animateFlex ? "flex 0.35s cubic-bezier(0.25, 1, 0.5, 1)" : "none",
+            }}
+          >
+            {column2.map((item, idx) => (
+              <AccordionCard
+                key={item.id}
+                card={item}
+                index={itemsPerColumn + idx}
+                isOpen={openCardId === item.id}
+                onToggle={() => handleToggle(item.id, itemsPerColumn + idx)}
+              />
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 }
@@ -202,30 +222,32 @@ export function AccordionWrapper({
         maxWidth: "100%",
         paddingLeft: "16px",
         paddingRight: "16px",
-        marginBottom: "96px",
+        marginBottom: "64px",
         display: "grid",
         gridTemplateColumns: "1fr 1fr",
-        gap: "32px",
+        gap: "20px",
       }}
-      className="md:gap-6 lg:grid-cols-2 md:grid-cols-1 grid-cols-1"
+      className="md:gap-4 lg:grid-cols-2 lg:gap-6 lg:mb-24 md:grid-cols-1 grid-cols-1"
     >
       {/* Left: Hasznos - Mint background */}
       <div
         style={{
           background: "#d3e8e0",
-          borderRadius: "32px",
-          paddingTop: "96px",
-          paddingBottom: "96px",
+          borderRadius: "24px",
+          paddingTop: "48px",
+          paddingBottom: "48px",
           paddingLeft: "16px",
           paddingRight: "16px",
         }}
+        className="md:rounded-3xl md:py-16 lg:rounded-4xl lg:py-20"
       >
-        <div style={{ maxWidth: "80rem", marginLeft: "auto", marginRight: "auto", paddingLeft: "16px", paddingRight: "16px" }}>
+        <div style={{ maxWidth: "80rem", marginLeft: "auto", marginRight: "auto", paddingLeft: "0", paddingRight: "0" }}>
           <ColumnSection
             label={leftLabel}
             title={leftTitle}
             subtitle={leftSubtitle}
             items={leftItems}
+            isMobile={true}
           />
         </div>
       </div>
@@ -234,20 +256,22 @@ export function AccordionWrapper({
       <div
         style={{
           background: "white",
-          borderRadius: "32px",
-          paddingTop: "96px",
-          paddingBottom: "96px",
+          borderRadius: "24px",
+          paddingTop: "48px",
+          paddingBottom: "48px",
           paddingLeft: "16px",
           paddingRight: "16px",
-          boxShadow: "0 10px 40px -5px rgba(0, 0, 0, 0.08)",
+          boxShadow: "0 4px 20px -2px rgba(0, 0, 0, 0.06)",
         }}
+        className="md:rounded-3xl md:py-16 md:shadow-md lg:rounded-4xl lg:py-20 lg:shadow-lg"
       >
-        <div style={{ maxWidth: "80rem", marginLeft: "auto", marginRight: "auto", paddingLeft: "16px", paddingRight: "16px" }}>
+        <div style={{ maxWidth: "80rem", marginLeft: "auto", marginRight: "auto", paddingLeft: "0", paddingRight: "0" }}>
           <ColumnSection
             label={rightLabel}
             title={rightTitle}
             subtitle={rightSubtitle}
             items={rightItems}
+            isMobile={true}
           />
         </div>
       </div>

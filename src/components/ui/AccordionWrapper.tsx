@@ -16,17 +16,17 @@ interface AccordionWrapperProps {
 
 function SectionHeader({ label, title, subtitle }: { label: string; title: string; subtitle: string }) {
   return (
-    <div style={{ marginBottom: "32px" }}>
+    <div style={{ marginBottom: "24px" }}>
       <p style={{ fontSize: "0.7rem", fontWeight: 600, color: "rgba(139,152,184,1)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "6px" }}>
         {label}
       </p>
       <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px", flexWrap: "wrap" }}>
-        <h2 style={{ fontSize: "clamp(1.25rem, 4vw, 2.75rem)", fontWeight: 800, color: "#1e2952", lineHeight: 1.2, margin: 0 }}>
+        <h2 style={{ fontSize: "clamp(1.25rem, 5vw, 2.75rem)", fontWeight: 800, color: "#1e2952", lineHeight: 1.2, margin: 0 }}>
           {title}
         </h2>
-        <div style={{ width: "32px", height: "3px", background: "#a8d5ba", borderRadius: "9999px", marginTop: "4px" }} />
+        <div style={{ width: "32px", height: "3px", background: "#a8d5ba", borderRadius: "9999px" }} />
       </div>
-      <p style={{ fontSize: "0.8rem", color: "rgba(139,152,184,1)", maxWidth: "600px", lineHeight: 1.5 }}>
+      <p style={{ fontSize: "0.8rem", color: "rgba(139,152,184,1)", lineHeight: 1.5 }}>
         {subtitle}
       </p>
     </div>
@@ -218,62 +218,28 @@ export function AccordionWrapper({
 }: AccordionWrapperProps) {
   return (
     <section
-      style={{
-        maxWidth: "100%",
-        paddingLeft: "16px",
-        paddingRight: "16px",
-        marginBottom: "64px",
-        display: "grid",
-        gridTemplateColumns: "1fr 1fr",
-        gap: "20px",
-      }}
-      className="md:gap-4 lg:grid-cols-2 lg:gap-6 lg:mb-24 md:grid-cols-1 grid-cols-1"
+      className="max-w-6xl mx-auto px-4 sm:px-6 mb-16 sm:mb-20 md:mb-24 grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 lg:gap-8"
     >
       {/* Left: Hasznos - Mint background */}
-      <div
-        style={{
-          background: "#d3e8e0",
-          borderRadius: "24px",
-          paddingTop: "48px",
-          paddingBottom: "48px",
-          paddingLeft: "16px",
-          paddingRight: "16px",
-        }}
-        className="md:rounded-3xl md:py-16 lg:rounded-4xl lg:py-20"
-      >
-        <div style={{ maxWidth: "80rem", marginLeft: "auto", marginRight: "auto", paddingLeft: "0", paddingRight: "0" }}>
-          <ColumnSection
-            label={leftLabel}
-            title={leftTitle}
-            subtitle={leftSubtitle}
-            items={leftItems}
-            isMobile={true}
-          />
-        </div>
+      <div className="bg-green-100 rounded-2xl sm:rounded-3xl lg:rounded-4xl p-6 sm:p-8 md:p-12 lg:p-20">
+        <ColumnSection
+          label={leftLabel}
+          title={leftTitle}
+          subtitle={leftSubtitle}
+          items={leftItems}
+          isMobile={true}
+        />
       </div>
 
       {/* Right: Fontos - White card */}
-      <div
-        style={{
-          background: "white",
-          borderRadius: "24px",
-          paddingTop: "48px",
-          paddingBottom: "48px",
-          paddingLeft: "16px",
-          paddingRight: "16px",
-          boxShadow: "0 4px 20px -2px rgba(0, 0, 0, 0.06)",
-        }}
-        className="md:rounded-3xl md:py-16 md:shadow-md lg:rounded-4xl lg:py-20 lg:shadow-lg"
-      >
-        <div style={{ maxWidth: "80rem", marginLeft: "auto", marginRight: "auto", paddingLeft: "0", paddingRight: "0" }}>
-          <ColumnSection
-            label={rightLabel}
-            title={rightTitle}
-            subtitle={rightSubtitle}
-            items={rightItems}
-            isMobile={true}
-          />
-        </div>
+      <div className="bg-white rounded-2xl sm:rounded-3xl lg:rounded-4xl p-6 sm:p-8 md:p-12 lg:p-20 shadow-md md:shadow-lg">
+        <ColumnSection
+          label={rightLabel}
+          title={rightTitle}
+          subtitle={rightSubtitle}
+          items={rightItems}
+          isMobile={true}
+        />
       </div>
     </section>
   );

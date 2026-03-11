@@ -31,23 +31,49 @@ export function BlogSection({ heading, posts }: BlogSectionProps) {
 
   return (
     <section id="blog" aria-labelledby="blog-cim" className="px-4 py-12 md:py-20">
-      {/* Header row: heading left, link right */}
-      <FadeIn viewport>
-        <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-          {heading && (
-            <h2
-              id="blog-cim"
-              className="max-w-md text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight text-primary"
-            >
-              {heading}
-            </h2>
-          )}
-        </div>
-      </FadeIn>
+      {/* Header: overline, heading, subheading */}
+      <div className="mb-12">
+        {/* Overline with decorative line */}
+        <motion.span
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="inline-flex items-center gap-3 text-xs font-semibold tracking-[0.2em] uppercase text-primary/40 mb-4"
+        >
+          <span className="w-8 h-px bg-primary/20" />
+          Blog Cikkek
+        </motion.span>
 
-      {/* Cards grid — 30/70 split on desktop */}
+        {/* Heading */}
+        {heading && (
+          <motion.h2
+            id="blog-cim"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
+            className="text-3xl md:text-4xl font-extrabold text-primary mb-4"
+          >
+            {heading}
+          </motion.h2>
+        )}
+
+        {/* Subheading */}
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
+          className="text-base text-primary/45"
+        >
+          Read our latest insights about medical care and wellness
+        </motion.p>
+      </div>
+
+      {/* Cards grid – 30/70 split on desktop */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-[2fr_3fr]">
-        {/* Left card — grey background, compact */}
+        {/* Left card – grey background, compact */}
         {leftPost && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -99,7 +125,7 @@ export function BlogSection({ heading, posts }: BlogSectionProps) {
           </motion.div>
         )}
 
-        {/* Right card — accent/teal background, title + button aligned bottom */}
+        {/* Right card – featured image background with text overlay */}
         {rightPost && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -109,10 +135,25 @@ export function BlogSection({ heading, posts }: BlogSectionProps) {
           >
             <CircleWipeLink
               href={`/blog/${rightPost.slug?.current}`}
-              className="group relative flex h-full flex-col overflow-hidden rounded-3xl bg-accent p-12 transition-shadow hover:shadow-md md:flex-row md:gap-6"
+              className="group relative flex h-full flex-col overflow-hidden rounded-3xl transition-shadow hover:shadow-md"
             >
-              {/* Text side — category top, title + button bottom */}
-              <div className="flex flex-1 flex-col">
+              {/* Featured image as background (80% transparent = 20% opacity) */}
+              <div className="absolute inset-0">
+                {rightHasImage && rightPost.featuredImage ? (
+                  <Image
+                    src={urlFor(rightPost.featuredImage).width(800).height(500).url()}
+                    alt={rightPost.title ?? "Blog bejegyzés"}
+                    width={800}
+                    height={500}
+                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105 opacity-20"
+                  />
+                ) : (
+                  <div className="h-full w-full bg-gray-200/60" />
+                )}
+              </div>
+
+              {/* Text overlay on top of image */}
+              <div className="relative flex flex-col p-8 md:p-12">
                 <CategoryPill name={rightPost.category?.name} />
 
                 <div className="mt-auto flex flex-col gap-8 pt-6">
@@ -121,7 +162,7 @@ export function BlogSection({ heading, posts }: BlogSectionProps) {
                   </h3>
 
                   <span className="relative inline-flex w-fit items-center">
-                    {/* Left circle — hidden, scales in on hover */}
+                    {/* Left circle – hidden, scales in on hover */}
                     <span className="absolute left-0 top-1/2 flex h-12 w-12 -translate-y-1/2 scale-0 items-center justify-center rounded-full bg-white text-primary transition-transform duration-500 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] group-hover:scale-100">
                       <svg
                         className="h-5 w-5"
@@ -139,11 +180,11 @@ export function BlogSection({ heading, posts }: BlogSectionProps) {
                         />
                       </svg>
                     </span>
-                    {/* Pill — slides right on hover */}
+                    {/* Pill – slides right on hover */}
                     <span className="inline-flex h-12 items-center rounded-full bg-white px-7 text-sm font-bold text-primary whitespace-nowrap transition-transform duration-500 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] group-hover:translate-x-12">
                       Elolvasom
                     </span>
-                    {/* Right circle — scales out on hover */}
+                    {/* Right circle – scales out on hover */}
                     <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white text-primary transition-transform duration-500 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] group-hover:scale-0">
                       <svg
                         className="h-5 w-5"
@@ -162,41 +203,6 @@ export function BlogSection({ heading, posts }: BlogSectionProps) {
                       </svg>
                     </span>
                   </span>
-                </div>
-              </div>
-
-              {/* Image side with decorative yellow circle */}
-              <div className="relative mt-6 flex shrink-0 items-center justify-center md:mt-0 md:self-center">
-                <div className="absolute h-36 w-36 rounded-full bg-yellow-card/60 md:h-44 md:w-44" />
-                <div className="relative h-36 w-36 overflow-hidden rounded-full md:h-44 md:w-44">
-                  {rightHasImage && rightPost.featuredImage ? (
-                    <Image
-                      src={urlFor(rightPost.featuredImage).width(360).height(360).url()}
-                      alt={rightPost.title ?? "Blog bejegyzés"}
-                      width={360}
-                      height={360}
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center bg-accent/50">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="40"
-                        height="40"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1"
-                        className="text-primary/15"
-                        aria-hidden="true"
-                      >
-                        <title>Kép helykitöltő</title>
-                        <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
-                        <circle cx="9" cy="9" r="2" />
-                        <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
-                      </svg>
-                    </div>
-                  )}
                 </div>
               </div>
             </CircleWipeLink>

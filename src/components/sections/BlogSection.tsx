@@ -67,7 +67,7 @@ export function BlogSection({ heading, posts }: BlogSectionProps) {
           transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
           className="text-base text-primary/45"
         >
-          Hírek és újdonságok a noi egészség témakörben
+          HÃ­rek Ã©s ÃºjdonsÃ¡gok a nÅ‘i egÃ©szsÃ©g tÃ©makÃ¶rben
         </motion.p>
       </div>
 

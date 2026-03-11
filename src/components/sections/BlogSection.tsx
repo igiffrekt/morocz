@@ -42,7 +42,7 @@ export function BlogSection({ heading, posts }: BlogSectionProps) {
           className="inline-flex items-center gap-3 text-xs font-semibold tracking-[0.2em] uppercase text-primary/40 mb-4"
         >
           <span className="w-8 h-px bg-primary/20" />
-          Blog Cikkek
+          BLOG
         </motion.span>
 
         {/* Heading */}
@@ -67,7 +67,7 @@ export function BlogSection({ heading, posts }: BlogSectionProps) {
           transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
           className="text-base text-primary/45"
         >
-          Read our latest insights about medical care and wellness
+          Hírek és újdonságok a noi egészség témakörben
         </motion.p>
       </div>
 
@@ -212,3 +212,4 @@ export function BlogSection({ heading, posts }: BlogSectionProps) {
     </section>
   );
 }
+

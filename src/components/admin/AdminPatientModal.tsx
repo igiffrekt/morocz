@@ -2,8 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { AdminBooking } from "@/components/admin/AdminDashboard";
+import AdminPatientHistory from "@/components/admin/AdminPatientHistory";
 
-// ─── Helpers ───────────────────────────────────────────────────────────────────
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function formatHungarianDate(dateStr: string): string {
   const [year, month, day] = dateStr.split("-").map(Number);
@@ -24,7 +25,7 @@ function isWithin24Hours(slotDate: string, slotTime: string): boolean {
   return (appt.getTime() - Date.now()) / (1000 * 60 * 60) < 24;
 }
 
-// ─── Props ─────────────────────────────────────────────────────────────────────
+// ─── Props ───────────────────────────────────────────────────────────────────
 
 interface AdminPatientModalProps {
   booking: AdminBooking;
@@ -32,11 +33,11 @@ interface AdminPatientModalProps {
   onCancelled: () => void;
 }
 
-// ─── Sub-types ─────────────────────────────────────────────────────────────────
+// ─── Sub-types ───────────────────────────────────────────────────────────────
 
 type ModalView = "detail" | "cancel-confirm";
 
-// ─── Component ─────────────────────────────────────────────────────────────────
+// ─── Component ───────────────────────────────────────────────────────────────
 
 export default function AdminPatientModal({
   booking,
@@ -44,6 +45,7 @@ export default function AdminPatientModal({
   onCancelled,
 }: AdminPatientModalProps) {
   const [view, setView] = useState<ModalView>("detail");
+  const [activeTab, setActiveTab] = useState<"bookings" | "history">("bookings");
   const [menuOpen, setMenuOpen] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
   const [isCancelling, setIsCancelling] = useState(false);
@@ -58,7 +60,7 @@ export default function AdminPatientModal({
   const canCancel = !isCancelled && !isWithin24Hours(booking.slotDate, booking.slotTime);
   const formattedDate = formatHungarianDate(booking.slotDate);
 
-  // ── Fetch patient booking history ────────────────────────────────────────────
+  // ── Fetch patient booking history ──────────────────────────────────────────
   useEffect(() => {
     setHistoryLoading(true);
     void fetch(`/api/admin/bookings?email=${encodeURIComponent(booking.patientEmail)}`)
@@ -74,7 +76,7 @@ export default function AdminPatientModal({
       });
   }, [booking.patientEmail]);
 
-  // ── Close menu on outside click ──────────────────────────────────────────────
+  // ── Close menu on outside click ────────────────────────────────────────────
   useEffect(() => {
     if (!menuOpen) return;
     function handleOutside(e: MouseEvent) {
@@ -91,7 +93,7 @@ export default function AdminPatientModal({
     return () => document.removeEventListener("mousedown", handleOutside);
   }, [menuOpen]);
 
-  // ── Cancel handler ───────────────────────────────────────────────────────────
+  // ── Cancel handler ─────────────────────────────────────────────────────────
   async function handleCancelConfirm() {
     setIsCancelling(true);
     setCancelError(null);
@@ -117,7 +119,7 @@ export default function AdminPatientModal({
     }
   }
 
-  // ─── Styles ──────────────────────────────────────────────────────────────────
+  // ─── Styles ────────────────────────────────────────────────────────────────
 
   const S = {
     backdrop: {
@@ -177,12 +179,12 @@ export default function AdminPatientModal({
       {/* biome-ignore lint/a11y/noStaticElementInteractions: modal click trap prevents backdrop close */}
       {/* biome-ignore lint/a11y/useKeyWithClickEvents: modal click trap prevents backdrop close */}
       <div style={S.modal} onClick={(e) => e.stopPropagation()}>
-        {/* ── Close (X) button ──────────────────────────────────────────────── */}
+        {/* ── Close (X) button ────────────────────────────────────────────── */}
         <button type="button" style={S.closeBtn} onClick={onClose} aria-label="Bezárás">
           ✕
         </button>
 
-        {/* ── Three-dot menu button ─────────────────────────────────────────── */}
+        {/* ── Three-dot menu button ───────────────────────────────────────── */}
         {canCancel && (
           <button
             ref={menuButtonRef}
@@ -195,7 +197,7 @@ export default function AdminPatientModal({
           </button>
         )}
 
-        {/* ── Dropdown menu ─────────────────────────────────────────────────── */}
+        {/* ── Dropdown menu ───────────────────────────────────────────────── */}
         {menuOpen && canCancel && (
           <div
             ref={menuRef}
@@ -241,7 +243,7 @@ export default function AdminPatientModal({
           </div>
         )}
 
-        {/* ── Patient info section ──────────────────────────────────────────── */}
+        {/* ── Patient info section ────────────────────────────────────────── */}
         <div style={{ marginBottom: "1.25rem" }}>
           <h2
             style={{
@@ -356,10 +358,10 @@ export default function AdminPatientModal({
           </div>
         </div>
 
-        {/* ── Divider ───────────────────────────────────────────────────────── */}
+        {/* ── Divider ─────────────────────────────────────────────────────── */}
         <div style={{ borderTop: "1px solid #e8eaf0", marginBottom: "1.25rem" }} />
 
-        {/* ── Cancel confirmation view ──────────────────────────────────────── */}
+        {/* ── Cancel confirmation view ────────────────────────────────────── */}
         {view === "cancel-confirm" && (
           <div style={{ marginBottom: "1.25rem" }}>
             <h3
@@ -472,7 +474,54 @@ export default function AdminPatientModal({
           </div>
         )}
 
-        {/* ── Booking history section ───────────────────────────────────────── */}
+        {/* ── Tabs ────────────────────────────────────────────────────────── */}
+        <div
+          style={{
+            display: "flex",
+            gap: "0.5rem",
+            marginBottom: "1.25rem",
+            borderBottom: "1px solid #e8eaf0",
+            paddingBottom: "0.75rem",
+          }}
+        >
+          <button
+            type="button"
+            onClick={() => setActiveTab("bookings")}
+            style={{
+              background: "none",
+              border: "none",
+              padding: "0.375rem 0.75rem",
+              fontSize: "0.8125rem",
+              fontWeight: activeTab === "bookings" ? 600 : 500,
+              color: activeTab === "bookings" ? "#242a5f" : "#94a3b8",
+              borderBottom: activeTab === "bookings" ? "2px solid #242a5f" : "none",
+              marginBottom: "-0.75rem",
+              cursor: "pointer",
+            }}
+          >
+            Jelenlegi foglalások
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("history")}
+            style={{
+              background: "none",
+              border: "none",
+              padding: "0.375rem 0.75rem",
+              fontSize: "0.8125rem",
+              fontWeight: activeTab === "history" ? 600 : 500,
+              color: activeTab === "history" ? "#242a5f" : "#94a3b8",
+              borderBottom: activeTab === "history" ? "2px solid #242a5f" : "none",
+              marginBottom: "-0.75rem",
+              cursor: "pointer",
+            }}
+          >
+            Foglalási történet
+          </button>
+        </div>
+
+        {/* ── Booking history section ─────────────────────────────────────── */}
+        {activeTab === "bookings" && (
         <div>
           <h3
             style={{
@@ -604,6 +653,12 @@ export default function AdminPatientModal({
               </div>
             )}
         </div>
+        )}
+
+        {/* ── Appointment History tab ─────────────────────────────────────── */}
+        {activeTab === "history" && (
+          <AdminPatientHistory patientEmail={booking.patientEmail} patientName={booking.patientName} patientPhone={booking.patientPhone} />
+        )}
       </div>
     </div>
   );

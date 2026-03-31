@@ -6,7 +6,19 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { FadeIn } from "@/components/motion/FadeIn";
 import { urlFor } from "@/sanity/lib/image";
-import type { SanityImageObject, Slug } from "../../../sanity.types";
+import type { SanityImageCrop, SanityImageHotspot, Slug } from "../../../sanity.types";
+
+// Type definition for Sanity image objects
+type SanityImageObject = {
+  asset?: {
+    _ref: string;
+    _type: "reference";
+  };
+  media?: unknown;
+  hotspot?: SanityImageHotspot;
+  crop?: SanityImageCrop;
+  _type: "image";
+};
 
 interface LabTestData {
   _id: string;

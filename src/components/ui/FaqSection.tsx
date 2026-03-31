@@ -58,7 +58,7 @@ export function FaqSection({
           {column1Items.map((item, index) => (
             <AccordionCard
               key={item.id}
-              item={item}
+              card={item}
               index={index}
               isOpen={openCardId === item.id}
               onToggle={() => handleToggle(item.id)}
@@ -71,7 +71,7 @@ export function FaqSection({
           {column2Items.map((item, index) => (
             <AccordionCard
               key={item.id}
-              item={item}
+              card={item}
               index={itemsPerColumn + index}
               isOpen={openCardId === item.id}
               onToggle={() => handleToggle(item.id)}

@@ -20,7 +20,6 @@ export async function GET(request: Request) {
         name: session.user.name,
         email: session.user.email,
         image: session.user.image,
-        phone: session.user.phone || null,
       },
     });
   } catch (error) {

@@ -125,7 +125,7 @@ export function BookingWizard({ services, scheduleData }: BookingWizardProps) {
     // Check immediately
     const checkExpiry = () => {
       const now = new Date().getTime();
-      const expiresAt = new Date(selections.heldUntil).getTime();
+      const expiresAt = new Date(selections.heldUntil!).getTime();
       setHoldExpired(now > expiresAt);
     };
 

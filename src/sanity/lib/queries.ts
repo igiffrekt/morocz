@@ -214,6 +214,14 @@ export const privacyPolicyQuery = defineQuery(
 }`,
 );
 
+export const cookiePolicyQuery = defineQuery(
+  `*[_type == "cookiePolicy" && _id == "cookiePolicy"][0]{
+  title,
+  body,
+  lastUpdated
+}`,
+);
+
 // ─── Scheduling & Booking Queries ─────────────────────────────────────────────
 
 export const weeklyScheduleQuery = defineQuery(`*[_type == "weeklySchedule" && _id == "weeklySchedule"][0]{
@@ -255,12 +263,110 @@ export const servicesForBookingQuery = defineQuery(`*[_type == "service"] | orde
 export const KAPCSOLAT_QUERY = defineQuery(`*[_type == "kapcsolat"][0]{
   heroTitle,
   heroDescription,
-  phoneNumbers,
-  emailAddresses,
+  heroImage{
+    asset->{url, alt},
+    hotspot
+  },
+  phoneNumbers[]{label, number, iconName},
+  heroEmailAddresses[]{label, email, iconName},
+  emailAddresses[]{label, email, iconName, _key},
   address,
+  officeHoursTitle,
+  officeHoursIconName,
   officeHours,
-  informationCards,
-  importantNotices,
-  ctaButtonText,
-  ctaButtonUrl
+  locationTitle,
+  locationIconName,
+  locationImage{
+    asset->{url, alt},
+    hotspot
+  },
+  locationLat,
+  locationLng,
+  goodToKnowLabel,
+  goodToKnowTitle,
+  goodToKnowSubtitle,
+  goodToKnowCards[]{iconName, title, description, url},
+  hasznos_label,
+  hasznos_title,
+  hasznos_subtitle,
+  hasznos_items[]{title, body, iconName, _key},
+  fontos_label,
+  fontos_title,
+  fontos_subtitle,
+  fontos_items[]{title, body, iconName, _key}
+}`);
+
+// ─── Yoga Page ───────────────────────────────────────────────────────────────
+// Revalidation tag: "yogaPage"
+
+export const yogaPageQuery = defineQuery(`*[_type == "yogaPage"][0]{
+  heroHeadline,
+  heroSubtitle,
+  heroImage,
+  heroBadges[]{
+    _key,
+    emoji,
+    text
+  },
+  scheduleHeadline,
+  scheduleSubtitle,
+  instructorsHeadline,
+  metaDescription,
+  ogImage
+}`);
+
+// ─── Yoga Schedule ───────────────────────────────────────────────────────────
+// Revalidation tag: "yogaSchedule"
+
+export const yogaScheduleQuery = defineQuery(`*[_type == "yogaSchedule" && isActive != false] | order(dayOfWeek asc, startTime asc){
+  _id,
+  yogaClass->{
+    name,
+    color,
+    icon,
+    description
+  },
+  instructor->{
+    name,
+    color,
+    photo
+  },
+  dayOfWeek,
+  startTime,
+  endTime,
+  recurrence,
+  location,
+  notes,
+  maxParticipants
+}`);
+
+// ─── Yoga Instructors ────────────────────────────────────────────────────────
+// Revalidation tag: "yogaInstructor"
+
+export const yogaInstructorsQuery = defineQuery(`*[_type == "yogaInstructor"] | order(name asc){
+  _id,
+  name,
+  slug,
+  photo,
+  bio,
+  phone,
+  email,
+  color
+}`);
+
+// ─── Yoga Classes ────────────────────────────────────────────────────────────
+// Revalidation tag: "yogaClass"
+
+export const yogaClassesQuery = defineQuery(`*[_type == "yogaClass"] | order(name asc){
+  _id,
+  name,
+  slug,
+  description,
+  icon,
+  color,
+  instructors[]->{
+    _id,
+    name,
+    photo
+  }
 }`);

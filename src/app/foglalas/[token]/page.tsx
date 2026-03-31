@@ -167,7 +167,7 @@ export default async function FoglalasTokenPage({
           </div>
           <a
             href="/idopontfoglalas"
-            className="inline-block rounded-lg bg-[#99CEB7] px-6 py-3 text-sm font-semibold text-[#23264F] transition hover:bg-[#80bea6]"
+            className="inline-block rounded-lg bg-[#76c8b6] px-6 py-3 text-sm font-semibold text-[#23264F] transition hover:bg-[#80bea6]"
           >
             Új időpont foglalása
           </a>
@@ -193,7 +193,7 @@ export default async function FoglalasTokenPage({
             A foglalt időpontja már elmúlt. Ha új időpontot szeretne foglalni, kattintson az alábbi
             gombra.
           </p>
-          <div className="mb-6 rounded-lg border-l-4 border-[#99CEB7] bg-gray-50 p-4 text-sm">
+          <div className="mb-6 rounded-lg border-l-4 border-[#76c8b6] bg-gray-50 p-4 text-sm">
             <p className="mb-1 font-medium text-gray-500">Szolgáltatás</p>
             <p className="mb-3 font-semibold text-[#23264F]">
               {booking.service?.name ?? "Foglalt szolgáltatás"}

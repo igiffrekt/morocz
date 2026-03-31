@@ -5,7 +5,7 @@ import { PortableTextRenderer } from "@/components/blog/PortableTextRenderer";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import { allLabTestsQuery, labTestBySlugQuery, siteSettingsQuery } from "@/sanity/lib/queries";
-import type { LabTestDetailResult, SiteSettings } from "../../../../sanity.types";
+import type { LabTestBySlugQueryResult, SiteSettings } from "../../../../sanity.types";
 
 // ─── Static Generation ────────────────────────────────────────────────────────
 
@@ -26,7 +26,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const [test, settings] = await Promise.all([
-    sanityFetch<LabTestDetailResult | null>({
+    sanityFetch<LabTestBySlugQueryResult | null>({
       query: labTestBySlugQuery,
       params: { slug },
       tags: ["labTest"],
@@ -65,7 +65,7 @@ function formatPrice(price: number): string {
 export default async function LabTestPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
 
-  const test = await sanityFetch<LabTestDetailResult | null>({
+  const test = await sanityFetch<LabTestBySlugQueryResult | null>({
     query: labTestBySlugQuery,
     params: { slug },
     tags: ["labTest"],

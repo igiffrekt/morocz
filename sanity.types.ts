@@ -12,8 +12,137 @@
  * ---------------------------------------------------------------------------------
  */
 
-// Source: schema definitions (derived from Sanity schema types)
-// Generated: 2026-02-19
+// Source: schema.json
+export type Patient = {
+  _id: string;
+  _type: "patient";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  name?: string;
+  email?: string;
+  phone?: string;
+  lastVisitDate?: string;
+  source?: "imported" | "online";
+  importedAt?: string;
+  notes?: string;
+};
+
+export type SlotLock = {
+  _id: string;
+  _type: "slotLock";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  slotId?: string;
+  status?: "available" | "held" | "booked";
+  heldUntil?: string;
+  bookingRef?: {
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    [internalGroqTypeReferenceTo]?: "booking";
+  };
+};
+
+export type Booking = {
+  _id: string;
+  _type: "booking";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  service?: {
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    [internalGroqTypeReferenceTo]?: "service";
+  };
+  slotDate?: string;
+  slotTime?: string;
+  patientName?: string;
+  patientEmail?: string;
+  patientPhone?: string;
+  reservationNumber?: string;
+  managementToken?: string;
+  userId?: string;
+  status?: "confirmed" | "cancelled" | "rescheduled";
+  createdAt?: string;
+  reminderSent?: boolean;
+  googleCalendarEventId?: string;
+};
+
+export type BlockedDate = {
+  _id: string;
+  _type: "blockedDate";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  dates?: Array<{
+    date?: string;
+    isHoliday?: boolean;
+    _key: string;
+  }>;
+};
+
+export type WeeklySchedule = {
+  _id: string;
+  _type: "weeklySchedule";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  defaultSlotDuration?: 10 | 15 | 20 | 30 | 45 | 60;
+  bufferMinutes?: number;
+  days?: Array<{
+    dayOfWeek?: 1 | 2 | 3 | 4 | 5 | 6 | 0;
+    isDayOff?: boolean;
+    startTime?: string;
+    endTime?: string;
+    _key: string;
+  }>;
+};
+
+export type CookiePolicy = {
+  _id: string;
+  _type: "cookiePolicy";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  slug?: Slug;
+  body?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h2" | "h3" | "h4" | "blockquote";
+    listItem?: "bullet" | "number";
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  } | {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    caption?: string;
+    _type: "image";
+    _key: string;
+  }>;
+  lastUpdated?: string;
+};
 
 export type SanityImageCrop = {
   _type: "sanity.imageCrop";
@@ -31,152 +160,162 @@ export type SanityImageHotspot = {
   width?: number;
 };
 
-export type SanityReference<T = unknown> = {
-  _type: "reference";
-  _ref: string;
-  _weak?: boolean;
-  _strengthenOnPublish?: {
-    type: string;
-    weak?: boolean;
-    template?: {
-      id: string;
-      params?: Record<string, string | number | boolean>;
-    };
-  };
-} & { _referenced?: T };
-
-export type SanityImageAsset = {
-  _type: "sanity.imageAsset";
-  _id: string;
-  url?: string;
-  path?: string;
-  assetId?: string;
-  extension?: string;
-  mimeType?: string;
-  sha1hash?: string;
-  size?: number;
-  originalFilename?: string;
-  metadata?: {
-    _type: "sanity.imageMetadata";
-    dimensions?: {
-      _type: "sanity.imageDimensions";
-      height?: number;
-      width?: number;
-      aspectRatio?: number;
-    };
-    lqip?: string;
-    hasAlpha?: boolean;
-    isOpaque?: boolean;
-  };
-};
-
-export type SanityImageObject = {
-  _type: "image";
-  asset?: SanityReference<SanityImageAsset>;
-  hotspot?: SanityImageHotspot;
-  crop?: SanityImageCrop;
-};
-
 export type Slug = {
   _type: "slug";
   current?: string;
   source?: string;
 };
 
-// ─── Document Types ───────────────────────────────────────────────────────────
-
-export type Homepage = {
+export type PrivacyPolicy = {
   _id: string;
-  _type: "homepage";
+  _type: "privacyPolicy";
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
-  heroHeadline?: string;
-  heroSubtitle?: string;
-  heroBadges?: Array<{
-    _key: string;
-    emoji?: string;
-    text?: string;
-  }>;
-  heroDoctorImage?: SanityImageObject;
-  heroCards?: Array<{
-    _key: string;
-    title?: string;
-    subtitle?: string;
-    icon?: SanityImageObject;
-  }>;
-  servicesHeadline?: string;
-  servicesSubtitle?: string;
-  labTestsHeadline?: string;
-  labTestsSubtitle?: string;
-  testimonialsHeadline?: string; testimonialsCtaText?: string; testimonialsCtaUrl?: string; testimonials?: Array<{ _id: string; patientName?: string; photo?: SanityImageObject; text?: string; condition?: string; order?: number; }>;
-  blogHeadline?: string;
-  ctaHeadline?: string;
-  ctaDescription?: string;
-  metaDescription?: string;
-  ogImage?: SanityImageObject;
-};
-
-export type SiteSettings = {
-  _id: string;
-  _type: "siteSettings";
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  logo?: SanityImageObject;
-  clinicName?: string;
-  phone?: string;
-  email?: string;
-  address?: string;
-  navigationLinks?: Array<{
-    _key: string;
-    label?: string;
-    href?: string;
-  }>;
-  socialLinks?: Array<{
-    _key: string;
-    platform?: "facebook" | "instagram" | "linkedin" | "youtube" | "tiktok";
-    url?: string;
-  }>;
-  footerColumns?: Array<{
-    _key: string;
-    heading?: string;
-    links?: Array<{
+  title?: string;
+  body?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
       _key: string;
-      label?: string;
-      href?: string;
     }>;
+    style?: "normal" | "h2" | "h3" | "h4" | "blockquote";
+    listItem?: "bullet" | "number";
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  } | {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    caption?: string;
+    _type: "image";
+    _key: string;
   }>;
-  privacyPolicyUrl?: string;
+  lastUpdated?: string;
+};
+
+export type BlogPost = {
+  _id: string;
+  _type: "blogPost";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  slug?: Slug;
+  category?: {
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    [internalGroqTypeReferenceTo]?: "blogCategory";
+  };
+  featuredImage?: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  };
+  excerpt?: string;
+  body?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h2" | "h3" | "h4" | "blockquote";
+    listItem?: "bullet" | "number";
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  } | {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    caption?: string;
+    _type: "image";
+    _key: string;
+  }>;
   metaDescription?: string;
-  siteName?: string;
-  defaultOgImage?: SanityImageObject;
+  ogImage?: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  };
+  publishedAt?: string;
 };
 
-export type ServiceCategory = {
+export type BlogCategory = {
   _id: string;
-  _type: "serviceCategory";
+  _type: "blogCategory";
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
   name?: string;
-  emoji?: string;
+  slug?: Slug;
   order?: number;
 };
 
-export type Service = {
+export type Testimonial = {
   _id: string;
-  _type: "service";
+  _type: "testimonial";
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
-  name?: string;
-  description?: string;
-  price?: number;
-  icon?: SanityImageObject;
-  category?: SanityReference<ServiceCategory>;
+  patientName?: string;
+  photo?: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  };
+  text?: string;
+  condition?: string;
   order?: number;
-  appointmentDuration?: 10 | 15 | 20 | 30 | 45 | 60;
 };
 
 export type LabTest = {
@@ -191,269 +330,1065 @@ export type LabTest = {
   price?: number;
   originalPrice?: number;
   discount?: number;
-  illustration?: SanityImageObject;
-  body?: PortableTextBlock[];
+  illustration?: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  };
+  body?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h2" | "h3" | "h4";
+    listItem?: "bullet" | "number";
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
   order?: number;
 };
 
-export type Testimonial = {
+export type Service = {
   _id: string;
-  _type: "testimonial";
+  _type: "service";
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
-  patientName?: string;
-  photo?: SanityImageObject;
-  text?: string;
-  condition?: string;
-  order?: number;
-};
-
-export type BlogCategory = {
-  _id: string;
-  _type: "blogCategory";
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  name?: string;
-  slug?: Slug;
-  order?: number;
-};
-
-export type PortableTextSpan = {
-  _type: "span";
-  _key: string;
-  text?: string;
-  marks?: string[];
-};
-
-export type PortableTextMarkDefLink = {
-  _type: "link";
-  _key: string;
-  href?: string;
-};
-
-export type PortableTextBlock = {
-  _type: "block";
-  _key: string;
-  style?: "normal" | "h2" | "h3" | "h4" | "blockquote";
-  listItem?: "bullet" | "number";
-  children?: PortableTextSpan[];
-  markDefs?: PortableTextMarkDefLink[];
-};
-
-export type BlogPostBodyImage = SanityImageObject & {
-  _key: string;
-  alt?: string;
-  caption?: string;
-};
-
-export type BlogPost = {
-  _id: string;
-  _type: "blogPost";
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title?: string;
-  slug?: Slug;
-  category?: SanityReference<BlogCategory>;
-  featuredImage?: SanityImageObject;
-  excerpt?: string;
-  body?: Array<PortableTextBlock | BlogPostBodyImage>;
-  metaDescription?: string;
-  ogImage?: SanityImageObject;
-  publishedAt?: string;
-};
-
-export type PrivacyPolicy = {
-  _type: "privacyPolicy";
-  _id: string;
-  title?: string;
-  body?: Array<PortableTextBlock | BlogPostBodyImage>;
-  lastUpdated?: string;
-};
-
-// Weekly schedule day configuration
-export type WeeklyScheduleDay = {
-  _key: string;
-  dayOfWeek: 0 | 1 | 2 | 3 | 4 | 5 | 6;
-  isDayOff: boolean;
-  startTime?: string;
-  endTime?: string;
-};
-
-export type WeeklySchedule = {
-  _type: "weeklySchedule";
-  _id: string;
-  defaultSlotDuration: 10 | 15 | 20 | 30 | 45 | 60;
-  bufferMinutes: number;
-  days: WeeklyScheduleDay[];
-};
-
-// Blocked date entry
-export type BlockedDateEntry = {
-  _key: string;
-  date: string;
-  isHoliday: boolean;
-};
-
-export type BlockedDate = {
-  _type: "blockedDate";
-  _id: string;
-  dates: BlockedDateEntry[];
-};
-
-// ─── All Document Types Union ─────────────────────────────────────────────────
-
-// ─── Booking ──────────────────────────────────────────────────────────────────
-
-export type Booking = {
-  _type: "booking";
-  _id: string;
-  service?: SanityReference;
-  slotDate?: string;
-  slotTime?: string;
-  patientName?: string;
-  patientEmail?: string;
-  patientPhone?: string;
-  reservationNumber?: string;
-  managementToken?: string;
-  userId?: string;
-  status?: "confirmed" | "cancelled" | "rescheduled";
-  createdAt?: string;
-  reminderSent?: boolean;
-};
-
-// ─── Slot Lock ────────────────────────────────────────────────────────────────
-
-export type SlotLock = {
-  _type: "slotLock";
-  _id: string;
-  slotId?: string;
-  status?: "available" | "held" | "booked";
-  heldUntil?: string;
-  bookingRef?: SanityReference;
-};
-
-export type AllSanitySchemaTypes =
-  | Homepage
-  | SiteSettings
-  | ServiceCategory
-  | Service
-  | LabTest
-  | Testimonial
-  | BlogCategory
-  | BlogPost
-  | PrivacyPolicy
-  | WeeklySchedule
-  | BlockedDate
-  | Booking
-  | SlotLock;
-
-// ─── Query Result Types ───────────────────────────────────────────────────────
-// These types match the shape returned by GROQ queries that dereference references inline.
-
-export type ServiceQueryResult = {
-  _id: string;
   name?: string;
   description?: string;
   price?: number;
-  icon?: SanityImageObject;
-  category?: { _id: string; name?: string; emoji?: string };
+  icon?: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  };
+  category?: {
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    [internalGroqTypeReferenceTo]?: "serviceCategory";
+  };
   order?: number;
   appointmentDuration?: 10 | 15 | 20 | 30 | 45 | 60;
 };
 
-export type ServiceCategoryQueryResult = {
+export type ServiceCategory = {
   _id: string;
+  _type: "serviceCategory";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
   name?: string;
   emoji?: string;
   order?: number;
 };
 
-export type LabTestQueryResult = {
+export type SiteSettings = {
   _id: string;
-  name?: string;
-  slug?: Slug;
-  description?: string;
-  price?: number;
-  originalPrice?: number;
-  discount?: number;
-  illustration?: SanityImageObject;
-  order?: number;
-};
-
-export type LabTestDetailResult = {
-  _id: string;
-  name?: string;
-  slug?: Slug;
-  description?: string;
-  price?: number;
-  originalPrice?: number;
-  discount?: number;
-  illustration?: SanityImageObject;
-  body?: PortableTextBlock[];
-  order?: number;
-};
-
-export type TestimonialQueryResult = {
-  _id: string;
-  patientName?: string;
-  photo?: SanityImageObject;
-  text?: string;
-  condition?: string;
-  order?: number;
-};
-
-export type BlogPostQueryResult = {
-  _id: string;
-  title?: string;
-  slug?: Slug;
-  category?: { _id: string; name?: string };
-  featuredImage?: SanityImageObject;
-  excerpt?: string;
-};
-
-export type BlogPostDetailResult = {
-  _id: string;
-  title?: string;
-  slug?: Slug;
-  category?: { _id: string; name?: string; slug?: Slug };
-  featuredImage?: SanityImageObject;
-  body?: Array<PortableTextBlock | BlogPostBodyImage>;
-  excerpt?: string;
+  _type: "siteSettings";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  logo?: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  };
+  clinicName?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
+  navigationLinks?: Array<{
+    label?: string;
+    href?: string;
+    _key: string;
+  }>;
+  socialLinks?: Array<{
+    platform?: "facebook" | "instagram" | "linkedin" | "youtube" | "tiktok";
+    url?: string;
+    _key: string;
+  }>;
+  footerColumns?: Array<{
+    heading?: string;
+    links?: Array<{
+      label?: string;
+      href?: string;
+      _key: string;
+    }>;
+    _key: string;
+  }>;
+  privacyPolicyUrl?: string;
   metaDescription?: string;
-  ogImage?: SanityImageObject;
-  publishedAt?: string;
+  siteName?: string;
+  defaultOgImage?: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  };
 };
 
-// ─── Booking Query Result Types ───────────────────────────────────────────────
-
-export type BookingsForDateQueryResult = Array<{
+export type Kapcsolat = {
   _id: string;
-  slotTime?: string;
-  service?: { _id: string; appointmentDuration?: number } | null;
-}>;
-
-export type SlotLocksForDateQueryResult = Array<{
-  _id: string;
+  _type: "kapcsolat";
+  _createdAt: string;
+  _updatedAt: string;
   _rev: string;
-  slotId?: string;
-  status?: "available" | "held" | "booked";
-  heldUntil?: string | null;
-}>;
+  heroTitle?: string;
+  heroDescription?: string;
+  heroImage?: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  };
+  phoneNumbers?: Array<{
+    label?: string;
+    number?: string;
+    iconName?: string;
+    _key: string;
+  }>;
+  heroEmailAddresses?: Array<{
+    label?: string;
+    email?: string;
+    iconName?: string;
+    _key: string;
+  }>;
+  emailAddresses?: Array<{
+    label?: string;
+    email?: string;
+    iconName?: string;
+    _key: string;
+  }>;
+  address?: string;
+  officeHoursTitle?: string;
+  officeHoursIconName?: string;
+  officeHours?: Array<{
+    day?: string;
+    hours?: string;
+    _key: string;
+  }>;
+  locationTitle?: string;
+  locationIconName?: string;
+  locationImage?: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  };
+  locationLat?: number;
+  locationLng?: number;
+  goodToKnowLabel?: string;
+  goodToKnowTitle?: string;
+  goodToKnowSubtitle?: string;
+  goodToKnowCards?: Array<{
+    iconName?: string;
+    title?: string;
+    description?: string;
+    url?: string;
+    _key: string;
+  }>;
+  hasznos_label?: string;
+  hasznos_title?: string;
+  hasznos_subtitle?: string;
+  hasznos_items?: Array<{
+    title?: string;
+    body?: string;
+    iconName?: string;
+    _key: string;
+  }>;
+  fontos_label?: string;
+  fontos_title?: string;
+  fontos_subtitle?: string;
+  fontos_items?: Array<{
+    title?: string;
+    body?: string;
+    iconName?: string;
+    _key: string;
+  }>;
+  ctaTitle?: string;
+  ctaSubtitle?: string;
+  ctaButtonText?: string;
+  ctaButtonUrl?: string;
+};
 
-export type SlotLockByIdQueryResult = {
+export type Homepage = {
   _id: string;
+  _type: "homepage";
+  _createdAt: string;
+  _updatedAt: string;
   _rev: string;
-  status?: "available" | "held" | "booked";
-  heldUntil?: string | null;
+  heroHeadline?: string;
+  heroSubtitle?: string;
+  heroBadges?: Array<{
+    emoji?: string;
+    text?: string;
+    _key: string;
+  }>;
+  heroDoctorImage?: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  };
+  heroCards?: Array<{
+    title?: string;
+    subtitle?: string;
+    icon?: {
+      asset?: {
+        _ref: string;
+        _type: "reference";
+        _weak?: boolean;
+        [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      };
+      media?: unknown;
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      _type: "image";
+    };
+    _key: string;
+  }>;
+  servicesHeadline?: string;
+  servicesSubtitle?: string;
+  labTestsHeadline?: string;
+  labTestsSubtitle?: string;
+  testimonialsHeadline?: string;
+  testimonialsCtaText?: string;
+  testimonialsCtaUrl?: string;
+  testimonials?: Array<{
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    _key: string;
+    [internalGroqTypeReferenceTo]?: "testimonial";
+  }>;
+  blogHeadline?: string;
+  ctaHeadline?: string;
+  ctaDescription?: string;
+  metaDescription?: string;
+  ogImage?: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  };
+};
+
+export type SanityImagePaletteSwatch = {
+  _type: "sanity.imagePaletteSwatch";
+  background?: string;
+  foreground?: string;
+  population?: number;
+  title?: string;
+};
+
+export type SanityImagePalette = {
+  _type: "sanity.imagePalette";
+  darkMuted?: SanityImagePaletteSwatch;
+  lightVibrant?: SanityImagePaletteSwatch;
+  darkVibrant?: SanityImagePaletteSwatch;
+  vibrant?: SanityImagePaletteSwatch;
+  dominant?: SanityImagePaletteSwatch;
+  lightMuted?: SanityImagePaletteSwatch;
+  muted?: SanityImagePaletteSwatch;
+};
+
+export type SanityImageDimensions = {
+  _type: "sanity.imageDimensions";
+  height?: number;
+  width?: number;
+  aspectRatio?: number;
+};
+
+export type SanityImageMetadata = {
+  _type: "sanity.imageMetadata";
+  location?: Geopoint;
+  dimensions?: SanityImageDimensions;
+  palette?: SanityImagePalette;
+  lqip?: string;
+  blurHash?: string;
+  hasAlpha?: boolean;
+  isOpaque?: boolean;
+};
+
+export type SanityFileAsset = {
+  _id: string;
+  _type: "sanity.fileAsset";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  originalFilename?: string;
+  label?: string;
+  title?: string;
+  description?: string;
+  altText?: string;
+  sha1hash?: string;
+  extension?: string;
+  mimeType?: string;
+  size?: number;
+  assetId?: string;
+  uploadId?: string;
+  path?: string;
+  url?: string;
+  source?: SanityAssetSourceData;
+};
+
+export type SanityAssetSourceData = {
+  _type: "sanity.assetSourceData";
+  name?: string;
+  id?: string;
+  url?: string;
+};
+
+export type SanityImageAsset = {
+  _id: string;
+  _type: "sanity.imageAsset";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  originalFilename?: string;
+  label?: string;
+  title?: string;
+  description?: string;
+  altText?: string;
+  sha1hash?: string;
+  extension?: string;
+  mimeType?: string;
+  size?: number;
+  assetId?: string;
+  uploadId?: string;
+  path?: string;
+  url?: string;
+  metadata?: SanityImageMetadata;
+  source?: SanityAssetSourceData;
+};
+
+export type Geopoint = {
+  _type: "geopoint";
+  lat?: number;
+  lng?: number;
+  alt?: number;
+};
+
+export type AllSanitySchemaTypes = Patient | SlotLock | Booking | BlockedDate | WeeklySchedule | CookiePolicy | SanityImageCrop | SanityImageHotspot | Slug | PrivacyPolicy | BlogPost | BlogCategory | Testimonial | LabTest | Service | ServiceCategory | SiteSettings | Kapcsolat | Homepage | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageMetadata | SanityFileAsset | SanityAssetSourceData | SanityImageAsset | Geopoint;
+export declare const internalGroqTypeReferenceTo: unique symbol;
+// Source: ./src/app/api/booking/route.ts
+// Variable: serviceForEmailQuery
+// Query: *[_type == "service" && _id == $serviceId][0]{name, appointmentDuration}
+export type ServiceForEmailQueryResult = {
+  name: string | null;
+  appointmentDuration: 10 | 15 | 20 | 30 | 45 | 60 | null;
 } | null;
 
+// Source: ./src/app/api/slots/availability/route.ts
+// Variable: bookingsForRangeQuery
+// Query: *[_type == "booking" && slotDate >= $startDate && slotDate <= $endDate && status == "confirmed"]{  slotDate,  slotTime}
+export type BookingsForRangeQueryResult = Array<{
+  slotDate: string | null;
+  slotTime: string | null;
+}>;
+// Variable: slotLocksForRangeQuery
+// Query: *[_type == "slotLock" && slotId >= $startPrefix && slotId <= $endPrefix && (status == "booked" || (status == "held" && heldUntil > now()))]{  slotId,  status}
+export type SlotLocksForRangeQueryResult = Array<{
+  slotId: string | null;
+  status: "available" | "booked" | "held" | null;
+}>;
+// Variable: serviceByIdQuery
+// Query: *[_type == "service" && _id == $serviceId][0]{appointmentDuration}
+export type ServiceByIdQueryResult = {
+  appointmentDuration: 10 | 15 | 20 | 30 | 45 | 60 | null;
+} | null;
+
+// Source: ./src/sanity/lib/queries.ts
+// Variable: homepageQuery
+// Query: *[_type == "homepage" && _id == "homepage"][0]{  heroHeadline,  heroSubtitle,  heroBadges[]{    _key,    emoji,    text  },  heroDoctorImage,  heroCards[]{    _key,    title,    subtitle,    icon  },  servicesHeadline,  servicesSubtitle,  labTestsHeadline,  labTestsSubtitle,  testimonialsHeadline,  testimonialsCtaText,  testimonialsCtaUrl,  testimonials[]->{    _id,    patientName,    photo,    text,    condition,    order  },  blogHeadline,  ctaHeadline,  ctaDescription,  metaDescription,  ogImage}
+export type HomepageQueryResult = {
+  heroHeadline: string | null;
+  heroSubtitle: string | null;
+  heroBadges: Array<{
+    _key: string;
+    emoji: string | null;
+    text: string | null;
+  }> | null;
+  heroDoctorImage: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  } | null;
+  heroCards: Array<{
+    _key: string;
+    title: string | null;
+    subtitle: string | null;
+    icon: {
+      asset?: {
+        _ref: string;
+        _type: "reference";
+        _weak?: boolean;
+        [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      };
+      media?: unknown;
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      _type: "image";
+    } | null;
+  }> | null;
+  servicesHeadline: string | null;
+  servicesSubtitle: string | null;
+  labTestsHeadline: string | null;
+  labTestsSubtitle: string | null;
+  testimonialsHeadline: string | null;
+  testimonialsCtaText: string | null;
+  testimonialsCtaUrl: string | null;
+  testimonials: Array<{
+    _id: string;
+    patientName: string | null;
+    photo: {
+      asset?: {
+        _ref: string;
+        _type: "reference";
+        _weak?: boolean;
+        [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      };
+      media?: unknown;
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      _type: "image";
+    } | null;
+    text: string | null;
+    condition: string | null;
+    order: number | null;
+  }> | null;
+  blogHeadline: string | null;
+  ctaHeadline: string | null;
+  ctaDescription: string | null;
+  metaDescription: string | null;
+  ogImage: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  } | null;
+} | null;
+// Variable: siteSettingsQuery
+// Query: *[_type == "siteSettings" && _id == "siteSettings"][0]{  logo,  clinicName,  phone,  email,  address,  navigationLinks[]{    _key,    label,    href  },  socialLinks[]{    _key,    platform,    url  },  footerColumns[]{    _key,    heading,    links[]{      _key,      label,      href    }  },  privacyPolicyUrl,  metaDescription,  siteName,  defaultOgImage}
+export type SiteSettingsQueryResult = {
+  logo: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  } | null;
+  clinicName: string | null;
+  phone: string | null;
+  email: string | null;
+  address: string | null;
+  navigationLinks: Array<{
+    _key: string;
+    label: string | null;
+    href: string | null;
+  }> | null;
+  socialLinks: Array<{
+    _key: string;
+    platform: "facebook" | "instagram" | "linkedin" | "tiktok" | "youtube" | null;
+    url: string | null;
+  }> | null;
+  footerColumns: Array<{
+    _key: string;
+    heading: string | null;
+    links: Array<{
+      _key: string;
+      label: string | null;
+      href: string | null;
+    }> | null;
+  }> | null;
+  privacyPolicyUrl: string | null;
+  metaDescription: string | null;
+  siteName: string | null;
+  defaultOgImage: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  } | null;
+} | null;
+// Variable: allServicesQuery
+// Query: *[_type == "service"] | order(order asc){  _id,  name,  description,  price,  icon,  category->{_id, name, emoji},  order}
+export type AllServicesQueryResult = Array<{
+  _id: string;
+  name: string | null;
+  description: string | null;
+  price: number | null;
+  icon: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  } | null;
+  category: {
+    _id: string;
+    name: string | null;
+    emoji: string | null;
+  } | null;
+  order: number | null;
+}>;
+// Variable: allServiceCategoriesQuery
+// Query: *[_type == "serviceCategory"] | order(order asc){  _id,  name,  emoji,  order}
+export type AllServiceCategoriesQueryResult = Array<{
+  _id: string;
+  name: string | null;
+  emoji: string | null;
+  order: number | null;
+}>;
+// Variable: allLabTestsQuery
+// Query: *[_type == "labTest"] | order(order asc){  _id,  name,  slug,  description,  price,  originalPrice,  discount,  illustration,  order}
+export type AllLabTestsQueryResult = Array<{
+  _id: string;
+  name: string | null;
+  slug: Slug | null;
+  description: string | null;
+  price: number | null;
+  originalPrice: number | null;
+  discount: number | null;
+  illustration: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  } | null;
+  order: number | null;
+}>;
+// Variable: labTestBySlugQuery
+// Query: *[_type == "labTest" && slug.current == $slug][0]{  _id,  name,  slug,  description,  price,  originalPrice,  discount,  illustration,  body,  order}
+export type LabTestBySlugQueryResult = {
+  _id: string;
+  name: string | null;
+  slug: Slug | null;
+  description: string | null;
+  price: number | null;
+  originalPrice: number | null;
+  discount: number | null;
+  illustration: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  } | null;
+  body: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "h2" | "h3" | "h4" | "normal";
+    listItem?: "bullet" | "number";
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }> | null;
+  order: number | null;
+} | null;
+// Variable: allTestimonialsQuery
+// Query: *[_type == "testimonial"] | order(order asc){  _id,  patientName,  photo,  text,  condition,  order}
+export type AllTestimonialsQueryResult = Array<{
+  _id: string;
+  patientName: string | null;
+  photo: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  } | null;
+  text: string | null;
+  condition: string | null;
+  order: number | null;
+}>;
+// Variable: allBlogPostsQuery
+// Query: *[_type == "blogPost"] | order(publishedAt desc){  _id,  title,  slug,  category->{_id, name, slug},  featuredImage,  excerpt,  publishedAt}
+export type AllBlogPostsQueryResult = Array<{
+  _id: string;
+  title: string | null;
+  slug: Slug | null;
+  category: {
+    _id: string;
+    name: string | null;
+    slug: Slug | null;
+  } | null;
+  featuredImage: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  } | null;
+  excerpt: string | null;
+  publishedAt: string | null;
+}>;
+// Variable: blogPostBySlugQuery
+// Query: *[_type == "blogPost" && slug.current == $slug][0]{  _id,  title,  slug,  category->{_id, name, slug},  featuredImage,  body,  excerpt,  metaDescription,  ogImage,  publishedAt}
+export type BlogPostBySlugQueryResult = {
+  _id: string;
+  title: string | null;
+  slug: Slug | null;
+  category: {
+    _id: string;
+    name: string | null;
+    slug: Slug | null;
+  } | null;
+  featuredImage: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  } | null;
+  body: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "blockquote" | "h2" | "h3" | "h4" | "normal";
+    listItem?: "bullet" | "number";
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  } | {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    caption?: string;
+    _type: "image";
+    _key: string;
+  }> | null;
+  excerpt: string | null;
+  metaDescription: string | null;
+  ogImage: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  } | null;
+  publishedAt: string | null;
+} | null;
+// Variable: latestBlogPostsQuery
+// Query: *[_type == "blogPost"] | order(publishedAt desc)[0...5]{  _id,  title,  slug,  category->{_id, name},  featuredImage{    asset->{url, alt},    ...  },  excerpt,  content}
+export type LatestBlogPostsQueryResult = Array<{
+  _id: string;
+  title: string | null;
+  slug: Slug | null;
+  category: {
+    _id: string;
+    name: string | null;
+  } | null;
+  featuredImage: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  } | null;
+  excerpt: string | null;
+  content: null;
+}>;
+// Variable: relatedBlogPostsQuery
+// Query: *[_type == "blogPost" && category._ref == $categoryId && _id != $currentPostId] | order(publishedAt desc)[0...3]{  _id,  title,  slug,  featuredImage,  excerpt}
+export type RelatedBlogPostsQueryResult = Array<{
+  _id: string;
+  title: string | null;
+  slug: Slug | null;
+  featuredImage: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  } | null;
+  excerpt: string | null;
+}>;
+// Variable: privacyPolicyQuery
+// Query: *[_type == "privacyPolicy" && _id == "privacyPolicy"][0]{  title,  body,  lastUpdated}
+export type PrivacyPolicyQueryResult = {
+  title: string | null;
+  body: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "blockquote" | "h2" | "h3" | "h4" | "normal";
+    listItem?: "bullet" | "number";
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  } | {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    caption?: string;
+    _type: "image";
+    _key: string;
+  }> | null;
+  lastUpdated: string | null;
+} | null;
+// Variable: cookiePolicyQuery
+// Query: *[_type == "cookiePolicy" && _id == "cookiePolicy"][0]{  title,  body,  lastUpdated}
+export type CookiePolicyQueryResult = {
+  title: string | null;
+  body: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "blockquote" | "h2" | "h3" | "h4" | "normal";
+    listItem?: "bullet" | "number";
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  } | {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    caption?: string;
+    _type: "image";
+    _key: string;
+  }> | null;
+  lastUpdated: string | null;
+} | null;
+// Variable: weeklyScheduleQuery
+// Query: *[_type == "weeklySchedule" && _id == "weeklySchedule"][0]{  defaultSlotDuration,  bufferMinutes,  days[]{    _key,    dayOfWeek,    isDayOff,    startTime,    endTime  }}
+export type WeeklyScheduleQueryResult = {
+  defaultSlotDuration: 10 | 15 | 20 | 30 | 45 | 60 | null;
+  bufferMinutes: number | null;
+  days: Array<{
+    _key: string;
+    dayOfWeek: 0 | 1 | 2 | 3 | 4 | 5 | 6 | null;
+    isDayOff: boolean | null;
+    startTime: string | null;
+    endTime: string | null;
+  }> | null;
+} | null;
+// Variable: blockedDatesQuery
+// Query: *[_type == "blockedDate" && _id == "blockedDate"][0]{  dates[]{    _key,    date,    isHoliday  }}
+export type BlockedDatesQueryResult = {
+  dates: Array<{
+    _key: string;
+    date: string | null;
+    isHoliday: boolean | null;
+  }> | null;
+} | null;
+// Variable: slotLockByIdQuery
+// Query: *[_type == "slotLock" && _id == $slotLockId][0]{  _id, dateTime, status}
+export type SlotLockByIdQueryResult = {
+  _id: string;
+  dateTime: null;
+  status: "available" | "booked" | "held" | null;
+} | null;
+// Variable: bookingsForDateQuery
+// Query: *[_type == "booking" && dateTime >= $startDate && dateTime < $endDate]{  _id, dateTime, patientEmail, serviceId}
+export type BookingsForDateQueryResult = Array<{
+  _id: string;
+  dateTime: null;
+  patientEmail: string | null;
+  serviceId: null;
+}>;
+// Variable: slotLocksForDateQuery
+// Query: *[_type == "slotLock" && dateTime >= $startDate && dateTime < $endDate]{  _id, dateTime, status}
+export type SlotLocksForDateQueryResult = Array<{
+  _id: string;
+  dateTime: null;
+  status: "available" | "booked" | "held" | null;
+}>;
+// Variable: servicesForBookingQuery
+// Query: *[_type == "service"] | order(order asc){  _id, name, duration, price}
 export type ServicesForBookingQueryResult = Array<{
   _id: string;
-  name?: string;
-  appointmentDuration?: number;
-  icon?: SanityImageObject;
+  name: string | null;
+  duration: null;
+  price: number | null;
 }>;
+// Variable: KAPCSOLAT_QUERY
+// Query: *[_type == "kapcsolat"][0]{  heroTitle,  heroDescription,  heroImage{    asset->{url, alt},    hotspot  },  phoneNumbers[]{label, number, iconName},  heroEmailAddresses[]{label, email, iconName},  emailAddresses[]{label, email, iconName, _key},  address,  officeHoursTitle,  officeHoursIconName,  officeHours,  locationTitle,  locationIconName,  locationImage{    asset->{url, alt},    hotspot  },  locationLat,  locationLng,  goodToKnowLabel,  goodToKnowTitle,  goodToKnowSubtitle,  goodToKnowCards[]{iconName, title, description, url},  hasznos_label,  hasznos_title,  hasznos_subtitle,  hasznos_items[]{title, body, iconName, _key},  fontos_label,  fontos_title,  fontos_subtitle,  fontos_items[]{title, body, iconName, _key}}
+export type KAPCSOLAT_QUERYResult = {
+  heroTitle: string | null;
+  heroDescription: string | null;
+  heroImage: {
+    asset: {
+      url: string | null;
+      alt: null;
+    } | null;
+    hotspot: SanityImageHotspot | null;
+  } | null;
+  phoneNumbers: Array<{
+    label: string | null;
+    number: string | null;
+    iconName: string | null;
+  }> | null;
+  heroEmailAddresses: Array<{
+    label: string | null;
+    email: string | null;
+    iconName: string | null;
+  }> | null;
+  emailAddresses: Array<{
+    label: string | null;
+    email: string | null;
+    iconName: string | null;
+    _key: string;
+  }> | null;
+  address: string | null;
+  officeHoursTitle: string | null;
+  officeHoursIconName: string | null;
+  officeHours: Array<{
+    day?: string;
+    hours?: string;
+    _key: string;
+  }> | null;
+  locationTitle: string | null;
+  locationIconName: string | null;
+  locationImage: {
+    asset: {
+      url: string | null;
+      alt: null;
+    } | null;
+    hotspot: SanityImageHotspot | null;
+  } | null;
+  locationLat: number | null;
+  locationLng: number | null;
+  goodToKnowLabel: string | null;
+  goodToKnowTitle: string | null;
+  goodToKnowSubtitle: string | null;
+  goodToKnowCards: Array<{
+    iconName: string | null;
+    title: string | null;
+    description: string | null;
+    url: string | null;
+  }> | null;
+  hasznos_label: string | null;
+  hasznos_title: string | null;
+  hasznos_subtitle: string | null;
+  hasznos_items: Array<{
+    title: string | null;
+    body: string | null;
+    iconName: string | null;
+    _key: string;
+  }> | null;
+  fontos_label: string | null;
+  fontos_title: string | null;
+  fontos_subtitle: string | null;
+  fontos_items: Array<{
+    title: string | null;
+    body: string | null;
+    iconName: string | null;
+    _key: string;
+  }> | null;
+} | null;
 
+// Query TypeMap
+import "@sanity/client";
+declare module "@sanity/client" {
+  interface SanityQueries {
+    "*[_type == \"service\" && _id == $serviceId][0]{name, appointmentDuration}": ServiceForEmailQueryResult;
+    "*[_type == \"booking\" && slotDate >= $startDate && slotDate <= $endDate && status == \"confirmed\"]{\n  slotDate,\n  slotTime\n}": BookingsForRangeQueryResult;
+    "*[_type == \"slotLock\" && slotId >= $startPrefix && slotId <= $endPrefix && (status == \"booked\" || (status == \"held\" && heldUntil > now()))]{\n  slotId,\n  status\n}": SlotLocksForRangeQueryResult;
+    "*[_type == \"service\" && _id == $serviceId][0]{appointmentDuration}": ServiceByIdQueryResult;
+    "*[_type == \"homepage\" && _id == \"homepage\"][0]{\n  heroHeadline,\n  heroSubtitle,\n  heroBadges[]{\n    _key,\n    emoji,\n    text\n  },\n  heroDoctorImage,\n  heroCards[]{\n    _key,\n    title,\n    subtitle,\n    icon\n  },\n  servicesHeadline,\n  servicesSubtitle,\n  labTestsHeadline,\n  labTestsSubtitle,\n  testimonialsHeadline,\n  testimonialsCtaText,\n  testimonialsCtaUrl,\n  testimonials[]->{\n    _id,\n    patientName,\n    photo,\n    text,\n    condition,\n    order\n  },\n  blogHeadline,\n  ctaHeadline,\n  ctaDescription,\n  metaDescription,\n  ogImage\n}": HomepageQueryResult;
+    "*[_type == \"siteSettings\" && _id == \"siteSettings\"][0]{\n  logo,\n  clinicName,\n  phone,\n  email,\n  address,\n  navigationLinks[]{\n    _key,\n    label,\n    href\n  },\n  socialLinks[]{\n    _key,\n    platform,\n    url\n  },\n  footerColumns[]{\n    _key,\n    heading,\n    links[]{\n      _key,\n      label,\n      href\n    }\n  },\n  privacyPolicyUrl,\n  metaDescription,\n  siteName,\n  defaultOgImage\n}": SiteSettingsQueryResult;
+    "*[_type == \"service\"] | order(order asc){\n  _id,\n  name,\n  description,\n  price,\n  icon,\n  category->{_id, name, emoji},\n  order\n}": AllServicesQueryResult;
+    "*[_type == \"serviceCategory\"] | order(order asc){\n  _id,\n  name,\n  emoji,\n  order\n}": AllServiceCategoriesQueryResult;
+    "*[_type == \"labTest\"] | order(order asc){\n  _id,\n  name,\n  slug,\n  description,\n  price,\n  originalPrice,\n  discount,\n  illustration,\n  order\n}": AllLabTestsQueryResult;
+    "*[_type == \"labTest\" && slug.current == $slug][0]{\n  _id,\n  name,\n  slug,\n  description,\n  price,\n  originalPrice,\n  discount,\n  illustration,\n  body,\n  order\n}": LabTestBySlugQueryResult;
+    "*[_type == \"testimonial\"] | order(order asc){\n  _id,\n  patientName,\n  photo,\n  text,\n  condition,\n  order\n}": AllTestimonialsQueryResult;
+    "*[_type == \"blogPost\"] | order(publishedAt desc){\n  _id,\n  title,\n  slug,\n  category->{_id, name, slug},\n  featuredImage,\n  excerpt,\n  publishedAt\n}": AllBlogPostsQueryResult;
+    "*[_type == \"blogPost\" && slug.current == $slug][0]{\n  _id,\n  title,\n  slug,\n  category->{_id, name, slug},\n  featuredImage,\n  body,\n  excerpt,\n  metaDescription,\n  ogImage,\n  publishedAt\n}": BlogPostBySlugQueryResult;
+    "*[_type == \"blogPost\"] | order(publishedAt desc)[0...5]{\n  _id,\n  title,\n  slug,\n  category->{_id, name},\n  featuredImage{\n    asset->{url, alt},\n    ...\n  },\n  excerpt,\n  content\n}": LatestBlogPostsQueryResult;
+    "*[_type == \"blogPost\" && category._ref == $categoryId && _id != $currentPostId] | order(publishedAt desc)[0...3]{\n  _id,\n  title,\n  slug,\n  featuredImage,\n  excerpt\n}": RelatedBlogPostsQueryResult;
+    "*[_type == \"privacyPolicy\" && _id == \"privacyPolicy\"][0]{\n  title,\n  body,\n  lastUpdated\n}": PrivacyPolicyQueryResult;
+    "*[_type == \"cookiePolicy\" && _id == \"cookiePolicy\"][0]{\n  title,\n  body,\n  lastUpdated\n}": CookiePolicyQueryResult;
+    "*[_type == \"weeklySchedule\" && _id == \"weeklySchedule\"][0]{\n  defaultSlotDuration,\n  bufferMinutes,\n  days[]{\n    _key,\n    dayOfWeek,\n    isDayOff,\n    startTime,\n    endTime\n  }\n}": WeeklyScheduleQueryResult;
+    "*[_type == \"blockedDate\" && _id == \"blockedDate\"][0]{\n  dates[]{\n    _key,\n    date,\n    isHoliday\n  }\n}": BlockedDatesQueryResult;
+    "*[_type == \"slotLock\" && _id == $slotLockId][0]{\n  _id, dateTime, status\n}": SlotLockByIdQueryResult;
+    "*[_type == \"booking\" && dateTime >= $startDate && dateTime < $endDate]{\n  _id, dateTime, patientEmail, serviceId\n}": BookingsForDateQueryResult;
+    "*[_type == \"slotLock\" && dateTime >= $startDate && dateTime < $endDate]{\n  _id, dateTime, status\n}": SlotLocksForDateQueryResult;
+    "*[_type == \"service\"] | order(order asc){\n  _id, name, duration, price\n}": ServicesForBookingQueryResult;
+    "*[_type == \"kapcsolat\"][0]{\n  heroTitle,\n  heroDescription,\n  heroImage{\n    asset->{url, alt},\n    hotspot\n  },\n  phoneNumbers[]{label, number, iconName},\n  heroEmailAddresses[]{label, email, iconName},\n  emailAddresses[]{label, email, iconName, _key},\n  address,\n  officeHoursTitle,\n  officeHoursIconName,\n  officeHours,\n  locationTitle,\n  locationIconName,\n  locationImage{\n    asset->{url, alt},\n    hotspot\n  },\n  locationLat,\n  locationLng,\n  goodToKnowLabel,\n  goodToKnowTitle,\n  goodToKnowSubtitle,\n  goodToKnowCards[]{iconName, title, description, url},\n  hasznos_label,\n  hasznos_title,\n  hasznos_subtitle,\n  hasznos_items[]{title, body, iconName, _key},\n  fontos_label,\n  fontos_title,\n  fontos_subtitle,\n  fontos_items[]{title, body, iconName, _key}\n}": KAPCSOLAT_QUERYResult;
+  }
+}

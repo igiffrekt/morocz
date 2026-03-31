@@ -1,10 +1,10 @@
 import Image from "next/image";
 import { CircleWipeLink } from "@/components/motion/CircleWipeLink";
 import { urlFor } from "@/sanity/lib/image";
-import type { BlogPostQueryResult } from "../../../sanity.types";
+import type { RelatedBlogPostsQueryResult } from "../../../sanity.types";
 
 interface RelatedPostsProps {
-  posts: BlogPostQueryResult[];
+  posts: RelatedBlogPostsQueryResult;
 }
 
 export function RelatedPosts({ posts }: RelatedPostsProps) {

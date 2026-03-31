@@ -68,18 +68,22 @@ export function Header({ clinicName, navigationLinks, phone, address }: HeaderPr
 
   const isCompact = navState === "compact";
 
+  // Fixed height to prevent layout shift on mobile
+  const headerHeight = "h-[72px]";
+
   return (
-    <div className="sticky top-0 z-50 w-full">
+    <div className={`sticky top-0 z-50 w-full ${headerHeight}`}>
       {/* Default header */}
       <header
         className={[
-          "w-full bg-background-light rounded-xl flex items-center justify-between transition-all duration-500 ease-in-out",
+          "w-full bg-background-light rounded-xl flex items-center justify-between transition-all duration-300 ease-out",
           "px-8 py-5 shadow-sm",
+          headerHeight,
           navState === "default"
             ? "opacity-100 translate-y-0"
             : navState === "hidden"
-              ? "opacity-0 -translate-y-full pointer-events-none absolute"
-              : "opacity-100 translate-y-0 md:opacity-0 md:-translate-y-full md:pointer-events-none md:absolute",
+              ? "opacity-0 -translate-y-full pointer-events-none"
+              : "opacity-100 translate-y-0 md:opacity-0 md:-translate-y-full md:pointer-events-none",
         ].join(" ")}
       >
         {/* Left: logo + address */}
@@ -201,7 +205,7 @@ export function Header({ clinicName, navigationLinks, phone, address }: HeaderPr
           "fixed top-3 left-1/2 -translate-x-1/2 w-[70%] max-w-[61.6rem]",
           "rounded-2xl hidden md:flex items-center justify-between px-5 py-2.5",
           "backdrop-blur-xl bg-white/60 border border-white/30 shadow-lg",
-          "transition-all duration-500 ease-in-out",
+          "transition-all duration-300 ease-out",
           isCompact ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4 pointer-events-none",
         ].join(" ")}
       >

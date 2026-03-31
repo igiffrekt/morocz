@@ -4,8 +4,20 @@ import { motion } from "motion/react";
 import Image from "next/image";
 import { FadeIn } from "@/components/motion/FadeIn";
 import { urlFor } from "@/sanity/lib/image";
-import type { SanityImageObject } from "../../../sanity.types";
+import type { SanityImageCrop, SanityImageHotspot } from "../../../sanity.types";
 import { HeroHeadline } from "./HeroHeadline";
+
+// Type definition for Sanity image objects
+type SanityImageObject = {
+  asset?: {
+    _ref: string;
+    _type: "reference";
+  };
+  media?: unknown;
+  hotspot?: SanityImageHotspot;
+  crop?: SanityImageCrop;
+  _type: "image";
+};
 
 interface HeroSectionProps {
   headline?: string;
@@ -14,11 +26,10 @@ interface HeroSectionProps {
   doctorImage?: SanityImageObject;
   phone?: string;
 }
-
 export function HeroSection({ headline, subtitle, badges, doctorImage, phone }: HeroSectionProps) {
-  // Desktop: 600×700 (6:7 arány)
+  // Desktop: width-based, no crop to preserve full image
   const doctorImageUrl = doctorImage
-    ? urlFor(doctorImage).width(600).height(700).fit("crop").url()
+    ? urlFor(doctorImage).width(600).url()
     : null;
 
   // Mobil: 480px — elég a ~80vw megjelenítéshez (max 430px eszközök),
@@ -128,7 +139,7 @@ export function HeroSection({ headline, subtitle, badges, doctorImage, phone }: 
         - w-full h-auto: eredeti arány megmarad, nincs crop
         - sizes prop: Next.js Image optimalizáció
       */}
-      <div className="md:hidden absolute bottom-0 left-1/2 -translate-x-1/2 z-10 w-[80%]">
+      <div className="md:hidden absolute bottom-0 left-1/2 -translate-x-1/2 z-10 w-[70%]">
         <FadeIn direction="up" delay={0.4}>
           {mobileDoctorImageUrl ? (
             <Image
@@ -137,7 +148,7 @@ export function HeroSection({ headline, subtitle, badges, doctorImage, phone }: 
               width={480}
               height={640}
               priority
-              sizes="80vw"
+              sizes="70vw"
               className="w-full h-auto"
             />
           ) : (
@@ -189,15 +200,15 @@ export function HeroSection({ headline, subtitle, badges, doctorImage, phone }: 
         </FadeIn>
 
         {/* Bottom-center: doctor image */}
-        <div className="w-1/3 flex justify-center relative">
+        <div className="w-1/3 flex justify-center items-end relative">
           <FadeIn direction="up" delay={0.4}>
             {doctorImageUrl ? (
               <Image
                 src={doctorImageUrl}
                 alt="Dr. Mórocz"
-                className="h-[480px] object-cover object-top drop-shadow-2xl"
-                width={400}
-                height={480}
+                className="max-h-[480px] w-auto object-contain object-bottom drop-shadow-2xl"
+                width={600}
+                height={700}
                 priority
                 sizes="(min-width: 768px) 33vw, 0px"
               />

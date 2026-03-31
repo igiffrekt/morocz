@@ -7,7 +7,7 @@ import { isEmailConfigured, sendEmail } from "./email";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, { provider: "pg" }),
-  trustedOrigins: ["http://localhost:3000", "http://192.168.1.9:3000"],
+  trustedOrigins: ["http://localhost:3000", "http://192.168.1.9:3000", "http://192.168.1.14:3000"],
 
   emailAndPassword: {
     enabled: true,

@@ -41,7 +41,7 @@ export default function AdminCalendar({
   selectedDate,
   onSelectDate,
   monthBookings,
-  viewMode,
+  viewMode = "month", // Default to month view
   onViewModeChange,
   onMonthChange,
   initialYear,
@@ -128,6 +128,24 @@ export default function AdminCalendar({
       }}
     >
       <style>{`
+        /* Button reset styles */
+        button {
+          appearance: none;
+          -webkit-appearance: none;
+          outline: none;
+          border: none;
+          margin: 0;
+          padding: 0;
+          background: transparent;
+          font-family: inherit;
+          cursor: pointer;
+          user-select: none;
+        }
+        
+        button:active {
+          outline: none;
+        }
+        
         /* Mobile-first responsive for calendar */
         @media (max-width: 768px) {
           /* Smaller padding inside calendar */
@@ -213,7 +231,10 @@ export default function AdminCalendar({
                 cursor: "pointer",
                 fontSize: "1.125rem",
                 transition: "all 0.15s",
-              }}
+                padding: 0,
+                margin: 0,
+                appearance: "none",
+              } as React.CSSProperties}
             >
               &#8249;
             </button>
@@ -248,7 +269,10 @@ export default function AdminCalendar({
                 cursor: "pointer",
                 fontSize: "1.125rem",
                 transition: "all 0.15s",
-              }}
+                padding: 0,
+                margin: 0,
+                appearance: "none",
+              } as React.CSSProperties}
             >
               &#8250;
             </button>
@@ -356,7 +380,9 @@ export default function AdminCalendar({
                           position: "relative",
                           overflow: "hidden",
                           padding: 0,
-                        }}
+                          margin: 0,
+                          appearance: "none",
+                        } as React.CSSProperties}
                       >
                         {/* Left-border accent for days with bookings */}
                         {hasBookings && (

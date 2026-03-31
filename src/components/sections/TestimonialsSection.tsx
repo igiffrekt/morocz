@@ -5,7 +5,9 @@ import Image from "next/image";
 import { useState } from "react";
 import { FadeIn } from "@/components/motion/FadeIn";
 import { urlFor } from "@/sanity/lib/image";
-import type { TestimonialQueryResult } from "../../../sanity.types";
+import type { AllTestimonialsQueryResult } from "../../../sanity.types";
+
+type TestimonialQueryResult = AllTestimonialsQueryResult[number];
 
 interface TestimonialsSectionProps {
   heading?: string;

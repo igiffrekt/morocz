@@ -51,11 +51,20 @@ export default async function IdopontfoglalasPage() {
     blockedDates: (blockedDatesDoc?.dates ?? []).map((d) => d.date ?? "").filter(Boolean),
   };
 
+  // Transform services: filter nulls and map fields to ServiceItem format
+  const transformedServices = services
+    .filter((s): s is typeof services[number] & { name: string } => s.name !== null && s.name !== undefined)
+    .map((s) => ({
+      _id: s._id,
+      name: s.name,
+      appointmentDuration: undefined, // duration is null in query, so keep undefined
+    }));
+
   // Collapse matching services into exactly 2 booking options:
   // - First "Nőgyógyász*" service → displayed as "Nőgyógyászati vizsgálat"
   // - "Várandósgondozás" (exact match)
-  const gyneService = services.find((s) => s.name?.startsWith("Nőgyógyász"));
-  const prenatalService = services.find((s) => s.name === "Várandósgondozás");
+  const gyneService = transformedServices.find((s) => s.name?.startsWith("Nőgyógyász"));
+  const prenatalService = transformedServices.find((s) => s.name === "Várandósgondozás");
   const bookingServices = [
     ...(gyneService ? [{ ...gyneService, name: "Nőgyógyászati vizsgálat" }] : []),
     ...(prenatalService ? [prenatalService] : []),

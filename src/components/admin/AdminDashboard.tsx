@@ -1,5 +1,6 @@
 "use client";
 
+import AdminAppointmentHistoryView from "@/components/admin/AdminAppointmentHistoryView";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import AdminCalendar from "@/components/admin/AdminCalendar";
@@ -9,7 +10,7 @@ import { AdminSignOut } from "@/components/admin/AdminLogin";
 import AdminPatientModal from "@/components/admin/AdminPatientModal";
 import AdminPatientsView from "@/components/admin/AdminPatientsView";
 
-// ─── Types ─────────────────────────────────────────────────────────────────────
+// ─── Types ───────────────────────────────────────────────────────────────────
 
 export type AdminBooking = {
   _id: string;
@@ -24,9 +25,9 @@ export type AdminBooking = {
   managementToken: string;
 };
 
-type NavTab = "calendar" | "patients" | "finance";
+type NavTab = "calendar" | "patients" | "finance" | "history";
 
-// ─── Helpers ───────────────────────────────────────────────────────────────────
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function getTodayString(): string {
   const today = new Date();
@@ -44,7 +45,7 @@ function getMonthRange(year: number, month: number): { startDate: string; endDat
   return { startDate: fmt(start), endDate: fmt(end) };
 }
 
-// ─── Nav tab button ────────────────────────────────────────────────────────────
+// ─── Nav tab button ──────────────────────────────────────────────────────────
 
 function NavTabBtn({
   id,
@@ -86,7 +87,7 @@ function NavTabBtn({
   );
 }
 
-// ─── Component ─────────────────────────────────────────────────────────────────
+// ─── Component ───────────────────────────────────────────────────────────────
 
 interface AdminSession {
   user: {
@@ -118,7 +119,7 @@ export default function AdminDashboard({
   const [isDayLoading, setIsDayLoading] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState<AdminBooking | null>(null);
 
-  // ── Fetch helpers ────────────────────────────────────────────────────────────
+  // ── Fetch helpers ──────────────────────────────────────────────────────────
 
   const fetchBookings = useCallback(
     async (startDate: string, endDate: string): Promise<AdminBooking[]> => {
@@ -132,7 +133,7 @@ export default function AdminDashboard({
     [],
   );
 
-  // ── Fetch day bookings when selectedDate changes ──────────────────────────────
+  // ── Fetch day bookings when selectedDate changes ───────────────────────────
 
   useEffect(() => {
     let cancelled = false;
@@ -148,7 +149,7 @@ export default function AdminDashboard({
     };
   }, [selectedDate, fetchBookings]);
 
-  // ── Month navigation ──────────────────────────────────────────────────────────
+  // ── Month navigation ───────────────────────────────────────────────────────
 
   function handleMonthChange(year: number, month: number) {
     const { startDate, endDate } = getMonthRange(year, month);
@@ -191,7 +192,7 @@ export default function AdminDashboard({
       }}
     >
       <style>{`
-        /* ─── Header responsive strategy ─────────────────────────────── */
+        /* ─── Header responsive strategy ─────────────────────────── */
         /* Mobile: stacked layout — nav always visible */
         /* Desktop: single row — [logo] [nav] [user] */
 
@@ -275,7 +276,7 @@ export default function AdminDashboard({
           }
         }
 
-        /* ─── Mobile responsive layout ───────────────────────────────── */
+        /* ─── Mobile responsive layout ─────────────────────────── */
         @media (max-width: 768px) {
           /* Two-panel layout — single column on mobile */
           [data-admin-two-panel] {
@@ -353,7 +354,7 @@ export default function AdminDashboard({
         }
       `}</style>
 
-      {/* ── Header ──────────────────────────────────────────────────────────── */}
+      {/* ── Header ────────────────────────────────────────────────────────── */}
       <header className="admin-header" data-admin-header="true">
         {/* Left: Logo */}
         <div className="admin-header-logo">
@@ -439,6 +440,32 @@ export default function AdminDashboard({
           >
             💰 Pénzügyek
           </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab("history")}
+            className="admin-nav-tab"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "0.375rem",
+              padding: "0.5rem 1rem",
+              borderRadius: "9999px",
+              border: "none",
+              cursor: "pointer",
+              fontSize: "0.8125rem",
+              fontWeight: activeTab === "history" ? 600 : 500,
+              backgroundColor: activeTab === "history" ? "rgba(255,255,255,0.18)" : "transparent",
+              color: activeTab === "history" ? "#ffffff" : "rgba(255,255,255,0.6)",
+              transition: "all 0.15s ease",
+              letterSpacing: "0.01em",
+              whiteSpace: "nowrap",
+              lineHeight: 1.4,
+            }}
+          >
+            Foglalási történet
+          </button>
         </nav>
 
         {/* Right: User + sign out */}
@@ -476,7 +503,7 @@ export default function AdminDashboard({
         </div>
       </header>
 
-      {/* ── Calendar view ────────────────────────────────────────────────────── */}
+      {/* ── Calendar view ─────────────────────────────────────────────────── */}
       {activeTab === "calendar" && (
         <>
           {/* Stats summary */}
@@ -588,13 +615,16 @@ export default function AdminDashboard({
         </>
       )}
 
-      {/* ── Patients view ────────────────────────────────────────────────────── */}
+      {/* ── Patients view ─────────────────────────────────────────────────── */}
       {activeTab === "patients" && <AdminPatientsView />}
 
-      {/* ── Finance view ─────────────────────────────────────────────────────── */}
+      {/* ── Finance view ──────────────────────────────────────────────────── */}
       {activeTab === "finance" && <AdminFinanceView />}
 
-      {/* ── Patient detail modal ─────────────────────────────────────────────── */}
+      {/* ── Appointment History view ──────────────────────────────────────── */}
+      {activeTab === "history" && <AdminAppointmentHistoryView />}
+
+      {/* ── Patient detail modal ──────────────────────────────────────────── */}
       {selectedBooking && (
         <AdminPatientModal
           booking={selectedBooking}
@@ -606,7 +636,7 @@ export default function AdminDashboard({
   );
 }
 
-// ─── Inline stat box (calendar view) ───────────────────────────────────────────
+// ─── Inline stat box (calendar view) ─────────────────────────────────────────
 
 function StatBox({
   label,

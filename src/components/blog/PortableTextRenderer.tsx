@@ -2,7 +2,40 @@ import type { PortableTextReactComponents } from "@portabletext/react";
 import { PortableText } from "@portabletext/react";
 import Image from "next/image";
 import { urlFor } from "@/sanity/lib/image";
-import type { BlogPostBodyImage, PortableTextBlock } from "../../../sanity.types";
+import type { SanityImageCrop, SanityImageHotspot } from "../../../sanity.types";
+
+// Type definitions for Portable Text blocks
+type PortableTextBlock = {
+  children?: Array<{
+    marks?: Array<string>;
+    text?: string;
+    _type: "span";
+    _key: string;
+  }>;
+  style?: "normal" | "h2" | "h3" | "h4" | "blockquote";
+  listItem?: "bullet" | "number";
+  markDefs?: Array<{
+    href?: string;
+    _type: "link";
+    _key: string;
+  }>;
+  level?: number;
+  _type: "block";
+  _key: string;
+};
+
+type BlogPostBodyImage = {
+  asset?: {
+    _ref: string;
+    _type: "reference";
+  };
+  media?: unknown;
+  hotspot?: SanityImageHotspot;
+  crop?: SanityImageCrop;
+  _type: "image";
+  alt?: string;
+  caption?: string;
+};
 
 interface PortableTextRendererProps {
   body: Array<PortableTextBlock | BlogPostBodyImage>;

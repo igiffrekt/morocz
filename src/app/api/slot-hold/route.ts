@@ -36,6 +36,7 @@ export async function POST(request: Request): Promise<Response> {
     const session = await auth.api.getSession({ headers: await headers() });
 
     // ── 4. Create or update slot lock with "held" status ────────────────────────
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const lockData: any = {
       _id: slotLockDocId,
       _type: "slotLock",
@@ -53,6 +54,7 @@ export async function POST(request: Request): Promise<Response> {
 
     // ── 5. Update existing lock to "held" if it exists with different status ────
     try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const updateData: any = { status: "held", heldUntil };
       if (session?.user?.id) {
         updateData.userId = session.user.id;

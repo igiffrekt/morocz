@@ -5,11 +5,11 @@ import Image from "next/image";
 import { CircleWipeLink } from "@/components/motion/CircleWipeLink";
 import { FadeIn } from "@/components/motion/FadeIn";
 import { urlFor } from "@/sanity/lib/image";
-import type { BlogPostQueryResult } from "../../../sanity.types";
+import type { LatestBlogPostsQueryResult } from "../../../sanity.types";
 
 interface BlogSectionProps {
   heading?: string;
-  posts: BlogPostQueryResult[];
+  posts: LatestBlogPostsQueryResult;
 }
 
 function CategoryPill({ name }: { name?: string }) {
@@ -30,7 +30,7 @@ export function BlogSection({ heading, posts }: BlogSectionProps) {
   const rightHasImage = rightPost?.featuredImage?.asset != null;
 
   return (
-    <section id="blog" aria-labelledby="blog-cim" className="px-4 py-12 md:py-20">
+    <section id="blog" aria-labelledby="blog-cim" className="px-4 py-8 md:py-12">
       {/* Header: overline, heading, subheading */}
       <div className="mb-12">
         {/* Overline with decorative line */}
@@ -85,7 +85,7 @@ export function BlogSection({ heading, posts }: BlogSectionProps) {
               href={`/blog/${leftPost.slug?.current}`}
               className="group flex h-full flex-col rounded-3xl bg-[#edf0f5] p-10 transition-shadow hover:shadow-md"
             >
-              <CategoryPill name={leftPost.category?.name} />
+              <CategoryPill name={leftPost.category?.name ?? undefined} />
 
               <div className="mt-3 overflow-hidden rounded-2xl">
                 {leftHasImage && leftPost.featuredImage ? (
@@ -154,7 +154,7 @@ export function BlogSection({ heading, posts }: BlogSectionProps) {
 
               {/* Text overlay on top of image */}
               <div className="relative flex flex-col p-8 md:p-12">
-                <CategoryPill name={rightPost.category?.name} />
+                <CategoryPill name={rightPost.category?.name ?? undefined} />
 
                 <div className="mt-auto flex flex-col gap-8 pt-6">
                   <h3 className="text-2xl font-extrabold leading-snug text-primary md:text-3xl">

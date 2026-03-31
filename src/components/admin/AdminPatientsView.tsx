@@ -6,6 +6,7 @@ type PatientRow = {
   email: string;
   name: string;
   phone: string;
+  latogatas: number;
   totalBookings: number;
   confirmedCount: number;
   cancelledCount: number;
@@ -162,23 +163,17 @@ function PatientRow({ p, i, total }: { p: PatientRow; i: number; total: number }
   const avatar = getAvatar(p.email || p.name);
 
   const visitBadgeStyle: React.CSSProperties =
-    p.totalBookings === 0
+    p.latogatas === 0
       ? {
           background: "rgba(148,163,184,0.12)",
           color: "#94a3b8",
           border: "1px solid rgba(148,163,184,0.2)",
         }
-      : p.confirmedCount > 0
-        ? {
-            background: "linear-gradient(135deg,rgba(36,42,95,0.1),rgba(79,110,247,0.12))",
-            color: "#242a5f",
-            border: "1px solid rgba(36,42,95,0.15)",
-          }
-        : {
-            background: "rgba(239,68,68,0.08)",
-            color: "#b91c1c",
-            border: "1px solid rgba(239,68,68,0.15)",
-          };
+      : {
+          background: "linear-gradient(135deg,rgba(36,42,95,0.1),rgba(79,110,247,0.12))",
+          color: "#242a5f",
+          border: "1px solid rgba(36,42,95,0.15)",
+        };
 
   return (
     <div
@@ -298,7 +293,7 @@ function PatientRow({ p, i, total }: { p: PatientRow; i: number; total: number }
             ...visitBadgeStyle,
           }}
         >
-          {p.totalBookings}
+          {p.latogatas}
         </span>
       </div>
 
@@ -372,11 +367,11 @@ export default function AdminPatientsView() {
     const matchSearch =
       p.name.toLowerCase().includes(search.toLowerCase()) ||
       p.email.toLowerCase().includes(search.toLowerCase());
-    const matchFilter = filter === "all" || (filter === "with-bookings" && p.totalBookings > 0);
+    const matchFilter = filter === "all" || (filter === "with-bookings" && p.latogatas > 0);
     return matchSearch && matchFilter;
   });
 
-  const bookingCount = patients.filter((p) => p.totalBookings > 0).length;
+  const bookingCount = patients.filter((p) => p.latogatas > 0).length;
 
   // Pagination
   const ITEMS_PER_PAGE = 10;

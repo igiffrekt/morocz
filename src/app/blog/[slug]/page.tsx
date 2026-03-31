@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -15,12 +15,12 @@ import {
   siteSettingsQuery,
 } from "@/sanity/lib/queries";
 import type {
-  BlogPostDetailResult,
-  BlogPostQueryResult,
+  BlogPostBySlugQueryResult,
+  RelatedBlogPostsQueryResult,
   SiteSettings,
 } from "../../../../sanity.types";
 
-// ─── Static Generation ────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇ Static Generation ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 export async function generateStaticParams() {
   const posts = await sanityFetch<Array<{ slug: { current: string } }>>({
@@ -30,7 +30,7 @@ export async function generateStaticParams() {
   return posts.filter((post) => post.slug?.current).map((post) => ({ slug: post.slug.current }));
 }
 
-// ─── Metadata ─────────────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇ Metadata ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 export async function generateMetadata({
   params,
@@ -39,7 +39,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const [post, settings] = await Promise.all([
-    sanityFetch<BlogPostDetailResult | null>({
+    sanityFetch<BlogPostBySlugQueryResult | null>({
       query: blogPostBySlugQuery,
       params: { slug },
       tags: ["blogPost"],
@@ -50,7 +50,7 @@ export async function generateMetadata({
     }),
   ]);
 
-  const title = post?.title ?? "Blog | Mórocz Medical";
+  const title = post?.title ?? "Blog | M├│rocz Medical";
   const description = post?.metaDescription ?? post?.excerpt ?? undefined;
 
   // OG image cascade: ogImage > featuredImage > defaultOgImage
@@ -83,12 +83,12 @@ export async function generateMetadata({
   };
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇ Page ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
 
-  const post = await sanityFetch<BlogPostDetailResult | null>({
+  const post = await sanityFetch<BlogPostBySlugQueryResult | null>({
     query: blogPostBySlugQuery,
     params: { slug },
     tags: ["blogPost"],
@@ -98,17 +98,17 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     notFound();
   }
 
-  // Fetch related posts — fallback to latest if no category or too few results
-  let relatedPosts: BlogPostQueryResult[] = [];
+  // Fetch related posts ΓÇö fallback to latest if no category or too few results
+  let relatedPosts: RelatedBlogPostsQueryResult = [];
   if (post.category?._id) {
-    relatedPosts = await sanityFetch<BlogPostQueryResult[]>({
+    relatedPosts = await sanityFetch<RelatedBlogPostsQueryResult>({
       query: relatedBlogPostsQuery,
       params: { categoryId: post.category._id, currentPostId: post._id },
       tags: ["blogPost"],
     });
   }
   if (relatedPosts.length < 2) {
-    relatedPosts = await sanityFetch<BlogPostQueryResult[]>({
+    relatedPosts = await sanityFetch<RelatedBlogPostsQueryResult>({
       query: latestBlogPostsQuery,
       tags: ["blogPost"],
     });
@@ -125,7 +125,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       {
         "@type": "ListItem",
         position: 1,
-        name: "Kezdőlap",
+        name: "Kezd┼ælap",
         item: "https://drmoroczangela.hu",
       },
       {
@@ -176,7 +176,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         <ol className="flex items-center gap-1.5 text-sm text-gray-500">
           <li>
             <Link href="/" className="hover:text-primary transition-colors duration-200">
-              Kezdőlap
+              Kezd┼ælap
             </Link>
           </li>
           <li aria-hidden="true">/</li>
@@ -197,7 +197,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         <div className="aspect-video rounded-2xl overflow-hidden mb-6">
           <Image
             src={urlFor(post.featuredImage).width(768).height(432).url()}
-            alt={post.title ?? "Blog bejegyzés"}
+            alt={post.title ?? "Blog bejegyz├⌐s"}
             width={768}
             height={432}
             className="w-full h-full object-cover"

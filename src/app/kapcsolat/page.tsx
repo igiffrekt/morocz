@@ -1,258 +1,338 @@
-import {
-  Phone,
-  Mail,
-  Clock,
-  MapPin,
-  Car,
-  CreditCard,
-  type LucideIcon,
-  Info,
-} from "lucide-react";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import { KAPCSOLAT_QUERY } from "@/sanity/lib/queries";
-import { CTAButton } from "@/components/ui/CTAButton";
+import Image from "next/image";
+
+import { Metadata } from "next";
 import { AccordionWrapper } from "@/components/ui/AccordionWrapper";
-import type { AccordionItemProps } from "@/components/ui/AccordionCard";
+
+import { SectionHeader } from "@/components/ui/SectionHeader";
+
 
 export const revalidate = 30;
 
-interface PhoneEntry {
+interface PhoneNumber {
   label: string;
   number: string;
+  iconName?: string;
 }
 
-interface EmailEntry {
+interface Email {
   label: string;
   email: string;
+  iconName?: string;
+  _key?: string;
 }
 
-interface OfficeHoursEntry {
+interface OfficeHour {
   day: string;
   hours: string;
 }
 
+interface AccordionItem {
+  _key?: string;
+  title: string;
+  body: string;
+  iconName?: string;
+}
+
 interface GoodToKnowCard {
+  _key?: string;
   iconName: string;
   title: string;
   description: string;
-  colorScheme?: "mint" | "blue" | "pink";
+  url?: string;
 }
 
 interface KapcsolatData {
+  // Hero
   heroTitle: string;
   heroDescription: string;
-  phoneNumbers: PhoneEntry[];
-  emailAddresses: EmailEntry[];
+  heroImage?: { asset?: { url: string; alt?: string } };
+  phoneNumbers: PhoneNumber[];
+  heroEmailAddresses: Email[];
+  emailAddresses: Email[];
   address: string;
-  officeHours: OfficeHoursEntry[];
+
+  // Details
+  officeHoursTitle: string;
+  officeHoursIconName?: string;
+  officeHours: OfficeHour[];
+  locationTitle: string;
+  locationIconName?: string;
+  locationImage?: { asset?: { url: string; alt?: string } };
+  locationLat?: number;
+  locationLng?: number;
+
+  // Good to know
+  goodToKnowLabel: string;
+  goodToKnowTitle: string;
+  goodToKnowSubtitle: string;
   goodToKnowCards: GoodToKnowCard[];
-  ctaTitle: string;
-  ctaButtonText: string;
-  ctaButtonUrl: string;
+
+  // Accordions
+  hasznos_label: string;
+  hasznos_title: string;
+  hasznos_subtitle: string;
+  hasznos_items: AccordionItem[];
+  fontos_label: string;
+  fontos_title: string;
+  fontos_subtitle: string;
+  fontos_items: AccordionItem[];
+
+
 }
 
-const iconMap: Record<string, LucideIcon> = {
-  Phone,
-  Mail,
-  Clock,
-  MapPin,
-  Car,
-  CreditCard,
-  Info,
+export const metadata: Metadata = {
+  title: "Kapcsolat | Mórocz Medical",
+  description: "Lépjen kapcsolatba velünk. Rendelési idő, elérhetőségek, helyszín és további információ.",
 };
 
-function getIcon(name: string): LucideIcon {
-  return iconMap[name] ?? Info;
+// Custom SVG icon loader with size option
+function getSvgIcon(iconName?: string, size: "sm" | "md" | "lg" = "md", isHero: boolean = false): React.ReactNode {
+  if (!iconName) return null;
+
+  const sizes = {
+    sm: "w-4 h-4", // 16px
+    md: "w-5 h-5 sm:w-6 sm:h-6", // 20-24px
+    lg: "w-8 h-8 sm:w-10 sm:h-10", // 32-40px
+  };
+
+  // Only apply white filter in hero section, navy blue elsewhere
+  const filter = isHero ? `brightness(0) invert(1)` : `brightness(0) saturate(100%) invert(11%) sepia(53%) saturate(1459%) hue-rotate(224deg) brightness(95%)`;
+
+  return (
+    <img
+      src={`/icons/${iconName}.svg`}
+      alt={iconName}
+      className={sizes[size]}
+      style={{ 
+        width: "1em", 
+        height: "1em", 
+        display: "inline",
+        filter
+      }}
+    />
+  );
 }
 
-const colorSchemes = {
-  mint: { bgColor: "#E3F1EE", iconColor: "#2D5F7E" },
-  blue: { bgColor: "#E8EDF5", iconColor: "#6B7B8D" },
-  pink: { bgColor: "#F8E2EE", iconColor: "#D4567A" },
-};
+// Smart icon fallback based on title keywords
+function getSmartIcon(title: string, iconName?: string, size: "sm" | "md" | "lg" = "md"): React.ReactNode {
+  // If custom icon is set, use it
+  if (iconName) {
+    return getSvgIcon(iconName, size);
+  }
 
-const hasznos_info_items: AccordionItemProps[] = [
-  {
-    id: "idopontfoglalas",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-        <line x1="16" y1="2" x2="16" y2="6" />
-        <line x1="8" y1="2" x2="8" y2="6" />
-        <line x1="3" y1="10" x2="21" y2="10" />
-      </svg>
-    ),
-    title: "Időpontfoglalás",
-    body: "Rendelésre bejelentkezni vagy időpontot egyeztetni kizárólag online lehetséges, az oldal alján található gombra kattintva.\n\nKérjük vegyék figyelembe, hogy lemondani a foglalt időpontot maximum 1 nappal a rendelés előtt lehetséges, az 1 napon belüli lemondásért ügyeleti díjat számolunk fel, melynek összege 10.000,- Ft / alkalom.",
-    highlight: "1 napon belüli lemondás: 10.000 Ft",
-  },
-  {
-    id: "surgossegi-ellatas",
-    icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M22 12h-4l-3 9L9 3l-3 9H2" /></svg>,
-    title: "Sürgősségi ellátás",
-    body: "Telefonon csak a rendelési időben vagyunk elérhetőek. Sürgős esetben rendelési időben telefonon, rendelési időn kívül pedig a drmoroczangela@gmail.com email címen vegyék fel velünk a kapcsolatot.",
-  },
-  {
-    id: "gyogyszer-igenyeles",
-    icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z" /><path d="m8.5 8.5 7 7" /></svg>,
-    title: "Gyógyszer igénylés",
-    body: "Rendszeresen szedett fogamzásgátló gyógyszerek igényét az alábbi email címre jelezzék, figyelembe véve, hogy gyógyszert felírni csak a rendelési napokon tudunk.",
-    highlight: "gyogyszer@drmoroczangela.hu",
-  },
-  {
-    id: "leletek-beadasa",
-    icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" /><polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /></svg>,
-    title: "Leletek beadása",
-    body: "Leleteket, eredményeket továbbra is a drmoroczangela@gmail.com email címre várjuk.",
-    highlight: "drmoroczangela@gmail.com",
-  },
-  {
-    id: "egyeb-kerdesek",
-    icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><circle cx="12" cy="12" r="10" /><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" /><line x1="12" y1="17" x2="12.01" y2="17" /></svg>,
-    title: "Egyéb kérdések",
-    body: "Időpontfoglalással kapcsolatos, illetve egyéb technikai kérdéseket az alábbi email címre legyenek kedvesek írni.",
-    highlight: "recepcio@drmoroczangela.hu",
-  },
-  {
-    id: "telefonszamunk",
-    icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" /></svg>,
-    title: "Telefonszámunk",
-    body: "Rendelési időben elérhető telefonszámunk:\n+36 70 639 5239",
-    highlight: "Rendelési időben",
-  },
-  {
-    id: "cimunk",
-    icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>,
-    title: "Címünk",
-    body: "2500 Esztergom, Martsa Alajos utca 6/c",
-  },
-  {
-    id: "rendelesi-ido",
-    icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>,
-    title: "Rendelési idő",
-    body: "Hétfő: 12:00 – 15:00\nKedd: 12:00 – 15:00\nCsütörtök: 13:00 – 17:00",
-  },
-  {
-    id: "hasznos-email-cimek",
-    icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><rect x="2" y="4" width="20" height="16" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" /></svg>,
-    title: "Hasznos email címek",
-    body: "Általános kérdések, recepció: recepcio@drmoroczangela.hu\n\nGyógyszer igények: gyogyszer@drmoroczangela.hu\n\nVérvétel: labordiagnosztika@drmoroczangela.hu\n\nSürgősségi: drmoroczangela@gmail.com",
-  },
-];
+  const lowerTitle = title.toLowerCase();
 
-const fontos_tudnivalok_items: AccordionItemProps[] = [
-  {
-    id: "leletek-kuldese",
-    icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M22 2 11 13" /><path d="m22 2-7 20-4-9-9-4 20-7Z" /></svg>,
-    title: "Leletek küldése",
-    body: "Leletek elektronikus úton történő megküldése és kiértékelése kizárólag előzetes kérésem után történhet. Minden egyéb esetben személyes konzultáció szükséges az eredményekkel.\n\nVárandósgondozást elektronikus úton nem végzek, személyes megjelenés szükséges.",
-  },
-  {
-    id: "diagnozis",
-    icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>,
-    title: "Diagnózis felállítása",
-    body: "Elektronikus úton részletezett panaszok és tünetek, fotók alapján diagnózis felállítani nem tudok. Ilyen esetekben vizsgálat szükséges, kérem jelentkezzen be online vagy a megadott elérhetőségeken egyeztessen velünk időpontot.",
-  },
-  {
-    id: "igazolasok",
-    icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M4 7V4a2 2 0 0 1 2-2h8.5L20 7.5V20a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-3" /><polyline points="14 2 14 8 20 8" /><path d="M5 12h9" /><path d="m9 8-4 4 4 4" /></svg>,
-    title: "Igazolások kiállítása",
-    body: "Elektronikus úton igazolást nem tudunk kiállítani. Időpontfoglalás nélkül, rendelési idő alatt személyes megjelenést követően állítjuk ki a kért igazolásokat.\n\nSzakorvosi igazolás kiállításának díja 10.000 Ft, melyet a recepción tud rendezni.",
-    highlight: "10.000 Ft",
-  },
-  {
-    id: "egeszsegpenztar",
-    icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><rect x="2" y="5" width="20" height="14" rx="2" /><line x1="2" y1="10" x2="22" y2="10" /></svg>,
-    title: "Egészségpénztár",
-    body: "Egészségpénztárakkal nem állok szerződésben, ezért számlát nem tudok kiállítani.",
-  },
-  {
-    id: "intimtorna",
-    icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M18 20V6a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v14" /><path d="M2 20h20" /><path d="M14 12v.01" /></svg>,
-    title: "Intimtorna tanfolyam",
-    body: "Csoportos hétvégi tanfolyamok egyéni tornaterv átadásával és 1 hónapig online konzultációs lehetőséggel.",
-    highlight: "40.000 Ft",
-  },
-  {
-    id: "magzati-ultrahang",
-    icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M12 2a3 3 0 0 0-3 3c0 1.6.8 3 2 4l1 1 1-1c1.2-1 2-2.4 2-4a3 3 0 0 0-3-3z" /><path d="M9 12c-2.8 1-5 4-5 7.5 0 1.4 1.1 2.5 2.5 2.5h11c1.4 0 2.5-1.1 2.5-2.5 0-3.5-2.2-6.5-5-7.5" /><path d="M12 10v4" /></svg>,
-    title: "Magzati genetikai ultrahang",
-    body: "Magzati genetikai ultrahangot nem végzek.",
-    highlight: "Ajánlott: Czeikel Intézet, Budapest",
-  },
-];
+  // Time-related
+  if (lowerTitle.includes("idő") || lowerTitle.includes("rendelés")) return getSvgIcon("clock", size);
 
+  // Contact-related
+  if (lowerTitle.includes("telefon")) return getSvgIcon("phone", size);
+  if (lowerTitle.includes("email") || lowerTitle.includes("cím")) return getSvgIcon("mail", size);
+  if (lowerTitle.includes("lakcím") || lowerTitle.includes("címünk")) return getSvgIcon("map-pin", size);
+
+  // Alert/Important
+  if (
+    lowerTitle.includes("sürgős") ||
+    lowerTitle.includes("fontos") ||
+    lowerTitle.includes("nem végzek") ||
+    lowerTitle.includes("diagnózis")
+  ) {
+    return getSvgIcon("alert-circle", size);
+  }
+
+  // Help/Questions
+  if (lowerTitle.includes("kérdés") || lowerTitle.includes("egyéb")) return getSvgIcon("help-circle", size);
+
+  // Default to Info
+  return getSvgIcon("info", size);
+}
+
+// Fallback data (restored from old version)
 const fallbackData: KapcsolatData = {
   heroTitle: "Kapcsolat",
   heroDescription: "Kérdése van? Keressen minket bizalommal az alábbi elérhetőségek valamelyikén.",
-  phoneNumbers: [{ label: "Rendelési időben", number: "+36 70 639 5239" }],
+  phoneNumbers: [{ label: "Rendelési időben", number: "+36 70 639 5239", iconName: "telefon" }],
+  heroEmailAddresses: [
+    { label: "Általános", email: "recepcio@drmoroczangela.hu", iconName: "email" },
+  ],
   emailAddresses: [
-    { label: "Általános / Recepció", email: "recepcio@drmoroczangela.hu" },
-    { label: "Gyógyszer igények", email: "gyogyszer@drmoroczangela.hu" },
-    { label: "Vérvétel / Labor", email: "labordiagnosztika@drmoroczangela.hu" },
-    { label: "Sürgős eset", email: "drmoroczangela@gmail.com" },
+    { label: "Általános / Recepció", email: "recepcio@drmoroczangela.hu", iconName: "email" },
+    { label: "Gyógyszer igények", email: "gyogyszer@drmoroczangela.hu", iconName: "email" },
+    { label: "Vérvétel / Labor", email: "labordiagnosztika@drmoroczangela.hu", iconName: "email" },
+    { label: "Sürgős eset", email: "drmoroczangela@gmail.com", iconName: "surgos" },
   ],
   address: "2500 Esztergom, Martsa Alajos utca 6/c",
+  officeHoursTitle: "Rendelési idő",
+  officeHoursIconName: "ora",
   officeHours: [
     { day: "Hétfő", hours: "12:00 – 15:00" },
     { day: "Kedd", hours: "12:00 – 15:00" },
     { day: "Csütörtök", hours: "13:00 – 17:00" },
   ],
+  locationTitle: "Rendelő",
+  locationIconName: "terkep",
+  locationLat: 47.787,
+  locationLng: 18.7344,
+  goodToKnowLabel: "Hasznos",
+  goodToKnowTitle: "Jó tudni érkezés előtt",
+  goodToKnowSubtitle: "Segítünk, hogy stresszmentes legyen a vizit",
   goodToKnowCards: [
     {
       iconName: "Car",
       title: "Parkolás",
       description: "A klinika előtt és a környező utcákban díjmentes parkolási lehetőség biztosított.",
-      colorScheme: "mint",
     },
     {
       iconName: "Clock",
       title: "Érkezés",
       description: "Kérjük, érkezzen 10 perccel az előre egyeztetett időpont előtt az adminisztráció miatt.",
-      colorScheme: "blue",
     },
     {
       iconName: "CreditCard",
       title: "Fizetési módok",
-      description: "Készpénzes és bankkártyás fizetésre egyaránt van lehetőség, valamint egészségpénztári kártyát is elfogadunk.",
-      colorScheme: "pink",
+      description: "Készpénzes és bankkártyás fizetésre egyaránt van lehetőség.",
     },
   ],
-  ctaTitle: "Foglaljon időpontot még ma",
-  ctaButtonText: "Foglaljon időpontot",
-  ctaButtonUrl: "/idopontfoglalas",
+  hasznos_label: "Tudnivalók",
+  hasznos_title: "Hasznos információk",
+  hasznos_subtitle: "Válaszok az Ön legfontosabb kérdéseire",
+  hasznos_items: [
+    {
+      _key: "hasznos-1",
+      title: "Időpontfoglalás",
+      body: "Rendelésre bejelentkezni vagy időpontot egyeztetni kizárólag online lehetséges, az oldal alján található gombra kattintva.\n\nKérjük vegyék figyelembe, hogy lemondani a foglalt időpontot maximum 1 nappal a rendelés előtt lehetséges.",
+      iconName: "Clock",
+    },
+    {
+      _key: "hasznos-2",
+      title: "Sürgősségi ellátás",
+      body: "Telefonon csak a rendelési időben vagyunk elérhetőek. Sürgős esetben rendelési időben telefonon, rendelési időn kívül pedig email-en vegyék fel velünk a kapcsolatot.",
+      iconName: "AlertCircle",
+    },
+    {
+      _key: "hasznos-3",
+      title: "Gyógyszer igénylés",
+      body: "Rendszeresen szedett fogamzásgátló gyógyszerek igényét az alábbi email címre jelezzék.",
+      iconName: "Info",
+    },
+    {
+      _key: "hasznos-4",
+      title: "Leletek beadása",
+      body: "Leleteket, eredményeket a drmoroczangela@gmail.com email címre várjuk.",
+      iconName: "Info",
+    },
+    {
+      _key: "hasznos-5",
+      title: "Egyéb kérdések",
+      body: "Időpontfoglalással kapcsolatos kérdéseket az alábbi email címre legyenek kedvesek írni.",
+      iconName: "HelpCircle",
+    },
+    {
+      _key: "hasznos-6",
+      title: "Telefonszámunk",
+      body: "Rendelési időben elérhető telefonszámunk:\n+36 70 639 5239",
+      iconName: "Phone",
+    },
+    {
+      _key: "hasznos-7",
+      title: "Címünk",
+      body: "2500 Esztergom, Martsa Alajos utca 6/c",
+      iconName: "MapPin",
+    },
+    {
+      _key: "hasznos-8",
+      title: "Rendelési idő",
+      body: "Hétfő: 12:00 – 15:00\nKedd: 12:00 – 15:00\nCsütörtök: 13:00 – 17:00",
+      iconName: "Clock",
+    },
+    {
+      _key: "hasznos-9",
+      title: "Hasznos email címek",
+      body: "Általános: recepcio@drmoroczangela.hu\nGyógyszer: gyogyszer@drmoroczangela.hu\nVérvétel: labordiagnosztika@drmoroczangela.hu\nSürgős: drmoroczangela@gmail.com",
+      iconName: "Mail",
+    },
+  ],
+  fontos_label: "Fontos",
+  fontos_title: "Fontos tudnivalók",
+  fontos_subtitle: "Biztonság és komfort az ellátás során",
+  fontos_items: [
+    {
+      _key: "fontos-1",
+      title: "Leletek küldése",
+      body: "Leletek elektronikus úton történő megküldése kizárólag előzetes kérésem után történhet. Személyes konzultáció szükséges.",
+      iconName: "AlertCircle",
+    },
+    {
+      _key: "fontos-2",
+      title: "Diagnózis felállítása",
+      body: "Elektronikus úton diagnózis felállítani nem tudok. Vizsgálat szükséges.",
+      iconName: "Info",
+    },
+    {
+      _key: "fontos-3",
+      title: "Igazolások kiállítása",
+      body: "Szakorvosi igazolás kiállításának díja 10.000 Ft.",
+      iconName: "Info",
+    },
+    {
+      _key: "fontos-4",
+      title: "Egészségpénztár",
+      body: "Egészségpénztárakkal nem állok szerződésben.",
+      iconName: "AlertCircle",
+    },
+    {
+      _key: "fontos-5",
+      title: "Intimtorna tanfolyam",
+      body: "Csoportos hétvégi tanfolyamok. Díj: 40.000 Ft",
+      iconName: "Info",
+    },
+    {
+      _key: "fontos-6",
+      title: "Magzati genetikai ultrahang",
+      body: "Magzati genetikai ultrahangot nem végzek.",
+      iconName: "AlertCircle",
+    },
+  ],
 };
-
-function SectionHeader({ label, title, subtitle }: { label: string; title: string; subtitle: string }) {
-  return (
-    <div style={{ marginBottom: "48px" }}>
-      <span style={{ display: "inline-flex", alignItems: "center", gap: "12px", fontSize: "0.75rem", fontWeight: 600, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(36,42,95,0.4)", marginBottom: "16px" }}>
-        <span style={{ width: "32px", height: "1px", background: "rgba(36,42,95,0.2)" }} />
-        {label}
-      </span>
-      <h2 style={{ fontSize: "clamp(1.75rem, 5vw, 2.75rem)", fontWeight: 800, color: "#1e2952", lineHeight: 1.2, margin: 0, marginBottom: "12px" }}>
-        {title}
-      </h2>
-      <p style={{ fontSize: "0.875rem", color: "rgba(36,42,95,0.45)", maxWidth: "600px", lineHeight: 1.6 }}>
-        {subtitle}
-      </p>
-    </div>
-  );
-}
 
 export default async function KapcsolatPage() {
   let data: KapcsolatData = fallbackData;
 
   try {
-    const result = await sanityFetch<KapcsolatData>({ query: KAPCSOLAT_QUERY });
-    if (result) data = result;
-  } catch {
-    // use fallback
+    const result = await sanityFetch<KapcsolatData>({
+      query: KAPCSOLAT_QUERY,
+    });
+    if (result) {
+      data = result;
+      console.log("✓ Sanity data fetched:", {
+        heroImageUrl: data.heroImage?.asset?.url,
+        heroImageAlt: data.heroImage?.asset?.alt,
+      });
+    }
+  } catch (_err) {
+    console.error("✗ Sanity fetch error:", _err);
   }
+
+  // Convert accordion items to AccordionCard format with smart icon fallback
+  const hasznos_converted = data.hasznos_items.map((item, idx) => ({
+    id: `hasznos-${idx}`,
+    icon: getSmartIcon(item.title, item.iconName),
+    title: item.title,
+    body: item.body,
+  }));
+
+  const fontos_converted = data.fontos_items.map((item, idx) => ({
+    id: `fontos-${idx}`,
+    icon: getSmartIcon(item.title, item.iconName),
+    title: item.title,
+    body: item.body,
+  }));
 
   return (
     <main className="min-h-screen bg-white text-primary">
-      {/* Hero */}
+      {/* ──────────────────────────────────── HERO ──────────────────────────────────── */}
       <section
         style={{
           background: "#1e2952",
@@ -260,16 +340,29 @@ export default async function KapcsolatPage() {
           borderBottomRightRadius: "40px",
           position: "relative",
           overflow: "hidden",
-          paddingTop: "56px",
-          paddingBottom: "64px",
+          paddingTop: "80px",
+          paddingBottom: "100px",
           marginTop: "-40px",
           color: "white",
         }}
-        className="sm:pb-96 md:pb-32 lg:pb-40 sm:pt-16 md:pt-20"
+        className="sm:pb-96 md:pb-32 lg:pb-40"
       >
-        <div style={{ position: "absolute", right: "-80px", top: "-80px", width: "384px", height: "384px", background: "#a8d5ba", opacity: 0.05, borderRadius: "9999px", filter: "blur(48px)" }} />
+        {/* Decorative blob (restored) */}
+        <div
+          style={{
+            position: "absolute",
+            right: "-80px",
+            top: "-80px",
+            width: "384px",
+            height: "384px",
+            background: "#a8d5ba",
+            opacity: 0.05,
+            borderRadius: "9999px",
+            filter: "blur(48px)",
+          }}
+        />
 
-        <div style={{ position: "relative", zIndex: 10, maxWidth: "80rem", marginLeft: "auto", marginRight: "auto", paddingLeft: "16px", paddingRight: "16px" }}>
+        <div style={{ position: "relative", zIndex: 10, maxWidth: "95rem", marginLeft: "auto", marginRight: "auto", paddingLeft: "3rem", paddingRight: "3rem" }}>
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-12 items-center">
             {/* Contact Info */}
             <div>
@@ -279,146 +372,187 @@ export default async function KapcsolatPage() {
               <p className="text-base sm:text-lg md:text-xl text-blue-200 mb-6 md:mb-8 max-w-lg leading-relaxed">
                 {data.heroDescription}
               </p>
-              <div className="flex flex-col gap-4">
-                {data.phoneNumbers.map((p, i) => (
-                  <a
-                    key={i}
-                    href={`tel:${p.number.replace(/\s/g, "")}`}
-                    className="flex items-center gap-3 hover:opacity-80 active:bg-white/10 p-2 -ml-2 rounded-lg transition-all"
-                  >
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center bg-white/10 flex-shrink-0">
-                      <Phone className="w-5 h-5 sm:w-6 sm:h-6" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-xs font-bold text-blue-200 uppercase tracking-wide">
-                        {p.label}
-                      </p>
-                      <p className="font-semibold text-sm sm:text-base truncate">{p.number}</p>
-                    </div>
-                  </a>
-                ))}
 
-                {data.emailAddresses.length > 0 && (
-                  <a
-                    href={`mailto:${data.emailAddresses[0].email}`}
-                    className="flex items-center gap-3 hover:opacity-80 active:bg-white/10 p-2 -ml-2 rounded-lg transition-all"
-                  >
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center bg-white/10 flex-shrink-0">
-                      <Mail className="w-5 h-5 sm:w-6 sm:h-6" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-xs font-bold text-blue-200 uppercase tracking-wide">
-                        {data.emailAddresses[0].label}
-                      </p>
-                      <p className="font-semibold text-sm sm:text-base truncate">
-                        {data.emailAddresses[0].email}
-                      </p>
-                    </div>
-                  </a>
-                )}
+              {/* All Phone Numbers */}
+              {data.phoneNumbers?.map((phone, idx) => (
+                <a
+                  key={idx}
+                  href={`tel:${phone.number.replace(/\s/g, "")}`}
+                  className="flex items-center gap-3 hover:opacity-80 active:bg-white/10 p-2 -ml-2 rounded-lg transition-all mb-4"
+                >
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center bg-white/10 flex-shrink-0">
+                    {getSvgIcon(phone.iconName || "telefon", "md", true)}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs font-bold text-blue-200 uppercase tracking-wide">{phone.label}</p>
+                    <p className="font-semibold text-sm sm:text-base truncate text-white">{phone.number}</p>
+                  </div>
+                </a>
+              ))}
+
+              {/* Hero Email Addresses */}
+              {data.heroEmailAddresses?.map((email, idx) => (
+                <a
+                  key={idx}
+                  href={`mailto:${email.email}`}
+                  className="flex items-center gap-3 hover:opacity-80 active:bg-white/10 p-2 -ml-2 rounded-lg transition-all mb-4"
+                >
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center bg-white/10 flex-shrink-0">
+                    {getSvgIcon(email.iconName || "email", "md", true)}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs font-bold text-blue-200 uppercase tracking-wide">{email.label}</p>
+                    <p className="font-semibold text-sm sm:text-base truncate text-white">{email.email}</p>
+                  </div>
+                </a>
+              ))}
+            </div>
+
+            {/* Hero Image */}
+            {data.heroImage?.asset?.url && (
+              <div className="hidden md:block relative h-[300px] sm:h-[400px] md:h-[500px] rounded-[40px] shadow-2xl border-4 border-white/10 overflow-hidden">
+                <Image
+                  src={data.heroImage.asset.url}
+                  alt={data.heroImage.asset.alt || "Rendelő"}
+                  fill
+                  className="object-cover"
+                  priority
+                />
               </div>
-            </div>
-
-            {/* Image */}
-            <div className="hidden md:block">
-              <img
-                alt="Mórocz Medical klinika"
-                className="rounded-3xl sm:rounded-4xl shadow-2xl border-4 border-white/10 w-full h-auto object-cover"
-                src="/morocz-medical-kulter.webp"
-              />
-            </div>
+            )}
           </div>
         </div>
       </section>
 
-      {/* Details Section */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 -mt-32 sm:-mt-48 md:-mt-20 mb-12 md:mb-24 relative z-20">
-        <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2">
-          {/* Hours Card */}
-          <div className="bg-white/95 backdrop-blur border border-gray-200 rounded-3xl sm:rounded-4xl p-6 sm:p-8 shadow-lg flex flex-col">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-full flex items-center justify-center text-green-600">
-                <Clock className="w-5 h-5 sm:w-6 sm:h-6" />
-              </div>
-              <h2 className="text-lg sm:text-xl font-bold">Nyitvatartás</h2>
-            </div>
-            <div className="flex-1">
-              {data.officeHours.map((h, i) => (
-                <div key={i} className="flex justify-between items-center py-2 sm:py-3 border-b border-gray-100 last:border-b-0">
-                  <span className="text-gray-600 font-medium text-sm sm:text-base">{h.day}</span>
-                  <span className="font-bold text-navy text-sm sm:text-base">{h.hours}</span>
+      {/* ──────────────────────────────────── DETAILS (GLASS CARDS) ──────────────────────────────────── */}
+      <section style={{ maxWidth: "95rem", paddingLeft: "3rem", paddingRight: "3rem" }} className="mx-auto -mt-16 relative z-10 mb-32">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Office Hours Card */}
+          <div
+            className="p-6 sm:p-8 rounded-3xl shadow-lg hover:shadow-xl transition-shadow flex flex-col"
+            style={{
+              background: "rgba(255, 255, 255, 0.95)",
+              backdropFilter: "blur(10px)",
+            }}
+          >
+            <h3 className="text-lg sm:text-xl font-bold text-[#1e2952] mb-6 flex items-center gap-3">
+              <div className="w-6 h-6 flex items-center justify-center">{getSvgIcon(data.officeHoursIconName || "ora", "md", false)}</div>
+              {data.officeHoursTitle}
+            </h3>
+            <div className="mb-auto">
+              {data.officeHours?.map((hour, idx) => (
+                <div key={idx}>
+                  <div className="flex justify-between py-3 text-gray-700">
+                    <span className="font-medium">{hour.day}</span>
+                    <span className="font-bold text-[#1e2952]">{hour.hours}</span>
+                  </div>
+                  {idx < (data.officeHours?.length || 0) - 1 && (
+                    <div className="border-b border-gray-200" />
+                  )}
                 </div>
               ))}
-            </div>
-            <div className="pt-4 mt-4 border-t border-gray-100">
-              <CTAButton text={data.ctaButtonText} href={data.ctaButtonUrl} />
             </div>
           </div>
 
           {/* Location Card */}
-          <div className="bg-white/95 backdrop-blur border border-gray-200 rounded-3xl sm:rounded-4xl p-6 sm:p-8 shadow-lg">
-            <div className="flex items-start gap-3 mb-4">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-red-100 rounded-full flex items-center justify-center text-red-500 flex-shrink-0">
-                <MapPin className="w-5 h-5 sm:w-6 sm:h-6" />
-              </div>
-              <div className="min-w-0">
-                <h2 className="text-lg sm:text-xl font-bold">Rendelő</h2>
-                <p className="text-gray-600 text-sm sm:text-base truncate">{data.address}</p>
-              </div>
-            </div>
-            <div className="mt-6 flex flex-col gap-3 border-t border-gray-100 pt-4">
-              <p className="text-xs font-bold text-gray-600 uppercase tracking-wide">Email elérhetőségek</p>
-              {data.emailAddresses.map((e, i) => (
-                <div key={i} className="text-xs sm:text-sm">
-                  <p className="text-gray-600 text-xs uppercase tracking-wide">{e.label}</p>
-                  <a href={`mailto:${e.email}`} className="text-primary font-semibold hover:underline break-all">
-                    {e.email}
+          <div
+            className="p-6 sm:p-8 rounded-3xl shadow-lg hover:shadow-xl transition-shadow overflow-hidden relative"
+            style={{
+              background: "rgba(255, 255, 255, 0.95)",
+              backdropFilter: "blur(10px)",
+            }}
+          >
+            <h3 className="text-lg sm:text-xl font-bold text-[#1e2952] mb-6 flex items-center gap-3 relative z-10">
+              <div className="w-6 h-6 flex items-center justify-center">{getSvgIcon(data.locationIconName || "terkep", "md", false)}</div>
+              {data.locationTitle}
+            </h3>
+
+            {data.locationImage?.asset?.url && (
+              <Image
+                src={data.locationImage.asset.url}
+                alt={data.locationImage.asset.alt || "Helyszín"}
+                width={400}
+                height={300}
+                className="w-full h-48 object-cover rounded-2xl mb-4"
+              />
+            )}
+
+            <p className="text-gray-700 font-medium relative z-10 mb-4">{data.address}</p>
+
+            {/* Email Addresses */}
+            {data.emailAddresses?.length > 0 && (
+              <div className="space-y-3 relative z-10">
+                {data.emailAddresses.map((email, idx) => (
+                  <a
+                    key={idx}
+                    href={`mailto:${email.email}`}
+                    className="flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r from-white/50 to-white/30 hover:from-white hover:to-white/80 border border-gray-200 hover:border-[#a8d5ba] transition-all group"
+                  >
+                    <div className="w-4 h-4 flex items-center justify-center flex-shrink-0 transition-colors">
+                      {getSvgIcon(email.iconName || "email", "sm", false)}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide group-hover:text-[#1e2952] transition-colors">{email.label}</p>
+                      <p className="text-sm font-medium text-gray-700 truncate group-hover:text-[#1e2952] transition-colors">{email.email}</p>
+                    </div>
                   </a>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </section>
 
-      {/* Good to Know */}
-      <section className="bg-gradient-to-b from-orange-50 to-white rounded-2xl sm:rounded-3xl lg:rounded-4xl px-4 sm:px-6 py-12 sm:py-16 md:py-24 mx-4 sm:mx-6 mb-12 md:mb-24">
-        <div className="max-w-6xl mx-auto">
+      {/* ──────────────────────────────────── JÓ TUDNI ──────────────────────────────────── */}
+      <section className="mb-32" style={{ background: "#FAF8F3", borderRadius: "24px", paddingTop: "64px", paddingBottom: "64px", marginTop: "32px", paddingLeft: "3rem", paddingRight: "3rem" }}>
+        <div style={{ maxWidth: "95rem" }} className="mx-auto">
           <SectionHeader
-            label="ELŐKÉSZÜLETEK"
-            title="Jó tudni érkezés előtt"
-            subtitle="Az alábbi információk segítségével megfelelően felkészülhetsz a rendelésre."
+            label={data.goodToKnowLabel}
+            title={data.goodToKnowTitle}
+            subtitle={data.goodToKnowSubtitle}
           />
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {data.goodToKnowCards.map((card, i) => {
-              const Icon = getIcon(card.iconName);
-              const scheme = colorSchemes[card.colorScheme || "mint"];
+
+          {/* Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {data.goodToKnowCards?.map((card, idx) => {
+              const CardComponent = card.url ? "a" : "div";
+              const cardProps = card.url
+                ? {
+                    href: card.url,
+                    target: "_blank",
+                    rel: "noopener noreferrer",
+                  }
+                : {};
+
               return (
-                <div key={i} className="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-md hover:shadow-lg hover:-translate-y-1 transition-all">
-                  <div style={{ backgroundColor: scheme.bgColor, color: scheme.iconColor }} className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center mb-4">
-                    <Icon className="w-6 h-6 sm:w-8 sm:h-8" />
+                <CardComponent
+                  key={idx}
+                  className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm hover:shadow-md hover:translate-y-[-4px] transition-all duration-300 cursor-pointer"
+                  {...cardProps}
+                >
+                  <div className="text-[#a8d5ba] mb-4 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                    {getSmartIcon(card.title, card.iconName, "lg")}
                   </div>
-                  <h3 className="text-base sm:text-lg font-bold mb-3 text-navy">{card.title}</h3>
-                  <p className="text-gray-600 text-sm sm:text-base leading-relaxed">{card.description}</p>
-                </div>
+                  <h3 className="text-lg font-bold text-[#1e2952] mb-3">{card.title}</h3>
+                  <p className="text-gray-600 text-sm leading-relaxed">{card.description}</p>
+                </CardComponent>
               );
             })}
           </div>
         </div>
       </section>
 
-      {/* Accordions - Controlled by wrapper for dynamic width */}
+      {/* ──────────────────────────────────── ACCORDIONS (TWIN 50-50) ──────────────────────────────────── */}
       <AccordionWrapper
-        leftTitle="Hasznos információk"
-        leftSubtitle="Kérjük, az időpontfoglalás előtt olvassa el az alábbi információkat."
-        leftLabel="FONTOS TUDNIVALÓ"
-        leftItems={hasznos_info_items}
-        rightTitle="Fontos tudnivalók"
-        rightSubtitle="Válaszok az időpontfoglalás előtt felmerülő gyakori kérdésekre."
-        rightLabel="KÉRDÉSEK"
-        rightItems={fontos_tudnivalok_items}
+        leftLabel={data.hasznos_label}
+        leftTitle={data.hasznos_title}
+        leftSubtitle={data.hasznos_subtitle}
+        leftItems={hasznos_converted}
+        rightLabel={data.fontos_label}
+        rightTitle={data.fontos_title}
+        rightSubtitle={data.fontos_subtitle}
+        rightItems={fontos_converted}
       />
-
 
     </main>
   );

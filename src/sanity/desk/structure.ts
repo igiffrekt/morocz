@@ -73,6 +73,38 @@ export const structure: StructureResolver = (S) =>
 
       S.divider(),
 
+      // Jóga group
+      S.listItem()
+        .title("Jóga")
+        .child(
+          S.list()
+            .title("Jóga")
+            .items([
+              S.listItem()
+                .title("Jóga oldal beállítások")
+                .child(
+                  S.document()
+                    .schemaType("yogaPage")
+                    .documentId("yogaPage")
+                    .title("Jóga oldal szerkesztése"),
+                ),
+              S.listItem()
+                .title("Órarend")
+                .schemaType("yogaSchedule")
+                .child(S.documentTypeList("yogaSchedule").title("Órarend")),
+              S.listItem()
+                .title("Jóga típusok")
+                .schemaType("yogaClass")
+                .child(S.documentTypeList("yogaClass").title("Jóga típusok")),
+              S.listItem()
+                .title("Oktatók")
+                .schemaType("yogaInstructor")
+                .child(S.documentTypeList("yogaInstructor").title("Oktatók")),
+            ]),
+        ),
+
+      S.divider(),
+
       // Vélemények (Testimonials — standalone)
       S.listItem()
         .title("Vélemények")
@@ -101,6 +133,18 @@ export const structure: StructureResolver = (S) =>
 
       S.divider(),
 
+      // Kapcsolat oldal (kapcsolat singleton)
+      S.listItem()
+        .title("Kapcsolat oldal")
+        .child(
+          S.document()
+            .schemaType("kapcsolat")
+            .documentId("kapcsolat")
+            .title("Kapcsolat oldal szerkesztése"),
+        ),
+
+      S.divider(),
+
       // Adatkezelési tájékoztató (privacyPolicy singleton)
       S.listItem()
         .title("Adatkezelési tájékoztató")
@@ -109,6 +153,16 @@ export const structure: StructureResolver = (S) =>
             .schemaType("privacyPolicy")
             .documentId("privacyPolicy")
             .title("Adatkezelési tájékoztató szerkesztése"),
+        ),
+
+      // Cookie Szabályzat (cookiePolicy singleton)
+      S.listItem()
+        .title("Cookie Szabályzat")
+        .child(
+          S.document()
+            .schemaType("cookiePolicy")
+            .documentId("cookiePolicy")
+            .title("Cookie Szabályzat szerkesztése"),
         ),
 
       S.divider(),

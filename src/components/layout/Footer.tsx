@@ -21,6 +21,7 @@ interface FooterProps {
     url?: string;
   }>;
   privacyPolicyUrl?: string;
+  cookiePolicyUrl?: string;
 }
 
 export default function Footer({
@@ -30,6 +31,7 @@ export default function Footer({
   footerColumns,
   socialLinks,
   privacyPolicyUrl,
+  cookiePolicyUrl,
 }: FooterProps) {
   const displayName = clinicName ?? "Mórocz Medical";
 
@@ -116,12 +118,21 @@ export default function Footer({
               <p>
                 &copy;{new Date().getFullYear()} {displayName}. Minden jog fenntartva.
               </p>
-              <Link
-                href={privacyPolicyUrl ?? "/adatkezelesi-tajekoztato"}
-                className="hover:text-white transition-colors"
-              >
-                Adatkezelési tájékoztató
-              </Link>
+              <div className="flex gap-4">
+                <Link
+                  href={privacyPolicyUrl ?? "/adatkezelesi-tajekoztato"}
+                  className="hover:text-white transition-colors"
+                >
+                  Adatkezelési tájékoztató
+                </Link>
+                <span className="text-white/30">|</span>
+                <Link
+                  href={cookiePolicyUrl ?? "/cookie-szabalyzat"}
+                  className="hover:text-white transition-colors"
+                >
+                  Cookie Szabályzat
+                </Link>
+              </div>
             </div>
           </div>
         </div>

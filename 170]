@@ -1,1 +1,0 @@
-with open(src/components/auth/AuthStep.tsx, r) as f: lines = f.readlines(); [lines.__setitem__(i, line.replace(if (result?.user?.id, if ((result as any)?.user?.id)) for i, line in enumerate(lines) if (result?.user?.id && phoneNumber.trim()) in line and i ; open(src/components/auth/AuthStep.tsx, w).writelines(lines)

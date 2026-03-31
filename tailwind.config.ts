@@ -15,8 +15,11 @@ const config: Config = {
       colors: {
         primary: '#1e2952',
         'medical-navy': '#1e2952',
-        'medical-green': '#a8d5ba',
-        'medical-light-green': '#e8f3ee',
+        'medical-green': '#76c8b6',
+        'medical-teal': '#469993',
+        'medical-orange': '#efc462',
+        'medical-coral': '#eb8966',
+        'medical-light-green': '#e6f5f2',
         'medical-text-gray': '#4b5563',
       },
       backgroundColor: {

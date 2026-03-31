@@ -7,6 +7,7 @@ export type PatientRow = {
   email: string;
   name: string;
   phone: string;
+  latogatas: number; // Visit count from CSV (Sanity field)
   totalBookings: number;
   confirmedCount: number;
   cancelledCount: number;
@@ -29,6 +30,7 @@ type PatientDoc = {
   phone?: string;
   lastVisitDate?: string;
   source?: string;
+  latogatas?: number;
 };
 
 export async function GET(request: Request): Promise<Response> {
@@ -58,7 +60,8 @@ export async function GET(request: Request): Promise<Response> {
           email,
           phone,
           lastVisitDate,
-          source
+          source,
+          latogatas
         }`,
       ),
     ]);
@@ -75,6 +78,7 @@ export async function GET(request: Request): Promise<Response> {
           email,
           name: b.patientName ?? "",
           phone: b.patientPhone ?? "",
+          latogatas: 0, // Will be updated from imported patients
           totalBookings: 0,
           confirmedCount: 0,
           cancelledCount: 0,
@@ -105,6 +109,7 @@ export async function GET(request: Request): Promise<Response> {
         const p = patientMap.get(key)!;
         p.source = "both";
         if (!p.phone && ip.phone) p.phone = ip.phone;
+        if (ip.latogatas) p.latogatas = ip.latogatas; // Use CSV visit count
         // Merge lastVisit: take whichever is more recent
         if (ip.lastVisitDate) {
           if (!p.lastVisit || ip.lastVisitDate > p.lastVisit) {
@@ -117,6 +122,7 @@ export async function GET(request: Request): Promise<Response> {
           email,
           name: ip.name,
           phone: ip.phone ?? "",
+          latogatas: ip.latogatas ?? 0, // Use CSV visit count or 0
           totalBookings: 0,
           confirmedCount: 0,
           cancelledCount: 0,

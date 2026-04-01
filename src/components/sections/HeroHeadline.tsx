@@ -36,7 +36,7 @@ export function HeroHeadline({ text, id }: HeroHeadlineProps) {
       animate="visible"
       // Mobilon: flex flex-col → szavak egymás alatt, gap-0 → nincs sortávolság
       // Desktopon: md:block → inline szavak egy sorban
-      className="text-8xl md:text-8xl lg:text-[8rem] xl:text-[10rem] font-extrabold tracking-tighter text-[#dae8fe] text-center flex flex-col gap-0 md:block"
+      className="text-5xl sm:text-6xl md:text-8xl lg:text-[8rem] xl:text-[10rem] font-extrabold tracking-tighter text-[#dae8fe] text-center flex flex-col gap-0 md:block"
     >
       {words.map((w, wi) => (
         // biome-ignore lint/suspicious/noArrayIndexKey: word position is stable

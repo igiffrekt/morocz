@@ -6,10 +6,17 @@ export const slotLockType = defineType({
   type: "document",
   fields: [
     defineField({
-      name: "slotId",
-      title: "Időpont azonosító",
+      name: "slotDate",
+      title: "Dátum",
       type: "string",
-      description: "Formátum: 2026-03-15T09:20:00 (dátum + időpont)",
+      description: "Formátum: YYYY-MM-DD (pl. 2026-04-02)",
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: "slotTime",
+      title: "Időpont",
+      type: "string",
+      description: "Formátum: HH:MM (pl. 14:20)",
       validation: (rule) => rule.required(),
     }),
     defineField({
@@ -26,8 +33,8 @@ export const slotLockType = defineType({
       initialValue: "available",
     }),
     defineField({
-      name: "heldUntil",
-      title: "Foglalva eddig",
+      name: "expiresAt",
+      title: "Lejár",
       type: "datetime",
       description: "A soft-hold lejárati ideje (ha held státuszban van)",
     }),
@@ -41,18 +48,19 @@ export const slotLockType = defineType({
   ],
   preview: {
     select: {
-      title: "slotId",
-      subtitle: "status",
+      slotDate: "slotDate",
+      slotTime: "slotTime",
+      status: "status",
     },
-    prepare({ title, subtitle }) {
+    prepare({ slotDate, slotTime, status }) {
       const statusLabels: Record<string, string> = {
         available: "Szabad",
         held: "Foglalt (függőben)",
         booked: "Lefoglalva",
       };
       return {
-        title: title ?? "Ismeretlen időpont",
-        subtitle: statusLabels[subtitle as string] ?? subtitle ?? "Státusz ismeretlen",
+        title: `${slotDate} ${slotTime}`,
+        subtitle: statusLabels[status as string] ?? status ?? "Státusz ismeretlen",
       };
     },
   },

@@ -2,6 +2,7 @@ import { headers } from "next/headers";
 import Link from "next/link";
 import AdminDashboard from "@/components/admin/AdminDashboard";
 import AdminLogin from "@/components/admin/AdminLogin";
+import LogoutButton from "@/components/admin/LogoutButton";
 import { auth } from "@/lib/auth";
 import { getWriteClient } from "@/lib/sanity-write-client";
 
@@ -112,22 +113,8 @@ export default async function AdminPage() {
             >
               Ez az oldal csak adminisztrátorok számára érhető el.
             </p>
-            <div style={{ display: "flex", gap: "0.75rem", justifyContent: "center", marginBottom: "1.5rem" }}>
-              <Link
-                href="/api/auth/sign-out?callbackUrl=/admin"
-                style={{
-                  display: "inline-block",
-                  padding: "0.5rem 1.25rem",
-                  backgroundColor: "#ef4444",
-                  color: "#ffffff",
-                  borderRadius: "9999px",
-                  textDecoration: "none",
-                  fontSize: "0.875rem",
-                  fontWeight: 500,
-                }}
-              >
-                Kijelentkezés és bejelentkezés adminként
-              </Link>
+            <div style={{ marginBottom: "1.5rem" }}>
+              <LogoutButton />
             </div>
             <Link
               href="/"

@@ -110,21 +110,38 @@ export default async function AdminPage() {
           >
             Ez az oldal csak adminisztrátorok számára érhető el.
           </p>
-          <Link
-            href="/"
-            style={{
-              display: "inline-block",
-              padding: "0.5rem 1.25rem",
-              backgroundColor: "#242a5f",
-              color: "#ffffff",
-              borderRadius: "9999px",
-              textDecoration: "none",
-              fontSize: "0.875rem",
-              fontWeight: 500,
-            }}
-          >
-            Vissza a főoldalra
-          </Link>
+          <div style={{ display: "flex", gap: "0.75rem", justifyContent: "center" }}>
+            <Link
+              href="/api/auth/sign-out"
+              style={{
+                display: "inline-block",
+                padding: "0.5rem 1.25rem",
+                backgroundColor: "#ef4444",
+                color: "#ffffff",
+                borderRadius: "9999px",
+                textDecoration: "none",
+                fontSize: "0.875rem",
+                fontWeight: 500,
+              }}
+            >
+              Kijelentkezés
+            </Link>
+            <Link
+              href="/"
+              style={{
+                display: "inline-block",
+                padding: "0.5rem 1.25rem",
+                backgroundColor: "#242a5f",
+                color: "#ffffff",
+                borderRadius: "9999px",
+                textDecoration: "none",
+                fontSize: "0.875rem",
+                fontWeight: 500,
+              }}
+            >
+              Vissza a főoldalra
+            </Link>
+          </div>
         </div>
       </div>
     );

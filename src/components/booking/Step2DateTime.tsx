@@ -123,7 +123,8 @@ export function Step2DateTime({
     return () => {
       cancelled = true;
     };
-  }, [viewYear, viewMonth, serviceId, scheduleData, todayStr, maxDateStr]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [viewYear, viewMonth, serviceId, todayStr, maxDateStr]);
 
   // Fetch time slots when a date is selected
   const fetchSlots = useCallback(

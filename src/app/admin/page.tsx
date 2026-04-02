@@ -110,7 +110,6 @@ export default async function AdminPage() {
                 lineHeight: 1.6,
               }}
             >
-              Bejelentkezve mint: <strong>{session.user.email}</strong><br />
               Ez az oldal csak adminisztrátorok számára érhető el.
             </p>
             <div style={{ display: "flex", gap: "0.75rem", justifyContent: "center", marginBottom: "1.5rem" }}>
@@ -127,7 +126,7 @@ export default async function AdminPage() {
                   fontWeight: 500,
                 }}
               >
-                Kijelentkezés és admin bejelentkezés
+                Kijelentkezés és bejelentkezés adminként
               </Link>
             </div>
             <Link

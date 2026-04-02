@@ -61,6 +61,10 @@ export const structure: StructureResolver = (S) =>
                     .title("Blokkolt napok szerkesztése"),
                 ),
               S.listItem()
+                .title("Egyedi elérhetőség")
+                .schemaType("customAvailability")
+                .child(S.documentTypeList("customAvailability").title("Egyedi elérhetőség")),
+              S.listItem()
                 .title("Foglalások")
                 .schemaType("booking")
                 .child(S.documentTypeList("booking").title("Foglalások")),

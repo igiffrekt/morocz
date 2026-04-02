@@ -84,15 +84,8 @@ export async function POST(request: Request): Promise<Response> {
       return Response.json({ error: "Ez az időpont már nem aktív." }, { status: 400 });
     }
 
-    // ── 5. Enforce 24h window ──────────────────────────────────────────────────
-    if (isWithin24Hours(booking.slotDate, booking.slotTime)) {
-      return Response.json(
-        {
-          error: "Az időpont már nem mondható le (kevesebb mint 24 óra van hátra).",
-        },
-        { status: 403 },
-      );
-    }
+    // ── 5. Admin bypass: no 24h restriction ────────────────────────────────────
+    // Admin users can cancel at any time, so we skip the 24h window check
 
     // ── 6. Patch booking status to "cancelled" ─────────────────────────────────
     await getWriteClient().patch(booking._id).set({ status: "cancelled" }).commit();

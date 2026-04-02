@@ -4,6 +4,7 @@ import AdminAppointmentHistoryView from "@/components/admin/AdminAppointmentHist
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import AdminCalendar from "@/components/admin/AdminCalendar";
+import AdminCancelModal from "@/components/admin/AdminCancelModal";
 import AdminDayPanel from "@/components/admin/AdminDayPanel";
 import AdminFinanceView from "@/components/admin/AdminFinanceView";
 import { AdminSignOut } from "@/components/admin/AdminLogin";
@@ -118,6 +119,7 @@ export default function AdminDashboard({
   const [monthBookings, setMonthBookings] = useState<AdminBooking[]>(initialMonthBookings);
   const [isDayLoading, setIsDayLoading] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState<AdminBooking | null>(null);
+  const [cancellingBooking, setCancellingBooking] = useState<AdminBooking | null>(null);
 
   // ── Fetch helpers ──────────────────────────────────────────────────────────
 
@@ -158,6 +160,45 @@ export default function AdminDashboard({
 
   function handleBookingClick(booking: AdminBooking) {
     setSelectedBooking(booking);
+  }
+
+  function handleCancelBooking(bookingId: string) {
+    const booking = dayBookings.find((b) => b._id === bookingId);
+    if (booking) {
+      setCancellingBooking(booking);
+    }
+  }
+
+  async function handleConfirmCancel(bookingId: string, reason?: string) {
+    try {
+      const res = await fetch("/api/admin/booking-cancel", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bookingId, reason }),
+      });
+
+      if (!res.ok) {
+        const data = (await res.json()) as { error?: string };
+        alert(data.error ?? "Hiba történt a lemondás során.");
+        return;
+      }
+
+      setCancellingBooking(null);
+
+      // Refresh bookings
+      const updatedDay = await fetchBookings(selectedDate, selectedDate);
+      setDayBookings(updatedDay);
+      const currentDate = new Date(selectedDate);
+      const { startDate: mStart, endDate: mEnd } = getMonthRange(
+        currentDate.getFullYear(),
+        currentDate.getMonth(),
+      );
+      const updatedMonth = await fetchBookings(mStart, mEnd);
+      setMonthBookings(updatedMonth);
+    } catch (err) {
+      console.error("Cancel booking error:", err);
+      alert("Hiba történt a lemondás során.");
+    }
   }
 
   async function handleCancelRefresh() {
@@ -608,6 +649,7 @@ export default function AdminDashboard({
                   selectedDate={selectedDate}
                   isLoading={isDayLoading}
                   onBookingClick={handleBookingClick}
+                  onCancelBooking={handleCancelBooking}
                 />
               </div>
             </div>
@@ -630,6 +672,19 @@ export default function AdminDashboard({
           booking={selectedBooking}
           onClose={() => setSelectedBooking(null)}
           onCancelled={() => void handleCancelRefresh()}
+        />
+      )}
+
+      {/* ── Cancel booking modal ──────────────────────────────────────────── */}
+      {cancellingBooking && (
+        <AdminCancelModal
+          bookingId={cancellingBooking._id}
+          patientName={cancellingBooking.patientName}
+          slotDate={cancellingBooking.slotDate}
+          slotTime={cancellingBooking.slotTime}
+          serviceName={cancellingBooking.service?.name ?? null}
+          onClose={() => setCancellingBooking(null)}
+          onConfirm={handleConfirmCancel}
         />
       )}
     </div>

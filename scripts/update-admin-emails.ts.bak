@@ -1,0 +1,87 @@
+import { drizzle } from "drizzle-orm/neon-http";
+import { neon } from "@neondatabase/serverless";
+import { eq } from "drizzle-orm";
+import * as schema from "../src/lib/db/schema";
+
+// Update admin email from old to new
+async function updateAdminEmails() {
+  const sql = neon(process.env.DATABASE_URL!);
+  const db = drizzle(sql, { schema });
+
+  console.log("Updating admin emails...");
+
+  // Ensure drmoroczangela@gmail.com exists and is admin
+  const drmoroczUser = await db
+    .select()
+    .from(schema.user)
+    .where(eq(schema.user.email, "drmoroczangela@gmail.com"))
+    .limit(1);
+
+  if (drmoroczUser.length === 0) {
+    console.log("Creating new admin user: drmoroczangela@gmail.com");
+    const newUser = await db
+      .insert(schema.user)
+      .values({
+        email: "drmoroczangela@gmail.com",
+        name: "Dr. Mórocz Angela",
+        role: "admin",
+        emailVerified: true,
+      })
+      .returning();
+    console.log("Created new admin:", newUser);
+  } else {
+    console.log("User drmoroczangela@gmail.com already exists");
+    // Make sure they have admin role
+    const updated = await db
+      .update(schema.user)
+      .set({ role: "admin" })
+      .where(eq(schema.user.email, "drmoroczangela@gmail.com"))
+      .returning();
+    console.log("Ensured admin role:", updated);
+  }
+
+  // Check if stickerey@gmail.com exists, if not create it
+  const existingUser = await db
+    .select()
+    .from(schema.user)
+    .where(eq(schema.user.email, "stickerey@gmail.com"))
+    .limit(1);
+
+  if (existingUser.length === 0) {
+    console.log("Creating new admin user: stickerey@gmail.com");
+    const newUser = await db
+      .insert(schema.user)
+      .values({
+        email: "stickerey@gmail.com",
+        name: "Stickerey Admin",
+        role: "admin",
+        emailVerified: true,
+      })
+      .returning();
+    console.log("Created new admin:", newUser);
+  } else {
+    console.log("User stickerey@gmail.com already exists");
+    // Make sure they have admin role
+    const updated = await db
+      .update(schema.user)
+      .set({ role: "admin" })
+      .where(eq(schema.user.email, "stickerey@gmail.com"))
+      .returning();
+    console.log("Ensured admin role:", updated);
+  }
+
+  console.log("\nAll admin emails updated successfully!");
+  console.log("Admin users:");
+  const admins = await db
+    .select({ email: schema.user.email, name: schema.user.name, role: schema.user.role })
+    .from(schema.user)
+    .where(eq(schema.user.role, "admin"));
+  console.table(admins);
+}
+
+updateAdminEmails()
+  .then(() => process.exit(0))
+  .catch((err) => {
+    console.error("Error updating admin emails:", err);
+    process.exit(1);
+  });

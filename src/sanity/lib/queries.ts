@@ -249,7 +249,7 @@ export const slotLockByIdQuery = defineQuery(`*[_type == "slotLock" && _id == $s
   _id, dateTime, status
 }`);
 
-export const bookingsForDateQuery = defineQuery(`*[_type == "booking" && slotDate == $date]{
+export const bookingsForDateQuery = defineQuery(`*[_type == "booking" && slotDate == $date && status == "confirmed"]{
   _id, slotDate, slotTime, patientEmail, service->{_id}
 }`);
 

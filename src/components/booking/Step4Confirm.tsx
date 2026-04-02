@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { z } from "zod";
 
-import { useSession } from "@/lib/auth-client";
+import { useSession, signOut } from "@/lib/auth-client";
 import { CONSENT_LABEL, CONSENT_LINK_TEXT, PRIVACY_POLICY_URL } from "@/lib/consent-text";
 
 interface Step4Props {
@@ -299,6 +299,19 @@ export function Step4Confirm({ selections, onBack, onSuccess, onConflict }: Step
           {errors.patientEmail && (
             <p className="mt-1 text-xs text-red-600">{errors.patientEmail}</p>
           )}
+          <p className="mt-2 text-xs text-gray-600">
+            Ez nem a te email címed?{" "}
+            <button
+              type="button"
+              onClick={async () => {
+                await signOut();
+                window.location.href = "/idopontfoglalas";
+              }}
+              className="text-[var(--color-primary)] underline hover:no-underline"
+            >
+              Jelentkezz be a fiókoddal
+            </button>
+          </p>
         </div>
 
         {/* Phone */}

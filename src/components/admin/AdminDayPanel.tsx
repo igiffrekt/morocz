@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { AdminBooking } from "@/components/admin/AdminDashboard";
 
 // ─── Props ─────────────────────────────────────────────────────────────────────
@@ -10,6 +10,7 @@ interface AdminDayPanelProps {
   selectedDate: string;
   isLoading: boolean;
   onBookingClick: (booking: AdminBooking) => void;
+  onCancelBooking: (bookingId: string) => void;
 }
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
@@ -57,12 +58,23 @@ export default function AdminDayPanel({
   selectedDate,
   isLoading,
   onBookingClick,
+  onCancelBooking,
 }: AdminDayPanelProps) {
   const confirmedBookings = bookings.filter((b) => b.status !== "cancelled");
   const cancelledBookings = bookings.filter((b) => b.status === "cancelled");
   const sortedBookings = [...confirmedBookings, ...cancelledBookings];
 
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+
+  // Close menu on click outside
+  useEffect(() => {
+    if (!openMenuId) return;
+
+    const handleClickOutside = () => setOpenMenuId(null);
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, [openMenuId]);
 
   return (
     <div
@@ -187,14 +199,13 @@ export default function AdminDayPanel({
             {sortedBookings.map((booking) => {
               const isCancelled = booking.status === "cancelled";
               const isHovered = hoveredId === booking._id;
+              const isMenuOpen = openMenuId === booking._id;
               const avatarColor = getAvatarColor(booking.patientName);
               const initial = getInitial(booking.patientName);
 
               return (
-                <button
+                <div
                   key={booking._id}
-                  type="button"
-                  onClick={() => onBookingClick(booking)}
                   onMouseEnter={() => setHoveredId(booking._id)}
                   onMouseLeave={() => setHoveredId(null)}
                   style={{
@@ -204,17 +215,18 @@ export default function AdminDayPanel({
                     padding: "0.75rem 1rem",
                     minHeight: "3.75rem",
                     backgroundColor: isHovered ? "rgba(153,206,183,0.06)" : "transparent",
-                    border: "none",
                     borderBottom: "1px solid #f0f1f5",
-                    cursor: "pointer",
                     textAlign: "left",
                     width: "100%",
                     opacity: isCancelled ? 0.55 : 1,
                     transition: "background-color 0.15s",
+                    position: "relative",
                   }}
                 >
                   {/* Avatar circle */}
-                  <div
+                  <button
+                    type="button"
+                    onClick={() => onBookingClick(booking)}
                     style={{
                       width: "2.5rem",
                       height: "2.5rem",
@@ -226,6 +238,8 @@ export default function AdminDayPanel({
                       flexShrink: 0,
                       opacity: isCancelled ? 0.6 : 0.85,
                       boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
+                      border: "none",
+                      cursor: "pointer",
                     }}
                   >
                     <span
@@ -238,16 +252,23 @@ export default function AdminDayPanel({
                     >
                       {initial}
                     </span>
-                  </div>
+                  </button>
 
                   {/* Name + service block */}
-                  <div
+                  <button
+                    type="button"
+                    onClick={() => onBookingClick(booking)}
                     style={{
                       flex: 1,
                       minWidth: 0,
                       display: "flex",
                       flexDirection: "column",
                       gap: "0.125rem",
+                      border: "none",
+                      background: "none",
+                      padding: 0,
+                      cursor: "pointer",
+                      textAlign: "left",
                     }}
                   >
                     <span
@@ -276,7 +297,7 @@ export default function AdminDayPanel({
                         {booking.service.name}
                       </span>
                     )}
-                  </div>
+                  </button>
 
                   {/* Time + status + menu */}
                   <div
@@ -320,8 +341,13 @@ export default function AdminDayPanel({
                       {isCancelled ? "Lemondva" : "Visszaigazolva"}
                     </span>
 
-                    {/* Three-dot menu */}
-                    <span
+                    {/* Three-dot menu button */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setOpenMenuId(isMenuOpen ? null : booking._id);
+                      }}
                       style={{
                         width: "2rem",
                         height: "2rem",
@@ -333,14 +359,78 @@ export default function AdminDayPanel({
                         color: "#64748b",
                         lineHeight: 1,
                         letterSpacing: "0.05em",
-                        backgroundColor: isHovered ? "rgba(0,0,0,0.05)" : "transparent",
+                        backgroundColor: isMenuOpen || isHovered ? "rgba(0,0,0,0.05)" : "transparent",
                         transition: "background-color 0.15s",
+                        border: "none",
+                        cursor: "pointer",
                       }}
                     >
                       &#8942;
-                    </span>
+                    </button>
+
+                    {/* Dropdown menu */}
+                    {isMenuOpen && !isCancelled && (
+                      <div
+                        style={{
+                          position: "absolute",
+                          right: "1rem",
+                          top: "3rem",
+                          backgroundColor: "#ffffff",
+                          borderRadius: "0.5rem",
+                          boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                          border: "1px solid #e8eaf0",
+                          zIndex: 10,
+                          minWidth: "10rem",
+                        }}
+                      >
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setOpenMenuId(null);
+                            onCancelBooking(booking._id);
+                          }}
+                          style={{
+                            width: "100%",
+                            padding: "0.75rem 1rem",
+                            border: "none",
+                            background: "none",
+                            textAlign: "left",
+                            cursor: "pointer",
+                            fontSize: "0.875rem",
+                            fontWeight: 500,
+                            color: "#ef4444",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "0.5rem",
+                            transition: "background-color 0.15s",
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = "rgba(239,68,68,0.05)";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = "transparent";
+                          }}
+                        >
+                          <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <line x1="18" y1="6" x2="6" y2="18" />
+                            <line x1="6" y1="6" x2="18" y2="18" />
+                          </svg>
+                          Lemondás
+                        </button>
+                      </div>
+                    )}
                   </div>
-                </button>
+                </div>
               );
             })}
           </div>

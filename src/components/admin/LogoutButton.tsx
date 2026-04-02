@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { signOut } from "@/lib/auth-client";
 
 export default function LogoutButton() {
   const [isLoading, setIsLoading] = useState(false);
@@ -8,24 +9,12 @@ export default function LogoutButton() {
   async function handleLogout() {
     setIsLoading(true);
     try {
-      // Call better-auth sign-out endpoint
-      await fetch("/api/auth/sign-out", {
-        method: "POST",
-        credentials: "include",
-      });
+      await signOut();
     } catch (error) {
       console.error("Logout error:", error);
     }
 
-    // Clear all cookies as backup
-    document.cookie.split(";").forEach((c) => {
-      const name = c.split("=")[0]?.trim();
-      if (name) {
-        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/`;
-      }
-    });
-
-    // Force reload to admin page
+    // Force reload to admin page to show login form
     window.location.href = "/admin";
   }
 

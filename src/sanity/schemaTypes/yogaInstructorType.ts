@@ -48,11 +48,25 @@ export const yogaInstructorType = defineType({
       validation: (Rule) =>
         Rule.regex(/^#[0-9A-Fa-f]{6}$/, { name: "hex color" }),
     }),
+    defineField({
+      name: "isActive",
+      title: "Aktív",
+      type: "boolean",
+      description: "Csak az aktív oktatók jelennek meg a weboldalon",
+      initialValue: true,
+    }),
   ],
   preview: {
     select: {
       title: "name",
       media: "photo",
+      isActive: "isActive",
+    },
+    prepare({ title, media, isActive }) {
+      return {
+        title: isActive === false ? `${title} (Inaktív)` : title,
+        media,
+      };
     },
   },
 });

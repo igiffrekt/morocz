@@ -327,7 +327,7 @@ export const yogaPageQuery = defineQuery(`*[_type == "yogaPage"][0]{
 // ─── Yoga Schedule ───────────────────────────────────────────────────────────
 // Revalidation tag: "yogaSchedule"
 
-export const yogaScheduleQuery = defineQuery(`*[_type == "yogaSchedule" && isActive != false] | order(dayOfWeek asc, startTime asc){
+export const yogaScheduleQuery = defineQuery(`*[_type == "yogaSchedule" && isActive != false && instructor->isActive == true] | order(dayOfWeek asc, startTime asc){
   _id,
   yogaClass->{
     name,
@@ -352,7 +352,7 @@ export const yogaScheduleQuery = defineQuery(`*[_type == "yogaSchedule" && isAct
 // ─── Yoga Instructors ────────────────────────────────────────────────────────
 // Revalidation tag: "yogaInstructor"
 
-export const yogaInstructorsQuery = defineQuery(`*[_type == "yogaInstructor"] | order(name asc){
+export const yogaInstructorsQuery = defineQuery(`*[_type == "yogaInstructor" && isActive == true] | order(name asc){
   _id,
   name,
   slug,

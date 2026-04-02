@@ -12,6 +12,11 @@ const typeToTags: Record<string, string[]> = {
   blogPost: ["blogPost"],
   blogCategory: ["blogCategory"],
   privacyPolicy: ["privacyPolicy"],
+  customAvailability: ["customAvailability"],
+  weeklySchedule: ["weeklySchedule"],
+  blockedDate: ["blockedDate"],
+  booking: ["booking"],
+  slotLock: ["slotLock"],
 };
 
 export async function POST(request: Request) {

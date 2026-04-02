@@ -35,7 +35,7 @@ export async function sanityFetch<T>({
 
   return client.fetch<T>(query, params, {
     next: {
-      revalidate: tags.length ? false : 60,
+      revalidate: 30, // Revalidate every 30 seconds
       tags,
     },
   });

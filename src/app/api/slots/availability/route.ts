@@ -154,8 +154,8 @@ export async function GET(request: Request): Promise<Response> {
     const dateStr = `${month}-${String(day).padStart(2, "0")}`;
 
     // Get the schedule for this date (either weekly or custom)
-    const dateObj = new Date(dateStr + 'T00:00:00');
-    const dayOfWeek = dateObj.getUTCDay();
+    const [y, m, d] = dateStr.split('-').map(Number);
+    const dayOfWeek = new Date(Date.UTC(y ?? 0, (m ?? 1) - 1, d ?? 1)).getUTCDay();
 
     let scheduleToUse = { ...scheduleForSlots };
 

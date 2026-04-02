@@ -66,66 +66,70 @@ export default async function AdminPage() {
     return <AdminLogin />;
   }
 
-  // ── Session exists but NOT an admin → access denied ──────────────────────
+  // ── Session exists but NOT an admin → show login form with option to switch accounts ──────────────────────
   if (session.user.role !== "admin") {
     return (
-      <div
-        style={{
-          minHeight: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "1.5rem",
-          backgroundColor: "#F2F4F8",
-        }}
-      >
+      <>
+        <style>{navbarHideStyle}</style>
         <div
           style={{
-            width: "100%",
-            maxWidth: "24rem",
-            backgroundColor: "#ffffff",
-            borderRadius: "1.5rem",
-            padding: "2rem",
-            textAlign: "center",
-            boxShadow: "0 4px 24px rgba(36,42,95,0.08)",
+            minHeight: "100vh",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "1.5rem",
+            backgroundColor: "#F2F4F8",
           }}
         >
-          <h1
+          <div
             style={{
-              margin: "0 0 0.75rem",
-              fontSize: "1.25rem",
-              fontWeight: 700,
-              color: "#ef4444",
+              width: "100%",
+              maxWidth: "24rem",
+              backgroundColor: "#ffffff",
+              borderRadius: "1.5rem",
+              padding: "2rem",
+              textAlign: "center",
+              boxShadow: "0 4px 24px rgba(36,42,95,0.08)",
             }}
           >
-            Hozzáférés megtagadva
-          </h1>
-          <p
-            style={{
-              margin: "0 0 1.5rem",
-              fontSize: "0.875rem",
-              color: "#64748b",
-              lineHeight: 1.6,
-            }}
-          >
-            Ez az oldal csak adminisztrátorok számára érhető el.
-          </p>
-          <div style={{ display: "flex", gap: "0.75rem", justifyContent: "center" }}>
-            <Link
-              href="/api/auth/sign-out"
+            <h1
               style={{
-                display: "inline-block",
-                padding: "0.5rem 1.25rem",
-                backgroundColor: "#ef4444",
-                color: "#ffffff",
-                borderRadius: "9999px",
-                textDecoration: "none",
-                fontSize: "0.875rem",
-                fontWeight: 500,
+                margin: "0 0 0.75rem",
+                fontSize: "1.25rem",
+                fontWeight: 700,
+                color: "#ef4444",
               }}
             >
-              Kijelentkezés
-            </Link>
+              Hozzáférés megtagadva
+            </h1>
+            <p
+              style={{
+                margin: "0 0 1.5rem",
+                fontSize: "0.875rem",
+                color: "#64748b",
+                lineHeight: 1.6,
+              }}
+            >
+              Bejelentkezve mint: <strong>{session.user.email}</strong><br />
+              Ez az oldal csak adminisztrátorok számára érhető el.
+            </p>
+            <div style={{ display: "flex", gap: "0.75rem", justifyContent: "center", marginBottom: "1.5rem" }}>
+              <Link
+                href="/api/auth/sign-out?callbackUrl=/admin"
+                style={{
+                  display: "inline-block",
+                  padding: "0.5rem 1.25rem",
+                  backgroundColor: "#ef4444",
+                  color: "#ffffff",
+                  borderRadius: "9999px",
+                  textDecoration: "none",
+                  fontSize: "0.875rem",
+                  fontWeight: 500,
+                }}
+              >
+                Kijelentkezés és admin bejelentkezés
+              </Link>
+            </div>
             <Link
               href="/"
               style={{
@@ -143,7 +147,7 @@ export default async function AdminPage() {
             </Link>
           </div>
         </div>
-      </div>
+      </>
     );
   }
 

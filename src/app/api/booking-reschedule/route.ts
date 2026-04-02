@@ -201,7 +201,7 @@ export async function POST(request: Request): Promise<Response> {
           description: `Foglalási szám: ${booking.reservationNumber}\nPáciens: ${booking.patientName}\nTelefon: ${booking.patientEmail}`,
           date: newDate,
           startTime: newTime,
-          durationMinutes: booking.service?.appointmentDuration ?? 30,
+          durationMinutes: booking.service?.appointmentDuration ?? 20,
         });
 
         // Update booking with new eventId

@@ -182,7 +182,7 @@ export async function POST(request: Request): Promise<Response> {
         description: `Páciens: ${patientName}\nE-mail: ${patientEmail}\nTelefon: ${patientPhone}\nFoglalási szám: ${reservationNumber}`,
         date: slotDate,
         startTime: slotTime,
-        durationMinutes: svc?.appointmentDuration ?? 30,
+        durationMinutes: svc?.appointmentDuration ?? 20,
       });
       if (eventId) {
         await getWriteClient().patch(booking._id).set({ googleCalendarEventId: eventId }).commit();

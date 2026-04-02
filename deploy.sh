@@ -13,7 +13,10 @@ rsync -avz .next/static drmorocz1@152.53.66.114:~/public_html/.next/
 echo "📦 Deploying public assets..."
 rsync -avz public/ drmorocz1@152.53.66.114:~/public_html/public/
 
-echo "🔄 Restarting server..."
-ssh drmorocz1@152.53.66.114 "pm2 restart morocz || node public_html/server.js &"
+echo "📦 Deploying environment variables..."
+rsync -avz .env.local drmorocz1@152.53.66.114:~/public_html/.env
 
-echo "✅ Deploy complete!"
+echo "🔄 Restarting server..."
+ssh drmorocz1@152.53.66.114 "pkill -f 'node server.js' || true; sleep 2"
+
+echo "✅ Deploy complete! Server will auto-restart."

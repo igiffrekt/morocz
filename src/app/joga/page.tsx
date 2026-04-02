@@ -37,14 +37,12 @@ export default async function JogaPage() {
       <div className="h-4 md:h-6" />
 
       {/* Hero Section */}
-      <div className="px-4 md:px-6 lg:px-8">
-        <YogaHeroSection
-          headline={page?.heroHeadline}
-          subtitle={page?.heroSubtitle}
-          badges={page?.heroBadges}
-          heroImage={page?.heroImage}
-        />
-      </div>
+      <YogaHeroSection
+        headline={page?.heroHeadline}
+        subtitle={page?.heroSubtitle}
+        badges={page?.heroBadges}
+        heroImage={page?.heroImage}
+      />
 
       {/* Schedule Section */}
       <Suspense fallback={<div className="min-h-[400px]" />}>

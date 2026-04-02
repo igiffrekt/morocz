@@ -37,10 +37,6 @@ export async function GET(request: Request): Promise<Response> {
   }
 
   try {
-    // Calculate start and end of the requested day for queries
-    const startDate = `${date}T00:00:00Z`;
-    const endDate = `${date}T23:59:59Z`;
-
     // 2. Fetch all data in parallel
     const [schedule, blockedDatesDoc, customAvail, bookings, slotLocks, service] = await Promise.all([
       sanityFetch<{
@@ -77,23 +73,25 @@ export async function GET(request: Request): Promise<Response> {
       sanityFetch<
         Array<{
           _id: string;
-          dateTime: string;
-          serviceId: string;
+          slotDate: string;
+          slotTime: string;
+          service: { _id: string } | null;
         }>
       >({
         query: bookingsForDateQuery,
-        params: { startDate, endDate },
+        params: { date },
         tags: ["booking"],
       }),
       sanityFetch<
         Array<{
           _id: string;
-          dateTime: string;
+          slotDate: string;
+          slotTime: string;
           status: string;
         }>
       >({
         query: slotLocksForDateQuery,
-        params: { startDate, endDate },
+        params: { date },
         tags: ["slotLock"],
       }),
       sanityFetch<{ name: string; appointmentDuration: number } | null>({
@@ -108,23 +106,16 @@ export async function GET(request: Request): Promise<Response> {
       return Response.json({ error: "A megadott szolgáltatás nem található." }, { status: 404 });
     }
 
-    // 4. Extract booked times from bookings (dateTime contains full timestamp)
+    // 4. Extract booked times from bookings
     const bookedSlots = bookings
-      .filter((b) => b.serviceId === serviceId)
-      .map((b) => {
-        // Extract HH:MM from dateTime (format: 2026-03-15T09:20:00Z or similar)
-        const timePart = b.dateTime.split("T")[1];
-        return timePart?.slice(0, 5) ?? "";
-      })
+      .filter((b) => b.service?._id === serviceId)
+      .map((b) => b.slotTime)
       .filter(Boolean);
 
     // 5. Extract held times from slotLocks
     const heldSlots = slotLocks
       .filter((lock) => lock.status === "held")
-      .map((lock) => {
-        const timePart = lock.dateTime.split("T")[1];
-        return timePart?.slice(0, 5) ?? "";
-      })
+      .map((lock) => lock.slotTime)
       .filter(Boolean);
 
     // 6. Check if custom availability exists for this date and service

@@ -249,8 +249,8 @@ export const slotLockByIdQuery = defineQuery(`*[_type == "slotLock" && _id == $s
   _id, dateTime, status
 }`);
 
-export const bookingsForDateQuery = defineQuery(`*[_type == "booking" && dateTime >= $startDate && dateTime < $endDate]{
-  _id, dateTime, patientEmail, serviceId
+export const bookingsForDateQuery = defineQuery(`*[_type == "booking" && slotDate == $date]{
+  _id, slotDate, slotTime, patientEmail, service->{_id}
 }`);
 
 export const customAvailabilityForDateQuery = defineQuery(`*[_type == "customAvailability" && date == $date][0]{
@@ -261,8 +261,8 @@ export const customAvailabilityForDateQuery = defineQuery(`*[_type == "customAva
   services[]->{_id}
 }`);
 
-export const slotLocksForDateQuery = defineQuery(`*[_type == "slotLock" && dateTime >= $startDate && dateTime < $endDate]{
-  _id, dateTime, status
+export const slotLocksForDateQuery = defineQuery(`*[_type == "slotLock" && slotDate == $date]{
+  _id, slotDate, slotTime, status
 }`);
 
 export const servicesForBookingQuery = defineQuery(`*[_type == "service" && isHidden != true] | order(order asc){

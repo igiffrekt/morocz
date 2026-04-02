@@ -4,112 +4,120 @@ const client = createClient({
   projectId: "l5qdfoyx",
   dataset: "production",
   apiVersion: "2024-01-01",
-  token: "skoN2qWYf4O4QfdhOgdWQ9WU9Eybt2TDiYabLkDnxU3FVKx5beSuTQcR2mz565ygay2J9U2Rgp2gDMSOuSmCdI1ERqd8b4sBJEqz6qBEdf6ZWYPul6MNMW6l8GBQ8eagbwbeNB0fHT6MAb7auL6qicXA12i3XXGungzd2xAsGxPZBtheHMrY",
+  token: process.env.SANITY_WRITE_TOKEN,
   useCdn: false,
 });
 
-// Categories based on the price list
+// Categories
 const categories = [
-  { name: "Nőgyógyászati vizsgálatok", emoji: "🏥", order: 1 },
-  { name: "Várandósgondozás", emoji: "🤰", order: 2 },
-  { name: "Spirál szolgáltatások", emoji: "💊", order: 3 },
-  { name: "Kiegészítő szolgáltatások", emoji: "🔬", order: 4 },
-  { name: "Laborvizsgálatok", emoji: "🧪", order: 5 },
-  { name: "Adminisztráció", emoji: "📋", order: 6 },
+  { name: "Nőgyógyászati vizsgálatok", emoji: "👩‍⚕️", order: 1 },
+  { name: "Egyéb szolgáltatások", emoji: "📋", order: 2 },
+  { name: "Mintavételek (Felárak)", emoji: "🧪", order: 3 },
+  { name: "Mikrobiológiai vizsgálatok", emoji: "🔬", order: 4 },
+  { name: "HPV vizsgálatok", emoji: "🧬", order: 5 },
+  { name: "Éves Szűrőcsomagok", emoji: "🩺", order: 6 },
 ];
 
-// Services from the price list - 2026.04.01
-const services = [
-  // Nőgyógyászati vizsgálatok
-  { name: "Nőgyógyászati vizsgálat/tanácsadás ultrahang nélkül", price: 30000, category: "Nőgyógyászati vizsgálatok", order: 1, duration: 20 },
-  { name: "Ultrahang felár", price: 13000, category: "Nőgyógyászati vizsgálatok", order: 2, duration: 10 },
-  { name: "Kontroll vizsgálat 3 hónapon belül", price: 22000, category: "Nőgyógyászati vizsgálatok", order: 3, duration: 15 },
-  { name: "Sürgősségi fogamzásgátlás", price: 15000, category: "Nőgyógyászati vizsgálatok", order: 4, duration: 15 },
-
-  // Várandósgondozás
-  { name: "Várandósgondozás", price: 45000, category: "Várandósgondozás", order: 1, duration: 30 },
-
-  // Spirál szolgáltatások
-  { name: "Spirál felhelyezés/csere + ultrahang", price: 43000, category: "Spirál szolgáltatások", order: 1, duration: 30, description: "Az eszköz árát nem tartalmazza – aktuális készletünkről érdeklődjön elérhetőségeinken" },
-  { name: "Spirál levétel ultrahang nélkül", price: 30000, category: "Spirál szolgáltatások", order: 2, duration: 20 },
-
-  // Kiegészítő szolgáltatások
-  { name: "Folyadék alapú méhnyakszűrés mintavétel", price: 11500, category: "Kiegészítő szolgáltatások", order: 1, duration: 10 },
-  { name: "Hagyományos citológia mintavétel", price: 6500, category: "Kiegészítő szolgáltatások", order: 2, duration: 10 },
-  { name: "Szövettani mintavétel (méhnyálkahártya)", price: 20000, category: "Kiegészítő szolgáltatások", order: 3, duration: 15 },
-  { name: "Injekció beadása", price: 6000, category: "Kiegészítő szolgáltatások", order: 4, duration: 10 },
-  { name: "Vérvételi díj", price: 3500, category: "Kiegészítő szolgáltatások", order: 5, duration: 10 },
-
-  // Laborvizsgálatok
-  { name: "Hüvelyváladék tenyésztés (aerob baktérium+gomba) + kenet", price: 8500, category: "Laborvizsgálatok", order: 1, duration: 10 },
-  { name: "HPV21 tipizálás (21 genotípus DNS alapú meghatározása)", price: 18000, category: "Laborvizsgálatok", order: 2, duration: 10 },
-  { name: "HPV15 tipizálás", price: 14000, category: "Laborvizsgálatok", order: 3, duration: 10 },
-  { name: "Aptima mRNS alapú tipizálás", price: 16000, category: "Laborvizsgálatok", order: 4, duration: 10 },
-  { name: "STD vizsgálat", price: 7500, category: "Laborvizsgálatok", order: 5, duration: 10, description: "Ár: 7500 Ft/kórokozó" },
-
-  // Adminisztráció
-  { name: "Szakorvosi dokumentáció kiállítása vizsgálaton kívül", price: 10000, category: "Adminisztráció", order: 1, duration: 10 },
-];
+// Services by category
+const servicesByCategory = {
+  "Nőgyógyászati vizsgálatok": [
+    { name: "Nőgyógyászati vizsgálat / tanácsadás (ultrahang nélkül)", price: 30000, order: 1 },
+    { name: "Nőgyógyászati vizsgálat ultrahanggal", price: 43000, order: 2 },
+    { name: "Kontroll vizsgálat (3 hónapon belül, rövidített)", price: 22000, order: 3 },
+    { name: "Spirál felhelyezés vagy csere ultrahanggal", price: 43000, description: "Az eszköz árát nem tartalmazza. Az aktuálisan elérhető eszközökről rendelőnk elérhetőségein érdeklődhet.", order: 4 },
+    { name: "Spirál eltávolítás (ultrahang nélkül)", price: 30000, order: 5 },
+    { name: "Várandósgondozás", price: 42000, description: "Várandósgondozás során tájékozódó ultrahangot végzek, mely nem minősül genetikai ultrahangnak!", order: 6 },
+  ],
+  "Egyéb szolgáltatások": [
+    { name: "Szakorvosi dokumentáció kiállítása (vizsgálaton kívül)", price: 12000, order: 1 },
+    { name: "Sürgősségi fogamzásgátlás", price: 12000, order: 2 },
+    { name: "Receptírás rendelőnk páciensei részére", price: 6000, description: "Receptírás a vizsgálat alkalmával díjtalan.", order: 3 },
+  ],
+  "Mintavételek (Felárak)": [
+    { name: "Folyadékalapú méhnyakszűrés (LBC) mintavétel", price: 11500, description: "A folyadékalapú citológia egy korszerűbb méhnyakszűrési módszer.", order: 1 },
+    { name: "Endometrium (méhnyálkahártya) szövettani mintavétel", price: 22000, order: 2 },
+    { name: "Injekció beadása", price: 6000, order: 3 },
+  ],
+  "Mikrobiológiai vizsgálatok": [
+    { name: "Hüvelyváladék tenyésztés (aerob baktérium + gomba + kenet)", price: 8500, order: 1 },
+    { name: "STD vizsgálat", price: 7500, description: "Ár kórokozónként", order: 2 },
+    { name: "GBS szűrés", price: 7500, order: 3 },
+  ],
+  "HPV vizsgálatok": [
+    { name: "HPV DNS alapú, 21 genotípus meghatározás", price: 18000, description: "HPV jelenlétét vizsgálja", order: 1 },
+    { name: "Aptima mRNS alapú HPV vizsgálat", price: 16000, description: "Magas kockázatú típusok aktivitásának kimutatására szolgál", order: 2 },
+  ],
+  "Éves Szűrőcsomagok": [
+    { name: "Alap Szűrőcsomag", price: 52000, description: "Nőgyógyászati vizsgálat + ultrahang vizsgálat, Folyadékalapú méhnyakszűrés (LBC). Évente egy alkalommal igénybe vehető.", order: 1 },
+    { name: "Komplex Szűrőcsomag", price: 64000, description: "Nőgyógyászati vizsgálat + ultrahang, Folyadékalapú méhnyakszűrés, HPV DNS tipizálás (21 típus). Évente egy alkalommal igénybe vehető.", order: 2 },
+    { name: "Prémium Szűrőcsomag", price: 74000, description: "Nőgyógyászati vizsgálat, Nőgyógyászati Ultrahang, Folyadékalapú méhnyakszűrés, Aptima mRNS alapú HPV vizsgálat, Hüvelyváladék tenyésztés (baktérium + gomba). Évente egy alkalommal igénybe vehető.", order: 3 },
+  ],
+};
 
 async function main() {
-  console.log("🗑️  Deleting existing services...");
+  console.log("Step 1: Delete ALL services first (to remove references)...");
 
-  // Delete existing services first (they reference categories)
-  const existingServices = await client.fetch('*[_type == "service"]._id');
-  for (const id of existingServices) {
+  // Delete all services first
+  const allServices = await client.fetch('*[_type == "service"]._id');
+  console.log("Found", allServices.length, "services to delete");
+  for (const id of allServices) {
     try {
       await client.delete(id);
-      console.log(`  Deleted service: ${id}`);
+      console.log("Deleted service:", id);
     } catch (e) {
-      console.log(`  Could not delete service ${id}: ${e.message}`);
+      console.log("Could not delete service", id, e.message);
     }
   }
 
-  console.log("\n🗑️  Deleting existing categories...");
-  // Delete existing categories
-  const existingCategories = await client.fetch('*[_type == "serviceCategory"]._id');
-  for (const id of existingCategories) {
+  console.log("\nStep 2: Delete ALL categories...");
+  const allCategories = await client.fetch('*[_type == "serviceCategory"]._id');
+  console.log("Found", allCategories.length, "categories to delete");
+  for (const id of allCategories) {
     try {
       await client.delete(id);
-      console.log(`  Deleted category: ${id}`);
+      console.log("Deleted category:", id);
     } catch (e) {
-      console.log(`  Could not delete category ${id}: ${e.message}`);
+      console.log("Could not delete category", id, e.message);
     }
   }
 
-  console.log("\n📁 Creating categories...");
+  console.log("\nStep 3: Creating new categories...");
+
+  // Create categories and store their IDs
   const categoryIds = {};
-
   for (const cat of categories) {
-    const doc = await client.create({
+    const result = await client.create({
       _type: "serviceCategory",
       name: cat.name,
       emoji: cat.emoji,
       order: cat.order,
     });
-    categoryIds[cat.name] = doc._id;
-    console.log(`  Created: ${cat.emoji} ${cat.name}`);
+    categoryIds[cat.name] = result._id;
+    console.log("Created category:", cat.name, result._id);
   }
 
-  console.log("\n💉 Creating services...");
+  console.log("\nStep 4: Creating services...");
 
-  for (const svc of services) {
-    const doc = await client.create({
-      _type: "service",
-      name: svc.name,
-      price: svc.price,
-      description: svc.description || "",
-      category: {
-        _type: "reference",
-        _ref: categoryIds[svc.category],
-      },
-      order: svc.order,
-      appointmentDuration: svc.duration,
-    });
-    console.log(`  Created: ${svc.name} - ${svc.price.toLocaleString()} Ft`);
+  // Create services
+  for (const [categoryName, services] of Object.entries(servicesByCategory)) {
+    const categoryId = categoryIds[categoryName];
+    for (const svc of services) {
+      const result = await client.create({
+        _type: "service",
+        name: svc.name,
+        price: svc.price,
+        description: svc.description || "",
+        order: svc.order,
+        category: {
+          _type: "reference",
+          _ref: categoryId,
+        },
+      });
+      console.log("Created service:", svc.name);
+    }
   }
 
-  console.log("\n✅ Done! Services updated.");
+  console.log("\nDone! Created", categories.length, "categories and", Object.values(servicesByCategory).flat().length, "services");
 }
 
 main().catch(console.error);

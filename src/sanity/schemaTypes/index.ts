@@ -4,6 +4,7 @@ import { blockedDateType } from "./blockedDateType";
 import { blogCategoryType } from "./blogCategoryType";
 import { blogPostType } from "./blogPostType";
 import { bookingType } from "./bookingType";
+import { customAvailabilityType } from "./customAvailabilityType";
 import { homepageType } from "./homepageType";
 import { kapcsolatType } from "./kapcsolatType";
 import { labTestType } from "./labTestType";
@@ -35,6 +36,7 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   cookiePolicyType,
   weeklyScheduleType,
   blockedDateType,
+  customAvailabilityType,
   bookingType,
   slotLockType,
   patientType,

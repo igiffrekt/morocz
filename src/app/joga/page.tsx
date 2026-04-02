@@ -1,9 +1,12 @@
 import { Metadata } from "next";
+import { Suspense } from "react";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import { yogaPageQuery, yogaScheduleQuery, yogaInstructorsQuery } from "@/sanity/lib/queries";
 import { YogaHeroSection } from "@/components/sections/YogaHeroSection";
 import { YogaScheduleSection } from "@/components/sections/YogaScheduleSection";
 import { YogaInstructorsSection } from "@/components/sections/YogaInstructorsSection";
+
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await sanityFetch<any>({
@@ -44,7 +47,9 @@ export default async function JogaPage() {
       </div>
 
       {/* Schedule Section */}
-      <YogaScheduleSection schedule={schedule || []} />
+      <Suspense fallback={<div className="min-h-[400px]" />}>
+        <YogaScheduleSection schedule={schedule || []} />
+      </Suspense>
 
       {/* Instructors Section */}
       {instructors && instructors.length > 0 && (

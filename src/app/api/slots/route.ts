@@ -4,6 +4,7 @@ import { sanityFetch } from "@/sanity/lib/fetch";
 import {
   blockedDatesQuery,
   bookingsForDateQuery,
+  customAvailabilityForDateQuery,
   slotLocksForDateQuery,
   weeklyScheduleQuery,
 } from "@/sanity/lib/queries";
@@ -41,7 +42,7 @@ export async function GET(request: Request): Promise<Response> {
     const endDate = `${date}T23:59:59Z`;
 
     // 2. Fetch all data in parallel
-    const [schedule, blockedDatesDoc, bookings, slotLocks, service] = await Promise.all([
+    const [schedule, blockedDatesDoc, customAvail, bookings, slotLocks, service] = await Promise.all([
       sanityFetch<{
         defaultSlotDuration: number;
         bufferMinutes: number;
@@ -61,6 +62,17 @@ export async function GET(request: Request): Promise<Response> {
       } | null>({
         query: blockedDatesQuery,
         tags: ["blockedDate"],
+      }),
+      sanityFetch<{
+        _id: string;
+        date: string;
+        startTime: string;
+        endTime: string;
+        services: Array<{ _id: string }> | null;
+      } | null>({
+        query: customAvailabilityForDateQuery,
+        params: { date },
+        tags: ["customAvailability"],
       }),
       sanityFetch<
         Array<{
@@ -115,12 +127,50 @@ export async function GET(request: Request): Promise<Response> {
       })
       .filter(Boolean);
 
-    // 6. Build the schedule object for generateAvailableSlots
-    const scheduleForSlots = schedule ?? {
+    // 6. Check if custom availability exists for this date and service
+    let scheduleForSlots = schedule ?? {
       defaultSlotDuration: 20,
       bufferMinutes: 0,
       days: [],
     };
+
+    // If custom availability exists and applies to this service (or all services)
+    if (customAvail) {
+      const appliesToService =
+        !customAvail.services || customAvail.services.length === 0 || customAvail.services.some((s) => s._id === serviceId);
+
+      if (appliesToService) {
+        // Override schedule for this specific date with custom availability
+        const dateObj = new Date(date);
+        const dayOfWeek = dateObj.getDay();
+
+        scheduleForSlots = {
+          ...scheduleForSlots,
+          days: scheduleForSlots.days.map((day) => {
+            if (day.dayOfWeek === dayOfWeek) {
+              return {
+                ...day,
+                isDayOff: false,
+                startTime: customAvail.startTime,
+                endTime: customAvail.endTime,
+              };
+            }
+            return day;
+          }),
+        };
+
+        // If the day doesn't exist in schedule, add it
+        if (!scheduleForSlots.days.find((d) => d.dayOfWeek === dayOfWeek)) {
+          scheduleForSlots.days.push({
+            _key: `custom-${dayOfWeek}`,
+            dayOfWeek,
+            isDayOff: false,
+            startTime: customAvail.startTime,
+            endTime: customAvail.endTime,
+          });
+        }
+      }
+    }
 
     // 7. Generate available slots
     const blockedDates = (blockedDatesDoc?.dates ?? []).map((d) => d.date).filter(Boolean);

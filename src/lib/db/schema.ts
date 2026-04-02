@@ -16,6 +16,10 @@ export const user = pgTable("user", {
   banReason: text("ban_reason"),
   banExpires: timestamp("ban_expires"),
   phoneNumber: text("phone_number"),
+  // customer fields
+  firstName: text("first_name"),
+  lastName: text("last_name"),
+  lastAppointment: timestamp("last_appointment"),
 });
 
 export const session = pgTable("session", {
@@ -68,4 +72,20 @@ export const cronRunLog = pgTable("cron_run_log", {
   remindersFailed: integer("reminders_failed").notNull().default(0),
   errorDetails: text("error_details"), // JSON string of per-email errors
   durationMs: integer("duration_ms"),
+});
+
+// Historical bookings table (migrated from Sanity to save document quota)
+export const bookingHistory = pgTable("booking_history", {
+  id: text("id").primaryKey(), // Original Sanity _id
+  patientId: text("patient_id"), // Reference to Sanity patient _id
+  patientEmail: text("patient_email"),
+  patientName: text("patient_name"),
+  serviceId: text("service_id"), // Reference to Sanity service _id
+  serviceName: text("service_name"),
+  date: text("date").notNull(), // YYYY-MM-DD
+  time: text("time").notNull(), // HH:mm
+  status: text("status").notNull(), // completed, cancelled, no-show
+  notes: text("notes"),
+  createdAt: timestamp("created_at").notNull(),
+  migratedAt: timestamp("migrated_at").notNull().defaultNow(),
 });

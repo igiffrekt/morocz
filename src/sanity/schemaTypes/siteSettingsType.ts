@@ -156,6 +156,11 @@ export const siteSettingsType = defineType({
       type: "string",
     }),
     defineField({
+      name: "cookiePolicyUrl",
+      title: "Cookie szabályzat URL",
+      type: "string",
+    }),
+    defineField({
       name: "metaDescription",
       title: "Meta leírás",
       type: "text",

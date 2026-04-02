@@ -22,6 +22,20 @@
       "when": 1773061938023,
       "tag": "0002_chubby_stingray",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1775130892287,
+      "tag": "0003_fixed_black_widow",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1775139830022,
+      "tag": "0004_wealthy_kronos",
+      "breakpoints": true
     }
   ]
 }

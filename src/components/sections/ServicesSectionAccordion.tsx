@@ -107,9 +107,9 @@ export function ServicesSectionAccordion({ heading, categories, services }: Serv
   };
 
   return (
-    <section aria-labelledby="szolgaltatasok-cim" className="px-4 py-12 md:py-20">
+    <section aria-labelledby="szolgaltatasok-cim" className="px-2 py-12 md:px-4 md:py-20">
       <div className="max-w-7xl mx-auto">
-        <div className="bg-white rounded-3xl p-6 md:p-10 lg:p-12">
+        <div className="bg-white rounded-3xl p-2 md:p-10 lg:p-12">
           <FadeIn viewport>
             {heading && (
               <h2
@@ -138,7 +138,7 @@ export function ServicesSectionAccordion({ heading, categories, services }: Serv
                     {/* Accordion Header */}
                     <button
                       onClick={() => toggleExpand(category._id)}
-                      className="w-full p-5 md:p-6 flex items-center gap-4 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-inset"
+                      className="w-full p-2 md:p-3 flex items-center gap-2 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-inset"
                     >
                       {/* Emoji Circle */}
                       <div
@@ -188,7 +188,7 @@ export function ServicesSectionAccordion({ heading, categories, services }: Serv
                           }}
                           className="overflow-hidden"
                         >
-                          <div className="px-5 md:px-6 pb-5 md:pb-6">
+                          <div className="px-2 md:px-3 pb-2 md:pb-3">
                             {/* Services List */}
                             <div className={`rounded-2xl overflow-hidden ${style.listBg} backdrop-blur-sm`}>
                               {categoryServices.map((service, serviceIndex) => (

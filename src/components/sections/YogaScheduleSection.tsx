@@ -11,26 +11,27 @@ import { PortableText } from "@portabletext/react";
 interface YogaScheduleItem {
   _id: string;
   yogaClass: {
-    name: string;
-    color?: string;
-    icon?: string;
-    description?: any[];
-  };
+    name: string | null;
+    color: string | null;
+    icon: string | null;
+    description: any;
+  } | null;
   instructor: {
-    name: string;
-    color?: string;
-    photo?: {
+    name: string | null;
+    color: string | null;
+    photo: {
       asset?: {
         _ref: string;
       };
-    };
-  };
-  dayOfWeek: string;
-  startTime: string;
-  endTime: string;
-  recurrence: string;
-  location?: string;
-  notes?: string;
+    } | null;
+  } | null;
+  dayOfWeek: string | null;
+  startTime: string | null;
+  endTime: string | null;
+  recurrence: string | null;
+  location: string | null;
+  notes: string | null;
+  maxParticipants: number | null;
 }
 
 interface YogaScheduleSectionProps {
@@ -76,17 +77,20 @@ function getClassDuration(startTime: string, endTime: string): number {
   return (endHours * 60 + endMins) - (startHours * 60 + startMins);
 }
 
-function getRecurrenceLabel(recurrence: string): string | null {
+function getRecurrenceLabel(recurrence: string | null): string | null {
+  if (!recurrence) return null;
   if (recurrence === "biweekly-even") return "Páros hét";
   if (recurrence === "biweekly-odd") return "Páratlan hét";
   return null;
 }
 
-function getDayLabel(dayKey: string): string {
+function getDayLabel(dayKey: string | null): string {
+  if (!dayKey) return "";
   return DAYS.find((d) => d.key === dayKey)?.label || dayKey;
 }
 
-function getNextOccurrence(dayKey: string): string {
+function getNextOccurrence(dayKey: string | null): string {
+  if (!dayKey) return "";
   const dayIndex: Record<string, number> = {
     monday: 1,
     tuesday: 2,
@@ -132,9 +136,9 @@ export function YogaScheduleSection({
   };
 
   // Generate unique slug for each schedule item (class name + day in HU + time)
-  const getDaySlug = (dayKey: string) => DAYS.find((d) => d.key === dayKey)?.slug || dayKey;
+  const getDaySlug = (dayKey: string | null) => DAYS.find((d) => d.key === dayKey)?.slug || dayKey || "";
   const getItemSlug = (item: YogaScheduleItem) =>
-    `${slugify(item.yogaClass.name)}-${getDaySlug(item.dayOfWeek)}-${item.startTime.replace(":", "")}`;
+    `${slugify(item.yogaClass?.name || "")}-${getDaySlug(item.dayOfWeek)}-${(item.startTime || "").replace(":", "")}`;
 
   // Open modal from URL on mount
   useEffect(() => {
@@ -166,13 +170,13 @@ export function YogaScheduleSection({
     (acc, day) => {
       acc[day.key] = schedule
         .filter((item) => item.dayOfWeek === day.key)
-        .sort((a, b) => a.startTime.localeCompare(b.startTime));
+        .sort((a, b) => (a.startTime || "").localeCompare(b.startTime || ""));
       return acc;
     },
     {} as Record<string, YogaScheduleItem[]>
   );
 
-  const allTimes = schedule.flatMap((item) => [item.startTime, item.endTime]);
+  const allTimes = schedule.flatMap((item) => [item.startTime, item.endTime]).filter((t): t is string => t !== null);
   const minTime = allTimes.length > 0
     ? Math.min(...allTimes.map((t) => parseInt(t.split(":")[0])))
     : 8;
@@ -186,13 +190,13 @@ export function YogaScheduleSection({
   });
 
   // Get unique class names sorted alphabetically for consistent color assignment
-  const uniqueClassNames = [...new Set(schedule.map((item) => item.yogaClass.name))].sort();
+  const uniqueClassNames = [...new Set(schedule.map((item) => item.yogaClass?.name).filter((n): n is string => n !== null))].sort();
   const classColors = new Map<string, string>();
   uniqueClassNames.forEach((className, index) => {
-    const classItem = schedule.find((item) => item.yogaClass.name === className);
+    const classItem = schedule.find((item) => item.yogaClass?.name === className);
     classColors.set(
       className,
-      classItem?.yogaClass.color || DEFAULT_COLORS[index % DEFAULT_COLORS.length]
+      classItem?.yogaClass?.color || DEFAULT_COLORS[index % DEFAULT_COLORS.length]
     );
   });
 
@@ -291,7 +295,7 @@ export function YogaScheduleSection({
                     const slotHour = parseInt(timeSlot.split(":")[0]);
                     // Find classes that start within this hour slot
                     const classesAtTime = daySchedule.filter((item) => {
-                      const startHour = parseInt(item.startTime.split(":")[0]);
+                      const startHour = parseInt((item.startTime || "00:00").split(":")[0]);
                       return startHour === slotHour;
                     });
 
@@ -301,13 +305,13 @@ export function YogaScheduleSection({
                         className="relative p-1 border-r border-gray-300/75 last:border-r-0"
                       >
                         {classesAtTime.map((item) => {
-                          const duration = getClassDuration(item.startTime, item.endTime);
+                          const duration = getClassDuration(item.startTime || "00:00", item.endTime || "00:00");
                           const heightSlots = duration / 60; // fractional: 90min = 1.5
-                          const color = classColors.get(item.yogaClass.name) || DEFAULT_COLORS[0];
+                          const color = classColors.get(item.yogaClass?.name || "") || DEFAULT_COLORS[0];
                           // Calculate offset within the hour (e.g., 08:30 = 0.5 * 48 = 24px offset)
-                          const startMins = parseInt(item.startTime.split(":")[1]);
+                          const startMins = parseInt((item.startTime || "00:00").split(":")[1]);
                           const offsetInSlot = (startMins / 60) * 48;
-                          const isFiltered = activeFilter !== null && activeFilter !== item.yogaClass.name;
+                          const isFiltered = activeFilter !== null && activeFilter !== item.yogaClass?.name;
 
                           return (
                             <motion.button
@@ -325,7 +329,7 @@ export function YogaScheduleSection({
                               }}
                             >
                               <div className="font-semibold text-sm text-primary truncate">
-                                {item.yogaClass.name}
+                                {item.yogaClass?.name}
                               </div>
                             </motion.button>
                           );
@@ -345,7 +349,7 @@ export function YogaScheduleSection({
             const daySchedule = scheduleByDay[day.key] || [];
             // Filter schedule if activeFilter is set
             const filteredDaySchedule = activeFilter
-              ? daySchedule.filter((item) => item.yogaClass.name === activeFilter)
+              ? daySchedule.filter((item) => item.yogaClass?.name === activeFilter)
               : daySchedule;
             if (filteredDaySchedule.length === 0) return null;
 
@@ -357,7 +361,7 @@ export function YogaScheduleSection({
                   </div>
                   <div className="divide-y divide-gray-50">
                     {filteredDaySchedule.map((item) => {
-                      const color = classColors.get(item.yogaClass.name) || DEFAULT_COLORS[0];
+                      const color = classColors.get(item.yogaClass?.name || "") || DEFAULT_COLORS[0];
 
                       return (
                         <button
@@ -371,7 +375,7 @@ export function YogaScheduleSection({
                           />
                           <div className="flex-1 min-w-0">
                             <div className="font-semibold text-primary">
-                              {item.yogaClass.name}
+                              {item.yogaClass?.name}
                             </div>
                           </div>
                           <div className="text-right flex-shrink-0">
@@ -452,7 +456,7 @@ export function YogaScheduleSection({
                 className="p-6 pb-4 flex-shrink-0 relative"
                 style={{
                   backgroundColor:
-                    classColors.get(selectedClass.yogaClass.name) || DEFAULT_COLORS[0],
+                    classColors.get(selectedClass.yogaClass?.name || "") || DEFAULT_COLORS[0],
                 }}
               >
                 <button
@@ -465,7 +469,7 @@ export function YogaScheduleSection({
                 </button>
                 <div className="pr-12">
                   <h3 className="text-2xl font-bold text-primary">
-                    {selectedClass.yogaClass.name}
+                    {selectedClass.yogaClass?.name}
                   </h3>
                   <p className="text-primary/70 mt-1">
                     {getNextOccurrence(selectedClass.dayOfWeek)}  •  {getDayLabel(selectedClass.dayOfWeek)}  •  {selectedClass.startTime} - {selectedClass.endTime}
@@ -482,26 +486,26 @@ export function YogaScheduleSection({
                   background: transparent;
                 }
                 .yoga-modal-content::-webkit-scrollbar-thumb {
-                  background: ${classColors.get(selectedClass.yogaClass.name) || DEFAULT_COLORS[0]};
+                  background: ${classColors.get(selectedClass.yogaClass?.name || "") || DEFAULT_COLORS[0]};
                   border-radius: 4px;
                 }
                 .yoga-modal-content::-webkit-scrollbar-thumb:hover {
-                  background: ${classColors.get(selectedClass.yogaClass.name) || DEFAULT_COLORS[0]}dd;
+                  background: ${classColors.get(selectedClass.yogaClass?.name || "") || DEFAULT_COLORS[0]}dd;
                 }
               `}</style>
               <div
                 className="yoga-modal-content flex-1 min-h-0 p-6 pb-8 space-y-4 overflow-y-auto"
                 style={{
                   scrollbarWidth: "thin",
-                  scrollbarColor: `${classColors.get(selectedClass.yogaClass.name) || DEFAULT_COLORS[0]} transparent`,
+                  scrollbarColor: `${classColors.get(selectedClass.yogaClass?.name || "") || DEFAULT_COLORS[0]} transparent`,
                 } as React.CSSProperties}
               >
                 {/* Instructor */}
                 <div className="flex items-center gap-3">
-                  {selectedClass.instructor.photo?.asset ? (
+                  {selectedClass.instructor?.photo?.asset ? (
                     <img
                       src={urlFor(selectedClass.instructor.photo).width(80).height(80).url()}
-                      alt={selectedClass.instructor.name}
+                      alt={selectedClass.instructor?.name || ""}
                       className="w-10 h-10 rounded-full object-cover"
                     />
                   ) : (
@@ -513,14 +517,14 @@ export function YogaScheduleSection({
                   )}
                   <div>
                     <div className="text-sm text-gray-500">Oktató</div>
-                    <div className="font-semibold text-primary">{selectedClass.instructor.name}</div>
+                    <div className="font-semibold text-primary">{selectedClass.instructor?.name}</div>
                   </div>
                 </div>
 
                 {/* Time */}
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                    {parseInt(selectedClass.startTime.split(":")[0]) < 12 ? (
+                    {parseInt((selectedClass.startTime || "12:00").split(":")[0]) < 12 ? (
                       <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                       </svg>
@@ -560,7 +564,7 @@ export function YogaScheduleSection({
                 )}
 
                 {/* Description */}
-                {selectedClass.yogaClass.description && selectedClass.yogaClass.description.length > 0 && (
+                {selectedClass.yogaClass?.description && Array.isArray(selectedClass.yogaClass.description) && selectedClass.yogaClass.description.length > 0 && (
                   <div className="border-t border-gray-100 pt-4 mt-4">
                     <div className="text-sm text-gray-500 mb-2">Leírás</div>
                     <div className="prose prose-sm prose-primary max-w-none text-gray-700">

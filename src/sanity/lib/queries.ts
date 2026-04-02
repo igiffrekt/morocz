@@ -70,6 +70,7 @@ export const siteSettingsQuery =
     }
   },
   privacyPolicyUrl,
+  cookiePolicyUrl,
   metaDescription,
   siteName,
   defaultOgImage
@@ -78,7 +79,7 @@ export const siteSettingsQuery =
 // ─── Services ─────────────────────────────────────────────────────────────────
 // Revalidation tag: "service"
 
-export const allServicesQuery = defineQuery(`*[_type == "service"] | order(order asc){
+export const allServicesQuery = defineQuery(`*[_type == "service" && isHidden != true] | order(order asc){
   _id,
   name,
   description,
@@ -252,11 +253,19 @@ export const bookingsForDateQuery = defineQuery(`*[_type == "booking" && dateTim
   _id, dateTime, patientEmail, serviceId
 }`);
 
+export const customAvailabilityForDateQuery = defineQuery(`*[_type == "customAvailability" && date == $date][0]{
+  _id,
+  date,
+  startTime,
+  endTime,
+  services[]->{_id}
+}`);
+
 export const slotLocksForDateQuery = defineQuery(`*[_type == "slotLock" && dateTime >= $startDate && dateTime < $endDate]{
   _id, dateTime, status
 }`);
 
-export const servicesForBookingQuery = defineQuery(`*[_type == "service"] | order(order asc){
+export const servicesForBookingQuery = defineQuery(`*[_type == "service" && isHidden != true] | order(order asc){
   _id, name, duration, price
 }`);
 

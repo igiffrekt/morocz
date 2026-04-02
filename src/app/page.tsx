@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { BlogSection } from "@/components/sections/BlogSection";
 import { HeroSection } from "@/components/sections/HeroSection";
 import { HeroServiceCards } from "@/components/sections/HeroServiceCards";
@@ -248,8 +249,10 @@ export default async function Home() {
         categories={transformedCategories}
         services={transformedServices}
       />
-      <YogaScheduleSection schedule={yogaSchedule ?? []} showCta inlineModal />
-      
+      <Suspense fallback={<div className="min-h-[400px]" />}>
+        <YogaScheduleSection schedule={yogaSchedule ?? []} showCta inlineModal />
+      </Suspense>
+
       {/* ImportantInfo + Testimonials 70-30 layout */}
       <div className="px-4 py-8 md:py-12">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[70%_30%] gap-6 md:gap-8">

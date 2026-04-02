@@ -77,21 +77,9 @@ export default function Footer({
             {/* Divider */}
             <div className="border-t border-gray-100 mb-8" />
 
-            {/* Contact info */}
-            {(phone || address) && (
-              <div className="flex flex-col gap-2 mb-6 text-base text-gray-600 md:flex-row md:gap-6">
-                {phone && (
-                  <a href={`tel:${phone}`} className="hover:text-primary transition-colors">
-                    {phone}
-                  </a>
-                )}
-                {address && <span>{address}</span>}
-              </div>
-            )}
-
             {/* Social icons */}
             {activeSocials.length > 0 && (
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 mb-6">
                 {activeSocials.map((social) => (
                   <SocialIcon
                     key={social._key}
@@ -100,6 +88,18 @@ export default function Footer({
                     className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all duration-300"
                   />
                 ))}
+              </div>
+            )}
+
+            {/* Contact info */}
+            {(phone || address) && (
+              <div className="flex flex-col gap-2 text-base text-gray-600 md:flex-row md:gap-6">
+                {phone && (
+                  <a href={`tel:${phone}`} className="hover:text-primary transition-colors">
+                    {phone}
+                  </a>
+                )}
+                {address && <span>{address}</span>}
               </div>
             )}
           </div>

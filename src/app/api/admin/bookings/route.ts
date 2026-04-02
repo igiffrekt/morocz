@@ -1,5 +1,8 @@
 import { auth } from "@/lib/auth";
 import { getWriteClient } from "@/lib/sanity-write-client";
+import { db } from "@/lib/db";
+import { bookingHistory } from "@/lib/db/schema";
+import { desc, eq, and, gte, lte } from "drizzle-orm";
 
 export const dynamic = "force-dynamic";
 
@@ -41,7 +44,8 @@ export async function GET(request: Request): Promise<Response> {
 
     // ── 3a. Email-based query (patient history) ────────────────────────────────
     if (email) {
-      const bookings = await getWriteClient().fetch<AdminBookingRow[]>(
+      // Fetch from Sanity (recent bookings)
+      const sanityBookings = await getWriteClient().fetch<AdminBookingRow[]>(
         `*[_type == "booking" && !(_id in path("drafts.**")) && patientEmail == $email] | order(slotDate desc, slotTime desc) {
           _id,
           patientName,
@@ -57,7 +61,35 @@ export async function GET(request: Request): Promise<Response> {
         { email },
       );
 
-      return Response.json({ bookings });
+      // Fetch from Postgres (historical bookings)
+      const historicalBookings = await db
+        .select()
+        .from(bookingHistory)
+        .where(eq(bookingHistory.patientEmail, email))
+        .orderBy(desc(bookingHistory.date));
+
+      // Transform historical bookings to match AdminBookingRow shape
+      const transformedHistorical: AdminBookingRow[] = historicalBookings.map((h) => ({
+        _id: h.id,
+        patientName: h.patientName || "",
+        patientEmail: h.patientEmail || "",
+        patientPhone: "",
+        reservationNumber: "",
+        service: h.serviceName ? { name: h.serviceName, appointmentDuration: 0 } : null,
+        slotDate: h.date,
+        slotTime: h.time,
+        status: h.status,
+        managementToken: "",
+      }));
+
+      // Combine and sort by date desc
+      const allBookings = [...sanityBookings, ...transformedHistorical].sort((a, b) => {
+        const dateA = `${a.slotDate} ${a.slotTime}`;
+        const dateB = `${b.slotDate} ${b.slotTime}`;
+        return dateB.localeCompare(dateA);
+      });
+
+      return Response.json({ bookings: allBookings });
     }
 
     // ── 3b. Date-range query ───────────────────────────────────────────────────
@@ -85,7 +117,7 @@ export async function GET(request: Request): Promise<Response> {
     }
 
     // ── 4. Fetch bookings via GROQ (real-time write client — no CDN) ───────────
-    const bookings = await getWriteClient().fetch<AdminBookingRow[]>(
+    const sanityBookings = await getWriteClient().fetch<AdminBookingRow[]>(
       `*[_type == "booking" && !(_id in path("drafts.**")) && slotDate >= $startDate && slotDate <= $endDate] | order(slotDate asc, slotTime asc) {
         _id,
         patientName,
@@ -101,7 +133,34 @@ export async function GET(request: Request): Promise<Response> {
       { startDate, endDate },
     );
 
-    return Response.json({ bookings });
+    // Fetch from Postgres (historical bookings in date range)
+    const historicalBookings = await db
+      .select()
+      .from(bookingHistory)
+      .where(and(gte(bookingHistory.date, startDate), lte(bookingHistory.date, endDate)));
+
+    // Transform historical bookings to match AdminBookingRow shape
+    const transformedHistorical: AdminBookingRow[] = historicalBookings.map((h) => ({
+      _id: h.id,
+      patientName: h.patientName || "",
+      patientEmail: h.patientEmail || "",
+      patientPhone: "",
+      reservationNumber: "",
+      service: h.serviceName ? { name: h.serviceName, appointmentDuration: 0 } : null,
+      slotDate: h.date,
+      slotTime: h.time,
+      status: h.status,
+      managementToken: "",
+    }));
+
+    // Combine and sort by date asc
+    const allBookings = [...sanityBookings, ...transformedHistorical].sort((a, b) => {
+      const dateA = `${a.slotDate} ${a.slotTime}`;
+      const dateB = `${b.slotDate} ${b.slotTime}`;
+      return dateA.localeCompare(dateB);
+    });
+
+    return Response.json({ bookings: allBookings });
   } catch (err) {
     console.error("[api/admin/bookings] Unexpected error:", err);
     return Response.json({ error: "Hiba történt. Kérjük, próbálja újra." }, { status: 500 });

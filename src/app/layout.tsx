@@ -10,13 +10,13 @@ import { plusJakartaSans } from "@/lib/fonts";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import { urlFor } from "@/sanity/lib/image";
 import { siteSettingsQuery } from "@/sanity/lib/queries";
-import type { SiteSettings } from "../../sanity.types";
+import type { SiteSettingsQueryResult } from "../../sanity.types";
 import "./globals.css";
 
 // ─── Dynamic Root Metadata ────────────────────────────────────────────────────
 
 export async function generateMetadata(): Promise<Metadata> {
-  const settings = await sanityFetch<SiteSettings | null>({
+  const settings = await sanityFetch<SiteSettingsQueryResult | null>({
     query: siteSettingsQuery,
     tags: ["siteSettings"],
   });
@@ -66,7 +66,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const settings = await sanityFetch<SiteSettings | null>({
+  const settings = await sanityFetch<SiteSettingsQueryResult | null>({
     query: siteSettingsQuery,
     tags: ["siteSettings"],
   });
@@ -78,20 +78,21 @@ export default async function RootLayout({
           <IntroOverlay />
           <div className="max-w-[88rem] mx-auto px-2 sm:px-3 lg:px-4 py-3 space-y-3">
             <Header
-              clinicName={settings?.clinicName}
-              navigationLinks={settings?.navigationLinks}
-              phone={settings?.phone}
-              address={settings?.address}
+              clinicName={settings?.clinicName ?? undefined}
+              navigationLinks={settings?.navigationLinks as any}
+              phone={settings?.phone ?? undefined}
+              address={settings?.address ?? undefined}
             />
             <main className="space-y-3">{children}</main>
             <Footer
-              clinicName={settings?.clinicName}
-              phone={settings?.phone}
-              email={settings?.email}
-              address={settings?.address}
-              footerColumns={settings?.footerColumns}
-              socialLinks={settings?.socialLinks}
-              privacyPolicyUrl={settings?.privacyPolicyUrl}
+              clinicName={settings?.clinicName ?? undefined}
+              phone={settings?.phone ?? undefined}
+              email={settings?.email ?? undefined}
+              address={settings?.address ?? undefined}
+              footerColumns={settings?.footerColumns as any}
+              socialLinks={settings?.socialLinks as any}
+              privacyPolicyUrl={settings?.privacyPolicyUrl ?? undefined}
+              cookiePolicyUrl={settings?.cookiePolicyUrl ?? undefined}
             />
           </div>
           <CookieNotice />

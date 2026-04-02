@@ -91,7 +91,9 @@ export function Step2DateTime({
     const monthStr = `${String(viewYear)}-${String(viewMonth + 1).padStart(2, "0")}`;
     let cancelled = false;
 
-    fetch(`/api/slots/calendar?month=${monthStr}&serviceId=${encodeURIComponent(serviceId)}`)
+    fetch(`/api/slots/calendar?month=${monthStr}&serviceId=${encodeURIComponent(serviceId)}`, {
+      cache: 'no-store'
+    })
       .then((res) => (res.ok ? res.json() : null))
       .then((data: { dates?: string[] } | null) => {
         if (!cancelled && data?.dates) {

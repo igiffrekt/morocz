@@ -158,10 +158,14 @@ export async function GET(request: Request): Promise<Response> {
     const dayOfWeek = new Date(Date.UTC(y ?? 0, (m ?? 1) - 1, d ?? 1)).getUTCDay();
 
     let scheduleToUse = { ...scheduleForSlots };
+    let blockedDatesToUse = blockedDates;
 
-    // If custom availability exists for this date, override the schedule
+    // If custom availability exists for this date, override the schedule and unblock the date
     const customAvail = customByDate.get(dateStr);
     if (customAvail && customAvail.startTime && customAvail.endTime) {
+      // Custom availability overrides blocked dates
+      blockedDatesToUse = blockedDates.filter(d => d !== dateStr);
+
       scheduleToUse = {
         ...scheduleForSlots,
         days: scheduleForSlots.days.map((day) => {
@@ -192,7 +196,7 @@ export async function GET(request: Request): Promise<Response> {
     // Total = slots with no bookings
     const total = generateAvailableSlots({
       schedule: scheduleToUse,
-      blockedDates,
+      blockedDates: blockedDatesToUse,
       bookedSlots: [],
       heldSlots: [],
       date: dateStr,
@@ -205,7 +209,7 @@ export async function GET(request: Request): Promise<Response> {
     // Available = slots after removing booked and held
     const available = generateAvailableSlots({
       schedule: scheduleToUse,
-      blockedDates,
+      blockedDates: blockedDatesToUse,
       bookedSlots: bookingsByDate.get(dateStr) ?? [],
       heldSlots: heldByDate.get(dateStr) ?? [],
       date: dateStr,

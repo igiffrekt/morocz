@@ -304,8 +304,9 @@ export function Step4Confirm({ selections, onBack, onSuccess, onConflict }: Step
             <button
               type="button"
               onClick={async () => {
+                sessionStorage.clear();
                 await signOut();
-                window.location.href = "/idopontfoglalas";
+                window.location.reload();
               }}
               className="text-[var(--color-primary)] underline hover:no-underline"
             >

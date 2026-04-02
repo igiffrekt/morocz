@@ -81,25 +81,49 @@ export function Step2DateTime({
   const todayStr = getTodayString();
   const maxDateStr = getMaxDateString();
 
-  // Compute available dates for the currently visible month
-  const availableDatesSet = useMemo(() => {
-    const firstDay = toDateString(viewYear, viewMonth, 1);
-    const lastDay = toDateString(viewYear, viewMonth, getDaysInMonth(viewYear, viewMonth));
+  // State for available dates (fetched from API to include custom availability)
+  const [availableDatesSet, setAvailableDatesSet] = useState<Set<string>>(new Set());
 
-    // Clamp to today..maxDate range
-    const rangeStart = firstDay < todayStr ? todayStr : firstDay;
-    const rangeEnd = lastDay > maxDateStr ? maxDateStr : lastDay;
+  // Fetch available dates for the currently visible month from API
+  useEffect(() => {
+    if (!serviceId) return;
 
-    if (rangeStart > rangeEnd) return new Set<string>();
+    const monthStr = `${String(viewYear)}-${String(viewMonth + 1).padStart(2, "0")}`;
+    let cancelled = false;
 
-    const available = getAvailableDatesInRange(
-      scheduleData.schedule,
-      scheduleData.blockedDates,
-      rangeStart,
-      rangeEnd,
-    );
-    return new Set(available);
-  }, [viewYear, viewMonth, scheduleData, todayStr, maxDateStr]);
+    fetch(`/api/slots/calendar?month=${monthStr}&serviceId=${encodeURIComponent(serviceId)}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: { dates?: string[] } | null) => {
+        if (!cancelled && data?.dates) {
+          // Filter to today..maxDate range
+          const filtered = data.dates.filter(d => d >= todayStr && d <= maxDateStr);
+          setAvailableDatesSet(new Set(filtered));
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          // Fallback to client-side calculation
+          const firstDay = toDateString(viewYear, viewMonth, 1);
+          const lastDay = toDateString(viewYear, viewMonth, getDaysInMonth(viewYear, viewMonth));
+          const rangeStart = firstDay < todayStr ? todayStr : firstDay;
+          const rangeEnd = lastDay > maxDateStr ? maxDateStr : lastDay;
+
+          if (rangeStart <= rangeEnd) {
+            const available = getAvailableDatesInRange(
+              scheduleData.schedule,
+              scheduleData.blockedDates,
+              rangeStart,
+              rangeEnd,
+            );
+            setAvailableDatesSet(new Set(available));
+          }
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [viewYear, viewMonth, serviceId, scheduleData, todayStr, maxDateStr]);
 
   // Fetch time slots when a date is selected
   const fetchSlots = useCallback(

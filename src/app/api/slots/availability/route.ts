@@ -19,6 +19,12 @@ const slotLocksForRangeQuery = defineQuery(
 }`,
 );
 
+const customAvailabilityForMonthQuery = defineQuery(
+  `*[_type == "customAvailability" && date >= $startDate && date <= $endDate]{
+    _id, date, startTime, endTime, services[]->{_id}
+  }`
+);
+
 const serviceByIdQuery = defineQuery(
   `*[_type == "service" && _id == $serviceId][0]{appointmentDuration}`,
 );
@@ -46,7 +52,7 @@ export async function GET(request: Request): Promise<Response> {
   const startDate = `${month}-01`;
   const endDate = `${month}-${String(daysInMonth).padStart(2, "0")}`;
 
-  const [schedule, blockedDatesDoc, bookings, slotLocks, service] = await Promise.all([
+  const [schedule, blockedDatesDoc, bookings, slotLocks, customAvails, service] = await Promise.all([
     sanityFetch<{
       defaultSlotDuration: number;
       bufferMinutes: number;
@@ -80,6 +86,19 @@ export async function GET(request: Request): Promise<Response> {
       },
       tags: ["slotLock"],
     }),
+    sanityFetch<
+      Array<{
+        _id: string;
+        date: string;
+        startTime: string;
+        endTime: string;
+        services: Array<{ _id: string }> | null;
+      }>
+    >({
+      query: customAvailabilityForMonthQuery,
+      params: { startDate, endDate },
+      tags: ["customAvailability"],
+    }),
     sanityFetch<{ appointmentDuration: number } | null>({
       query: serviceByIdQuery,
       params: { serviceId },
@@ -94,6 +113,20 @@ export async function GET(request: Request): Promise<Response> {
   const scheduleForSlots = schedule ?? { defaultSlotDuration: 20, bufferMinutes: 0, days: [] };
   const blockedDates = (blockedDatesDoc?.dates ?? []).map((d) => d.date).filter(Boolean);
   const serviceDuration = service.appointmentDuration ?? 20;
+
+  // Build map of custom availability by date
+  const customByDate = new Map<string, typeof customAvails[0]>();
+  for (const custom of customAvails) {
+    // Check if this custom availability applies to the service
+    const appliesToService =
+      !custom.services ||
+      custom.services.length === 0 ||
+      custom.services.some((s) => s._id === serviceId);
+
+    if (appliesToService) {
+      customByDate.set(custom.date, custom);
+    }
+  }
 
   // Group bookings and locks by date
   const bookingsByDate = new Map<string, string[]>();
@@ -122,9 +155,45 @@ export async function GET(request: Request): Promise<Response> {
   for (let day = 1; day <= daysInMonth; day++) {
     const dateStr = `${month}-${String(day).padStart(2, "0")}`;
 
+    // Get the schedule for this date (either weekly or custom)
+    const dateObj = new Date(dateStr + 'T00:00:00');
+    const dayOfWeek = dateObj.getUTCDay();
+
+    let scheduleToUse = { ...scheduleForSlots };
+
+    // If custom availability exists for this date, override the schedule
+    const customAvail = customByDate.get(dateStr);
+    if (customAvail && customAvail.startTime && customAvail.endTime) {
+      scheduleToUse = {
+        ...scheduleForSlots,
+        days: scheduleForSlots.days.map((day) => {
+          if (day.dayOfWeek === dayOfWeek) {
+            return {
+              ...day,
+              isDayOff: false,
+              startTime: customAvail.startTime,
+              endTime: customAvail.endTime,
+            };
+          }
+          return day;
+        }),
+      };
+
+      // If the day doesn't exist in schedule, add it
+      if (!scheduleToUse.days.find((d) => d.dayOfWeek === dayOfWeek)) {
+        scheduleToUse.days.push({
+          _key: `custom-${dayOfWeek}`,
+          dayOfWeek,
+          isDayOff: false,
+          startTime: customAvail.startTime,
+          endTime: customAvail.endTime,
+        });
+      }
+    }
+
     // Total = slots with no bookings
     const total = generateAvailableSlots({
-      schedule: scheduleForSlots,
+      schedule: scheduleToUse,
       blockedDates,
       bookedSlots: [],
       heldSlots: [],
@@ -137,7 +206,7 @@ export async function GET(request: Request): Promise<Response> {
 
     // Available = slots after removing booked and held
     const available = generateAvailableSlots({
-      schedule: scheduleForSlots,
+      schedule: scheduleToUse,
       blockedDates,
       bookedSlots: bookingsByDate.get(dateStr) ?? [],
       heldSlots: heldByDate.get(dateStr) ?? [],

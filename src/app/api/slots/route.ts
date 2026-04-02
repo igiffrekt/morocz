@@ -112,9 +112,9 @@ export async function GET(request: Request): Promise<Response> {
       .map((b) => b.slotTime)
       .filter(Boolean);
 
-    // 5. Extract held times from slotLocks
+    // 5. Extract held and booked times from slotLocks
     const heldSlots = slotLocks
-      .filter((lock) => lock.status === "held")
+      .filter((lock) => lock.status === "held" || lock.status === "booked")
       .map((lock) => lock.slotTime)
       .filter(Boolean);
 

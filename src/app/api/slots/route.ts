@@ -164,7 +164,17 @@ export async function GET(request: Request): Promise<Response> {
     }
 
     // 7. Generate available slots
-    const blockedDates = (blockedDatesDoc?.dates ?? []).map((d) => d.date).filter(Boolean);
+    let blockedDates = (blockedDatesDoc?.dates ?? []).map((d) => d.date).filter(Boolean);
+
+    // If custom availability exists for this date, remove it from blocked dates
+    if (customAvail) {
+      const appliesToService =
+        !customAvail.services || customAvail.services.length === 0 || customAvail.services.some((s) => s._id === serviceId);
+      if (appliesToService) {
+        blockedDates = blockedDates.filter(d => d !== date);
+      }
+    }
+
     const serviceDurationMinutes = service.appointmentDuration ?? 20;
 
     const slots = generateAvailableSlots({

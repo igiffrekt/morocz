@@ -99,13 +99,7 @@ export async function GET(request: Request): Promise<Response> {
       const dateStr = current.toISOString().slice(0, 10);
       const dow = current.getUTCDay();
 
-      // Check if date is blocked
-      if (blockedDates.has(dateStr)) {
-        current.setUTCDate(current.getUTCDate() + 1);
-        continue;
-      }
-
-      // Check for custom availability first
+      // Check for custom availability first (overrides blocked dates)
       if (customByDate.has(dateStr)) {
         const custom = customByDate.get(dateStr)!;
         if (custom.startTime && custom.endTime) {
@@ -113,6 +107,12 @@ export async function GET(request: Request): Promise<Response> {
           current.setUTCDate(current.getUTCDate() + 1);
           continue;
         }
+      }
+
+      // Check if date is blocked
+      if (blockedDates.has(dateStr)) {
+        current.setUTCDate(current.getUTCDate() + 1);
+        continue;
       }
 
       // Otherwise check weekly schedule

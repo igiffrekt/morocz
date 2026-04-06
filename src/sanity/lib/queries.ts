@@ -379,3 +379,20 @@ export const yogaClassesQuery = defineQuery(`*[_type == "yogaClass"] | order(nam
     photo
   }
 }`);
+
+// ─── Popup ──────────────────────────────────────────────────────────────────
+// Revalidation tag: "popup"
+
+export const activePopupQuery = defineQuery(`*[_type == "popup" && isActive == true][0]{
+  _id,
+  headline,
+  content,
+  image,
+  ctaButton{
+    label,
+    href
+  },
+  showOnPages,
+  displayDelay,
+  showOncePerSession
+}`);

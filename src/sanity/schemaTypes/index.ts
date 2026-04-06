@@ -21,6 +21,7 @@ import { yogaInstructorType } from "./yogaInstructorType";
 import { yogaClassType } from "./yogaClassType";
 import { yogaScheduleType } from "./yogaScheduleType";
 import { yogaPageType } from "./yogaPageType";
+import { popupType } from "./popupType";
 
 export const schemaTypes: SchemaTypeDefinition[] = [
   homepageType,
@@ -45,4 +46,5 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   yogaClassType,
   yogaScheduleType,
   yogaPageType,
+  popupType,
 ];

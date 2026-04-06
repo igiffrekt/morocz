@@ -6,11 +6,12 @@ import { MotionProvider } from "@/components/motion/MotionProvider";
 import { CookieNotice } from "@/components/ui/CookieNotice";
 import { DraftModeIndicator } from "@/components/ui/DraftModeIndicator";
 import { GoogleAnalytics } from "@/components/ui/GoogleAnalytics";
+import { PopupModal } from "@/components/ui/PopupModal";
 import { plusJakartaSans } from "@/lib/fonts";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import { urlFor } from "@/sanity/lib/image";
-import { siteSettingsQuery } from "@/sanity/lib/queries";
-import type { SiteSettingsQueryResult } from "../../sanity.types";
+import { siteSettingsQuery, activePopupQuery } from "@/sanity/lib/queries";
+import type { SiteSettingsQueryResult, ActivePopupQueryResult } from "../../sanity.types";
 import "./globals.css";
 
 // ─── Dynamic Root Metadata ────────────────────────────────────────────────────
@@ -66,14 +67,43 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const settings = await sanityFetch<SiteSettingsQueryResult | null>({
-    query: siteSettingsQuery,
-    tags: ["siteSettings"],
-  });
+  const [settings, popup] = await Promise.all([
+    sanityFetch<SiteSettingsQueryResult | null>({
+      query: siteSettingsQuery,
+      tags: ["siteSettings"],
+    }),
+    sanityFetch<ActivePopupQueryResult | null>({
+      query: activePopupQuery,
+      tags: ["popup"],
+    }),
+  ]);
 
   return (
     <html lang="hu" className={plusJakartaSans.variable}>
+      <head>
+        {/* Google Tag Manager */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-WGPDK69W');`,
+          }}
+        />
+        {/* End Google Tag Manager */}
+      </head>
       <body>
+        {/* Google Tag Manager (noscript) */}
+        <noscript>
+          <iframe
+            src="https://www.googletagmanager.com/ns.html?id=GTM-WGPDK69W"
+            height="0"
+            width="0"
+            style={{ display: "none", visibility: "hidden" }}
+          />
+        </noscript>
+        {/* End Google Tag Manager (noscript) */}
         <MotionProvider>
           <IntroOverlay />
           <div className="max-w-[88rem] mx-auto px-2 sm:px-3 lg:px-4 py-3 space-y-3">
@@ -96,6 +126,7 @@ export default async function RootLayout({
             />
           </div>
           <CookieNotice />
+          <PopupModal popup={popup as any} />
         </MotionProvider>
         <DraftModeIndicator />
         {process.env.NEXT_PUBLIC_GA_ID && <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />}

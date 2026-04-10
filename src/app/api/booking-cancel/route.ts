@@ -80,9 +80,16 @@ export async function POST(request: Request): Promise<Response> {
     // ── 4. Patch booking status to "cancelled" ─────────────────────────────────
     await getWriteClient().patch(booking._id).set({ status: "cancelled" }).commit();
 
-    // ── 4b. Delete Google Calendar event (fire-and-forget) ────────────────────
+    // ── 4b. Delete Google Calendar event ─────────────────────────────────────
     if (booking.googleCalendarEventId) {
-      void deleteCalendarEvent(booking.googleCalendarEventId);
+      try {
+        await deleteCalendarEvent(booking.googleCalendarEventId);
+        console.log(`[booking-cancel] Deleted calendar event: ${booking.googleCalendarEventId}`);
+      } catch (calErr) {
+        console.error("[booking-cancel] Failed to delete calendar event:", calErr);
+      }
+    } else {
+      console.warn(`[booking-cancel] No googleCalendarEventId on booking ${booking._id}`);
     }
 
     // ── 5. Release the slot — patch slotLock to available ─────────────────────

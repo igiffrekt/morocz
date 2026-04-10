@@ -106,9 +106,8 @@ export async function GET(request: Request): Promise<Response> {
       return Response.json({ error: "A megadott szolgáltatás nem található." }, { status: 404 });
     }
 
-    // 4. Extract booked times from bookings
+    // 4. Extract booked times from bookings (all services — doctor can only see one patient at a time)
     const bookedSlots = bookings
-      .filter((b) => b.service?._id === serviceId)
       .map((b) => b.slotTime)
       .filter(Boolean);
 

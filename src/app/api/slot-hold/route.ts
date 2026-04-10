@@ -41,6 +41,8 @@ export async function POST(request: Request): Promise<Response> {
       _id: slotLockDocId,
       _type: "slotLock",
       slotId: `${slotDate}T${slotTime}:00`,
+      slotDate,
+      slotTime,
       status: "held",
       heldUntil,
     };

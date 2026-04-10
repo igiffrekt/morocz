@@ -82,6 +82,8 @@ export async function POST(request: Request): Promise<Response> {
       _id: slotLockDocId,
       _type: "slotLock",
       slotId,
+      slotDate,
+      slotTime,
       status: "available",
     });
 
@@ -248,9 +250,9 @@ async function getAlternativeSlots(
         params: { date: slotDate },
         tags: ["booking"],
       }),
-      sanityFetch<Array<{ _id: string; slotId: string; status: string }>>({
+      sanityFetch<Array<{ _id: string; slotTime: string; status: string }>>({
         query: slotLocksForDateQuery,
-        params: { datePrefix: slotDate },
+        params: { date: slotDate },
         tags: ["slotLock"],
       }),
       sanityFetch<{ name: string; appointmentDuration: number } | null>({
@@ -262,11 +264,8 @@ async function getAlternativeSlots(
 
     const bookedSlots = bookings.map((b) => b.slotTime);
     const heldSlots = slotLocks
-      .filter((lock) => lock.status === "held")
-      .map((lock) => {
-        const parts = lock.slotId.split("T");
-        return parts[1]?.slice(0, 5) ?? "";
-      })
+      .filter((lock) => lock.status === "held" || lock.status === "booked")
+      .map((lock) => lock.slotTime)
       .filter(Boolean);
 
     const available = generateAvailableSlots({

@@ -7,6 +7,7 @@ import { CookieNotice } from "@/components/ui/CookieNotice";
 import { DraftModeIndicator } from "@/components/ui/DraftModeIndicator";
 import { GoogleAnalytics } from "@/components/ui/GoogleAnalytics";
 import { PopupModal } from "@/components/ui/PopupModal";
+import { StaleDeploymentReloader } from "@/components/ui/StaleDeploymentReloader";
 import { plusJakartaSans } from "@/lib/fonts";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import { urlFor } from "@/sanity/lib/image";
@@ -129,6 +130,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           <PopupModal popup={popup as any} />
         </MotionProvider>
         <DraftModeIndicator />
+        <StaleDeploymentReloader />
         {process.env.NEXT_PUBLIC_GA_ID && <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />}
       </body>
     </html>

@@ -1,7 +1,9 @@
+import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
-import { getWriteClient } from "@/lib/sanity-write-client";
+import { db } from "@/lib/db";
+import { user } from "@/lib/db/schema";
 
 export const dynamic = "force-dynamic";
 
@@ -27,17 +29,13 @@ export async function POST(request: Request) {
       );
     }
 
-    // Update user in Sanity (if user document exists there)
-    // Also update in Better Auth if needed
     const { phoneNumber } = parsed.data;
 
-    // Update Better Auth user
-    await auth.api.updateUser({
-      body: JSON.stringify({
-        phoneNumber,
-      }),
-      headers: await headers(),
-    });
+    // Update phone number directly via drizzle
+    await db
+      .update(user)
+      .set({ phoneNumber })
+      .where(eq(user.id, session.user.id));
 
     return Response.json({ success: true, phoneNumber }, { status: 200 });
   } catch (err) {

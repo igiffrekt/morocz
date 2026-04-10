@@ -119,6 +119,9 @@ export default function AuthStep({ onSuccess, defaultTab = "belepes" }: AuthStep
     }
     msg = msg.toLowerCase();
 
+    if (msg.includes("credential_account_not_found") || msg.includes("credential account not found")) {
+      return 'Ehhez az e-mail címhez Google-fiókkal regisztrált. Kérjük, használja a \u201eFolytatás Google-fiókkal\u201D gombot a belépéshez.';
+    }
     if (
       msg.includes("invalid") ||
       msg.includes("credentials") ||

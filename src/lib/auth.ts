@@ -2,6 +2,7 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
 import { admin } from "better-auth/plugins";
+import { buildPasswordResetEmail } from "./auth-email";
 import { db } from "./db";
 import { isEmailConfigured, sendEmail } from "./email";
 
@@ -25,7 +26,7 @@ export const auth = betterAuth({
         void sendEmail({
           to: user.email,
           subject: "Jelszó visszaállítása",
-          html: `<p>A jelszó visszaállításához kattintson az alábbi linkre:</p><p><a href="${url}">Jelszó visszaállítása</a></p><p>A link 1 óráig érvényes.</p>`,
+          html: buildPasswordResetEmail({ resetUrl: url }),
         });
       } catch {
         console.error("[auth] Failed to send reset password email to", user.email);

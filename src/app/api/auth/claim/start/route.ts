@@ -1,5 +1,6 @@
 import { eq } from "drizzle-orm";
 import { z } from "zod";
+import { buildClaimActivationEmail } from "@/lib/auth-email";
 import { generateRawToken, insertClaimToken } from "@/lib/claim-tokens";
 import { db } from "@/lib/db";
 import { account, user } from "@/lib/db/schema";
@@ -68,12 +69,7 @@ export async function POST(request: Request) {
             await sendEmail({
               to: email,
               subject: "Fejezze be a fiók aktiválását",
-              html: `<p>Kedves Páciensünk!</p>
-<p>Az Ön e-mail címével már létezik egy foglalási fiók a Mórocz Medical rendszerében.
-A fiók aktiválásához és jelszó beállításához kattintson az alábbi linkre:</p>
-<p><a href="${link}">Fiók aktiválása</a></p>
-<p>A link 60 percig érvényes.</p>
-<p>Ha nem Ön kezdeményezte, hagyja figyelmen kívül ezt az e-mailt.</p>`,
+              html: buildClaimActivationEmail({ claimUrl: link }),
             });
           } catch (err) {
             console.error("[claim/start] Email send failed for", email, err);

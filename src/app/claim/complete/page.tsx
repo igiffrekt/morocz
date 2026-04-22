@@ -73,7 +73,7 @@ function ClaimCompleteContent() {
         setError(data.error ?? "Hiba történt");
         return;
       }
-      router.push("/");
+      router.push("/idopontfoglalas");
     } catch {
       setError("Hiba történt. Próbálja újra.");
     } finally {

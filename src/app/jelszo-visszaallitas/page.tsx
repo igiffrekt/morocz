@@ -46,7 +46,7 @@ function ResetPasswordContent() {
         setError("Ez a link érvénytelen vagy lejárt. Kérjük, kérjen újat.");
         return;
       }
-      router.push("/");
+      router.push("/idopontfoglalas");
     } catch {
       setError("Hiba történt. Próbálja újra.");
     } finally {

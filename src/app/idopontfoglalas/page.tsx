@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { requireAddress } from "@/lib/address-gate";
 import { BookingWizard } from "@/components/booking/BookingWizard";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import {
@@ -18,6 +19,8 @@ export const metadata: Metadata = {
 };
 
 export default async function IdopontfoglalasPage() {
+  await requireAddress("/idopontfoglalas");
+
   const [services, weeklySchedule, blockedDatesDoc] = await Promise.all([
     sanityFetch<ServicesForBookingQueryResult>({
       query: servicesForBookingQuery,

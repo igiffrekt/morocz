@@ -1,4 +1,10 @@
 import { z } from "zod";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+import { eq } from "drizzle-orm";
+import { auth } from "@/lib/auth";
+import { db } from "@/lib/db";
+import { user } from "@/lib/db/schema";
 
 export const addressSchema = z.object({
   postalCode: z
@@ -17,3 +23,22 @@ export const addressSchema = z.object({
 });
 
 export type AddressInput = z.infer<typeof addressSchema>;
+
+/**
+ * For use in server components on authenticated pages.
+ * If the session user has no postal_code, redirects to /profil/cim?next=<currentPath>.
+ * If no session, returns null (caller decides whether to require login).
+ */
+export async function requireAddress(currentPath: string): Promise<void> {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session?.user) return;
+
+  const row = await db.query.user.findFirst({
+    where: eq(user.id, session.user.id),
+    columns: { postalCode: true },
+  });
+
+  if (!row?.postalCode) {
+    redirect(`/profil/cim?next=${encodeURIComponent(currentPath)}`);
+  }
+}

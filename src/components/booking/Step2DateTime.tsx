@@ -358,11 +358,16 @@ export function Step2DateTime({
               const isSelected = dateStr === selectedDate;
               const isPast = dateStr < todayStr;
               const isBeyondMax = dateStr > maxDateStr;
-              const isClickable = isAvailable && !isPast && !isBeyondMax;
-
-              // Availability stripe data
+              // Availability stripe data — loads async after the calendar renders.
+              // Disable days we know are fully booked; leave not-yet-loaded days clickable.
               const avail = dayAvailability[dateStr];
-              const pct = avail && avail.total > 0 ? avail.available / avail.total : null;
+              const isFullyBooked = avail !== undefined && avail.available === 0;
+              const isClickable = isAvailable && !isPast && !isBeyondMax && !isFullyBooked;
+
+              const pct =
+                avail && avail.total > 0 && avail.available > 0
+                  ? avail.available / avail.total
+                  : null;
               const stripeColor =
                 pct === null
                   ? ""

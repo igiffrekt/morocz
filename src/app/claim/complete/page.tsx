@@ -1,9 +1,9 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
-export default function ClaimCompletePage() {
+function ClaimCompleteContent() {
   const router = useRouter();
   const params = useSearchParams();
   const token = params.get("token") ?? "";
@@ -104,7 +104,7 @@ export default function ClaimCompletePage() {
       </p>
 
       {error && (
-        <div className="mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-lg">
+        <div role="alert" aria-live="polite" className="mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-lg">
           <p className="text-sm text-red-600">{error}</p>
         </div>
       )}
@@ -186,5 +186,13 @@ export default function ClaimCompletePage() {
         </button>
       </form>
     </div>
+  );
+}
+
+export default function ClaimCompletePage() {
+  return (
+    <Suspense fallback={<div className="max-w-md mx-auto px-4 py-16 text-center">Betöltés…</div>}>
+      <ClaimCompleteContent />
+    </Suspense>
   );
 }

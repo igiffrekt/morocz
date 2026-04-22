@@ -5,6 +5,22 @@ import { account, user } from "@/lib/db/schema";
 import { generateRawToken, insertClaimToken } from "@/lib/claim-tokens";
 import { isEmailConfigured, sendEmail } from "@/lib/email";
 
+const claimStartHits = new Map<string, { count: number; resetAt: number }>();
+const CLAIM_START_WINDOW_MS = 600_000; // 10 minutes
+const CLAIM_START_MAX = 3;
+
+function checkClaimStartRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const entry = claimStartHits.get(ip);
+  if (!entry || entry.resetAt < now) {
+    claimStartHits.set(ip, { count: 1, resetAt: now + CLAIM_START_WINDOW_MS });
+    return true;
+  }
+  if (entry.count >= CLAIM_START_MAX) return false;
+  entry.count++;
+  return true;
+}
+
 export const dynamic = "force-dynamic";
 
 const bodySchema = z.object({
@@ -12,6 +28,13 @@ const bodySchema = z.object({
 });
 
 export async function POST(request: Request) {
+  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
+    || request.headers.get("x-real-ip")
+    || "unknown";
+  if (!checkClaimStartRateLimit(ip)) {
+    return Response.json({ error: "Túl sok kérés" }, { status: 429 });
+  }
+
   const body = await request.json().catch(() => null);
   const parsed = bodySchema.safeParse(body);
   if (!parsed.success) {

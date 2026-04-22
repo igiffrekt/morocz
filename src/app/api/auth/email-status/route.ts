@@ -3,6 +3,22 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { account, user } from "@/lib/db/schema";
 
+const emailStatusHits = new Map<string, { count: number; resetAt: number }>();
+const EMAIL_STATUS_WINDOW_MS = 60_000;
+const EMAIL_STATUS_MAX = 10;
+
+function checkEmailStatusRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const entry = emailStatusHits.get(ip);
+  if (!entry || entry.resetAt < now) {
+    emailStatusHits.set(ip, { count: 1, resetAt: now + EMAIL_STATUS_WINDOW_MS });
+    return true;
+  }
+  if (entry.count >= EMAIL_STATUS_MAX) return false;
+  entry.count++;
+  return true;
+}
+
 export const dynamic = "force-dynamic";
 
 const querySchema = z.object({
@@ -10,6 +26,13 @@ const querySchema = z.object({
 });
 
 export async function GET(request: Request) {
+  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
+    || request.headers.get("x-real-ip")
+    || "unknown";
+  if (!checkEmailStatusRateLimit(ip)) {
+    return Response.json({ error: "Túl sok kérés" }, { status: 429 });
+  }
+
   const url = new URL(request.url);
   const parsed = querySchema.safeParse({ email: url.searchParams.get("email") });
   if (!parsed.success) {

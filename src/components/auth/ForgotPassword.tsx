@@ -29,7 +29,7 @@ export default function ForgotPassword({ onBack }: ForgotPasswordProps) {
     try {
       await authClient.requestPasswordReset({
         email,
-        redirectTo: "/idopontfoglalas",
+        redirectTo: "/jelszo-visszaallitas",
       });
       // Always show success — don't reveal whether email exists
       setSent(true);

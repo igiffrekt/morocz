@@ -20,6 +20,10 @@ export const user = pgTable("user", {
   firstName: text("first_name"),
   lastName: text("last_name"),
   lastAppointment: timestamp("last_appointment"),
+  // billing address (nullable; populated at signup, claim, or via address gate)
+  postalCode: text("postal_code"),
+  city: text("city"),
+  streetAddress: text("street_address"),
 });
 
 export const session = pgTable("session", {

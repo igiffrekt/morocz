@@ -16,6 +16,9 @@ interface FieldErrors {
   email?: string;
   password?: string;
   phoneNumber?: string;
+  postalCode?: string;
+  city?: string;
+  streetAddress?: string;
 }
 
 function GoogleIcon() {
@@ -50,156 +53,186 @@ function GoogleIcon() {
 export default function AuthStep({ onSuccess, defaultTab = "belepes" }: AuthStepProps) {
   const { data: session, isPending } = useSession();
   const [tab, setTab] = useState<Tab>(defaultTab);
+  const [belepesStep, setBelepesStep] = useState<"email" | "password" | "ghost">("email");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [postalCode, setPostalCode] = useState("");
+  const [city, setCity] = useState("");
+  const [streetAddress, setStreetAddress] = useState("");
   const [errors, setErrors] = useState<FieldErrors>({});
   const [loading, setLoading] = useState(false);
   const [globalError, setGlobalError] = useState("");
   const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [claimEmailSent, setClaimEmailSent] = useState(false);
 
-  // Auto-advance if session already exists
   useEffect(() => {
-    if (!isPending && session) {
-      onSuccess();
-    }
+    if (!isPending && session) onSuccess();
   }, [session, isPending, onSuccess]);
 
-  // While session is loading, don't render anything
-  if (isPending) {
-    return null;
-  }
+  if (isPending) return null;
+  if (session) return null;
+  if (showForgotPassword) return <ForgotPassword onBack={() => setShowForgotPassword(false)} />;
 
-  // If session exists, nothing to render (useEffect will call onSuccess)
-  if (session) {
-    return null;
-  }
-
-  if (showForgotPassword) {
-    return <ForgotPassword onBack={() => setShowForgotPassword(false)} />;
+  function resetBelepes() {
+    setBelepesStep("email");
+    setPassword("");
+    setClaimEmailSent(false);
+    setErrors({});
+    setGlobalError("");
   }
 
   function validate(): boolean {
     const newErrors: FieldErrors = {};
-
     if (tab === "regisztracio") {
-      if (!name.trim()) {
-        newErrors.name = "A név megadása kötelező";
-      }
+      if (!name.trim()) newErrors.name = "A név megadása kötelező";
       if (!phoneNumber || phoneNumber.replace(/\D/g, "").length < 10) {
         newErrors.phoneNumber = "A telefonszámnak legalább 10 számjegyből kell állnia";
       }
+      if (!/^\d{4}$/.test(postalCode)) {
+        newErrors.postalCode = "Az irányítószám 4 számjegyből áll";
+      }
+      if (!city.trim()) newErrors.city = "A település megadása kötelező";
+      if (!streetAddress.trim()) newErrors.streetAddress = "A cím megadása kötelező";
     }
-
-    if (!email.includes("@")) {
-      newErrors.email = "Érvénytelen e-mail cím";
+    if (!email.includes("@")) newErrors.email = "Érvénytelen e-mail cím";
+    if (tab === "regisztracio" || belepesStep === "password") {
+      if (password.length < 6) {
+        newErrors.password = "A jelszónak legalább 6 karakter hosszúnak kell lennie";
+      }
     }
-
-    if (password.length < 6) {
-      newErrors.password = "A jelszónak legalább 6 karakter hosszúnak kell lennie";
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   }
 
   function mapErrorMessage(error: unknown): string {
-    // Better Auth returns { message?: string, code?: string, status?: number }
     let msg = "";
-    if (error instanceof Error) {
-      msg = error.message;
-    } else if (typeof error === "string") {
-      msg = error;
-    } else if (error && typeof error === "object") {
+    if (error instanceof Error) msg = error.message;
+    else if (typeof error === "string") msg = error;
+    else if (error && typeof error === "object") {
       const obj = error as Record<string, unknown>;
       msg = String(obj.message ?? obj.code ?? obj.statusText ?? JSON.stringify(error));
-    } else {
-      msg = String(error);
-    }
+    } else msg = String(error);
     msg = msg.toLowerCase();
-
     if (msg.includes("credential_account_not_found") || msg.includes("credential account not found")) {
-      return 'Ehhez az e-mail címhez Google-fiókkal regisztrált. Kérjük, használja a \u201eFolytatás Google-fiókkal\u201D gombot a belépéshez.';
+      return 'Ehhez az e-mail címhez Google-fiókkal regisztrált. Kérjük, használja a „Folytatás Google-fiókkal" gombot.';
     }
-    if (
-      msg.includes("invalid") ||
-      msg.includes("credentials") ||
-      msg.includes("password") ||
-      msg.includes("not found") ||
-      msg.includes("incorrect")
-    ) {
+    if (msg.includes("invalid") || msg.includes("credentials") || msg.includes("password") || msg.includes("incorrect")) {
       return "Hibás e-mail cím vagy jelszó";
     }
-    if (
-      msg.includes("already") ||
-      msg.includes("exists") ||
-      msg.includes("registered") ||
-      msg.includes("user_already")
-    ) {
+    if (msg.includes("already") || msg.includes("exists") || msg.includes("registered")) {
       return "Ez az e-mail cím már regisztrálva van";
     }
     if (msg.includes("rate") || msg.includes("429") || msg.includes("too many")) {
       return "Kérjük, várjon egy percet, majd próbálja újra";
     }
-    if (msg.includes("weak") || msg.includes("short")) {
-      return "A jelszó túl gyenge. Kérjük, válasszon erősebb jelszót";
-    }
+    if (msg.includes("weak") || msg.includes("short")) return "A jelszó túl gyenge";
     console.error("[AuthStep] Unhandled auth error:", error);
     return "Hiba történt, kérjük próbálja újra";
   }
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleEmailContinue(e: React.FormEvent) {
     e.preventDefault();
     setGlobalError("");
-
-    if (!validate()) return;
-
+    const emailErr: FieldErrors = {};
+    if (!email.includes("@")) {
+      emailErr.email = "Érvénytelen e-mail cím";
+      setErrors(emailErr);
+      return;
+    }
+    setErrors({});
     setLoading(true);
-
     try {
-      if (tab === "belepes") {
-        const result = await signIn.email({
-          email,
-          password,
-          rememberMe: true,
-          callbackURL: "/idopontfoglalas",
-        });
+      const res = await fetch(
+        `/api/auth/email-status?email=${encodeURIComponent(email.toLowerCase())}`,
+      );
+      const data = await res.json();
+      if (data.status === "new") {
+        setTab("regisztracio");
+        setLoading(false);
+        return;
+      }
+      if (data.status === "oauth") {
+        await signIn.social({ provider: "google", callbackURL: "/idopontfoglalas" });
+        return;
+      }
+      if (data.status === "ghost") {
+        setBelepesStep("ghost");
+        setLoading(false);
+        return;
+      }
+      setBelepesStep("password");
+      setLoading(false);
+    } catch {
+      setGlobalError("Hiba történt, kérjük próbálja újra");
+      setLoading(false);
+    }
+  }
 
-        if (result.error) {
-          setGlobalError(mapErrorMessage(result.error));
-          return;
-        }
+  async function handlePasswordSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setGlobalError("");
+    if (!validate()) return;
+    setLoading(true);
+    try {
+      const result = await signIn.email({
+        email,
+        password,
+        rememberMe: true,
+        callbackURL: "/idopontfoglalas",
+      });
+      if (result.error) {
+        setGlobalError(mapErrorMessage(result.error));
+        return;
+      }
+      onSuccess();
+    } catch (err) {
+      setGlobalError(mapErrorMessage(err));
+    } finally {
+      setLoading(false);
+    }
+  }
 
-        onSuccess();
-      } else {
-        const result = await signUp.email({
-          email,
-          password,
-          name,
-          callbackURL: "/idopontfoglalas",
-        });
-
-        // Save phoneNumber separately (Better Auth doesn't support custom fields)
-        if (result?.data?.user?.id && phoneNumber.trim()) {
-          try {
+  async function handleRegisztracioSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setGlobalError("");
+    if (!validate()) return;
+    setLoading(true);
+    try {
+      const result = await signUp.email({
+        email,
+        password,
+        name,
+        callbackURL: "/idopontfoglalas",
+      });
+      if (result?.data?.user?.id) {
+        try {
+          if (phoneNumber.trim()) {
             await fetch("/api/user/phone", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ phoneNumber: phoneNumber.trim() }),
             });
-          } catch (err) {
-            console.error("[AuthStep] Phone save failed:", err);
           }
+          await fetch("/api/user/address", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              postalCode,
+              city: city.trim(),
+              streetAddress: streetAddress.trim(),
+            }),
+          });
+        } catch (err) {
+          console.error("[AuthStep] Post-signup profile save failed:", err);
         }
-
-        if (result.error) {
-          setGlobalError(mapErrorMessage(result.error));
-          return;
-        }
-
-        onSuccess();
       }
+      if (result.error) {
+        setGlobalError(mapErrorMessage(result.error));
+        return;
+      }
+      onSuccess();
     } catch (err) {
       setGlobalError(mapErrorMessage(err));
     } finally {
@@ -211,62 +244,63 @@ export default function AuthStep({ onSuccess, defaultTab = "belepes" }: AuthStep
     setGlobalError("");
     setLoading(true);
     try {
-      await signIn.social({
-        provider: "google",
-        callbackURL: "/idopontfoglalas",
-      });
+      await signIn.social({ provider: "google", callbackURL: "/idopontfoglalas" });
     } catch (err) {
       setGlobalError(mapErrorMessage(err));
       setLoading(false);
     }
   }
 
+  async function handleClaimStart() {
+    setGlobalError("");
+    setLoading(true);
+    try {
+      await fetch("/api/auth/claim/start", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.toLowerCase() }),
+      });
+      setClaimEmailSent(true);
+    } catch {
+      setGlobalError("Hiba történt, kérjük próbálja újra");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const inputCx = (hasError: boolean) =>
+    `w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors ${
+      hasError ? "border-red-400" : "border-gray-300"
+    }`;
+
   return (
     <div className="flex flex-col items-center justify-center min-h-[40vh] py-8 px-4">
-      {/* Contextual message */}
       <p className="text-center text-sm text-gray-600 mb-6 max-w-md">
         Az időpontfoglalás véglegesítéséhez kérjük, jelentkezzen be vagy hozzon létre egy fiókot.
       </p>
 
-      {/* Auth card */}
       <div className="w-full max-w-md mx-auto p-8 bg-white rounded-2xl shadow-lg">
-        {/* Tab toggle */}
         <div className="flex border-b border-gray-200 mb-6">
           <button
             type="button"
-            onClick={() => {
-              setTab("belepes");
-              setPhoneNumber("");
-              setErrors({});
-              setGlobalError("");
-            }}
+            onClick={() => { setTab("belepes"); resetBelepes(); }}
             className={`flex-1 pb-3 text-sm font-medium transition-colors ${
-              tab === "belepes"
-                ? "text-primary border-b-2 border-primary"
-                : "text-gray-500 hover:text-gray-700"
+              tab === "belepes" ? "text-primary border-b-2 border-primary" : "text-gray-500 hover:text-gray-700"
             }`}
           >
             Belépés
           </button>
           <button
             type="button"
-            onClick={() => {
-              setTab("regisztracio");
-              setPhoneNumber("");
-              setErrors({});
-              setGlobalError("");
-            }}
+            onClick={() => { setTab("regisztracio"); setErrors({}); setGlobalError(""); }}
             className={`flex-1 pb-3 text-sm font-medium transition-colors ${
-              tab === "regisztracio"
-                ? "text-primary border-b-2 border-primary"
-                : "text-gray-500 hover:text-gray-700"
+              tab === "regisztracio" ? "text-primary border-b-2 border-primary" : "text-gray-500 hover:text-gray-700"
             }`}
           >
             Regisztráció
           </button>
         </div>
 
-        {/* Google OAuth button — prominent, top position */}
         <button
           type="button"
           onClick={handleGoogleSignIn}
@@ -277,109 +311,68 @@ export default function AuthStep({ onSuccess, defaultTab = "belepes" }: AuthStep
           Folytatás Google-fiókkal
         </button>
 
-        {/* Divider */}
         <div className="flex items-center gap-4 my-5">
           <div className="flex-1 border-t border-gray-200" />
           <span className="text-xs text-gray-400 font-medium">vagy</span>
           <div className="flex-1 border-t border-gray-200" />
         </div>
 
-        {/* Global error */}
         {globalError && (
-          <div className="mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-lg">
+          <div role="alert" aria-live="polite" className="mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-lg">
             <p className="text-sm text-red-600">{globalError}</p>
           </div>
         )}
 
-        {/* Email/password form */}
-        <form onSubmit={handleSubmit} noValidate className="space-y-4">
-          {/* Name field — registration only */}
-          {tab === "regisztracio" && (
-            <>
-              <div>
-                <label htmlFor="auth-name" className="block text-sm font-medium text-gray-700 mb-1">
-                  Teljes név
-                </label>
-                <input
-                  id="auth-name"
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Kovács János"
-                  autoComplete="name"
-                  className={`w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors ${
-                    errors.name ? "border-red-400" : "border-gray-300"
-                  }`}
-                />
-                {errors.name && <p className="mt-1 text-xs text-red-600">{errors.name}</p>}
-              </div>
+        {tab === "belepes" && belepesStep === "email" && (
+          <form onSubmit={handleEmailContinue} noValidate className="space-y-4">
+            <div>
+              <label htmlFor="auth-email" className="block text-sm font-medium text-gray-700 mb-1">
+                E-mail cím
+              </label>
+              <input
+                id="auth-email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="pelda@email.hu"
+                autoComplete="email"
+                className={inputCx(!!errors.email)}
+              />
+              {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email}</p>}
+            </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 px-4 bg-primary text-white rounded-xl font-medium text-sm hover:bg-primary/90 disabled:opacity-50"
+            >
+              {loading ? "Folyamatban..." : "Tovább"}
+            </button>
+          </form>
+        )}
 
-              {/* Phone field — registration only */}
-              <div>
-                <label
-                  htmlFor="auth-phone"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Telefonszám
-                </label>
-                <input
-                  id="auth-phone"
-                  type="tel"
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
-                  placeholder="+36 70 000 0000"
-                  autoComplete="tel"
-                  className={`w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors ${
-                    errors.phoneNumber ? "border-red-400" : "border-gray-300"
-                  }`}
-                />
-                {errors.phoneNumber && (
-                  <p className="mt-1 text-xs text-red-600">{errors.phoneNumber}</p>
-                )}
-              </div>
-            </>
-          )}
-
-          {/* Email field */}
-          <div>
-            <label htmlFor="auth-email" className="block text-sm font-medium text-gray-700 mb-1">
-              E-mail cím
-            </label>
-            <input
-              id="auth-email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="pelda@email.hu"
-              autoComplete={tab === "belepes" ? "email" : "email"}
-              className={`w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors ${
-                errors.email ? "border-red-400" : "border-gray-300"
-              }`}
-            />
-            {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email}</p>}
-          </div>
-
-          {/* Password field */}
-          <div>
-            <label htmlFor="auth-password" className="block text-sm font-medium text-gray-700 mb-1">
-              Jelszó
-            </label>
-            <input
-              id="auth-password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder={tab === "belepes" ? "••••••••" : "Legalább 6 karakter"}
-              autoComplete={tab === "belepes" ? "current-password" : "new-password"}
-              className={`w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors ${
-                errors.password ? "border-red-400" : "border-gray-300"
-              }`}
-            />
-            {errors.password && <p className="mt-1 text-xs text-red-600">{errors.password}</p>}
-          </div>
-
-          {/* Forgot password link — login tab only */}
-          {tab === "belepes" && (
+        {tab === "belepes" && belepesStep === "password" && (
+          <form onSubmit={handlePasswordSubmit} noValidate className="space-y-4">
+            <div className="text-sm text-gray-600">
+              <span>{email}</span>{" "}
+              <button type="button" onClick={resetBelepes} className="text-primary hover:underline">
+                (változtatás)
+              </button>
+            </div>
+            <div>
+              <label htmlFor="auth-password" className="block text-sm font-medium text-gray-700 mb-1">
+                Jelszó
+              </label>
+              <input
+                id="auth-password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
+                className={inputCx(!!errors.password)}
+                autoFocus
+              />
+              {errors.password && <p className="mt-1 text-xs text-red-600">{errors.password}</p>}
+            </div>
             <div className="flex justify-end">
               <button
                 type="button"
@@ -389,20 +382,149 @@ export default function AuthStep({ onSuccess, defaultTab = "belepes" }: AuthStep
                 Elfelejtett jelszó?
               </button>
             </div>
-          )}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 px-4 bg-primary text-white rounded-xl font-medium text-sm hover:bg-primary/90 disabled:opacity-50"
+            >
+              {loading ? "Folyamatban..." : "Belépés"}
+            </button>
+          </form>
+        )}
 
-          {/* Submit button */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 px-4 bg-primary text-white rounded-xl font-medium text-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? "Folyamatban..." : tab === "belepes" ? "Belépés" : "Regisztráció"}
-          </button>
-        </form>
+        {tab === "belepes" && belepesStep === "ghost" && (
+          <div className="space-y-4">
+            <div className="text-sm text-gray-600">
+              <span>{email}</span>{" "}
+              <button type="button" onClick={resetBelepes} className="text-primary hover:underline">
+                (változtatás)
+              </button>
+            </div>
+            <p className="text-sm text-gray-700">
+              Rendszerünkben szerepel egy foglalási fiók ezzel az e-mail címmel, de még nincs aktiválva.
+              Válasszon az alábbi lehetőségek közül:
+            </p>
+            {claimEmailSent ? (
+              <div className="px-4 py-3 bg-green-50 border border-green-200 rounded-lg">
+                <p className="text-sm text-green-700">
+                  Elküldtük az aktiváló linket. Kérjük, ellenőrizze a postafiókját.
+                </p>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={handleClaimStart}
+                disabled={loading}
+                className="w-full py-3 px-4 bg-primary text-white rounded-xl font-medium text-sm hover:bg-primary/90 disabled:opacity-50"
+              >
+                {loading ? "Folyamatban..." : "Aktiváló link kérése e-mailben"}
+              </button>
+            )}
+          </div>
+        )}
+
+        {tab === "regisztracio" && (
+          <form onSubmit={handleRegisztracioSubmit} noValidate className="space-y-4">
+            <div>
+              <label htmlFor="auth-name" className="block text-sm font-medium text-gray-700 mb-1">Teljes név</label>
+              <input
+                id="auth-name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Kovács János"
+                autoComplete="name"
+                className={inputCx(!!errors.name)}
+              />
+              {errors.name && <p className="mt-1 text-xs text-red-600">{errors.name}</p>}
+            </div>
+            <div>
+              <label htmlFor="auth-phone" className="block text-sm font-medium text-gray-700 mb-1">Telefonszám</label>
+              <input
+                id="auth-phone"
+                type="tel"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                placeholder="+36 70 000 0000"
+                autoComplete="tel"
+                className={inputCx(!!errors.phoneNumber)}
+              />
+              {errors.phoneNumber && <p className="mt-1 text-xs text-red-600">{errors.phoneNumber}</p>}
+            </div>
+            <div>
+              <label htmlFor="auth-email-reg" className="block text-sm font-medium text-gray-700 mb-1">E-mail cím</label>
+              <input
+                id="auth-email-reg"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="pelda@email.hu"
+                autoComplete="email"
+                className={inputCx(!!errors.email)}
+              />
+              {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email}</p>}
+            </div>
+            <div>
+              <label htmlFor="auth-password-reg" className="block text-sm font-medium text-gray-700 mb-1">Jelszó</label>
+              <input
+                id="auth-password-reg"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Legalább 6 karakter"
+                autoComplete="new-password"
+                className={inputCx(!!errors.password)}
+              />
+              {errors.password && <p className="mt-1 text-xs text-red-600">{errors.password}</p>}
+            </div>
+            <div>
+              <label htmlFor="auth-postal" className="block text-sm font-medium text-gray-700 mb-1">Irányítószám</label>
+              <input
+                id="auth-postal"
+                type="text"
+                inputMode="numeric"
+                maxLength={4}
+                value={postalCode}
+                onChange={(e) => setPostalCode(e.target.value.replace(/\D/g, ""))}
+                autoComplete="postal-code"
+                className={inputCx(!!errors.postalCode)}
+              />
+              {errors.postalCode && <p className="mt-1 text-xs text-red-600">{errors.postalCode}</p>}
+            </div>
+            <div>
+              <label htmlFor="auth-city" className="block text-sm font-medium text-gray-700 mb-1">Település</label>
+              <input
+                id="auth-city"
+                type="text"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                autoComplete="address-level2"
+                className={inputCx(!!errors.city)}
+              />
+              {errors.city && <p className="mt-1 text-xs text-red-600">{errors.city}</p>}
+            </div>
+            <div>
+              <label htmlFor="auth-street" className="block text-sm font-medium text-gray-700 mb-1">Utca, házszám</label>
+              <input
+                id="auth-street"
+                type="text"
+                value={streetAddress}
+                onChange={(e) => setStreetAddress(e.target.value)}
+                autoComplete="street-address"
+                className={inputCx(!!errors.streetAddress)}
+              />
+              {errors.streetAddress && <p className="mt-1 text-xs text-red-600">{errors.streetAddress}</p>}
+            </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 px-4 bg-primary text-white rounded-xl font-medium text-sm hover:bg-primary/90 disabled:opacity-50"
+            >
+              {loading ? "Folyamatban..." : "Regisztráció"}
+            </button>
+          </form>
+        )}
       </div>
     </div>
   );
 }
-
-

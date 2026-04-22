@@ -88,6 +88,7 @@ export async function GET(request: Request): Promise<Response> {
           slotDate: string;
           slotTime: string;
           status: string;
+          heldUntil: string | null;
         }>
       >({
         query: slotLocksForDateQuery,
@@ -111,9 +112,13 @@ export async function GET(request: Request): Promise<Response> {
       .map((b) => b.slotTime)
       .filter(Boolean);
 
-    // 5. Extract held and booked times from slotLocks
+    // 5. Extract held and booked times from slotLocks (skip expired holds)
+    const now = new Date().toISOString();
     const heldSlots = slotLocks
-      .filter((lock) => lock.status === "held" || lock.status === "booked")
+      .filter((lock) =>
+        lock.status === "booked" ||
+        (lock.status === "held" && lock.heldUntil != null && lock.heldUntil > now),
+      )
       .map((lock) => lock.slotTime)
       .filter(Boolean);
 

@@ -16,7 +16,8 @@ const slotLocksForRangeQuery = defineQuery(
   `*[_type == "slotLock" && slotDate >= $startDate && slotDate <= $endDate && (status == "booked" || status == "held")]{
   slotDate,
   slotTime,
-  status
+  status,
+  heldUntil
 }`,
 );
 
@@ -79,7 +80,7 @@ export async function GET(request: Request): Promise<Response> {
       params: { startDate, endDate },
       tags: ["booking"],
     }),
-    sanityFetch<Array<{ slotDate: string; slotTime: string; status: string }>>({
+    sanityFetch<Array<{ slotDate: string; slotTime: string; status: string; heldUntil: string | null }>>({
       query: slotLocksForRangeQuery,
       params: { startDate, endDate },
       tags: ["slotLock"],
@@ -135,8 +136,12 @@ export async function GET(request: Request): Promise<Response> {
   }
 
   const heldByDate = new Map<string, string[]>();
+  const now = new Date().toISOString();
   for (const lock of slotLocks) {
-    if (lock.status === "held" || lock.status === "booked") {
+    const isActive =
+      lock.status === "booked" ||
+      (lock.status === "held" && lock.heldUntil != null && lock.heldUntil > now);
+    if (isActive) {
       const dateStr = lock.slotDate;
       const timeStr = lock.slotTime;
       if (dateStr && timeStr) {

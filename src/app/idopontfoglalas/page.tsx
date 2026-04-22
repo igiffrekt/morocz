@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { requireAddress } from "@/lib/address-gate";
 import { BookingWizard } from "@/components/booking/BookingWizard";
+import { requireAddress } from "@/lib/address-gate";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import {
   blockedDatesQuery,
@@ -56,7 +56,10 @@ export default async function IdopontfoglalasPage() {
 
   // Transform services: filter nulls and map fields to ServiceItem format
   const transformedServices = services
-    .filter((s): s is typeof services[number] & { name: string } => s.name !== null && s.name !== undefined)
+    .filter(
+      (s): s is (typeof services)[number] & { name: string } =>
+        s.name !== null && s.name !== undefined,
+    )
     .map((s) => ({
       _id: s._id,
       name: s.name,

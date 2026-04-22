@@ -90,7 +90,8 @@ function ClaimCompleteContent() {
       <div className="max-w-md mx-auto px-4 py-16">
         <h1 className="text-2xl font-bold mb-4">Érvénytelen link</h1>
         <p className="text-gray-600">
-          Ez a link érvénytelen vagy lejárt. Kérjük, kérjen új aktiváló e-mailt a bejelentkezési oldalon.
+          Ez a link érvénytelen vagy lejárt. Kérjük, kérjen új aktiváló e-mailt a bejelentkezési
+          oldalon.
         </p>
       </div>
     );
@@ -104,7 +105,11 @@ function ClaimCompleteContent() {
       </p>
 
       {error && (
-        <div role="alert" aria-live="polite" className="mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-lg">
+        <div
+          role="alert"
+          aria-live="polite"
+          className="mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-lg"
+        >
           <p className="text-sm text-red-600">{error}</p>
         </div>
       )}
@@ -124,7 +129,10 @@ function ClaimCompleteContent() {
           />
         </div>
         <div>
-          <label htmlFor="claim-password-confirm" className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="claim-password-confirm"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             Jelszó megerősítése
           </label>
           <input

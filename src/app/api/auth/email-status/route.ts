@@ -26,9 +26,10 @@ const querySchema = z.object({
 });
 
 export async function GET(request: Request) {
-  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
-    || request.headers.get("x-real-ip")
-    || "unknown";
+  const ip =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    request.headers.get("x-real-ip") ||
+    "unknown";
   if (!checkEmailStatusRateLimit(ip)) {
     return Response.json({ error: "Túl sok kérés" }, { status: 429 });
   }

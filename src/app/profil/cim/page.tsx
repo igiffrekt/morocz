@@ -55,11 +55,16 @@ function AddressGateContent() {
     <div className="max-w-md mx-auto px-4 py-12">
       <h1 className="text-2xl font-bold mb-2">Számlázási cím</h1>
       <p className="text-sm text-gray-600 mb-6">
-        Az időpontfoglalás véglegesítéséhez kérjük, adja meg számlázási címét. Erre számlakiállítás miatt van szükség.
+        Az időpontfoglalás véglegesítéséhez kérjük, adja meg számlázási címét. Erre számlakiállítás
+        miatt van szükség.
       </p>
 
       {error && (
-        <div role="alert" aria-live="polite" className="mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-lg">
+        <div
+          role="alert"
+          aria-live="polite"
+          className="mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-lg"
+        >
           <p className="text-sm text-red-600">{error}</p>
         </div>
       )}

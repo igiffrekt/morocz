@@ -1,8 +1,8 @@
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import { z } from "zod";
-import { auth } from "@/lib/auth";
 import { addressSchema } from "@/lib/address-gate";
+import { auth } from "@/lib/auth";
 import { consumeClaimToken, findValidClaimToken } from "@/lib/claim-tokens";
 import { db } from "@/lib/db";
 import { account, user } from "@/lib/db/schema";

@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
 import { addressSchema } from "@/lib/address-gate";
+import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { user } from "@/lib/db/schema";
 

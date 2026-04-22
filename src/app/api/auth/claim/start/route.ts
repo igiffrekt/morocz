@@ -1,8 +1,8 @@
 import { eq } from "drizzle-orm";
 import { z } from "zod";
+import { generateRawToken, insertClaimToken } from "@/lib/claim-tokens";
 import { db } from "@/lib/db";
 import { account, user } from "@/lib/db/schema";
-import { generateRawToken, insertClaimToken } from "@/lib/claim-tokens";
 import { isEmailConfigured, sendEmail } from "@/lib/email";
 
 const claimStartHits = new Map<string, { count: number; resetAt: number }>();
@@ -28,9 +28,10 @@ const bodySchema = z.object({
 });
 
 export async function POST(request: Request) {
-  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
-    || request.headers.get("x-real-ip")
-    || "unknown";
+  const ip =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    request.headers.get("x-real-ip") ||
+    "unknown";
   if (!checkClaimStartRateLimit(ip)) {
     return Response.json({ error: "Túl sok kérés" }, { status: 429 });
   }

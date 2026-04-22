@@ -1,15 +1,13 @@
-import { z } from "zod";
+import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { eq } from "drizzle-orm";
+import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { user } from "@/lib/db/schema";
 
 export const addressSchema = z.object({
-  postalCode: z
-    .string()
-    .regex(/^\d{4}$/, "Az irányítószám 4 számjegyből áll"),
+  postalCode: z.string().regex(/^\d{4}$/, "Az irányítószám 4 számjegyből áll"),
   city: z
     .string()
     .trim()

@@ -115,10 +115,18 @@ export default function AuthStep({ onSuccess, defaultTab = "belepes" }: AuthStep
       msg = String(obj.message ?? obj.code ?? obj.statusText ?? JSON.stringify(error));
     } else msg = String(error);
     msg = msg.toLowerCase();
-    if (msg.includes("credential_account_not_found") || msg.includes("credential account not found")) {
+    if (
+      msg.includes("credential_account_not_found") ||
+      msg.includes("credential account not found")
+    ) {
       return 'Ehhez az e-mail címhez Google-fiókkal regisztrált. Kérjük, használja a „Folytatás Google-fiókkal" gombot.';
     }
-    if (msg.includes("invalid") || msg.includes("credentials") || msg.includes("password") || msg.includes("incorrect")) {
+    if (
+      msg.includes("invalid") ||
+      msg.includes("credentials") ||
+      msg.includes("password") ||
+      msg.includes("incorrect")
+    ) {
       return "Hibás e-mail cím vagy jelszó";
     }
     if (msg.includes("already") || msg.includes("exists") || msg.includes("registered")) {
@@ -283,18 +291,29 @@ export default function AuthStep({ onSuccess, defaultTab = "belepes" }: AuthStep
         <div className="flex border-b border-gray-200 mb-6">
           <button
             type="button"
-            onClick={() => { setTab("belepes"); resetBelepes(); }}
+            onClick={() => {
+              setTab("belepes");
+              resetBelepes();
+            }}
             className={`flex-1 pb-3 text-sm font-medium transition-colors ${
-              tab === "belepes" ? "text-primary border-b-2 border-primary" : "text-gray-500 hover:text-gray-700"
+              tab === "belepes"
+                ? "text-primary border-b-2 border-primary"
+                : "text-gray-500 hover:text-gray-700"
             }`}
           >
             Belépés
           </button>
           <button
             type="button"
-            onClick={() => { setTab("regisztracio"); setErrors({}); setGlobalError(""); }}
+            onClick={() => {
+              setTab("regisztracio");
+              setErrors({});
+              setGlobalError("");
+            }}
             className={`flex-1 pb-3 text-sm font-medium transition-colors ${
-              tab === "regisztracio" ? "text-primary border-b-2 border-primary" : "text-gray-500 hover:text-gray-700"
+              tab === "regisztracio"
+                ? "text-primary border-b-2 border-primary"
+                : "text-gray-500 hover:text-gray-700"
             }`}
           >
             Regisztráció
@@ -318,7 +337,11 @@ export default function AuthStep({ onSuccess, defaultTab = "belepes" }: AuthStep
         </div>
 
         {globalError && (
-          <div role="alert" aria-live="polite" className="mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-lg">
+          <div
+            role="alert"
+            aria-live="polite"
+            className="mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-lg"
+          >
             <p className="text-sm text-red-600">{globalError}</p>
           </div>
         )}
@@ -359,7 +382,10 @@ export default function AuthStep({ onSuccess, defaultTab = "belepes" }: AuthStep
               </button>
             </div>
             <div>
-              <label htmlFor="auth-password" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="auth-password"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Jelszó
               </label>
               <input
@@ -401,8 +427,8 @@ export default function AuthStep({ onSuccess, defaultTab = "belepes" }: AuthStep
               </button>
             </div>
             <p className="text-sm text-gray-700">
-              Rendszerünkben szerepel egy foglalási fiók ezzel az e-mail címmel, de még nincs aktiválva.
-              Válasszon az alábbi lehetőségek közül:
+              Rendszerünkben szerepel egy foglalási fiók ezzel az e-mail címmel, de még nincs
+              aktiválva. Válasszon az alábbi lehetőségek közül:
             </p>
             {claimEmailSent ? (
               <div className="px-4 py-3 bg-green-50 border border-green-200 rounded-lg">
@@ -426,7 +452,9 @@ export default function AuthStep({ onSuccess, defaultTab = "belepes" }: AuthStep
         {tab === "regisztracio" && (
           <form onSubmit={handleRegisztracioSubmit} noValidate className="space-y-4">
             <div>
-              <label htmlFor="auth-name" className="block text-sm font-medium text-gray-700 mb-1">Teljes név</label>
+              <label htmlFor="auth-name" className="block text-sm font-medium text-gray-700 mb-1">
+                Teljes név
+              </label>
               <input
                 id="auth-name"
                 type="text"
@@ -439,7 +467,9 @@ export default function AuthStep({ onSuccess, defaultTab = "belepes" }: AuthStep
               {errors.name && <p className="mt-1 text-xs text-red-600">{errors.name}</p>}
             </div>
             <div>
-              <label htmlFor="auth-phone" className="block text-sm font-medium text-gray-700 mb-1">Telefonszám</label>
+              <label htmlFor="auth-phone" className="block text-sm font-medium text-gray-700 mb-1">
+                Telefonszám
+              </label>
               <input
                 id="auth-phone"
                 type="tel"
@@ -449,10 +479,17 @@ export default function AuthStep({ onSuccess, defaultTab = "belepes" }: AuthStep
                 autoComplete="tel"
                 className={inputCx(!!errors.phoneNumber)}
               />
-              {errors.phoneNumber && <p className="mt-1 text-xs text-red-600">{errors.phoneNumber}</p>}
+              {errors.phoneNumber && (
+                <p className="mt-1 text-xs text-red-600">{errors.phoneNumber}</p>
+              )}
             </div>
             <div>
-              <label htmlFor="auth-email-reg" className="block text-sm font-medium text-gray-700 mb-1">E-mail cím</label>
+              <label
+                htmlFor="auth-email-reg"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                E-mail cím
+              </label>
               <input
                 id="auth-email-reg"
                 type="email"
@@ -465,7 +502,12 @@ export default function AuthStep({ onSuccess, defaultTab = "belepes" }: AuthStep
               {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email}</p>}
             </div>
             <div>
-              <label htmlFor="auth-password-reg" className="block text-sm font-medium text-gray-700 mb-1">Jelszó</label>
+              <label
+                htmlFor="auth-password-reg"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Jelszó
+              </label>
               <input
                 id="auth-password-reg"
                 type="password"
@@ -478,7 +520,9 @@ export default function AuthStep({ onSuccess, defaultTab = "belepes" }: AuthStep
               {errors.password && <p className="mt-1 text-xs text-red-600">{errors.password}</p>}
             </div>
             <div>
-              <label htmlFor="auth-postal" className="block text-sm font-medium text-gray-700 mb-1">Irányítószám</label>
+              <label htmlFor="auth-postal" className="block text-sm font-medium text-gray-700 mb-1">
+                Irányítószám
+              </label>
               <input
                 id="auth-postal"
                 type="text"
@@ -489,10 +533,14 @@ export default function AuthStep({ onSuccess, defaultTab = "belepes" }: AuthStep
                 autoComplete="postal-code"
                 className={inputCx(!!errors.postalCode)}
               />
-              {errors.postalCode && <p className="mt-1 text-xs text-red-600">{errors.postalCode}</p>}
+              {errors.postalCode && (
+                <p className="mt-1 text-xs text-red-600">{errors.postalCode}</p>
+              )}
             </div>
             <div>
-              <label htmlFor="auth-city" className="block text-sm font-medium text-gray-700 mb-1">Település</label>
+              <label htmlFor="auth-city" className="block text-sm font-medium text-gray-700 mb-1">
+                Település
+              </label>
               <input
                 id="auth-city"
                 type="text"
@@ -504,7 +552,9 @@ export default function AuthStep({ onSuccess, defaultTab = "belepes" }: AuthStep
               {errors.city && <p className="mt-1 text-xs text-red-600">{errors.city}</p>}
             </div>
             <div>
-              <label htmlFor="auth-street" className="block text-sm font-medium text-gray-700 mb-1">Utca, házszám</label>
+              <label htmlFor="auth-street" className="block text-sm font-medium text-gray-700 mb-1">
+                Utca, házszám
+              </label>
               <input
                 id="auth-street"
                 type="text"
@@ -513,7 +563,9 @@ export default function AuthStep({ onSuccess, defaultTab = "belepes" }: AuthStep
                 autoComplete="street-address"
                 className={inputCx(!!errors.streetAddress)}
               />
-              {errors.streetAddress && <p className="mt-1 text-xs text-red-600">{errors.streetAddress}</p>}
+              {errors.streetAddress && (
+                <p className="mt-1 text-xs text-red-600">{errors.streetAddress}</p>
+              )}
             </div>
             <button
               type="submit"

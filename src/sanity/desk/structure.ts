@@ -21,6 +21,14 @@ export const structure: StructureResolver = (S) =>
             .title("Szolgáltatások")
             .items([
               S.listItem()
+                .title("Árak oldal")
+                .child(
+                  S.document()
+                    .schemaType("pricingPage")
+                    .documentId("pricingPage")
+                    .title("Árak oldal szerkesztése"),
+                ),
+              S.listItem()
                 .title("Szolgáltatások")
                 .schemaType("service")
                 .child(S.documentTypeList("service").title("Szolgáltatások")),
@@ -168,6 +176,14 @@ export const structure: StructureResolver = (S) =>
             .documentId("cookiePolicy")
             .title("Cookie Szabályzat szerkesztése"),
         ),
+
+      S.divider(),
+
+      // Felugró ablakok (Popups)
+      S.listItem()
+        .title("Felugró ablakok")
+        .schemaType("popup")
+        .child(S.documentTypeList("popup").title("Felugró ablakok")),
 
       S.divider(),
 

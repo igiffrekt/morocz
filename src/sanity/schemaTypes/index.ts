@@ -22,9 +22,11 @@ import { yogaClassType } from "./yogaClassType";
 import { yogaScheduleType } from "./yogaScheduleType";
 import { yogaPageType } from "./yogaPageType";
 import { popupType } from "./popupType";
+import { pricingPageType } from "./pricingPageType";
 
 export const schemaTypes: SchemaTypeDefinition[] = [
   homepageType,
+  pricingPageType,
   kapcsolatType,
   siteSettingsType,
   serviceCategoryType,

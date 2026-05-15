@@ -76,10 +76,49 @@ export const siteSettingsQuery =
   defaultOgImage
 }`);
 
+// ─── Pricing Page ─────────────────────────────────────────────────────────────
+// Revalidation tag: "pricingPage"
+
+export const pricingPageQuery = defineQuery(`*[_type == "pricingPage" && _id == "pricingPage"][0]{
+  validityNote,
+  gynBaseExam{
+    items[]{ _key, label, subtitle, badge, badgeStyle, note, price }
+  },
+  spiralServices{
+    items[]{ _key, label, subtitle, badge, badgeStyle, note, price },
+    footnote
+  },
+  pregnancyCare{ label, subtitle, price },
+  screeningPackages{
+    tiers[]{
+      _key,
+      name,
+      price,
+      highlighted,
+      features[]{ _key, text, subtext, included, emphasized }
+    }
+  },
+  samplingServices{
+    items[]{ _key, label, price }
+  },
+  microbiologyServices{
+    items[]{ _key, label, suffix, price }
+  },
+  hpvTests{
+    intro,
+    items[]{ _key, name, description, price }
+  },
+  otherServices{
+    items[]{ _key, label, price },
+    footnote
+  }
+}`);
+
 // ─── Services ─────────────────────────────────────────────────────────────────
 // Revalidation tag: "service"
 
-export const allServicesQuery = defineQuery(`*[_type == "service" && isHidden != true] | order(order asc){
+export const allServicesQuery =
+  defineQuery(`*[_type == "service" && isHidden != true] | order(order asc){
   _id,
   name,
   description,
@@ -225,7 +264,8 @@ export const cookiePolicyQuery = defineQuery(
 
 // ─── Scheduling & Booking Queries ─────────────────────────────────────────────
 
-export const weeklyScheduleQuery = defineQuery(`*[_type == "weeklySchedule" && _id == "weeklySchedule"][0]{
+export const weeklyScheduleQuery =
+  defineQuery(`*[_type == "weeklySchedule" && _id == "weeklySchedule"][0]{
   defaultSlotDuration,
   bufferMinutes,
   days[]{
@@ -246,14 +286,16 @@ export const blockedDatesQuery = defineQuery(`*[_type == "blockedDate" && _id ==
 }`);
 
 export const slotLockByIdQuery = defineQuery(`*[_type == "slotLock" && _id == $slotLockId][0]{
-  _id, dateTime, status
+  _id, _rev, status, heldUntil, userId
 }`);
 
-export const bookingsForDateQuery = defineQuery(`*[_type == "booking" && slotDate == $date && status == "confirmed"]{
+export const bookingsForDateQuery =
+  defineQuery(`*[_type == "booking" && slotDate == $date && status == "confirmed"]{
   _id, slotDate, slotTime, patientEmail, service->{_id}
 }`);
 
-export const customAvailabilityForDateQuery = defineQuery(`*[_type == "customAvailability" && date == $date][0]{
+export const customAvailabilityForDateQuery =
+  defineQuery(`*[_type == "customAvailability" && date == $date][0]{
   _id,
   date,
   startTime,
@@ -262,10 +304,11 @@ export const customAvailabilityForDateQuery = defineQuery(`*[_type == "customAva
 }`);
 
 export const slotLocksForDateQuery = defineQuery(`*[_type == "slotLock" && slotDate == $date]{
-  _id, slotDate, slotTime, status
+  _id, slotDate, slotTime, status, heldUntil
 }`);
 
-export const servicesForBookingQuery = defineQuery(`*[_type == "service" && isHidden != true] | order(order asc){
+export const servicesForBookingQuery =
+  defineQuery(`*[_type == "service" && isHidden != true] | order(order asc){
   _id, name, duration, price
 }`);
 
@@ -327,7 +370,8 @@ export const yogaPageQuery = defineQuery(`*[_type == "yogaPage"][0]{
 // ─── Yoga Schedule ───────────────────────────────────────────────────────────
 // Revalidation tag: "yogaSchedule"
 
-export const yogaScheduleQuery = defineQuery(`*[_type == "yogaSchedule" && isActive != false && instructor->isActive == true] | order(dayOfWeek asc, startTime asc){
+export const yogaScheduleQuery =
+  defineQuery(`*[_type == "yogaSchedule" && isActive != false && instructor->isActive == true] | order(dayOfWeek asc, startTime asc){
   _id,
   yogaClass->{
     name,
@@ -352,7 +396,8 @@ export const yogaScheduleQuery = defineQuery(`*[_type == "yogaSchedule" && isAct
 // ─── Yoga Instructors ────────────────────────────────────────────────────────
 // Revalidation tag: "yogaInstructor"
 
-export const yogaInstructorsQuery = defineQuery(`*[_type == "yogaInstructor" && isActive == true] | order(name asc){
+export const yogaInstructorsQuery =
+  defineQuery(`*[_type == "yogaInstructor" && isActive == true] | order(name asc){
   _id,
   name,
   slug,

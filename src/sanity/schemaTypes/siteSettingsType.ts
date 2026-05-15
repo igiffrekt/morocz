@@ -161,6 +161,13 @@ export const siteSettingsType = defineType({
       type: "string",
     }),
     defineField({
+      name: "financeResetDate",
+      title: "Pénzügyi nulla pont dátuma",
+      type: "date",
+      options: { dateFormat: "YYYY-MM-DD" },
+      description: "A pénzügyi kimutatás ettől a dátumtól kezdve számít. Az admin felületen állítható be.",
+    }),
+    defineField({
       name: "metaDescription",
       title: "Meta leírás",
       type: "text",

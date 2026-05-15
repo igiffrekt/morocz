@@ -1,5 +1,8 @@
 // Pure slot generation algorithm.
-// No side effects, no imports — safe to use in any server/client context.
+// No side effects — safe to use in any server/client context.
+
+/** Minutes before the day's start time at which a day becomes unbookable. */
+export const DAY_LOCK_MINUTES_BEFORE_START = 60;
 
 export interface SlotGenerationInput {
   schedule: {
@@ -23,6 +26,8 @@ export interface SlotGenerationInput {
   serviceDurationMinutes: number;
   /** Maximum number of days ahead bookings are allowed */
   maxDaysAhead: number;
+  /** Current time in ms since epoch; defaults to Date.now(). Override in tests. */
+  nowMs?: number;
 }
 
 /**
@@ -64,6 +69,38 @@ function getDayOfWeek(dateStr: string): number {
 }
 
 /**
+ * Format a moment in time as "YYYY-MM-DD HH:MM" in Europe/Budapest local time.
+ * Used for lexical comparison against schedule strings which are Budapest-local.
+ */
+function formatBudapestLocal(ms: number): string {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Budapest",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).formatToParts(new Date(ms));
+  const get = (t: string) => parts.find((p) => p.type === t)?.value ?? "";
+  return `${get("year")}-${get("month")}-${get("day")} ${get("hour")}:${get("minute")}`;
+}
+
+/**
+ * Returns true if `date` (with consulting `startTime`, Budapest local) is still
+ * accepting new bookings — i.e. "now" in Budapest is earlier than
+ * (date at startTime) - DAY_LOCK_MINUTES_BEFORE_START.
+ */
+export function isDayBookable(date: string, startTime: string, nowMs: number): boolean {
+  const startMin = timeToMinutes(startTime);
+  const thresholdMin = startMin - DAY_LOCK_MINUTES_BEFORE_START;
+  // Edge case: start time within the lock window of midnight — block entirely.
+  if (thresholdMin < 0) return false;
+  const threshold = `${date} ${minutesToTime(thresholdMin)}`;
+  return formatBudapestLocal(nowMs) < threshold;
+}
+
+/**
  * Generate available time slots for a given date.
  *
  * Returns "HH:MM" time strings for every 20-minute interval where:
@@ -81,6 +118,7 @@ export function generateAvailableSlots(input: SlotGenerationInput): string[] {
     date,
     serviceDurationMinutes,
     maxDaysAhead,
+    nowMs = Date.now(),
   } = input;
 
   // 1. Check date range
@@ -96,6 +134,9 @@ export function generateAvailableSlots(input: SlotGenerationInput): string[] {
 
   // 4. Validate day config
   if (!dayConfig || dayConfig.isDayOff || !dayConfig.startTime || !dayConfig.endTime) return [];
+
+  // 4b. Day-lock: block new bookings within DAY_LOCK_MINUTES_BEFORE_START of the day's start.
+  if (!isDayBookable(date, dayConfig.startTime, nowMs)) return [];
 
   const startMinutes = timeToMinutes(dayConfig.startTime);
   const endMinutes = timeToMinutes(dayConfig.endTime);
@@ -171,6 +212,7 @@ export function getAvailableDatesInRange(
   blockedDates: string[],
   startDate: string,
   endDate: string,
+  nowMs: number = Date.now(),
 ): string[] {
   const blockedSet = new Set(blockedDates);
   const result: string[] = [];
@@ -188,7 +230,13 @@ export function getAvailableDatesInRange(
 
     if (!blockedSet.has(dateStr)) {
       const dayConfig = schedule.days.find((d) => d.dayOfWeek === dow);
-      if (dayConfig && !dayConfig.isDayOff && dayConfig.startTime && dayConfig.endTime) {
+      if (
+        dayConfig &&
+        !dayConfig.isDayOff &&
+        dayConfig.startTime &&
+        dayConfig.endTime &&
+        isDayBookable(dateStr, dayConfig.startTime, nowMs)
+      ) {
         result.push(dateStr);
       }
     }

@@ -198,3 +198,53 @@ export function getAvailableDatesInRange(
 
   return result;
 }
+
+export interface ResolvedSchedule {
+  defaultSlotDuration: number;
+  bufferMinutes: number;
+  days: ScheduleForAvailability["days"];
+}
+
+export interface SeasonalScheduleSummary {
+  startDate: string;        // "YYYY-MM-DD"
+  endDate: string;          // "YYYY-MM-DD"
+  defaultSlotDuration: number;
+  bufferMinutes: number;
+  days: ScheduleForAvailability["days"];
+}
+
+/**
+ * Pick the schedule that applies for a target date.
+ *
+ * Returns the first seasonal whose [startDate, endDate] (inclusive) contains
+ * `date`, preferring the one with the earliest startDate as a deterministic
+ * tie-breaker if multiple overlap. Falls back to `defaultSchedule` when none match.
+ *
+ * Overlap is prevented at save time in Sanity; the earliest-startDate pick is a
+ * safety net for race conditions or bypassed validation.
+ */
+export function resolveScheduleForDate(
+  date: string,
+  defaultSchedule: ResolvedSchedule,
+  seasonalSchedules: SeasonalScheduleSummary[],
+): ResolvedSchedule {
+  const matches = seasonalSchedules.filter(
+    (s) => s.startDate <= date && date <= s.endDate,
+  );
+  if (matches.length === 0) return defaultSchedule;
+
+  if (matches.length > 1) {
+    console.warn(
+      `[resolveScheduleForDate] ${matches.length} seasonal schedules overlap for ${date}; using earliest startDate.`,
+    );
+  }
+
+  const pick = matches.reduce((earliest, s) =>
+    s.startDate < earliest.startDate ? s : earliest,
+  );
+  return {
+    defaultSlotDuration: pick.defaultSlotDuration,
+    bufferMinutes: pick.bufferMinutes,
+    days: pick.days,
+  };
+}

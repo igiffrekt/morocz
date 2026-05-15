@@ -65,6 +65,7 @@ export default async function FoglalasTokenPage({
       days: normalizedDays,
     },
     blockedDates: (blockedDatesDoc?.dates ?? []).map((d) => d.date ?? "").filter(Boolean),
+    bookingWindowDays: weeklySchedule?.bookingWindowDays ?? 30,
   };
 
   // Determine appointment state

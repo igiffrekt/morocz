@@ -8,13 +8,14 @@ import { db } from "@/lib/db";
 import { user } from "@/lib/db/schema";
 import { isEmailConfigured, sendEmail } from "@/lib/email";
 import { createCalendarEvent } from "@/lib/google-calendar";
-import { getWriteClient } from "@/lib/sanity-write-client";
 import { assertDayStillOpen } from "@/lib/booking-guards";
-import { generateAvailableSlots } from "@/lib/slots";
+import { getWriteClient } from "@/lib/sanity-write-client";
+import { generateAvailableSlots, resolveScheduleForDate } from "@/lib/slots";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import {
   blockedDatesQuery,
   bookingsForDateQuery,
+  seasonalScheduleForDateQuery,
   slotLockByIdQuery,
   slotLocksForDateQuery,
   weeklyScheduleQuery,
@@ -235,8 +236,23 @@ async function getAlternativeSlots(
   serviceId: string,
 ): Promise<string[]> {
   try {
-    const [schedule, blockedDatesDoc, bookings, slotLocks, service] = await Promise.all([
+    const [schedule, seasonal, blockedDatesDoc, bookings, slotLocks, service] = await Promise.all([
       sanityFetch<{
+        defaultSlotDuration: number;
+        bufferMinutes: number;
+        bookingWindowDays: number | null;
+        days: Array<{
+          _key: string;
+          dayOfWeek: number;
+          isDayOff: boolean;
+          startTime: string;
+          endTime: string;
+        }>;
+      } | null>({ query: weeklyScheduleQuery, tags: ["weeklySchedule"] }),
+      sanityFetch<{
+        _id: string;
+        startDate: string;
+        endDate: string;
         defaultSlotDuration: number;
         bufferMinutes: number;
         days: Array<{
@@ -246,7 +262,11 @@ async function getAlternativeSlots(
           startTime: string;
           endTime: string;
         }>;
-      } | null>({ query: weeklyScheduleQuery, tags: ["weeklySchedule"] }),
+      } | null>({
+        query: seasonalScheduleForDateQuery,
+        params: { date: slotDate },
+        tags: ["seasonalSchedule"],
+      }),
       sanityFetch<{
         dates: Array<{ _key: string; date: string; isHoliday: boolean }> | null;
       } | null>({ query: blockedDatesQuery, tags: ["blockedDate"] }),
@@ -277,14 +297,20 @@ async function getAlternativeSlots(
       .map((lock) => lock.slotTime)
       .filter(Boolean);
 
+    const resolvedSchedule = resolveScheduleForDate(
+      slotDate,
+      schedule ?? { defaultSlotDuration: 20, bufferMinutes: 0, days: [] },
+      seasonal ? [seasonal] : [],
+    );
+
     const available = generateAvailableSlots({
-      schedule: schedule ?? { defaultSlotDuration: 20, bufferMinutes: 0, days: [] },
+      schedule: resolvedSchedule,
       blockedDates: (blockedDatesDoc?.dates ?? []).map((d) => d.date).filter(Boolean),
       bookedSlots,
       heldSlots,
       date: slotDate,
       serviceDurationMinutes: service?.appointmentDuration ?? 20,
-      maxDaysAhead: 30,
+      maxDaysAhead: schedule?.bookingWindowDays ?? 30,
     });
 
     // Sort by time distance from requested slot, pick up to 5

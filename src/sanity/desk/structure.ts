@@ -61,6 +61,14 @@ export const structure: StructureResolver = (S) =>
                     .title("Heti beosztás szerkesztése"),
                 ),
               S.listItem()
+                .title("Szezonális beosztások")
+                .schemaType("seasonalSchedule")
+                .child(
+                  S.documentTypeList("seasonalSchedule")
+                    .title("Szezonális beosztások")
+                    .defaultOrdering([{ field: "startDate", direction: "asc" }]),
+                ),
+              S.listItem()
                 .title("Blokkolt napok")
                 .child(
                   S.document()

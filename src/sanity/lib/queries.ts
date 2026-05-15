@@ -268,6 +268,7 @@ export const weeklyScheduleQuery =
   defineQuery(`*[_type == "weeklySchedule" && _id == "weeklySchedule"][0]{
   defaultSlotDuration,
   bufferMinutes,
+  bookingWindowDays,
   days[]{
     _key,
     dayOfWeek,
@@ -441,3 +442,44 @@ export const activePopupQuery = defineQuery(`*[_type == "popup" && isActive == t
   displayDelay,
   showOncePerSession
 }`);
+
+// Active seasonal schedule for a single date (used by /api/slots, /api/booking, /api/checkout).
+// `order(startDate asc)[0]` is a deterministic safety net if two seasonals ever overlap;
+// the Sanity validator prevents overlap at save time.
+export const seasonalScheduleForDateQuery =
+  defineQuery(`*[_type == "seasonalSchedule" && startDate <= $date && endDate >= $date]
+    | order(startDate asc)[0]{
+    _id,
+    name,
+    startDate,
+    endDate,
+    defaultSlotDuration,
+    bufferMinutes,
+    days[]{
+      _key,
+      dayOfWeek,
+      isDayOff,
+      startTime,
+      endTime
+    }
+  }`);
+
+// All seasonal schedules whose range intersects [$startDate, $endDate].
+// Used by month-range endpoints (/api/slots/availability, /api/slots/calendar).
+export const seasonalSchedulesForRangeQuery =
+  defineQuery(`*[_type == "seasonalSchedule" && startDate <= $endDate && endDate >= $startDate]
+    | order(startDate asc){
+    _id,
+    name,
+    startDate,
+    endDate,
+    defaultSlotDuration,
+    bufferMinutes,
+    days[]{
+      _key,
+      dayOfWeek,
+      isDayOff,
+      startTime,
+      endTime
+    }
+  }`);

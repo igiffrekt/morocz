@@ -1,6 +1,7 @@
 import { defineQuery } from "next-sanity";
+import { resolveScheduleForDate, type SeasonalScheduleSummary, todayInBudapest } from "@/lib/slots";
 import { sanityFetch } from "@/sanity/lib/fetch";
-import { weeklyScheduleQuery, blockedDatesQuery } from "@/sanity/lib/queries";
+import { weeklyScheduleQuery, blockedDatesQuery, seasonalSchedulesForRangeQuery } from "@/sanity/lib/queries";
 
 export const dynamic = "force-dynamic";
 
@@ -40,8 +41,11 @@ export async function GET(request: Request): Promise<Response> {
     const endDate = lastDay.toISOString().slice(0, 10);
 
     // Fetch schedule, blocked dates, and custom availability in parallel
-    const [schedule, blockedDatesDoc, customAvails] = await Promise.all([
+    const [schedule, seasonals, blockedDatesDoc, customAvails] = await Promise.all([
       sanityFetch<{
+        defaultSlotDuration: number;
+        bufferMinutes: number;
+        bookingWindowDays: number | null;
         days: Array<{
           dayOfWeek: number;
           isDayOff: boolean;
@@ -51,6 +55,11 @@ export async function GET(request: Request): Promise<Response> {
       } | null>({
         query: weeklyScheduleQuery,
         tags: ["weeklySchedule"],
+      }),
+      sanityFetch<SeasonalScheduleSummary[]>({
+        query: seasonalSchedulesForRangeQuery,
+        params: { startDate, endDate },
+        tags: ["seasonalSchedule"],
       }),
       sanityFetch<{
         dates: Array<{ date: string }> | null;
@@ -91,12 +100,26 @@ export async function GET(request: Request): Promise<Response> {
       }
     }
 
+    const bookingWindowDays = schedule?.bookingWindowDays ?? 30;
+    // Budapest-local "today" + window = last bookable date (inclusive).
+    // Same definition of "today" as generateAvailableSlots in src/lib/slots.ts.
+    const horizon = new Date(todayInBudapest());
+    horizon.setUTCDate(horizon.getUTCDate() + bookingWindowDays);
+    const horizonStr = horizon.toISOString().slice(0, 10);
+
     const availableDates: string[] = [];
     const current = new Date(firstDay);
 
     // Iterate through each day in the month
     while (current <= lastDay) {
       const dateStr = current.toISOString().slice(0, 10);
+
+      // Cap at booking window — dates beyond this are not bookable.
+      if (dateStr > horizonStr) {
+        current.setUTCDate(current.getUTCDate() + 1);
+        continue;
+      }
+
       const dow = current.getUTCDay();
 
       // Check for custom availability first (overrides blocked dates)
@@ -115,8 +138,14 @@ export async function GET(request: Request): Promise<Response> {
         continue;
       }
 
-      // Otherwise check weekly schedule
-      const dayConfig = schedule?.days.find((d) => d.dayOfWeek === dow);
+      // Otherwise check seasonal-or-default schedule
+      const defaultForDate = schedule ?? {
+        defaultSlotDuration: 20,
+        bufferMinutes: 0,
+        days: [],
+      };
+      const resolved = resolveScheduleForDate(dateStr, defaultForDate, seasonals);
+      const dayConfig = resolved.days.find((d) => d.dayOfWeek === dow);
       if (dayConfig && !dayConfig.isDayOff && dayConfig.startTime && dayConfig.endTime) {
         availableDates.push(dateStr);
       }

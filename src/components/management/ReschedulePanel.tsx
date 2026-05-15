@@ -16,6 +16,7 @@ interface ReschedulePanelProps {
   scheduleData: {
     schedule: ScheduleForAvailability;
     blockedDates: string[];
+    bookingWindowDays: number;
   };
   onRescheduled: (newDate: string, newTime: string) => void;
   onCancel: () => void;
@@ -47,9 +48,9 @@ function getTodayString(): string {
   return toDateString(today.getFullYear(), today.getMonth(), today.getDate());
 }
 
-function getMaxDateString(): string {
+function getMaxDateString(bookingWindowDays: number): string {
   const max = new Date();
-  max.setDate(max.getDate() + 30);
+  max.setDate(max.getDate() + bookingWindowDays);
   return toDateString(max.getFullYear(), max.getMonth(), max.getDate());
 }
 
@@ -85,7 +86,7 @@ export function ReschedulePanel({
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const todayStr = getTodayString();
-  const maxDateStr = getMaxDateString();
+  const maxDateStr = getMaxDateString(scheduleData.bookingWindowDays);
 
   // Compute available dates for the currently visible month
   const availableDatesSet = useMemo(() => {
@@ -146,7 +147,7 @@ export function ReschedulePanel({
   const canGoPrev = !(viewYear === today.getFullYear() && viewMonth === today.getMonth());
   const canGoNext = (() => {
     const maxDate = new Date();
-    maxDate.setDate(maxDate.getDate() + 30);
+    maxDate.setDate(maxDate.getDate() + scheduleData.bookingWindowDays);
     return !(
       viewYear > maxDate.getFullYear() ||
       (viewYear === maxDate.getFullYear() && viewMonth >= maxDate.getMonth())

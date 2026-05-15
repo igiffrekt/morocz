@@ -23,6 +23,7 @@ interface BookingManagementCardProps {
   scheduleData: {
     schedule: ScheduleForAvailability;
     blockedDates: string[];
+    bookingWindowDays: number;
   };
 }
 

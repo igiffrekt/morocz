@@ -52,6 +52,7 @@ export default async function IdopontfoglalasPage() {
       days: normalizedDays,
     },
     blockedDates: (blockedDatesDoc?.dates ?? []).map((d) => d.date ?? "").filter(Boolean),
+    bookingWindowDays: weeklySchedule?.bookingWindowDays ?? 30,
   };
 
   // Transform services: filter nulls and map fields to ServiceItem format

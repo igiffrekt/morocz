@@ -37,6 +37,7 @@ interface BookingResult {
 interface ScheduleData {
   schedule: ScheduleForAvailability;
   blockedDates: string[];
+  bookingWindowDays: number;
 }
 
 interface BookingWizardProps {

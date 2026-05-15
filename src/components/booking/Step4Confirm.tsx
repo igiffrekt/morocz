@@ -119,7 +119,7 @@ export function Step4Confirm({ selections, onBack, onSuccess, onConflict }: Step
     setSubmitting(true);
 
     try {
-      const res = await fetch("/api/booking", {
+      const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -134,14 +134,15 @@ export function Step4Confirm({ selections, onBack, onSuccess, onConflict }: Step
       });
 
       const data = (await res.json()) as {
+        checkoutUrl?: string;
         bookingId?: string;
         reservationNumber?: string;
         error?: string;
         alternatives?: string[];
       };
 
-      if (res.status === 201 && data.bookingId) {
-        onSuccess(data.bookingId, data.reservationNumber ?? "", patientName, patientEmail);
+      if (res.status === 201 && data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
         return;
       }
 
@@ -243,6 +244,13 @@ export function Step4Confirm({ selections, onBack, onSuccess, onConflict }: Step
             {selections.selectedTime}
           </span>
         </div>
+        <div className="flex items-start gap-2 pt-2 border-t border-gray-200">
+          <span className="text-xs text-gray-500 w-24 shrink-0 pt-0.5">Foglalási díj:</span>
+          <span className="text-sm font-bold text-[var(--color-primary)]">10 000 Ft</span>
+        </div>
+        <p className="text-xs text-gray-500 mt-1">
+          A foglalási díj a vizsgálat árába beszámít. Online bankkártyás fizetés a Stripe rendszerén keresztül.
+        </p>
       </div>
 
       {/* Global error */}
@@ -379,7 +387,7 @@ export function Step4Confirm({ selections, onBack, onSuccess, onConflict }: Step
             disabled={submitting}
             className="px-8 py-3 bg-[var(--color-primary)] text-white rounded-xl font-semibold text-sm hover:bg-[var(--color-primary)]/90 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg transition-all duration-200"
           >
-            {submitting ? "Foglalás folyamatban..." : "Időpont foglalása"}
+            {submitting ? "Átirányítás a fizetéshez..." : "Foglalás és fizetés (10 000 Ft)"}
           </button>
         </div>
       </form>

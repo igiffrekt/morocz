@@ -82,9 +82,42 @@ export const bookingType = defineType({
           { title: "Visszaigazolt", value: "confirmed" },
           { title: "Lemondva", value: "cancelled" },
           { title: "Átütemezve", value: "rescheduled" },
+          { title: "Teljesítve", value: "completed" },
+          { title: "Nem jelent meg", value: "no-show" },
         ],
       },
       initialValue: "confirmed",
+    }),
+    defineField({
+      name: "stripeSessionId",
+      title: "Stripe Session ID",
+      type: "string",
+      readOnly: true,
+    }),
+    defineField({
+      name: "stripePaymentIntentId",
+      title: "Stripe Payment Intent ID",
+      type: "string",
+      readOnly: true,
+    }),
+    defineField({
+      name: "paymentStatus",
+      title: "Fizetési státusz",
+      type: "string",
+      options: {
+        list: [
+          { title: "Fizetésre vár", value: "pending" },
+          { title: "Fizetve", value: "paid" },
+          { title: "Sikertelen", value: "failed" },
+        ],
+      },
+      initialValue: "pending",
+    }),
+    defineField({
+      name: "paymentAmount",
+      title: "Foglalási díj (Ft)",
+      type: "number",
+      description: "A Stripe-on keresztül befizetett foglalási díj",
     }),
     defineField({
       name: "createdAt",
@@ -97,6 +130,28 @@ export const bookingType = defineType({
       type: "boolean",
       description: "Igaz, ha a 24 órás emlékeztető e-mail már ki lett küldve",
       initialValue: false,
+    }),
+    defineField({
+      name: "completedServices",
+      title: "Elvégzett szolgáltatások",
+      type: "array",
+      of: [
+        {
+          type: "object",
+          fields: [
+            { name: "serviceId", title: "Szolgáltatás ID", type: "string" },
+            { name: "serviceName", title: "Szolgáltatás neve", type: "string" },
+            { name: "price", title: "Ár (Ft)", type: "number" },
+          ],
+        },
+      ],
+      description: "Az admin által rögzített, ténylegesen elvégzett szolgáltatások",
+    }),
+    defineField({
+      name: "completedAt",
+      title: "Teljesítés dátuma",
+      type: "datetime",
+      description: "Mikor lett a foglalás teljesítettként megjelölve",
     }),
     defineField({
       name: "googleCalendarEventId",

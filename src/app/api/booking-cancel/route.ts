@@ -1,8 +1,13 @@
+import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
-import { buildCancellationEmail } from "@/lib/booking-email";
+import { buildCancellationEmail, buildReceptionCancellationEmail } from "@/lib/booking-email";
+import { db } from "@/lib/db";
+import { user } from "@/lib/db/schema";
 import { isEmailConfigured, sendEmail } from "@/lib/email";
 import { deleteCalendarEvent } from "@/lib/google-calendar";
 import { getWriteClient } from "@/lib/sanity-write-client";
+
+const RECEPTION_EMAIL = "recepcio@drmoroczangela.hu";
 
 export const dynamic = "force-dynamic";
 
@@ -45,6 +50,7 @@ export async function POST(request: Request): Promise<Response> {
       _id: string;
       patientName: string;
       patientEmail: string;
+      patientPhone: string;
       reservationNumber: string;
       service: { name: string } | null;
       slotDate: string;
@@ -56,7 +62,7 @@ export async function POST(request: Request): Promise<Response> {
 
     const booking = await getWriteClient().fetch<BookingForCancel | null>(
       `*[_type == "booking" && managementToken == $manageToken && status == "confirmed"][0]{
-        _id, patientName, patientEmail, reservationNumber, service->{name},
+        _id, patientName, patientEmail, patientPhone, reservationNumber, service->{name},
         slotDate, slotTime, status, managementToken, googleCalendarEventId
       }`,
       { manageToken: token },
@@ -105,15 +111,27 @@ export async function POST(request: Request): Promise<Response> {
       console.warn("[api/booking-cancel] Failed to release slotLock:", slotErr);
     }
 
-    // ── 6. Send cancellation email (fire-and-forget) ───────────────────────────
+    // ── 6. Send cancellation emails (fire-and-forget) ──────────────────────────
     if (isEmailConfigured()) {
+      const serviceName = booking.service?.name?.startsWith("Nőgyógyász")
+        ? "Nőgyógyászati vizsgálat"
+        : (booking.service?.name ?? "Foglalt szolgáltatás");
+
       void sendCancellationEmailAsync({
         patientName: booking.patientName,
         patientEmail: booking.patientEmail,
         reservationNumber: booking.reservationNumber,
-        serviceName: booking.service?.name?.startsWith("Nőgyógyász")
-          ? "Nőgyógyászati vizsgálat"
-          : (booking.service?.name ?? "Foglalt szolgáltatás"),
+        serviceName,
+        slotDate: booking.slotDate,
+        slotTime: booking.slotTime,
+      });
+
+      void sendReceptionCancellationEmailAsync({
+        patientName: booking.patientName,
+        patientEmail: booking.patientEmail,
+        patientPhone: booking.patientPhone,
+        reservationNumber: booking.reservationNumber,
+        serviceName,
         slotDate: booking.slotDate,
         slotTime: booking.slotTime,
       });
@@ -176,5 +194,63 @@ async function sendCancellationEmailAsync({
   } catch (err) {
     // Fire-and-forget: log but never throw — cancellation is already processed
     console.error("[api/booking-cancel] Failed to send cancellation email:", err);
+  }
+}
+
+// ── Helper: notify reception (fire-and-forget) ────────────────────────────────
+async function sendReceptionCancellationEmailAsync({
+  patientName,
+  patientEmail,
+  patientPhone,
+  reservationNumber,
+  serviceName,
+  slotDate,
+  slotTime,
+}: {
+  patientName: string;
+  patientEmail: string;
+  patientPhone: string;
+  reservationNumber: string;
+  serviceName: string;
+  slotDate: string;
+  slotTime: string;
+}) {
+  try {
+    const formattedDate = new Date(slotDate).toLocaleDateString("hu-HU", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      weekday: "long",
+    });
+
+    const addressRow = patientEmail
+      ? await db.query.user.findFirst({
+          where: eq(sql`lower(${user.email})`, patientEmail.toLowerCase()),
+          columns: { postalCode: true, city: true, streetAddress: true },
+        })
+      : null;
+
+    const html = buildReceptionCancellationEmail({
+      patientName,
+      patientEmail,
+      patientPhone,
+      billingAddress: {
+        postalCode: addressRow?.postalCode ?? null,
+        city: addressRow?.city ?? null,
+        streetAddress: addressRow?.streetAddress ?? null,
+      },
+      serviceName,
+      reservationNumber,
+      date: formattedDate,
+      time: slotTime,
+    });
+
+    await sendEmail({
+      to: RECEPTION_EMAIL,
+      subject: `Páciens lemondás — ${patientName}, ${formattedDate} ${slotTime}`,
+      html,
+    });
+  } catch (err) {
+    console.error("[api/booking-cancel] Failed to send reception notification:", err);
   }
 }

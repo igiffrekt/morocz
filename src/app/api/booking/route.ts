@@ -9,6 +9,7 @@ import { user } from "@/lib/db/schema";
 import { isEmailConfigured, sendEmail } from "@/lib/email";
 import { createCalendarEvent } from "@/lib/google-calendar";
 import { getWriteClient } from "@/lib/sanity-write-client";
+import { assertDayStillOpen } from "@/lib/booking-guards";
 import { generateAvailableSlots } from "@/lib/slots";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import {
@@ -68,6 +69,10 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   const { serviceId, slotDate, slotTime, patientName, patientEmail, patientPhone, slotLockId: providedSlotLockId } = parsed.data;
+
+  // ── 2b. Day-lock: reject bookings within 1h of day's start ────────────────
+  const dayLockError = await assertDayStillOpen(slotDate);
+  if (dayLockError) return dayLockError;
 
   // ── 3. Get slotLock — it's the source of truth for availability ──────────────
   const slotId = `${slotDate}T${slotTime}:00`;
@@ -250,7 +255,7 @@ async function getAlternativeSlots(
         params: { date: slotDate },
         tags: ["booking"],
       }),
-      sanityFetch<Array<{ _id: string; slotTime: string; status: string }>>({
+      sanityFetch<Array<{ _id: string; slotTime: string; status: string; heldUntil: string | null }>>({
         query: slotLocksForDateQuery,
         params: { date: slotDate },
         tags: ["slotLock"],
@@ -263,8 +268,12 @@ async function getAlternativeSlots(
     ]);
 
     const bookedSlots = bookings.map((b) => b.slotTime);
+    const now = new Date().toISOString();
     const heldSlots = slotLocks
-      .filter((lock) => lock.status === "held" || lock.status === "booked")
+      .filter((lock) =>
+        lock.status === "booked" ||
+        (lock.status === "held" && lock.heldUntil != null && lock.heldUntil > now),
+      )
       .map((lock) => lock.slotTime)
       .filter(Boolean);
 

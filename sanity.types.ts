@@ -1835,6 +1835,40 @@ export type ActivePopupQueryResult = {
   displayDelay: number | null;
   showOncePerSession: boolean | null;
 } | null;
+// Variable: seasonalScheduleForDateQuery
+// Query: *[_type == "seasonalSchedule" && startDate <= $date && endDate >= $date]    | order(startDate asc)[0]{    _id,    name,    startDate,    endDate,    defaultSlotDuration,    bufferMinutes,    days[]{      _key,      dayOfWeek,      isDayOff,      startTime,      endTime    }  }
+export type SeasonalScheduleForDateQueryResult = {
+  _id: string;
+  name: string | null;
+  startDate: string | null;
+  endDate: string | null;
+  defaultSlotDuration: 10 | 15 | 20 | 30 | 45 | 60 | null;
+  bufferMinutes: number | null;
+  days: Array<{
+    _key: string;
+    dayOfWeek: 0 | 1 | 2 | 3 | 4 | 5 | 6 | null;
+    isDayOff: boolean | null;
+    startTime: string | null;
+    endTime: string | null;
+  }> | null;
+} | null;
+// Variable: seasonalSchedulesForRangeQuery
+// Query: *[_type == "seasonalSchedule" && startDate <= $endDate && endDate >= $startDate]    | order(startDate asc){    _id,    name,    startDate,    endDate,    defaultSlotDuration,    bufferMinutes,    days[]{      _key,      dayOfWeek,      isDayOff,      startTime,      endTime    }  }
+export type SeasonalSchedulesForRangeQueryResult = Array<{
+  _id: string;
+  name: string | null;
+  startDate: string | null;
+  endDate: string | null;
+  defaultSlotDuration: 10 | 15 | 20 | 30 | 45 | 60 | null;
+  bufferMinutes: number | null;
+  days: Array<{
+    _key: string;
+    dayOfWeek: 0 | 1 | 2 | 3 | 4 | 5 | 6 | null;
+    isDayOff: boolean | null;
+    startTime: string | null;
+    endTime: string | null;
+  }> | null;
+}>;
 
 // Query TypeMap
 import "@sanity/client";
@@ -1871,5 +1905,7 @@ declare module "@sanity/client" {
     "*[_type == \"yogaInstructor\" && isActive == true] | order(name asc){\n  _id,\n  name,\n  slug,\n  photo,\n  bio,\n  phone,\n  email,\n  color\n}": YogaInstructorsQueryResult;
     "*[_type == \"yogaClass\"] | order(name asc){\n  _id,\n  name,\n  slug,\n  description,\n  icon,\n  color,\n  instructors[]->{\n    _id,\n    name,\n    photo\n  }\n}": YogaClassesQueryResult;
     "*[_type == \"popup\" && isActive == true][0]{\n  _id,\n  headline,\n  content,\n  image,\n  ctaButton{\n    label,\n    href\n  },\n  showOnPages,\n  displayDelay,\n  showOncePerSession\n}": ActivePopupQueryResult;
+    "*[_type == \"seasonalSchedule\" && startDate <= $date && endDate >= $date]\n    | order(startDate asc)[0]{\n    _id,\n    name,\n    startDate,\n    endDate,\n    defaultSlotDuration,\n    bufferMinutes,\n    days[]{\n      _key,\n      dayOfWeek,\n      isDayOff,\n      startTime,\n      endTime\n    }\n  }": SeasonalScheduleForDateQueryResult;
+    "*[_type == \"seasonalSchedule\" && startDate <= $endDate && endDate >= $startDate]\n    | order(startDate asc){\n    _id,\n    name,\n    startDate,\n    endDate,\n    defaultSlotDuration,\n    bufferMinutes,\n    days[]{\n      _key,\n      dayOfWeek,\n      isDayOff,\n      startTime,\n      endTime\n    }\n  }": SeasonalSchedulesForRangeQueryResult;
   }
 }

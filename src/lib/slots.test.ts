@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   type ResolvedSchedule,
-  type SeasonalScheduleSummary,
   resolveScheduleForDate,
+  type SeasonalScheduleSummary,
 } from "./slots";
 
 const defaultSchedule: ResolvedSchedule = {

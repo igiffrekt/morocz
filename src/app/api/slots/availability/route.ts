@@ -194,8 +194,8 @@ export async function GET(request: Request): Promise<Response> {
       blockedDatesToUse = blockedDates.filter(d => d !== dateStr);
 
       scheduleToUse = {
-        ...scheduleForSlots,
-        days: scheduleForSlots.days.map((day) => {
+        ...resolved,
+        days: resolved.days.map((day) => {
           if (day.dayOfWeek === dayOfWeek) {
             return {
               ...day,

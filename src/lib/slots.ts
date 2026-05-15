@@ -229,7 +229,7 @@ export function resolveScheduleForDate(
   seasonalSchedules: SeasonalScheduleSummary[],
 ): ResolvedSchedule {
   const matches = seasonalSchedules.filter(
-    (s) => s.startDate <= date && date <= s.endDate,
+    (s) => s.startDate && s.endDate && s.startDate <= date && date <= s.endDate,
   );
   if (matches.length === 0) return defaultSchedule;
 

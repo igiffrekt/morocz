@@ -43,6 +43,8 @@ export async function GET(request: Request): Promise<Response> {
     // Fetch schedule, blocked dates, and custom availability in parallel
     const [schedule, seasonals, blockedDatesDoc, customAvails] = await Promise.all([
       sanityFetch<{
+        defaultSlotDuration: number;
+        bufferMinutes: number;
         days: Array<{
           dayOfWeek: number;
           isDayOff: boolean;
@@ -122,9 +124,11 @@ export async function GET(request: Request): Promise<Response> {
       }
 
       // Otherwise check seasonal-or-default schedule
-      const defaultForDate = schedule
-        ? { defaultSlotDuration: 20, bufferMinutes: 0, days: schedule.days }
-        : { defaultSlotDuration: 20, bufferMinutes: 0, days: [] };
+      const defaultForDate = schedule ?? {
+        defaultSlotDuration: 20,
+        bufferMinutes: 0,
+        days: [],
+      };
       const resolved = resolveScheduleForDate(dateStr, defaultForDate, seasonals);
       const dayConfig = resolved.days.find((d) => d.dayOfWeek === dow);
       if (dayConfig && !dayConfig.isDayOff && dayConfig.startTime && dayConfig.endTime) {

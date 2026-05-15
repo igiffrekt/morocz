@@ -9,11 +9,12 @@ import { user } from "@/lib/db/schema";
 import { isEmailConfigured, sendEmail } from "@/lib/email";
 import { createCalendarEvent } from "@/lib/google-calendar";
 import { getWriteClient } from "@/lib/sanity-write-client";
-import { generateAvailableSlots } from "@/lib/slots";
+import { generateAvailableSlots, resolveScheduleForDate } from "@/lib/slots";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import {
   blockedDatesQuery,
   bookingsForDateQuery,
+  seasonalScheduleForDateQuery,
   slotLockByIdQuery,
   slotLocksForDateQuery,
   weeklyScheduleQuery,
@@ -230,7 +231,7 @@ async function getAlternativeSlots(
   serviceId: string,
 ): Promise<string[]> {
   try {
-    const [schedule, blockedDatesDoc, bookings, slotLocks, service] = await Promise.all([
+    const [schedule, seasonal, blockedDatesDoc, bookings, slotLocks, service] = await Promise.all([
       sanityFetch<{
         defaultSlotDuration: number;
         bufferMinutes: number;
@@ -243,6 +244,24 @@ async function getAlternativeSlots(
         }>;
       } | null>({ query: weeklyScheduleQuery, tags: ["weeklySchedule"] }),
       sanityFetch<{
+        _id: string;
+        startDate: string;
+        endDate: string;
+        defaultSlotDuration: number;
+        bufferMinutes: number;
+        days: Array<{
+          _key: string;
+          dayOfWeek: number;
+          isDayOff: boolean;
+          startTime: string;
+          endTime: string;
+        }>;
+      } | null>({
+        query: seasonalScheduleForDateQuery,
+        params: { date: slotDate },
+        tags: ["seasonalSchedule"],
+      }),
+      sanityFetch<{
         dates: Array<{ _key: string; date: string; isHoliday: boolean }> | null;
       } | null>({ query: blockedDatesQuery, tags: ["blockedDate"] }),
       sanityFetch<Array<{ _id: string; slotTime: string }>>({
@@ -250,7 +269,7 @@ async function getAlternativeSlots(
         params: { date: slotDate },
         tags: ["booking"],
       }),
-      sanityFetch<Array<{ _id: string; slotTime: string; status: string }>>({
+      sanityFetch<Array<{ _id: string; slotTime: string; status: string; heldUntil: string | null }>>({
         query: slotLocksForDateQuery,
         params: { date: slotDate },
         tags: ["slotLock"],
@@ -263,13 +282,23 @@ async function getAlternativeSlots(
     ]);
 
     const bookedSlots = bookings.map((b) => b.slotTime);
+    const now = new Date().toISOString();
     const heldSlots = slotLocks
-      .filter((lock) => lock.status === "held" || lock.status === "booked")
+      .filter((lock) =>
+        lock.status === "booked" ||
+        (lock.status === "held" && lock.heldUntil != null && lock.heldUntil > now),
+      )
       .map((lock) => lock.slotTime)
       .filter(Boolean);
 
+    const resolvedSchedule = resolveScheduleForDate(
+      slotDate,
+      schedule ?? { defaultSlotDuration: 20, bufferMinutes: 0, days: [] },
+      seasonal ? [seasonal] : [],
+    );
+
     const available = generateAvailableSlots({
-      schedule: schedule ?? { defaultSlotDuration: 20, bufferMinutes: 0, days: [] },
+      schedule: resolvedSchedule,
       blockedDates: (blockedDatesDoc?.dates ?? []).map((d) => d.date).filter(Boolean),
       bookedSlots,
       heldSlots,

@@ -58,6 +58,7 @@ export async function GET(request: Request): Promise<Response> {
     sanityFetch<{
       defaultSlotDuration: number;
       bufferMinutes: number;
+      bookingWindowDays: number | null;
       days: Array<{
         _key: string;
         dayOfWeek: number;
@@ -227,7 +228,7 @@ export async function GET(request: Request): Promise<Response> {
       heldSlots: [],
       date: dateStr,
       serviceDurationMinutes: serviceDuration,
-      maxDaysAhead: 30,
+      maxDaysAhead: schedule?.bookingWindowDays ?? 30,
     });
 
     if (total.length === 0) continue;
@@ -240,7 +241,7 @@ export async function GET(request: Request): Promise<Response> {
       heldSlots: heldByDate.get(dateStr) ?? [],
       date: dateStr,
       serviceDurationMinutes: serviceDuration,
-      maxDaysAhead: 30,
+      maxDaysAhead: schedule?.bookingWindowDays ?? 30,
     });
 
     availability[dateStr] = { available: available.length, total: total.length };

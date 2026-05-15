@@ -1495,10 +1495,11 @@ export type CookiePolicyQueryResult = {
   lastUpdated: string | null;
 } | null;
 // Variable: weeklyScheduleQuery
-// Query: *[_type == "weeklySchedule" && _id == "weeklySchedule"][0]{  defaultSlotDuration,  bufferMinutes,  days[]{    _key,    dayOfWeek,    isDayOff,    startTime,    endTime  }}
+// Query: *[_type == "weeklySchedule" && _id == "weeklySchedule"][0]{  defaultSlotDuration,  bufferMinutes,  bookingWindowDays,  days[]{    _key,    dayOfWeek,    isDayOff,    startTime,    endTime  }}
 export type WeeklyScheduleQueryResult = {
   defaultSlotDuration: 10 | 15 | 20 | 30 | 45 | 60;
   bufferMinutes: number | null;
+  bookingWindowDays: number;
   days: Array<{
     _key: string;
     dayOfWeek: 0 | 1 | 2 | 3 | 4 | 5 | 6;
@@ -1893,7 +1894,7 @@ declare module "@sanity/client" {
     "*[_type == \"blogPost\" && category._ref == $categoryId && _id != $currentPostId] | order(publishedAt desc)[0...3]{\n  _id,\n  title,\n  slug,\n  featuredImage,\n  excerpt\n}": RelatedBlogPostsQueryResult;
     "*[_type == \"privacyPolicy\" && _id == \"privacyPolicy\"][0]{\n  title,\n  body,\n  lastUpdated\n}": PrivacyPolicyQueryResult;
     "*[_type == \"cookiePolicy\" && _id == \"cookiePolicy\"][0]{\n  title,\n  body,\n  lastUpdated\n}": CookiePolicyQueryResult;
-    "*[_type == \"weeklySchedule\" && _id == \"weeklySchedule\"][0]{\n  defaultSlotDuration,\n  bufferMinutes,\n  days[]{\n    _key,\n    dayOfWeek,\n    isDayOff,\n    startTime,\n    endTime\n  }\n}": WeeklyScheduleQueryResult;
+    "*[_type == \"weeklySchedule\" && _id == \"weeklySchedule\"][0]{\n  defaultSlotDuration,\n  bufferMinutes,\n  bookingWindowDays,\n  days[]{\n    _key,\n    dayOfWeek,\n    isDayOff,\n    startTime,\n    endTime\n  }\n}": WeeklyScheduleQueryResult;
     "*[_type == \"blockedDate\" && _id == \"blockedDate\"][0]{\n  dates[]{\n    _key,\n    date,\n    isHoliday\n  }\n}": BlockedDatesQueryResult;
     "*[_type == \"slotLock\" && _id == $slotLockId][0]{\n  _id, dateTime, status\n}": SlotLockByIdQueryResult;
     "*[_type == \"booking\" && slotDate == $date && status == \"confirmed\"]{\n  _id, slotDate, slotTime, patientEmail, service->{_id}\n}": BookingsForDateQueryResult;

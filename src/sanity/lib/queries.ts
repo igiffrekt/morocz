@@ -228,6 +228,7 @@ export const cookiePolicyQuery = defineQuery(
 export const weeklyScheduleQuery = defineQuery(`*[_type == "weeklySchedule" && _id == "weeklySchedule"][0]{
   defaultSlotDuration,
   bufferMinutes,
+  bookingWindowDays,
   days[]{
     _key,
     dayOfWeek,

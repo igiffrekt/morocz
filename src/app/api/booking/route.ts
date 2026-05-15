@@ -235,6 +235,7 @@ async function getAlternativeSlots(
       sanityFetch<{
         defaultSlotDuration: number;
         bufferMinutes: number;
+        bookingWindowDays: number | null;
         days: Array<{
           _key: string;
           dayOfWeek: number;
@@ -304,7 +305,7 @@ async function getAlternativeSlots(
       heldSlots,
       date: slotDate,
       serviceDurationMinutes: service?.appointmentDuration ?? 20,
-      maxDaysAhead: 30,
+      maxDaysAhead: schedule?.bookingWindowDays ?? 30,
     });
 
     // Sort by time distance from requested slot, pick up to 5

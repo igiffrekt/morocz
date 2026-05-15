@@ -43,12 +43,22 @@ function minutesToTime(totalMinutes: number): string {
 }
 
 /**
- * Compute the number of days between today (UTC midnight) and the target date.
+ * "Today" in Budapest as a YYYY-MM-DD string. Used everywhere "today" must
+ * match the clinic's wall clock, not the host server's.
+ */
+export function todayInBudapest(): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Budapest",
+  }).format(new Date());
+}
+
+/**
+ * Compute the number of days between today (Budapest) and the target date.
  * Returns negative if date is in the past.
  */
 function daysAheadFromToday(dateStr: string): number {
-  const today = new Date();
-  const todayMidnight = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+  const [ty, tm, td] = todayInBudapest().split("-").map(Number);
+  const todayMidnight = Date.UTC(ty ?? 0, (tm ?? 1) - 1, td ?? 1);
   const [year, month, day] = dateStr.split("-").map(Number);
   const targetMidnight = Date.UTC(year ?? 0, (month ?? 1) - 1, day ?? 1);
   return Math.round((targetMidnight - todayMidnight) / (1000 * 60 * 60 * 24));

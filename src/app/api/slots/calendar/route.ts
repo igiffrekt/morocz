@@ -1,5 +1,5 @@
 import { defineQuery } from "next-sanity";
-import { resolveScheduleForDate, type SeasonalScheduleSummary } from "@/lib/slots";
+import { resolveScheduleForDate, type SeasonalScheduleSummary, todayInBudapest } from "@/lib/slots";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import { weeklyScheduleQuery, blockedDatesQuery, seasonalSchedulesForRangeQuery } from "@/sanity/lib/queries";
 
@@ -102,10 +102,8 @@ export async function GET(request: Request): Promise<Response> {
 
     const bookingWindowDays = schedule?.bookingWindowDays ?? 30;
     // Budapest-local "today" + window = last bookable date (inclusive).
-    const todayBudapest = new Intl.DateTimeFormat("en-CA", {
-      timeZone: "Europe/Budapest",
-    }).format(new Date()); // "YYYY-MM-DD"
-    const horizon = new Date(todayBudapest);
+    // Same definition of "today" as generateAvailableSlots in src/lib/slots.ts.
+    const horizon = new Date(todayInBudapest());
     horizon.setUTCDate(horizon.getUTCDate() + bookingWindowDays);
     const horizonStr = horizon.toISOString().slice(0, 10);
 

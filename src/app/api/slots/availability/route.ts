@@ -1,7 +1,7 @@
 import { defineQuery } from "next-sanity";
-import { generateAvailableSlots } from "@/lib/slots";
+import { generateAvailableSlots, resolveScheduleForDate } from "@/lib/slots";
 import { sanityFetch } from "@/sanity/lib/fetch";
-import { blockedDatesQuery, weeklyScheduleQuery } from "@/sanity/lib/queries";
+import { blockedDatesQuery, seasonalSchedulesForRangeQuery, weeklyScheduleQuery } from "@/sanity/lib/queries";
 
 export const dynamic = "force-dynamic";
 
@@ -54,7 +54,7 @@ export async function GET(request: Request): Promise<Response> {
   const startDate = `${month}-01`;
   const endDate = `${month}-${String(daysInMonth).padStart(2, "0")}`;
 
-  const [schedule, blockedDatesDoc, bookings, slotLocks, customAvails, service] = await Promise.all([
+  const [schedule, seasonals, blockedDatesDoc, bookings, slotLocks, customAvails, service] = await Promise.all([
     sanityFetch<{
       defaultSlotDuration: number;
       bufferMinutes: number;
@@ -68,6 +68,26 @@ export async function GET(request: Request): Promise<Response> {
     } | null>({
       query: weeklyScheduleQuery,
       tags: ["weeklySchedule"],
+    }),
+    sanityFetch<
+      Array<{
+        _id: string;
+        startDate: string;
+        endDate: string;
+        defaultSlotDuration: number;
+        bufferMinutes: number;
+        days: Array<{
+          _key: string;
+          dayOfWeek: number;
+          isDayOff: boolean;
+          startTime: string;
+          endTime: string;
+        }>;
+      }>
+    >({
+      query: seasonalSchedulesForRangeQuery,
+      params: { startDate, endDate },
+      tags: ["seasonalSchedule"],
     }),
     sanityFetch<{
       dates: Array<{ _key: string; date: string; isHoliday: boolean }> | null;
@@ -162,7 +182,9 @@ export async function GET(request: Request): Promise<Response> {
     const [y, m, d] = dateStr.split('-').map(Number);
     const dayOfWeek = new Date(Date.UTC(y ?? 0, (m ?? 1) - 1, d ?? 1)).getUTCDay();
 
-    let scheduleToUse = { ...scheduleForSlots };
+    // Resolve seasonal-or-default schedule for this date, then layer customAvailability on top.
+    const resolved = resolveScheduleForDate(dateStr, scheduleForSlots, seasonals);
+    let scheduleToUse = { ...resolved };
     let blockedDatesToUse = blockedDates;
 
     // If custom availability exists for this date, override the schedule and unblock the date
@@ -189,7 +211,6 @@ export async function GET(request: Request): Promise<Response> {
       // If the day doesn't exist in schedule, add it
       if (!scheduleToUse.days.find((d) => d.dayOfWeek === dayOfWeek)) {
         scheduleToUse.days.push({
-          _key: `custom-${dayOfWeek}`,
           dayOfWeek,
           isDayOff: false,
           startTime: customAvail.startTime,

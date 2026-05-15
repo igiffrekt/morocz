@@ -14,6 +14,7 @@ const typeToTags: Record<string, string[]> = {
   privacyPolicy: ["privacyPolicy"],
   customAvailability: ["customAvailability"],
   weeklySchedule: ["weeklySchedule"],
+  seasonalSchedule: ["seasonalSchedule"],
   blockedDate: ["blockedDate"],
   booking: ["booking"],
   slotLock: ["slotLock"],

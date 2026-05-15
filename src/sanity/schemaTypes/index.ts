@@ -22,6 +22,7 @@ import { yogaClassType } from "./yogaClassType";
 import { yogaScheduleType } from "./yogaScheduleType";
 import { yogaPageType } from "./yogaPageType";
 import { popupType } from "./popupType";
+import { seasonalScheduleType } from "./seasonalScheduleType";
 
 export const schemaTypes: SchemaTypeDefinition[] = [
   homepageType,
@@ -36,6 +37,7 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   privacyPolicyType,
   cookiePolicyType,
   weeklyScheduleType,
+  seasonalScheduleType,
   blockedDateType,
   customAvailabilityType,
   bookingType,

@@ -45,6 +45,7 @@ export async function GET(request: Request): Promise<Response> {
       sanityFetch<{
         defaultSlotDuration: number;
         bufferMinutes: number;
+        bookingWindowDays: number | null;
         days: Array<{
           dayOfWeek: number;
           isDayOff: boolean;
@@ -99,12 +100,28 @@ export async function GET(request: Request): Promise<Response> {
       }
     }
 
+    const bookingWindowDays = schedule?.bookingWindowDays ?? 30;
+    // Budapest-local "today" + window = last bookable date (inclusive).
+    const todayBudapest = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Europe/Budapest",
+    }).format(new Date()); // "YYYY-MM-DD"
+    const horizon = new Date(todayBudapest);
+    horizon.setUTCDate(horizon.getUTCDate() + bookingWindowDays);
+    const horizonStr = horizon.toISOString().slice(0, 10);
+
     const availableDates: string[] = [];
     const current = new Date(firstDay);
 
     // Iterate through each day in the month
     while (current <= lastDay) {
       const dateStr = current.toISOString().slice(0, 10);
+
+      // Cap at booking window — dates beyond this are not bookable.
+      if (dateStr > horizonStr) {
+        current.setUTCDate(current.getUTCDate() + 1);
+        continue;
+      }
+
       const dow = current.getUTCDay();
 
       // Check for custom availability first (overrides blocked dates)

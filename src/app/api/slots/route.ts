@@ -43,6 +43,7 @@ export async function GET(request: Request): Promise<Response> {
       sanityFetch<{
         defaultSlotDuration: number;
         bufferMinutes: number;
+        bookingWindowDays: number | null;
         days: Array<{
           _key: string;
           dayOfWeek: number;
@@ -213,7 +214,7 @@ export async function GET(request: Request): Promise<Response> {
       heldSlots,
       date,
       serviceDurationMinutes,
-      maxDaysAhead: 30,
+      maxDaysAhead: schedule?.bookingWindowDays ?? 30,
     });
 
     // 8. Return result

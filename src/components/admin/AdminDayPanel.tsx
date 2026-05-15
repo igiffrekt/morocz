@@ -11,6 +11,7 @@ interface AdminDayPanelProps {
   isLoading: boolean;
   onBookingClick: (booking: AdminBooking) => void;
   onCancelBooking: (bookingId: string) => void;
+  onAddBooking: () => void;
 }
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
@@ -51,6 +52,18 @@ function getInitial(name: string): string {
   return name.charAt(0).toUpperCase();
 }
 
+function isBookingOngoing(booking: AdminBooking, now: Date): boolean {
+  if (booking.status !== "confirmed") return false;
+  const duration = booking.service?.appointmentDuration;
+  if (!duration) return false;
+  const [y, m, d] = booking.slotDate.split("-").map(Number);
+  const [hh, mm] = booking.slotTime.split(":").map(Number);
+  if (y == null || m == null || d == null || hh == null || mm == null) return false;
+  const start = new Date(y, m - 1, d, hh, mm);
+  const end = new Date(start.getTime() + duration * 60_000);
+  return now >= start && now < end;
+}
+
 // ─── Component ─────────────────────────────────────────────────────────────────
 
 export default function AdminDayPanel({
@@ -59,13 +72,24 @@ export default function AdminDayPanel({
   isLoading,
   onBookingClick,
   onCancelBooking,
+  onAddBooking,
 }: AdminDayPanelProps) {
   const confirmedBookings = bookings.filter((b) => b.status !== "cancelled");
   const cancelledBookings = bookings.filter((b) => b.status === "cancelled");
-  const sortedBookings = [...confirmedBookings, ...cancelledBookings];
+  const [showCancelled, setShowCancelled] = useState(false);
+  const displayBookings = showCancelled
+    ? [...confirmedBookings, ...cancelledBookings]
+    : confirmedBookings;
 
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [now, setNow] = useState<Date>(() => new Date());
+
+  // Re-evaluate "ongoing" window every 30s
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 30_000);
+    return () => clearInterval(id);
+  }, []);
 
   // Close menu on click outside
   useEffect(() => {
@@ -77,6 +101,21 @@ export default function AdminDayPanel({
   }, [openMenuId]);
 
   return (
+    <>
+    <style>{`@media (max-width: 768px) {
+  .booking-avatar { display: none !important; }
+  .booking-status-text { display: none !important; }
+  .booking-status-icon { display: flex !important; }
+  .booking-payment-text { display: none !important; }
+}
+@keyframes adminOngoingPulse {
+  0%, 100% { background-color: rgba(153,206,183,0.06); }
+  50%      { background-color: rgba(153,206,183,0.22); }
+}
+@keyframes adminOngoingDot {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50%      { transform: scale(1.35); opacity: 1; }
+}`}</style>
     <div
       style={{
         backgroundColor: "#ffffff",
@@ -93,36 +132,93 @@ export default function AdminDayPanel({
       {/* ── Header ──────────────────────────────────────────────────────────── */}
       <div
         style={{
-          padding: "1.125rem 1.25rem",
+          padding: "1rem 1.25rem",
           borderBottom: "1px solid #e8eaf0",
           flexShrink: 0,
         }}
       >
-        <h2
-          style={{
-            margin: 0,
-            fontSize: "1rem",
-            fontWeight: 700,
-            color: "#242a5f",
-            lineHeight: 1.3,
-          }}
-        >
-          {formatHungarianDate(selectedDate)}
-        </h2>
-        {!isLoading && (
-          <p
+        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+          <h2
             style={{
-              margin: "0.375rem 0 0",
-              fontSize: "0.8125rem",
-              color: "#64748b",
-              fontWeight: 500,
+              margin: 0,
+              fontSize: "1rem",
+              fontWeight: 700,
+              color: "#242a5f",
+              lineHeight: 1.3,
+              flex: 1,
+              minWidth: 0,
             }}
           >
-            {bookings.length === 0
-              ? "Nincs foglalás"
-              : `${confirmedBookings.length} foglalás${cancelledBookings.length > 0 ? ` \u00B7 ${cancelledBookings.length} lemondva` : ""}`}
-          </p>
-        )}
+            {formatHungarianDate(selectedDate)}
+            {!isLoading && bookings.length > 0 && (
+              <span style={{ fontSize: "0.8125rem", fontWeight: 500, color: "#94a3b8", marginLeft: "0.5rem" }}>
+                ({confirmedBookings.length})
+              </span>
+            )}
+          </h2>
+
+          {/* Separator */}
+          <div style={{ width: "1px", height: "1.5rem", backgroundColor: "#e8eaf0", flexShrink: 0 }} />
+
+          {/* Cancelled toggle */}
+          {!isLoading && cancelledBookings.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setShowCancelled((v) => !v)}
+              style={{
+                border: showCancelled ? "1px solid rgba(159,18,57,0.3)" : "1px solid #e8eaf0",
+                backgroundColor: showCancelled ? "rgba(159,18,57,0.08)" : "#f8f9fb",
+                borderRadius: "9999px",
+                cursor: "pointer",
+                fontSize: "0.75rem",
+                fontWeight: 600,
+                color: showCancelled ? "#9f1239" : "#64748b",
+                padding: "0.3125rem 0.75rem",
+                whiteSpace: "nowrap",
+                transition: "all 0.15s ease",
+                flexShrink: 0,
+              }}
+            >
+              Lemondottak{cancelledBookings.length > 0 ? ` (${cancelledBookings.length})` : ""}
+            </button>
+          )}
+
+          {/* Add booking button */}
+          <button
+            type="button"
+            onClick={onAddBooking}
+            title="Új foglalás"
+            style={{
+              width: "2.25rem",
+              height: "2.25rem",
+              borderRadius: "50%",
+              border: "none",
+              backgroundColor: "#99CEB7",
+              color: "#fff",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              flexShrink: 0,
+              boxShadow: "0 2px 6px rgba(153,206,183,0.4)",
+              transition: "transform 0.15s ease, box-shadow 0.15s ease",
+              padding: 0,
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "scale(1.08)";
+              e.currentTarget.style.boxShadow = "0 3px 10px rgba(153,206,183,0.5)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "scale(1)";
+              e.currentTarget.style.boxShadow = "0 2px 6px rgba(153,206,183,0.4)";
+            }}
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+              <line x1="8" y1="3" x2="8" y2="13" />
+              <line x1="3" y1="8" x2="13" y2="8" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       {/* ── Content ─────────────────────────────────────────────────────────── */}
@@ -157,7 +253,7 @@ export default function AdminDayPanel({
         )}
 
         {/* Empty state */}
-        {!isLoading && bookings.length === 0 && (
+        {!isLoading && displayBookings.length === 0 && (
           <div
             style={{
               display: "flex",
@@ -194,12 +290,15 @@ export default function AdminDayPanel({
         )}
 
         {/* Booking rows */}
-        {!isLoading && sortedBookings.length > 0 && (
+        {!isLoading && displayBookings.length > 0 && (
           <div style={{ display: "flex", flexDirection: "column" }}>
-            {sortedBookings.map((booking) => {
+            {displayBookings.map((booking) => {
               const isCancelled = booking.status === "cancelled";
+              const isBookingCompleted = booking.status === "completed";
+              const isNoShow = booking.status === "no-show";
               const isHovered = hoveredId === booking._id;
               const isMenuOpen = openMenuId === booking._id;
+              const isOngoing = isBookingOngoing(booking, now);
               const avatarColor = getAvatarColor(booking.patientName);
               const initial = getInitial(booking.patientName);
 
@@ -208,6 +307,9 @@ export default function AdminDayPanel({
                   key={booking._id}
                   onMouseEnter={() => setHoveredId(booking._id)}
                   onMouseLeave={() => setHoveredId(null)}
+                  onClick={() => onBookingClick(booking)}
+                  role="button"
+                  tabIndex={0}
                   style={{
                     display: "flex",
                     alignItems: "center",
@@ -216,17 +318,21 @@ export default function AdminDayPanel({
                     minHeight: "3.75rem",
                     backgroundColor: isHovered ? "rgba(153,206,183,0.06)" : "transparent",
                     borderBottom: "1px solid #f0f1f5",
+                    borderLeft: isOngoing ? "3px solid #99CEB7" : "3px solid transparent",
                     textAlign: "left",
                     width: "100%",
                     opacity: isCancelled ? 0.55 : 1,
                     transition: "background-color 0.15s",
+                    animation: isOngoing && !isHovered ? "adminOngoingPulse 2.4s ease-in-out infinite" : undefined,
                     position: "relative",
+                    cursor: "pointer",
                   }}
                 >
                   {/* Avatar circle */}
                   <button
                     type="button"
                     onClick={() => onBookingClick(booking)}
+                    className="booking-avatar"
                     style={{
                       width: "2.5rem",
                       height: "2.5rem",
@@ -319,8 +425,49 @@ export default function AdminDayPanel({
                       {booking.slotTime}
                     </span>
 
-                    {/* Status badge */}
+                    {/* Payment badge — desktop only */}
+                    {!isCancelled && booking.paymentStatus && (
+                      <span
+                        className="booking-payment-text"
+                        style={{
+                          fontSize: "0.6875rem",
+                          fontWeight: 600,
+                          padding: "0.1875rem 0.5rem",
+                          borderRadius: "9999px",
+                          whiteSpace: "nowrap",
+                          textTransform: "uppercase",
+                          letterSpacing: "0.04em",
+                          backgroundColor:
+                            booking.paymentStatus === "paid"
+                              ? "rgba(22,163,74,0.14)"
+                              : booking.paymentStatus === "failed"
+                                ? "rgba(239,68,68,0.1)"
+                                : "rgba(245,158,11,0.1)",
+                          color:
+                            booking.paymentStatus === "paid"
+                              ? "#15803d"
+                              : booking.paymentStatus === "failed"
+                                ? "#b91c1c"
+                                : "#b45309",
+                          border:
+                            booking.paymentStatus === "paid"
+                              ? "1px solid rgba(22,163,74,0.32)"
+                              : booking.paymentStatus === "failed"
+                                ? "1px solid rgba(239,68,68,0.25)"
+                                : "1px solid rgba(245,158,11,0.25)",
+                        }}
+                      >
+                        {booking.paymentStatus === "paid"
+                          ? "✓ Fizetve"
+                          : booking.paymentStatus === "failed"
+                            ? "Sikertelen"
+                            : "Fizetetlen"}
+                      </span>
+                    )}
+
+                    {/* Status badge — text on desktop */}
                     <span
+                      className="booking-status-text"
                       style={{
                         fontSize: "0.6875rem",
                         fontWeight: 600,
@@ -328,18 +475,34 @@ export default function AdminDayPanel({
                         borderRadius: "9999px",
                         backgroundColor: isCancelled
                           ? "rgba(231,193,211,0.15)"
-                          : "rgba(153,206,183,0.15)",
-                        color: isCancelled ? "#9f1239" : "#099268",
+                          : isBookingCompleted
+                            ? "rgba(59,130,246,0.1)"
+                            : isNoShow
+                              ? "rgba(217,119,6,0.1)"
+                              : "rgba(153,206,183,0.15)",
+                        color: isCancelled ? "#9f1239" : isBookingCompleted ? "#2563eb" : isNoShow ? "#d97706" : "#099268",
                         border: isCancelled
                           ? "1px solid rgba(231,193,211,0.25)"
-                          : "1px solid rgba(153,206,183,0.25)",
+                          : isBookingCompleted
+                            ? "1px solid rgba(59,130,246,0.2)"
+                            : isNoShow
+                              ? "1px solid rgba(217,119,6,0.2)"
+                              : "1px solid rgba(153,206,183,0.25)",
                         textTransform: "uppercase",
                         letterSpacing: "0.04em",
                         whiteSpace: "nowrap",
                       }}
                     >
-                      {isCancelled ? "Lemondva" : "Visszaigazolva"}
+                      {isCancelled ? "Lemondva" : isBookingCompleted ? "Teljesítve" : isNoShow ? "Nem jelent meg" : "Visszaigazolva"}
                     </span>
+                    {/* Status icon — mobile only */}
+                    {!isCancelled && (
+                      <span className="booking-status-icon" style={{ display: "none", color: isBookingCompleted ? "#2563eb" : "#099268", flexShrink: 0 }}>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                      </span>
+                    )}
 
                     {/* Three-dot menu button */}
                     <button
@@ -437,5 +600,6 @@ export default function AdminDayPanel({
         )}
       </div>
     </div>
+    </>
   );
 }

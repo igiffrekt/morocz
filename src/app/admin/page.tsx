@@ -21,6 +21,7 @@ type AdminBooking = {
   slotTime: string;
   status: string;
   managementToken: string;
+  paymentStatus: string | null;
 };
 
 function getTodayString(): string {
@@ -49,7 +50,8 @@ const BOOKINGS_QUERY = `*[_type == "booking" && !(_id in path("drafts.**")) && s
   slotDate,
   slotTime,
   status,
-  managementToken
+  managementToken,
+  paymentStatus
 }`;
 
 export default async function AdminPage() {
@@ -169,7 +171,7 @@ export default async function AdminPage() {
   return (
     <>
       <style>{`
-        /* Hide website navbar/header but NOT the admin header */
+        /* Hide website navbar/header/footer but NOT the admin header */
         header:not([data-admin-header="true"]),
         body > nav:first-of-type,
         footer {
@@ -178,6 +180,28 @@ export default async function AdminPage() {
           height: 0 !important;
           margin: 0 !important;
           padding: 0 !important;
+        }
+        /* Hide the sticky 72px header wrapper from Header.tsx */
+        .sticky.h-\\[72px\\] {
+          display: none !important;
+          height: 0 !important;
+        }
+        /* Remove layout container padding/spacing on admin */
+        main.space-y-3 {
+          padding: 0 !important;
+          margin: 0 !important;
+        }
+        main.space-y-3 > * + * {
+          margin-top: 0 !important;
+        }
+        .max-w-\\[88rem\\] {
+          max-width: 100% !important;
+          padding: 0 !important;
+          margin: 0 !important;
+        }
+        .space-y-3 > * + * {
+          --tw-space-y-reverse: 0;
+          margin-top: 0 !important;
         }
       `}</style>
       <AdminDashboard

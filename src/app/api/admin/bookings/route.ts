@@ -1,10 +1,23 @@
+import { and, desc, eq, gte, lte } from "drizzle-orm";
 import { auth } from "@/lib/auth";
-import { getWriteClient } from "@/lib/sanity-write-client";
+import { reconcileAllStalePending } from "@/lib/booking-reconciler";
 import { db } from "@/lib/db";
 import { bookingHistory } from "@/lib/db/schema";
-import { desc, eq, and, gte, lte } from "drizzle-orm";
+import { getWriteClient } from "@/lib/sanity-write-client";
 
 export const dynamic = "force-dynamic";
+
+// Lazy reconciliation: throttle to once per 2 minutes across all admin requests.
+let lastReconcileAt = 0;
+const RECONCILE_THROTTLE_MS = 2 * 60 * 1000;
+function triggerLazyReconcile(): void {
+  const now = Date.now();
+  if (now - lastReconcileAt < RECONCILE_THROTTLE_MS) return;
+  lastReconcileAt = now;
+  void reconcileAllStalePending().catch((err) => {
+    console.error("[api/admin/bookings] Lazy reconcile failed:", err);
+  });
+}
 
 // ── GET /api/admin/bookings ────────────────────────────────────────────────────
 // Returns bookings for a date range or by patient email.
@@ -23,6 +36,8 @@ export async function GET(request: Request): Promise<Response> {
       return Response.json({ error: "Jogosulatlan hozzáférés." }, { status: 403 });
     }
 
+    triggerLazyReconcile();
+
     // ── 2. Parse query params ──────────────────────────────────────────────────
     const { searchParams } = new URL(request.url);
     const email = searchParams.get("email");
@@ -40,6 +55,8 @@ export async function GET(request: Request): Promise<Response> {
       slotTime: string;
       status: string;
       managementToken: string;
+      paymentStatus: string | null;
+      completedServices: { serviceId: string; serviceName: string; price: number }[] | null;
     };
 
     // ── 3a. Email-based query (patient history) ────────────────────────────────
@@ -56,7 +73,9 @@ export async function GET(request: Request): Promise<Response> {
           slotDate,
           slotTime,
           status,
-          managementToken
+          managementToken,
+          paymentStatus,
+          completedServices[]{serviceId, serviceName, price}
         }`,
         { email },
       );
@@ -80,6 +99,8 @@ export async function GET(request: Request): Promise<Response> {
         slotTime: h.time,
         status: h.status,
         managementToken: "",
+        paymentStatus: null,
+        completedServices: null,
       }));
 
       // Combine and sort by date desc
@@ -128,7 +149,9 @@ export async function GET(request: Request): Promise<Response> {
         slotDate,
         slotTime,
         status,
-        managementToken
+        managementToken,
+        paymentStatus,
+        completedServices[]{serviceId, serviceName, price}
       }`,
       { startDate, endDate },
     );
@@ -151,6 +174,8 @@ export async function GET(request: Request): Promise<Response> {
       slotTime: h.time,
       status: h.status,
       managementToken: "",
+      paymentStatus: null,
+      completedServices: null,
     }));
 
     // Combine and sort by date asc

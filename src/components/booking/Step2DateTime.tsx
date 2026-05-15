@@ -368,14 +368,7 @@ export function Step2DateTime({
                 avail && avail.total > 0 && avail.available > 0
                   ? avail.available / avail.total
                   : null;
-              const stripeColor =
-                pct === null
-                  ? ""
-                  : pct > 0.6
-                    ? "bg-[#99CEB7]"
-                    : pct > 0.25
-                      ? "bg-amber-400"
-                      : "bg-rose-400";
+              const stripeColor = pct === null ? "" : "bg-[#99CEB7]";
 
               return (
                 <button

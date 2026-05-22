@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { buildAdminCancellationEmail } from "@/lib/booking-email";
 import { isEmailConfigured, sendEmail } from "@/lib/email";
 import { deleteCalendarEvent } from "@/lib/google-calendar";
+import { issueRefund } from "@/lib/refund/issue-refund";
 import { getWriteClient } from "@/lib/sanity-write-client";
 
 export const dynamic = "force-dynamic";
@@ -11,20 +12,13 @@ export const dynamic = "force-dynamic";
 const AdminCancelSchema = z.object({
   bookingId: z.string().min(1, "A foglalás azonosítója megadása kötelező."),
   reason: z.string().optional(),
+  refund: z.boolean().optional().default(false),
 });
-
-// ── 24h window enforcement ─────────────────────────────────────────────────────
-function isWithin24Hours(slotDate: string, slotTime: string): boolean {
-  const [h, m] = slotTime.split(":").map(Number);
-  const appt = new Date(
-    `${slotDate}T${String(h ?? 0).padStart(2, "0")}:${String(m ?? 0).padStart(2, "0")}:00`,
-  );
-  return (appt.getTime() - Date.now()) / (1000 * 60 * 60) < 24;
-}
 
 // ── POST /api/admin/booking-cancel ─────────────────────────────────────────────
 // Cancels a booking by _id with admin session auth.
-// Enforces 24h rule, releases slot, sends admin cancellation email.
+// No time restriction (admin bypass). Optionally issues a Stripe refund if refund===true.
+// Releases slot, sends admin cancellation email.
 export async function POST(request: Request): Promise<Response> {
   try {
     // ── 1. Admin session check ─────────────────────────────────────────────────
@@ -50,7 +44,7 @@ export async function POST(request: Request): Promise<Response> {
       return Response.json({ error: firstError }, { status: 400 });
     }
 
-    const { bookingId, reason } = parsed.data;
+    const { bookingId, reason, refund } = parsed.data;
 
     // ── 3. Fetch booking by _id ────────────────────────────────────────────────
     // Note: $token is reserved in @sanity/client QueryParams — use $bookingId
@@ -65,12 +59,15 @@ export async function POST(request: Request): Promise<Response> {
       slotTime: string;
       status: string;
       googleCalendarEventId?: string | null;
+      paymentStatus?: string | null;
+      stripePaymentIntentId?: string | null;
     };
 
     const booking = await getWriteClient().fetch<BookingForAdminCancel | null>(
       `*[_type == "booking" && _id == $bookingId][0]{
         _id, patientName, patientEmail, patientPhone, reservationNumber,
-        service->{name}, slotDate, slotTime, status, googleCalendarEventId
+        service->{name}, slotDate, slotTime, status, googleCalendarEventId,
+        paymentStatus, stripePaymentIntentId
       }`,
       { bookingId },
     );
@@ -90,7 +87,19 @@ export async function POST(request: Request): Promise<Response> {
     // ── 6. Patch booking status to "cancelled" ─────────────────────────────────
     await getWriteClient().patch(booking._id).set({ status: "cancelled" }).commit();
 
-    // ── 6b. Delete Google Calendar event ────────────────────────────────────
+    // ── 6b. Refund if the admin opted in (credit invoice issued by the webhook) ─
+    if (refund && booking.paymentStatus === "paid" && booking.stripePaymentIntentId) {
+      try {
+        await issueRefund({
+          paymentIntentId: booking.stripePaymentIntentId,
+          bookingId: booking._id,
+        });
+      } catch (refundErr) {
+        console.error("[admin/booking-cancel] Refund failed:", refundErr);
+      }
+    }
+
+    // ── 6c. Delete Google Calendar event ────────────────────────────────────
     if (booking.googleCalendarEventId) {
       try {
         await deleteCalendarEvent(booking.googleCalendarEventId);

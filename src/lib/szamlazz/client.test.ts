@@ -1,11 +1,22 @@
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { issueCreditInvoice, SzamlazzError } from "./client";
 
-const buyer = { name: "Teszt", zip: "2500", city: "Esztergom", address: "Fő u. 1.", email: "t@e.hu" };
+const buyer = {
+  name: "Teszt",
+  zip: "2500",
+  city: "Esztergom",
+  address: "Fő u. 1.",
+  email: "t@e.hu",
+};
 
 describe("issueCreditInvoice", () => {
-  beforeEach(() => { process.env.SZAMLA_AGENT_KEY = "KEY"; });
-  afterEach(() => { vi.restoreAllMocks(); delete process.env.SZAMLA_AGENT_KEY; });
+  beforeEach(() => {
+    process.env.SZAMLA_AGENT_KEY = "KEY";
+  });
+  afterEach(() => {
+    vi.restoreAllMocks();
+    delete process.env.SZAMLA_AGENT_KEY;
+  });
 
   it("returns the invoice number on success", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
@@ -25,12 +36,16 @@ describe("issueCreditInvoice", () => {
         headers: { szlahu_error_code: "3", szlahu_error_message: "Hibás agent kulcs" },
       }),
     );
-    await expect(issueCreditInvoice({ amountHuf: 10_000, buyer })).rejects.toBeInstanceOf(SzamlazzError);
+    await expect(issueCreditInvoice({ amountHuf: 10_000, buyer })).rejects.toBeInstanceOf(
+      SzamlazzError,
+    );
   });
 
   it("throws when SZAMLA_AGENT_KEY is missing", async () => {
     delete process.env.SZAMLA_AGENT_KEY;
-    await expect(issueCreditInvoice({ amountHuf: 10_000, buyer })).rejects.toThrow(/SZAMLA_AGENT_KEY/);
+    await expect(issueCreditInvoice({ amountHuf: 10_000, buyer })).rejects.toThrow(
+      /SZAMLA_AGENT_KEY/,
+    );
   });
 
   it("throws SzamlazzError on an HTTP 500 response", async () => {

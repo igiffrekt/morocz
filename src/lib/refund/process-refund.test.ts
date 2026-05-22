@@ -1,11 +1,11 @@
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/lib/stripe", () => ({
   stripe: {},
   BOOKING_FEE_HUF: 10_000,
 }));
 
-import { processRefund, type ProcessRefundDeps } from "./process-refund";
+import { type ProcessRefundDeps, processRefund } from "./process-refund";
 
 function makeDeps(overrides: Partial<ProcessRefundDeps> = {}): ProcessRefundDeps {
   return {
@@ -15,7 +15,9 @@ function makeDeps(overrides: Partial<ProcessRefundDeps> = {}): ProcessRefundDeps
       patientEmail: "t@e.hu",
       stripeRefundId: null,
     }),
-    getBuyerAddress: vi.fn().mockResolvedValue({ zip: "2500", city: "Esztergom", address: "Fő u. 1." }),
+    getBuyerAddress: vi
+      .fn()
+      .mockResolvedValue({ zip: "2500", city: "Esztergom", address: "Fő u. 1." }),
     issueCreditInvoice: vi.fn().mockResolvedValue({ invoiceNumber: "E-CR-1" }),
     patchBooking: vi.fn().mockResolvedValue(undefined),
     sendInvoiceFailedEmail: vi.fn().mockResolvedValue(undefined),
@@ -38,20 +40,34 @@ describe("processRefund", () => {
     await processRefund(charge, deps);
     expect(deps.issueCreditInvoice).toHaveBeenCalledWith({
       amountHuf: 10_000,
-      buyer: { name: "Teszt Páciens", zip: "2500", city: "Esztergom", address: "Fő u. 1.", email: "t@e.hu" },
+      buyer: {
+        name: "Teszt Páciens",
+        zip: "2500",
+        city: "Esztergom",
+        address: "Fő u. 1.",
+        email: "t@e.hu",
+      },
     });
-    expect(deps.patchBooking).toHaveBeenCalledWith("booking-1", expect.objectContaining({
-      refundStatus: "refunded",
-      stripeRefundId: "re_1",
-      creditInvoiceNumber: "E-CR-1",
-      creditInvoiceIssuedAt: expect.any(String),
-    }));
+    expect(deps.patchBooking).toHaveBeenCalledWith(
+      "booking-1",
+      expect.objectContaining({
+        refundStatus: "refunded",
+        stripeRefundId: "re_1",
+        creditInvoiceNumber: "E-CR-1",
+        creditInvoiceIssuedAt: expect.any(String),
+      }),
+    );
     expect(deps.sendInvoiceFailedEmail).not.toHaveBeenCalled();
   });
 
   it("is a no-op when the refund id is already recorded (idempotent)", async () => {
     const deps = makeDeps({
-      findBooking: vi.fn().mockResolvedValue({ _id: "booking-1", patientName: "X", patientEmail: "t@e.hu", stripeRefundId: "re_1" }),
+      findBooking: vi.fn().mockResolvedValue({
+        _id: "booking-1",
+        patientName: "X",
+        patientEmail: "t@e.hu",
+        stripeRefundId: "re_1",
+      }),
     });
     await processRefund(charge, deps);
     expect(deps.issueCreditInvoice).not.toHaveBeenCalled();
@@ -65,9 +81,16 @@ describe("processRefund", () => {
   });
 
   it("falls back to email + invoice_failed when issuing the invoice throws", async () => {
-    const deps = makeDeps({ issueCreditInvoice: vi.fn().mockImplementation(async () => { throw new Error("boom"); }) });
+    const deps = makeDeps({
+      issueCreditInvoice: vi.fn().mockImplementation(async () => {
+        throw new Error("boom");
+      }),
+    });
     await processRefund(charge, deps);
-    expect(deps.patchBooking).toHaveBeenCalledWith("booking-1", { refundStatus: "invoice_failed", stripeRefundId: "re_1" });
+    expect(deps.patchBooking).toHaveBeenCalledWith("booking-1", {
+      refundStatus: "invoice_failed",
+      stripeRefundId: "re_1",
+    });
     expect(deps.sendInvoiceFailedEmail).toHaveBeenCalledWith({ patientName: "Teszt Páciens" });
   });
 
@@ -84,10 +107,15 @@ describe("processRefund", () => {
 
   it("prefers Stripe billing address when the user record has none", async () => {
     const deps = makeDeps({ getBuyerAddress: vi.fn().mockResolvedValue(null) });
-    const chargeWithAddr = { ...charge, billingAddress: { zip: "1011", city: "Budapest", address: "Vár u. 2." } };
+    const chargeWithAddr = {
+      ...charge,
+      billingAddress: { zip: "1011", city: "Budapest", address: "Vár u. 2." },
+    };
     await processRefund(chargeWithAddr, deps);
-    expect(deps.issueCreditInvoice).toHaveBeenCalledWith(expect.objectContaining({
-      buyer: expect.objectContaining({ zip: "1011", city: "Budapest", address: "Vár u. 2." }),
-    }));
+    expect(deps.issueCreditInvoice).toHaveBeenCalledWith(
+      expect.objectContaining({
+        buyer: expect.objectContaining({ zip: "1011", city: "Budapest", address: "Vár u. 2." }),
+      }),
+    );
   });
 });

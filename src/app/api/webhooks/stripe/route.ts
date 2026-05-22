@@ -1,8 +1,12 @@
+import { eq, sql } from "drizzle-orm";
 import { defineQuery } from "next-sanity";
-import { buildConfirmationEmail, buildInvoiceFailedEmail, INVOICE_FAILED_SUBJECT } from "@/lib/booking-email";
+import {
+  buildConfirmationEmail,
+  buildInvoiceFailedEmail,
+  INVOICE_FAILED_SUBJECT,
+} from "@/lib/booking-email";
 import { db } from "@/lib/db";
 import { user } from "@/lib/db/schema";
-import { eq, sql } from "drizzle-orm";
 import { isEmailConfigured, sendEmail } from "@/lib/email";
 import { createCalendarEvent } from "@/lib/google-calendar";
 import { processRefund, type RefundBooking } from "@/lib/refund/process-refund";
@@ -84,7 +88,10 @@ export async function POST(request: Request): Promise<Response> {
             durationMinutes: svc?.appointmentDuration ?? 20,
           });
           if (eventId) {
-            await getWriteClient().patch(bookingId).set({ googleCalendarEventId: eventId }).commit();
+            await getWriteClient()
+              .patch(bookingId)
+              .set({ googleCalendarEventId: eventId })
+              .commit();
             console.log(`[stripe-webhook] Google Calendar event created: ${eventId}`);
           }
         } catch (err) {

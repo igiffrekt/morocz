@@ -120,6 +120,39 @@ export const bookingType = defineType({
       description: "A Stripe-on keresztül befizetett foglalási díj",
     }),
     defineField({
+      name: "refundStatus",
+      title: "Visszatérítés státusza",
+      type: "string",
+      options: {
+        list: [
+          { title: "Nincs", value: "none" },
+          { title: "Visszatérítve", value: "refunded" },
+          { title: "Nincs visszatérítés", value: "no_refund" },
+          { title: "Számla hiba", value: "invoice_failed" },
+        ],
+      },
+      initialValue: "none",
+      readOnly: true,
+    }),
+    defineField({
+      name: "stripeRefundId",
+      title: "Stripe Refund ID",
+      type: "string",
+      readOnly: true,
+    }),
+    defineField({
+      name: "creditInvoiceNumber",
+      title: "Helyesbítő számla száma",
+      type: "string",
+      readOnly: true,
+    }),
+    defineField({
+      name: "creditInvoiceIssuedAt",
+      title: "Helyesbítő számla kiállítva",
+      type: "datetime",
+      readOnly: true,
+    }),
+    defineField({
       name: "createdAt",
       title: "Létrehozva",
       type: "datetime",

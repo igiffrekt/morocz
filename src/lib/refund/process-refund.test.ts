@@ -118,4 +118,20 @@ describe("processRefund", () => {
       }),
     );
   });
+
+  it("still issues the invoice (Stripe address fallback) when the address lookup throws", async () => {
+    const deps = makeDeps({
+      getBuyerAddress: vi.fn().mockRejectedValue(new Error("db down")),
+    });
+    const chargeWithAddr = {
+      ...charge,
+      billingAddress: { zip: "1011", city: "Budapest", address: "Vár u. 2." },
+    };
+    await processRefund(chargeWithAddr, deps);
+    expect(deps.issueCreditInvoice).toHaveBeenCalledWith(
+      expect.objectContaining({
+        buyer: expect.objectContaining({ zip: "1011", city: "Budapest", address: "Vár u. 2." }),
+      }),
+    );
+  });
 });

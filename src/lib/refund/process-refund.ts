@@ -38,7 +38,14 @@ export async function processRefund(charge: RefundCharge, deps: ProcessRefundDep
     return;
   }
 
-  const userAddr = await deps.getBuyerAddress(booking.patientEmail);
+  // A buyer-address lookup failure must not abort invoicing — fall back to the Stripe
+  // billing address. (Throwing here would skip the invoice + the reception fallback.)
+  let userAddr: { zip: string | null; city: string | null; address: string | null } | null = null;
+  try {
+    userAddr = await deps.getBuyerAddress(booking.patientEmail);
+  } catch (err) {
+    console.error(`[process-refund] Buyer address lookup failed for ${booking._id}:`, err);
+  }
   const zip = userAddr?.zip ?? charge.billingAddress.zip ?? "";
   const city = userAddr?.city ?? charge.billingAddress.city ?? "";
   const address = userAddr?.address ?? charge.billingAddress.address ?? "";

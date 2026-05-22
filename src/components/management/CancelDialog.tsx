@@ -10,6 +10,7 @@ interface CancelDialogProps {
     slotDate: string;
     slotTime: string;
     managementToken: string;
+    paymentStatus?: string | null;
   };
   onCancelled: () => void;
   onClose: () => void;
@@ -26,6 +27,12 @@ export function CancelDialog({ booking, onCancelled, onClose }: CancelDialogProp
     weekday: "long",
   });
 
+  const hoursUntil =
+    (new Date(`${booking.slotDate}T${booking.slotTime}:00`).getTime() - Date.now()) / 3600_000;
+  const isPaid = booking.paymentStatus === "paid";
+  const willRefund = isPaid && hoursUntil >= 48;
+  const noRefund = isPaid && hoursUntil < 48;
+
   async function handleConfirm() {
     setLoading(true);
     setError(null);
@@ -34,7 +41,7 @@ export function CancelDialog({ booking, onCancelled, onClose }: CancelDialogProp
       const res = await fetch("/api/booking-cancel", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token: booking.managementToken }),
+        body: JSON.stringify({ token: booking.managementToken, confirmNoRefund: noRefund }),
       });
 
       const data = (await res.json()) as { error?: string };
@@ -77,10 +84,24 @@ export function CancelDialog({ booking, onCancelled, onClose }: CancelDialogProp
         </div>
       </div>
 
+      {willRefund && (
+        <div className="mb-4 rounded-lg bg-emerald-50 p-3 text-sm text-emerald-800">
+          A 10.000 Ft foglalási díj a lemondás után visszatérítésre kerül.
+        </div>
+      )}
+      {noRefund && (
+        <div className="mb-4 rounded-lg border border-red-300 bg-red-100 p-3 text-sm text-red-800">
+          Kedves Páciensünk! 48 órán belüli lemondás esetén a 10.000 Ft-os foglalási díj NEM kerül
+          visszatérítésre. Amennyiben ennek tudatában is le kívánja mondani az időpontot, kérjük
+          kattintson a gombra.
+        </div>
+      )}
+
       {error && <div className="mb-4 rounded-lg bg-red-100 p-3 text-sm text-red-700">{error}</div>}
 
       <div className="flex gap-3">
         <button
+          type="button"
           onClick={handleConfirm}
           disabled={loading}
           className="rounded-lg bg-red-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
@@ -88,6 +109,7 @@ export function CancelDialog({ booking, onCancelled, onClose }: CancelDialogProp
           {loading ? "Feldolgozás..." : "Igen, lemondás"}
         </button>
         <button
+          type="button"
           onClick={onClose}
           disabled={loading}
           className="rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"

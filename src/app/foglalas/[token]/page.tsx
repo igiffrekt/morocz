@@ -31,6 +31,7 @@ export default async function FoglalasTokenPage({
     slotTime: string;
     status: string;
     managementToken: string;
+    paymentStatus: string | null;
   };
 
   // Fetch booking by managementToken using write client (always fresh, never cached)
@@ -40,7 +41,7 @@ export default async function FoglalasTokenPage({
       _id, patientName, patientEmail, patientPhone, reservationNumber,
       service->{name, appointmentDuration},
       "serviceId": service._ref,
-      slotDate, slotTime, status, managementToken
+      slotDate, slotTime, status, managementToken, paymentStatus
     }`,
     { manageToken: token },
   );

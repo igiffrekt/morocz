@@ -19,6 +19,7 @@ interface BookingManagementCardProps {
     slotTime: string;
     status: string;
     managementToken: string;
+    paymentStatus?: string | null;
   };
   scheduleData: {
     schedule: ScheduleForAvailability;

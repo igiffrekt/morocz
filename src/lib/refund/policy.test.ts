@@ -15,9 +15,9 @@ describe("resolveRefund", () => {
   });
 
   it("treats exactly 48h as eligible (>=48h)", () => {
-    // Inject a fixed `now` exactly 48h before the appointment so the boundary is
-    // deterministic (apptIn truncates seconds and would land at 47.999h).
-    const now = new Date("2026-06-01T10:00:00");
+    // Slot 2026-06-03 10:00 Budapest (CEST) === 08:00 UTC; an absolute `now` exactly
+    // 48h earlier makes the boundary deterministic regardless of the test runtime TZ.
+    const now = new Date("2026-06-01T08:00:00Z");
     const r = resolveRefund({
       slotDate: "2026-06-03",
       slotTime: "10:00",

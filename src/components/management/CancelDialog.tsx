@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { hoursUntilBudapestSlot } from "@/lib/refund/slot-time";
 
 interface CancelDialogProps {
   booking: {
@@ -27,8 +28,9 @@ export function CancelDialog({ booking, onCancelled, onClose }: CancelDialogProp
     weekday: "long",
   });
 
-  const hoursUntil =
-    (new Date(`${booking.slotDate}T${booking.slotTime}:00`).getTime() - Date.now()) / 3600_000;
+  // Interpret the slot in Budapest time so this matches the server's resolveRefund
+  // decision exactly, regardless of the browser's timezone.
+  const hoursUntil = hoursUntilBudapestSlot(booking.slotDate, booking.slotTime, new Date());
   const isPaid = booking.paymentStatus === "paid";
   const willRefund = isPaid && hoursUntil >= 48;
   const noRefund = isPaid && hoursUntil < 48;
@@ -85,12 +87,15 @@ export function CancelDialog({ booking, onCancelled, onClose }: CancelDialogProp
       </div>
 
       {willRefund && (
-        <div className="mb-4 rounded-lg bg-emerald-50 p-3 text-sm text-emerald-800">
+        <output className="mb-4 block rounded-lg bg-emerald-50 p-3 text-sm text-emerald-800">
           A 10.000 Ft foglalási díj a lemondás után visszatérítésre kerül.
-        </div>
+        </output>
       )}
       {noRefund && (
-        <div className="mb-4 rounded-lg border border-red-300 bg-red-100 p-3 text-sm text-red-800">
+        <div
+          role="alert"
+          className="mb-4 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900"
+        >
           Kedves Páciensünk! 48 órán belüli lemondás esetén a 10.000 Ft-os foglalási díj NEM kerül
           visszatérítésre. Amennyiben ennek tudatában is le kívánja mondani az időpontot, kérjük
           kattintson a gombra.

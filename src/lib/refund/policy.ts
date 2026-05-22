@@ -1,3 +1,5 @@
+import { hoursUntilBudapestSlot } from "./slot-time";
+
 export const REFUND_WINDOW_HOURS = 48;
 
 export interface ResolveRefundInput {
@@ -14,14 +16,6 @@ export interface RefundDecision {
   reason: "ok" | "within_window" | "not_paid";
 }
 
-function hoursUntilAppointment(slotDate: string, slotTime: string, now: Date): number {
-  const [h, m] = slotTime.split(":").map(Number);
-  const appt = new Date(
-    `${slotDate}T${String(h ?? 0).padStart(2, "0")}:${String(m ?? 0).padStart(2, "0")}:00`,
-  );
-  return (appt.getTime() - now.getTime()) / 3600_000;
-}
-
 export function resolveRefund(input: ResolveRefundInput): RefundDecision {
   const now = input.now ?? new Date();
 
@@ -29,7 +23,7 @@ export function resolveRefund(input: ResolveRefundInput): RefundDecision {
     return { eligible: false, requiresConfirmation: false, reason: "not_paid" };
   }
 
-  const hours = hoursUntilAppointment(input.slotDate, input.slotTime, now);
+  const hours = hoursUntilBudapestSlot(input.slotDate, input.slotTime, now);
   if (hours >= REFUND_WINDOW_HOURS) {
     return { eligible: true, requiresConfirmation: false, reason: "ok" };
   }

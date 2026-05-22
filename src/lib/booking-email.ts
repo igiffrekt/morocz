@@ -969,6 +969,27 @@ export function buildReminderEmail(params: {
 }
 
 /**
+ * Builds a plain HTML notification email sent to the clinic reception
+ * when a Stripe refund succeeded but the offsetting Számlázz.hu credit invoice failed.
+ * Reception must issue the invoice manually.
+ */
+export function buildInvoiceFailedEmail({ patientName }: { patientName: string }): string {
+  return `<!DOCTYPE html>
+<html lang="hu">
+  <body style="font-family: Arial, sans-serif; color: #1A1D2D; line-height: 1.6;">
+    <p>Tisztelt Recepció,</p>
+    <p>
+      ${patientName} páciens részére visszatérítettük a 10.000 Ft-os foglalási díjat,
+      azonban az erről szóló helyesbítő számla rendszerhiba miatt meghiúsult.
+      Kérjük, állítsa ki manuálisan a számlát a Számlázz.hu rendszerében.
+    </p>
+  </body>
+</html>`;
+}
+
+export const INVOICE_FAILED_SUBJECT = "A helyesbítő számla kiállítása meghiúsult";
+
+/**
  * Builds a branded HTML notification email sent to the clinic reception
  * when a patient cancels their appointment via the management link.
  * Includes full patient contact + billing address + booking details.

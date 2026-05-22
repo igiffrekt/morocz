@@ -13,6 +13,71 @@
  */
 
 // Source: schema.json
+export type Popup = {
+  _id: string;
+  _type: "popup";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  isActive?: boolean;
+  headline?: string;
+  content?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h3" | "h4";
+    listItem?: "bullet" | "number";
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
+  image?: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+  ctaButton?: {
+    label?: string;
+    href?: string;
+  };
+  showOnPages?: Array<string>;
+  displayDelay?: number;
+  showOncePerSession?: boolean;
+};
+
+export type SanityImageCrop = {
+  _type: "sanity.imageCrop";
+  top?: number;
+  bottom?: number;
+  left?: number;
+  right?: number;
+};
+
+export type SanityImageHotspot = {
+  _type: "sanity.imageHotspot";
+  x?: number;
+  y?: number;
+  height?: number;
+  width?: number;
+};
+
 export type YogaPage = {
   _id: string;
   _type: "yogaPage";
@@ -38,9 +103,6 @@ export type YogaPage = {
     text?: string;
     _key: string;
   }>;
-  scheduleHeadline?: string;
-  scheduleSubtitle?: string;
-  instructorsHeadline?: string;
   metaDescription?: string;
   ogImage?: {
     asset?: {
@@ -54,22 +116,6 @@ export type YogaPage = {
     crop?: SanityImageCrop;
     _type: "image";
   };
-};
-
-export type SanityImageCrop = {
-  _type: "sanity.imageCrop";
-  top?: number;
-  bottom?: number;
-  left?: number;
-  right?: number;
-};
-
-export type SanityImageHotspot = {
-  _type: "sanity.imageHotspot";
-  x?: number;
-  y?: number;
-  height?: number;
-  width?: number;
 };
 
 export type YogaSchedule = {
@@ -108,7 +154,24 @@ export type YogaClass = {
   _rev: string;
   name?: string;
   slug?: Slug;
-  description?: string;
+  description?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h3" | "h4";
+    listItem?: "bullet" | "number";
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
   icon?: string;
   color?: string;
   instructors?: Array<{
@@ -150,6 +213,7 @@ export type YogaInstructor = {
   phone?: string;
   email?: string;
   color?: string;
+  isActive?: boolean;
 };
 
 export type AppointmentHistory = {
@@ -196,9 +260,10 @@ export type SlotLock = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
-  slotId?: string;
+  slotDate?: string;
+  slotTime?: string;
   status?: "available" | "held" | "booked";
-  heldUntil?: string;
+  expiresAt?: string;
   bookingRef?: {
     _ref: string;
     _type: "reference";
@@ -227,10 +292,44 @@ export type Booking = {
   reservationNumber?: string;
   managementToken?: string;
   userId?: string;
-  status?: "confirmed" | "cancelled" | "rescheduled";
+  status?: "confirmed" | "cancelled" | "rescheduled" | "completed" | "no-show";
+  stripeSessionId?: string;
+  stripePaymentIntentId?: string;
+  paymentStatus?: "pending" | "paid" | "failed";
+  paymentAmount?: number;
+  refundStatus?: "none" | "refunded" | "no_refund" | "invoice_failed";
+  stripeRefundId?: string;
+  creditInvoiceNumber?: string;
+  creditInvoiceIssuedAt?: string;
   createdAt?: string;
   reminderSent?: boolean;
+  completedServices?: Array<{
+    serviceId?: string;
+    serviceName?: string;
+    price?: number;
+    _key: string;
+  }>;
+  completedAt?: string;
   googleCalendarEventId?: string;
+};
+
+export type CustomAvailability = {
+  _id: string;
+  _type: "customAvailability";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  date?: string;
+  startTime?: string;
+  endTime?: string;
+  services?: Array<{
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    _key: string;
+    [internalGroqTypeReferenceTo]?: "service";
+  }>;
+  note?: string;
 };
 
 export type BlockedDate = {
@@ -246,6 +345,26 @@ export type BlockedDate = {
   }>;
 };
 
+export type SeasonalSchedule = {
+  _id: string;
+  _type: "seasonalSchedule";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  name?: string;
+  startDate?: string;
+  endDate?: string;
+  defaultSlotDuration?: 10 | 15 | 20 | 30 | 45 | 60;
+  bufferMinutes?: number;
+  days?: Array<{
+    dayOfWeek?: 1 | 2 | 3 | 4 | 5 | 6 | 0;
+    isDayOff?: boolean;
+    startTime?: string;
+    endTime?: string;
+    _key: string;
+  }>;
+};
+
 export type WeeklySchedule = {
   _id: string;
   _type: "weeklySchedule";
@@ -254,6 +373,7 @@ export type WeeklySchedule = {
   _rev: string;
   defaultSlotDuration?: 10 | 15 | 20 | 30 | 45 | 60;
   bufferMinutes?: number;
+  bookingWindowDays?: number;
   days?: Array<{
     dayOfWeek?: 1 | 2 | 3 | 4 | 5 | 6 | 0;
     isDayOff?: boolean;
@@ -587,6 +707,8 @@ export type SiteSettings = {
     _key: string;
   }>;
   privacyPolicyUrl?: string;
+  cookiePolicyUrl?: string;
+  financeResetDate?: string;
   metaDescription?: string;
   siteName?: string;
   defaultOgImage?: {
@@ -697,6 +819,90 @@ export type Kapcsolat = {
   ctaSubtitle?: string;
   ctaButtonText?: string;
   ctaButtonUrl?: string;
+};
+
+export type PricingPage = {
+  _id: string;
+  _type: "pricingPage";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  validityNote?: string;
+  gynBaseExam?: {
+    items?: Array<{
+      label?: string;
+      subtitle?: string;
+      badge?: string;
+      badgeStyle?: "mint" | "pink" | "white";
+      note?: string;
+      price?: number;
+      _key: string;
+    }>;
+  };
+  spiralServices?: {
+    items?: Array<{
+      label?: string;
+      subtitle?: string;
+      badge?: string;
+      badgeStyle?: "mint" | "pink" | "white";
+      note?: string;
+      price?: number;
+      _key: string;
+    }>;
+    footnote?: string;
+  };
+  pregnancyCare?: {
+    label?: string;
+    subtitle?: string;
+    price?: number;
+  };
+  screeningPackages?: {
+    tiers?: Array<{
+      name?: string;
+      price?: number;
+      highlighted?: boolean;
+      features?: Array<{
+        text?: string;
+        subtext?: string;
+        included?: boolean;
+        emphasized?: boolean;
+        _key: string;
+      }>;
+      _key: string;
+    }>;
+  };
+  samplingServices?: {
+    items?: Array<{
+      label?: string;
+      price?: number;
+      _key: string;
+    }>;
+  };
+  microbiologyServices?: {
+    items?: Array<{
+      label?: string;
+      suffix?: string;
+      price?: number;
+      _key: string;
+    }>;
+  };
+  hpvTests?: {
+    intro?: string;
+    items?: Array<{
+      name?: string;
+      description?: string;
+      price?: number;
+      _key: string;
+    }>;
+  };
+  otherServices?: {
+    items?: Array<{
+      label?: string;
+      price?: number;
+      _key: string;
+    }>;
+    footnote?: string;
+  };
 };
 
 export type Homepage = {
@@ -869,7 +1075,7 @@ export type Geopoint = {
   alt?: number;
 };
 
-export type AllSanitySchemaTypes = YogaPage | SanityImageCrop | SanityImageHotspot | YogaSchedule | YogaClass | Slug | YogaInstructor | AppointmentHistory | Patient | SlotLock | Booking | BlockedDate | WeeklySchedule | CookiePolicy | PrivacyPolicy | BlogPost | BlogCategory | Testimonial | LabTest | Service | ServiceCategory | SiteSettings | Kapcsolat | Homepage | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageMetadata | SanityFileAsset | SanityAssetSourceData | SanityImageAsset | Geopoint;
+export type AllSanitySchemaTypes = Popup | SanityImageCrop | SanityImageHotspot | YogaPage | YogaSchedule | YogaClass | Slug | YogaInstructor | AppointmentHistory | Patient | SlotLock | Booking | CustomAvailability | BlockedDate | SeasonalSchedule | WeeklySchedule | CookiePolicy | PrivacyPolicy | BlogPost | BlogCategory | Testimonial | LabTest | Service | ServiceCategory | SiteSettings | Kapcsolat | PricingPage | Homepage | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageMetadata | SanityFileAsset | SanityAssetSourceData | SanityImageAsset | Geopoint;
 export declare const internalGroqTypeReferenceTo: unique symbol;
 // Source: ./src/app/api/booking/route.ts
 // Variable: serviceForEmailQuery
@@ -877,6 +1083,15 @@ export declare const internalGroqTypeReferenceTo: unique symbol;
 export type ServiceForEmailQueryResult = {
   name: string | null;
   appointmentDuration: 10 | 15 | 20 | 30 | 45 | 60 | null;
+} | null;
+
+// Source: ./src/app/api/checkout/route.ts
+// Variable: serviceForCheckoutQuery
+// Query: *[_type == "service" && _id == $serviceId][0]{name, appointmentDuration, price}
+export type ServiceForCheckoutQueryResult = {
+  name: string | null;
+  appointmentDuration: 10 | 15 | 20 | 30 | 45 | 60 | null;
+  price: number | null;
 } | null;
 
 // Source: ./src/app/api/slots/availability/route.ts
@@ -887,15 +1102,24 @@ export type BookingsForRangeQueryResult = Array<{
   slotTime: string | null;
 }>;
 // Variable: slotLocksForRangeQuery
-// Query: *[_type == "slotLock" && slotDate >= $startDate && slotDate <= $endDate && (status == "booked" || status == "held")]{  slotDate,  slotTime,  status}
+// Query: *[_type == "slotLock" && slotDate >= $startDate && slotDate <= $endDate && (status == "booked" || status == "held")]{  slotDate,  slotTime,  status,  heldUntil}
 export type SlotLocksForRangeQueryResult = Array<{
-  slotDate: null;
-  slotTime: null;
+  slotDate: string | null;
+  slotTime: string | null;
   status: "available" | "booked" | "held" | null;
+  heldUntil: null;
 }>;
 // Variable: customAvailabilityForMonthQuery
 // Query: *[_type == "customAvailability" && date >= $startDate && date <= $endDate]{    _id, date, startTime, endTime, services[]->{_id}  }
-export type CustomAvailabilityForMonthQueryResult = Array<never>;
+export type CustomAvailabilityForMonthQueryResult = Array<{
+  _id: string;
+  date: string | null;
+  startTime: string | null;
+  endTime: string | null;
+  services: Array<{
+    _id: string;
+  }> | null;
+}>;
 // Variable: serviceByIdQuery
 // Query: *[_type == "service" && _id == $serviceId][0]{appointmentDuration}
 export type ServiceByIdQueryResult = {
@@ -1024,7 +1248,7 @@ export type SiteSettingsQueryResult = {
     }> | null;
   }> | null;
   privacyPolicyUrl: string | null;
-  cookiePolicyUrl: null;
+  cookiePolicyUrl: string | null;
   metaDescription: string | null;
   siteName: string | null;
   defaultOgImage: {
@@ -1038,6 +1262,86 @@ export type SiteSettingsQueryResult = {
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
     _type: "image";
+  } | null;
+} | null;
+// Variable: pricingPageQuery
+// Query: *[_type == "pricingPage" && _id == "pricingPage"][0]{  validityNote,  gynBaseExam{    items[]{ _key, label, subtitle, badge, badgeStyle, note, price }  },  spiralServices{    items[]{ _key, label, subtitle, badge, badgeStyle, note, price },    footnote  },  pregnancyCare{ label, subtitle, price },  screeningPackages{    tiers[]{      _key,      name,      price,      highlighted,      features[]{ _key, text, subtext, included, emphasized }    }  },  samplingServices{    items[]{ _key, label, price }  },  microbiologyServices{    items[]{ _key, label, suffix, price }  },  hpvTests{    intro,    items[]{ _key, name, description, price }  },  otherServices{    items[]{ _key, label, price },    footnote  }}
+export type PricingPageQueryResult = {
+  validityNote: string | null;
+  gynBaseExam: {
+    items: Array<{
+      _key: string;
+      label: string | null;
+      subtitle: string | null;
+      badge: string | null;
+      badgeStyle: "mint" | "pink" | "white" | null;
+      note: string | null;
+      price: number | null;
+    }> | null;
+  } | null;
+  spiralServices: {
+    items: Array<{
+      _key: string;
+      label: string | null;
+      subtitle: string | null;
+      badge: string | null;
+      badgeStyle: "mint" | "pink" | "white" | null;
+      note: string | null;
+      price: number | null;
+    }> | null;
+    footnote: string | null;
+  } | null;
+  pregnancyCare: {
+    label: string | null;
+    subtitle: string | null;
+    price: number | null;
+  } | null;
+  screeningPackages: {
+    tiers: Array<{
+      _key: string;
+      name: string | null;
+      price: number | null;
+      highlighted: boolean | null;
+      features: Array<{
+        _key: string;
+        text: string | null;
+        subtext: string | null;
+        included: boolean | null;
+        emphasized: boolean | null;
+      }> | null;
+    }> | null;
+  } | null;
+  samplingServices: {
+    items: Array<{
+      _key: string;
+      label: string | null;
+      price: number | null;
+    }> | null;
+  } | null;
+  microbiologyServices: {
+    items: Array<{
+      _key: string;
+      label: string | null;
+      suffix: string | null;
+      price: number | null;
+    }> | null;
+  } | null;
+  hpvTests: {
+    intro: string | null;
+    items: Array<{
+      _key: string;
+      name: string | null;
+      description: string | null;
+      price: number | null;
+    }> | null;
+  } | null;
+  otherServices: {
+    items: Array<{
+      _key: string;
+      label: string | null;
+      price: number | null;
+    }> | null;
+    footnote: string | null;
   } | null;
 } | null;
 // Variable: allServicesQuery
@@ -1380,10 +1684,11 @@ export type CookiePolicyQueryResult = {
   lastUpdated: string | null;
 } | null;
 // Variable: weeklyScheduleQuery
-// Query: *[_type == "weeklySchedule" && _id == "weeklySchedule"][0]{  defaultSlotDuration,  bufferMinutes,  days[]{    _key,    dayOfWeek,    isDayOff,    startTime,    endTime  }}
+// Query: *[_type == "weeklySchedule" && _id == "weeklySchedule"][0]{  defaultSlotDuration,  bufferMinutes,  bookingWindowDays,  days[]{    _key,    dayOfWeek,    isDayOff,    startTime,    endTime  }}
 export type WeeklyScheduleQueryResult = {
   defaultSlotDuration: 10 | 15 | 20 | 30 | 45 | 60 | null;
   bufferMinutes: number | null;
+  bookingWindowDays: number | null;
   days: Array<{
     _key: string;
     dayOfWeek: 0 | 1 | 2 | 3 | 4 | 5 | 6 | null;
@@ -1402,11 +1707,13 @@ export type BlockedDatesQueryResult = {
   }> | null;
 } | null;
 // Variable: slotLockByIdQuery
-// Query: *[_type == "slotLock" && _id == $slotLockId][0]{  _id, dateTime, status}
+// Query: *[_type == "slotLock" && _id == $slotLockId][0]{  _id, _rev, status, heldUntil, userId}
 export type SlotLockByIdQueryResult = {
   _id: string;
-  dateTime: null;
+  _rev: string;
   status: "available" | "booked" | "held" | null;
+  heldUntil: null;
+  userId: null;
 } | null;
 // Variable: bookingsForDateQuery
 // Query: *[_type == "booking" && slotDate == $date && status == "confirmed"]{  _id, slotDate, slotTime, patientEmail, service->{_id}}
@@ -1421,14 +1728,23 @@ export type BookingsForDateQueryResult = Array<{
 }>;
 // Variable: customAvailabilityForDateQuery
 // Query: *[_type == "customAvailability" && date == $date][0]{  _id,  date,  startTime,  endTime,  services[]->{_id}}
-export type CustomAvailabilityForDateQueryResult = null;
+export type CustomAvailabilityForDateQueryResult = {
+  _id: string;
+  date: string | null;
+  startTime: string | null;
+  endTime: string | null;
+  services: Array<{
+    _id: string;
+  }> | null;
+} | null;
 // Variable: slotLocksForDateQuery
-// Query: *[_type == "slotLock" && slotDate == $date]{  _id, slotDate, slotTime, status}
+// Query: *[_type == "slotLock" && slotDate == $date]{  _id, slotDate, slotTime, status, heldUntil}
 export type SlotLocksForDateQueryResult = Array<{
   _id: string;
-  slotDate: null;
-  slotTime: null;
+  slotDate: string | null;
+  slotTime: string | null;
   status: "available" | "booked" | "held" | null;
+  heldUntil: null;
 }>;
 // Variable: servicesForBookingQuery
 // Query: *[_type == "service" && isHidden != true] | order(order asc){  _id, name, duration, price}
@@ -1535,9 +1851,9 @@ export type YogaPageQueryResult = {
     emoji: string | null;
     text: string | null;
   }> | null;
-  scheduleHeadline: string | null;
-  scheduleSubtitle: string | null;
-  instructorsHeadline: string | null;
+  scheduleHeadline: null;
+  scheduleSubtitle: null;
+  instructorsHeadline: null;
   metaDescription: string | null;
   ogImage: {
     asset?: {
@@ -1554,17 +1870,102 @@ export type YogaPageQueryResult = {
 } | null;
 // Variable: yogaScheduleQuery
 // Query: *[_type == "yogaSchedule" && isActive != false && instructor->isActive == true] | order(dayOfWeek asc, startTime asc){  _id,  yogaClass->{    name,    color,    icon,    description  },  instructor->{    name,    color,    photo  },  dayOfWeek,  startTime,  endTime,  recurrence,  location,  notes,  maxParticipants}
-export type YogaScheduleQueryResult = Array<never>;
+export type YogaScheduleQueryResult = Array<{
+  _id: string;
+  yogaClass: {
+    name: string | null;
+    color: string | null;
+    icon: string | null;
+    description: Array<{
+      children?: Array<{
+        marks?: Array<string>;
+        text?: string;
+        _type: "span";
+        _key: string;
+      }>;
+      style?: "h3" | "h4" | "normal";
+      listItem?: "bullet" | "number";
+      markDefs?: Array<{
+        href?: string;
+        _type: "link";
+        _key: string;
+      }>;
+      level?: number;
+      _type: "block";
+      _key: string;
+    }> | null;
+  } | null;
+  instructor: {
+    name: string | null;
+    color: string | null;
+    photo: {
+      asset?: {
+        _ref: string;
+        _type: "reference";
+        _weak?: boolean;
+        [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      };
+      media?: unknown;
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      _type: "image";
+    } | null;
+  } | null;
+  dayOfWeek: "friday" | "monday" | "saturday" | "sunday" | "thursday" | "tuesday" | "wednesday" | null;
+  startTime: string | null;
+  endTime: string | null;
+  recurrence: "biweekly-even" | "biweekly-odd" | "weekly" | null;
+  location: string | null;
+  notes: string | null;
+  maxParticipants: number | null;
+}>;
 // Variable: yogaInstructorsQuery
 // Query: *[_type == "yogaInstructor" && isActive == true] | order(name asc){  _id,  name,  slug,  photo,  bio,  phone,  email,  color}
-export type YogaInstructorsQueryResult = Array<never>;
+export type YogaInstructorsQueryResult = Array<{
+  _id: string;
+  name: string | null;
+  slug: Slug | null;
+  photo: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  } | null;
+  bio: string | null;
+  phone: string | null;
+  email: string | null;
+  color: string | null;
+}>;
 // Variable: yogaClassesQuery
 // Query: *[_type == "yogaClass"] | order(name asc){  _id,  name,  slug,  description,  icon,  color,  instructors[]->{    _id,    name,    photo  }}
 export type YogaClassesQueryResult = Array<{
   _id: string;
   name: string | null;
   slug: Slug | null;
-  description: string | null;
+  description: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "h3" | "h4" | "normal";
+    listItem?: "bullet" | "number";
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }> | null;
   icon: string | null;
   color: string | null;
   instructors: Array<{
@@ -1586,19 +1987,96 @@ export type YogaClassesQueryResult = Array<{
 }>;
 // Variable: activePopupQuery
 // Query: *[_type == "popup" && isActive == true][0]{  _id,  headline,  content,  image,  ctaButton{    label,    href  },  showOnPages,  displayDelay,  showOncePerSession}
-export type ActivePopupQueryResult = null;
+export type ActivePopupQueryResult = {
+  _id: string;
+  headline: string | null;
+  content: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "h3" | "h4" | "normal";
+    listItem?: "bullet" | "number";
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }> | null;
+  image: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  } | null;
+  ctaButton: {
+    label: string | null;
+    href: string | null;
+  } | null;
+  showOnPages: Array<string> | null;
+  displayDelay: number | null;
+  showOncePerSession: boolean | null;
+} | null;
+// Variable: seasonalScheduleForDateQuery
+// Query: *[_type == "seasonalSchedule" && startDate <= $date && endDate >= $date]    | order(startDate asc)[0]{    _id,    name,    startDate,    endDate,    defaultSlotDuration,    bufferMinutes,    days[]{      _key,      dayOfWeek,      isDayOff,      startTime,      endTime    }  }
+export type SeasonalScheduleForDateQueryResult = {
+  _id: string;
+  name: string | null;
+  startDate: string | null;
+  endDate: string | null;
+  defaultSlotDuration: 10 | 15 | 20 | 30 | 45 | 60 | null;
+  bufferMinutes: number | null;
+  days: Array<{
+    _key: string;
+    dayOfWeek: 0 | 1 | 2 | 3 | 4 | 5 | 6 | null;
+    isDayOff: boolean | null;
+    startTime: string | null;
+    endTime: string | null;
+  }> | null;
+} | null;
+// Variable: seasonalSchedulesForRangeQuery
+// Query: *[_type == "seasonalSchedule" && startDate <= $endDate && endDate >= $startDate]    | order(startDate asc){    _id,    name,    startDate,    endDate,    defaultSlotDuration,    bufferMinutes,    days[]{      _key,      dayOfWeek,      isDayOff,      startTime,      endTime    }  }
+export type SeasonalSchedulesForRangeQueryResult = Array<{
+  _id: string;
+  name: string | null;
+  startDate: string | null;
+  endDate: string | null;
+  defaultSlotDuration: 10 | 15 | 20 | 30 | 45 | 60 | null;
+  bufferMinutes: number | null;
+  days: Array<{
+    _key: string;
+    dayOfWeek: 0 | 1 | 2 | 3 | 4 | 5 | 6 | null;
+    isDayOff: boolean | null;
+    startTime: string | null;
+    endTime: string | null;
+  }> | null;
+}>;
 
 // Query TypeMap
 import "@sanity/client";
 declare module "@sanity/client" {
   interface SanityQueries {
     "*[_type == \"service\" && _id == $serviceId][0]{name, appointmentDuration}": ServiceForEmailQueryResult;
+    "*[_type == \"service\" && _id == $serviceId][0]{name, appointmentDuration, price}": ServiceForCheckoutQueryResult;
     "*[_type == \"booking\" && slotDate >= $startDate && slotDate <= $endDate && status == \"confirmed\"]{\n  slotDate,\n  slotTime\n}": BookingsForRangeQueryResult;
-    "*[_type == \"slotLock\" && slotDate >= $startDate && slotDate <= $endDate && (status == \"booked\" || status == \"held\")]{\n  slotDate,\n  slotTime,\n  status\n}": SlotLocksForRangeQueryResult;
+    "*[_type == \"slotLock\" && slotDate >= $startDate && slotDate <= $endDate && (status == \"booked\" || status == \"held\")]{\n  slotDate,\n  slotTime,\n  status,\n  heldUntil\n}": SlotLocksForRangeQueryResult;
     "*[_type == \"customAvailability\" && date >= $startDate && date <= $endDate]{\n    _id, date, startTime, endTime, services[]->{_id}\n  }": CustomAvailabilityForMonthQueryResult;
     "*[_type == \"service\" && _id == $serviceId][0]{appointmentDuration}": ServiceByIdQueryResult;
     "*[_type == \"homepage\" && _id == \"homepage\"][0]{\n  heroHeadline,\n  heroSubtitle,\n  heroBadges[]{\n    _key,\n    emoji,\n    text\n  },\n  heroDoctorImage,\n  heroCards[]{\n    _key,\n    title,\n    subtitle,\n    icon\n  },\n  servicesHeadline,\n  servicesSubtitle,\n  labTestsHeadline,\n  labTestsSubtitle,\n  testimonialsHeadline,\n  testimonialsCtaText,\n  testimonialsCtaUrl,\n  testimonials[]->{\n    _id,\n    patientName,\n    photo,\n    text,\n    condition,\n    order\n  },\n  blogHeadline,\n  ctaHeadline,\n  ctaDescription,\n  metaDescription,\n  ogImage\n}": HomepageQueryResult;
     "*[_type == \"siteSettings\" && _id == \"siteSettings\"][0]{\n  logo,\n  clinicName,\n  phone,\n  email,\n  address,\n  navigationLinks[]{\n    _key,\n    label,\n    href\n  },\n  socialLinks[]{\n    _key,\n    platform,\n    url\n  },\n  footerColumns[]{\n    _key,\n    heading,\n    links[]{\n      _key,\n      label,\n      href\n    }\n  },\n  privacyPolicyUrl,\n  cookiePolicyUrl,\n  metaDescription,\n  siteName,\n  defaultOgImage\n}": SiteSettingsQueryResult;
+    "*[_type == \"pricingPage\" && _id == \"pricingPage\"][0]{\n  validityNote,\n  gynBaseExam{\n    items[]{ _key, label, subtitle, badge, badgeStyle, note, price }\n  },\n  spiralServices{\n    items[]{ _key, label, subtitle, badge, badgeStyle, note, price },\n    footnote\n  },\n  pregnancyCare{ label, subtitle, price },\n  screeningPackages{\n    tiers[]{\n      _key,\n      name,\n      price,\n      highlighted,\n      features[]{ _key, text, subtext, included, emphasized }\n    }\n  },\n  samplingServices{\n    items[]{ _key, label, price }\n  },\n  microbiologyServices{\n    items[]{ _key, label, suffix, price }\n  },\n  hpvTests{\n    intro,\n    items[]{ _key, name, description, price }\n  },\n  otherServices{\n    items[]{ _key, label, price },\n    footnote\n  }\n}": PricingPageQueryResult;
     "*[_type == \"service\" && isHidden != true] | order(order asc){\n  _id,\n  name,\n  description,\n  price,\n  icon,\n  category->{_id, name, emoji},\n  order\n}": AllServicesQueryResult;
     "*[_type == \"serviceCategory\"] | order(order asc){\n  _id,\n  name,\n  emoji,\n  order\n}": AllServiceCategoriesQueryResult;
     "*[_type == \"labTest\"] | order(order asc){\n  _id,\n  name,\n  slug,\n  description,\n  price,\n  originalPrice,\n  discount,\n  illustration,\n  order\n}": AllLabTestsQueryResult;
@@ -1610,12 +2088,12 @@ declare module "@sanity/client" {
     "*[_type == \"blogPost\" && category._ref == $categoryId && _id != $currentPostId] | order(publishedAt desc)[0...3]{\n  _id,\n  title,\n  slug,\n  featuredImage,\n  excerpt\n}": RelatedBlogPostsQueryResult;
     "*[_type == \"privacyPolicy\" && _id == \"privacyPolicy\"][0]{\n  title,\n  body,\n  lastUpdated\n}": PrivacyPolicyQueryResult;
     "*[_type == \"cookiePolicy\" && _id == \"cookiePolicy\"][0]{\n  title,\n  body,\n  lastUpdated\n}": CookiePolicyQueryResult;
-    "*[_type == \"weeklySchedule\" && _id == \"weeklySchedule\"][0]{\n  defaultSlotDuration,\n  bufferMinutes,\n  days[]{\n    _key,\n    dayOfWeek,\n    isDayOff,\n    startTime,\n    endTime\n  }\n}": WeeklyScheduleQueryResult;
+    "*[_type == \"weeklySchedule\" && _id == \"weeklySchedule\"][0]{\n  defaultSlotDuration,\n  bufferMinutes,\n  bookingWindowDays,\n  days[]{\n    _key,\n    dayOfWeek,\n    isDayOff,\n    startTime,\n    endTime\n  }\n}": WeeklyScheduleQueryResult;
     "*[_type == \"blockedDate\" && _id == \"blockedDate\"][0]{\n  dates[]{\n    _key,\n    date,\n    isHoliday\n  }\n}": BlockedDatesQueryResult;
-    "*[_type == \"slotLock\" && _id == $slotLockId][0]{\n  _id, dateTime, status\n}": SlotLockByIdQueryResult;
+    "*[_type == \"slotLock\" && _id == $slotLockId][0]{\n  _id, _rev, status, heldUntil, userId\n}": SlotLockByIdQueryResult;
     "*[_type == \"booking\" && slotDate == $date && status == \"confirmed\"]{\n  _id, slotDate, slotTime, patientEmail, service->{_id}\n}": BookingsForDateQueryResult;
     "*[_type == \"customAvailability\" && date == $date][0]{\n  _id,\n  date,\n  startTime,\n  endTime,\n  services[]->{_id}\n}": CustomAvailabilityForDateQueryResult;
-    "*[_type == \"slotLock\" && slotDate == $date]{\n  _id, slotDate, slotTime, status\n}": SlotLocksForDateQueryResult;
+    "*[_type == \"slotLock\" && slotDate == $date]{\n  _id, slotDate, slotTime, status, heldUntil\n}": SlotLocksForDateQueryResult;
     "*[_type == \"service\" && isHidden != true] | order(order asc){\n  _id, name, duration, price\n}": ServicesForBookingQueryResult;
     "*[_type == \"kapcsolat\"][0]{\n  heroTitle,\n  heroDescription,\n  heroImage{\n    asset->{url, alt},\n    hotspot\n  },\n  phoneNumbers[]{label, number, iconName},\n  heroEmailAddresses[]{label, email, iconName},\n  emailAddresses[]{label, email, iconName, _key},\n  address,\n  officeHoursTitle,\n  officeHoursIconName,\n  officeHours,\n  locationTitle,\n  locationIconName,\n  locationImage{\n    asset->{url, alt},\n    hotspot\n  },\n  locationLat,\n  locationLng,\n  goodToKnowLabel,\n  goodToKnowTitle,\n  goodToKnowSubtitle,\n  goodToKnowCards[]{iconName, title, description, url},\n  hasznos_label,\n  hasznos_title,\n  hasznos_subtitle,\n  hasznos_items[]{title, body, iconName, _key},\n  fontos_label,\n  fontos_title,\n  fontos_subtitle,\n  fontos_items[]{title, body, iconName, _key}\n}": KAPCSOLAT_QUERYResult;
     "*[_type == \"yogaPage\"][0]{\n  heroHeadline,\n  heroSubtitle,\n  heroImage,\n  heroBadges[]{\n    _key,\n    emoji,\n    text\n  },\n  scheduleHeadline,\n  scheduleSubtitle,\n  instructorsHeadline,\n  metaDescription,\n  ogImage\n}": YogaPageQueryResult;
@@ -1623,5 +2101,7 @@ declare module "@sanity/client" {
     "*[_type == \"yogaInstructor\" && isActive == true] | order(name asc){\n  _id,\n  name,\n  slug,\n  photo,\n  bio,\n  phone,\n  email,\n  color\n}": YogaInstructorsQueryResult;
     "*[_type == \"yogaClass\"] | order(name asc){\n  _id,\n  name,\n  slug,\n  description,\n  icon,\n  color,\n  instructors[]->{\n    _id,\n    name,\n    photo\n  }\n}": YogaClassesQueryResult;
     "*[_type == \"popup\" && isActive == true][0]{\n  _id,\n  headline,\n  content,\n  image,\n  ctaButton{\n    label,\n    href\n  },\n  showOnPages,\n  displayDelay,\n  showOncePerSession\n}": ActivePopupQueryResult;
+    "*[_type == \"seasonalSchedule\" && startDate <= $date && endDate >= $date]\n    | order(startDate asc)[0]{\n    _id,\n    name,\n    startDate,\n    endDate,\n    defaultSlotDuration,\n    bufferMinutes,\n    days[]{\n      _key,\n      dayOfWeek,\n      isDayOff,\n      startTime,\n      endTime\n    }\n  }": SeasonalScheduleForDateQueryResult;
+    "*[_type == \"seasonalSchedule\" && startDate <= $endDate && endDate >= $startDate]\n    | order(startDate asc){\n    _id,\n    name,\n    startDate,\n    endDate,\n    defaultSlotDuration,\n    bufferMinutes,\n    days[]{\n      _key,\n      dayOfWeek,\n      isDayOff,\n      startTime,\n      endTime\n    }\n  }": SeasonalSchedulesForRangeQueryResult;
   }
 }

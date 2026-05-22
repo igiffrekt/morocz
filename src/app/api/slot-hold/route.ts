@@ -1,6 +1,7 @@
 import { headers } from "next/headers";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
+import { assertDayStillOpen } from "@/lib/booking-guards";
 import { getWriteClient } from "@/lib/sanity-write-client";
 
 export const dynamic = "force-dynamic";
@@ -28,10 +29,28 @@ export async function POST(request: Request): Promise<Response> {
 
     const { slotDate, slotTime } = parsed.data;
 
+    const dayLockError = await assertDayStillOpen(slotDate);
+    if (dayLockError) return dayLockError;
+
     // ── 2. Generate slot lock ID and calculate hold expiration (5 minutes) ─────
     const slotLockDocId = `slotLock-${slotDate}-${slotTime.replace(":", "-")}`;
     const heldUntil = new Date(Date.now() + 5 * 60 * 1000).toISOString();
-    
+
+    // ── 2b. Refuse to re-hold a lock that is already booked ─────────────────────
+    // Without this, a user who abandons checkout (closes the Stripe tab without
+    // hitting /foglalas/megszakitva) can re-select the same slot, which silently
+    // reverts the lock from "booked" back to "held" and lets them double-book.
+    const existingLock = await getWriteClient().fetch<{ status: string } | null>(
+      `*[_type == "slotLock" && _id == $id][0]{status}`,
+      { id: slotLockDocId },
+    );
+    if (existingLock?.status === "booked") {
+      return Response.json(
+        { error: "Ez az időpont sajnos már foglalt. Kérjük, válasszon új időpontot." },
+        { status: 409 },
+      );
+    }
+
     // ── 3. Get session (optional for tracking, but not required for hold) ──────
     const session = await auth.api.getSession({ headers: await headers() });
 

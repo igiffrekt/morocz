@@ -1,24 +1,23 @@
+import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
-import { buildCancellationEmail } from "@/lib/booking-email";
+import { buildCancellationEmail, buildReceptionCancellationEmail } from "@/lib/booking-email";
+import { db } from "@/lib/db";
+import { user } from "@/lib/db/schema";
 import { isEmailConfigured, sendEmail } from "@/lib/email";
 import { deleteCalendarEvent } from "@/lib/google-calendar";
+import { issueRefund } from "@/lib/refund/issue-refund";
+import { resolveRefund } from "@/lib/refund/policy";
 import { getWriteClient } from "@/lib/sanity-write-client";
+
+const RECEPTION_EMAIL = "recepcio@drmoroczangela.hu";
 
 export const dynamic = "force-dynamic";
 
 // ── Request body schema ────────────────────────────────────────────────────────
 const CancelSchema = z.object({
   token: z.string().min(1, "Token megadása kötelező."),
+  confirmNoRefund: z.boolean().optional().default(false),
 });
-
-// ── 24h window enforcement ─────────────────────────────────────────────────────
-function isWithin24Hours(slotDate: string, slotTime: string): boolean {
-  const [h, m] = slotTime.split(":").map(Number);
-  const appt = new Date(
-    `${slotDate}T${String(h ?? 0).padStart(2, "0")}:${String(m ?? 0).padStart(2, "0")}:00`,
-  );
-  return (appt.getTime() - Date.now()) / (1000 * 60 * 60) < 24;
-}
 
 // ── POST handler ───────────────────────────────────────────────────────────────
 export async function POST(request: Request): Promise<Response> {
@@ -37,7 +36,7 @@ export async function POST(request: Request): Promise<Response> {
       return Response.json({ error: firstError }, { status: 400 });
     }
 
-    const { token } = parsed.data;
+    const { token, confirmNoRefund } = parsed.data;
 
     // ── 2. Fetch booking by managementToken ────────────────────────────────────
     // Note: $token is reserved in @sanity/client QueryParams — use $manageToken instead
@@ -45,6 +44,7 @@ export async function POST(request: Request): Promise<Response> {
       _id: string;
       patientName: string;
       patientEmail: string;
+      patientPhone: string;
       reservationNumber: string;
       service: { name: string } | null;
       slotDate: string;
@@ -52,12 +52,15 @@ export async function POST(request: Request): Promise<Response> {
       status: string;
       managementToken: string;
       googleCalendarEventId?: string | null;
+      paymentStatus?: string | null;
+      stripePaymentIntentId?: string | null;
     };
 
     const booking = await getWriteClient().fetch<BookingForCancel | null>(
       `*[_type == "booking" && managementToken == $manageToken && status == "confirmed"][0]{
-        _id, patientName, patientEmail, reservationNumber, service->{name},
-        slotDate, slotTime, status, managementToken, googleCalendarEventId
+        _id, patientName, patientEmail, patientPhone, reservationNumber, service->{name},
+        slotDate, slotTime, status, managementToken, googleCalendarEventId,
+        paymentStatus, stripePaymentIntentId
       }`,
       { manageToken: token },
     );
@@ -66,19 +69,41 @@ export async function POST(request: Request): Promise<Response> {
       return Response.json({ error: "Érvénytelen vagy lejárt hivatkozás." }, { status: 404 });
     }
 
-    // ── 3. Enforce 24h window server-side ──────────────────────────────────────
-    if (isWithin24Hours(booking.slotDate, booking.slotTime)) {
+    // ── 3. Resolve refund eligibility (48h policy) ─────────────────────────────
+    const decision = resolveRefund({
+      slotDate: booking.slotDate,
+      slotTime: booking.slotTime,
+      paymentStatus: booking.paymentStatus ?? "pending",
+      confirmNoRefund,
+    });
+
+    if (decision.requiresConfirmation) {
       return Response.json(
         {
-          error:
-            "Az időpont már nem mondható le (kevesebb mint 24 óra van hátra). Kérjük, hívjon minket: +36 70 639 5239",
+          requiresConfirmation: true,
+          warning:
+            "Kedves Páciensünk! 48 órán belüli lemondás esetén a 10.000 Ft-os foglalási díj NEM kerül visszatérítésre. Amennyiben ennek tudatában is le kívánja mondani az időpontot, kérjük kattintson a gombra.",
         },
-        { status: 403 },
+        { status: 409 },
       );
     }
 
     // ── 4. Patch booking status to "cancelled" ─────────────────────────────────
     await getWriteClient().patch(booking._id).set({ status: "cancelled" }).commit();
+
+    // ── 4a. Refund (the credit invoice is issued by the Stripe webhook) ────────
+    if (decision.eligible && booking.stripePaymentIntentId) {
+      try {
+        await issueRefund({
+          paymentIntentId: booking.stripePaymentIntentId,
+          bookingId: booking._id,
+        });
+      } catch (refundErr) {
+        console.error("[booking-cancel] Refund failed:", refundErr);
+      }
+    } else if (decision.reason === "within_window") {
+      await getWriteClient().patch(booking._id).set({ refundStatus: "no_refund" }).commit();
+    }
 
     // ── 4b. Delete Google Calendar event ─────────────────────────────────────
     if (booking.googleCalendarEventId) {
@@ -105,15 +130,27 @@ export async function POST(request: Request): Promise<Response> {
       console.warn("[api/booking-cancel] Failed to release slotLock:", slotErr);
     }
 
-    // ── 6. Send cancellation email (fire-and-forget) ───────────────────────────
+    // ── 6. Send cancellation emails (fire-and-forget) ──────────────────────────
     if (isEmailConfigured()) {
+      const serviceName = booking.service?.name?.startsWith("Nőgyógyász")
+        ? "Nőgyógyászati vizsgálat"
+        : (booking.service?.name ?? "Foglalt szolgáltatás");
+
       void sendCancellationEmailAsync({
         patientName: booking.patientName,
         patientEmail: booking.patientEmail,
         reservationNumber: booking.reservationNumber,
-        serviceName: booking.service?.name?.startsWith("Nőgyógyász")
-          ? "Nőgyógyászati vizsgálat"
-          : (booking.service?.name ?? "Foglalt szolgáltatás"),
+        serviceName,
+        slotDate: booking.slotDate,
+        slotTime: booking.slotTime,
+      });
+
+      void sendReceptionCancellationEmailAsync({
+        patientName: booking.patientName,
+        patientEmail: booking.patientEmail,
+        patientPhone: booking.patientPhone,
+        reservationNumber: booking.reservationNumber,
+        serviceName,
         slotDate: booking.slotDate,
         slotTime: booking.slotTime,
       });
@@ -176,5 +213,63 @@ async function sendCancellationEmailAsync({
   } catch (err) {
     // Fire-and-forget: log but never throw — cancellation is already processed
     console.error("[api/booking-cancel] Failed to send cancellation email:", err);
+  }
+}
+
+// ── Helper: notify reception (fire-and-forget) ────────────────────────────────
+async function sendReceptionCancellationEmailAsync({
+  patientName,
+  patientEmail,
+  patientPhone,
+  reservationNumber,
+  serviceName,
+  slotDate,
+  slotTime,
+}: {
+  patientName: string;
+  patientEmail: string;
+  patientPhone: string;
+  reservationNumber: string;
+  serviceName: string;
+  slotDate: string;
+  slotTime: string;
+}) {
+  try {
+    const formattedDate = new Date(slotDate).toLocaleDateString("hu-HU", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      weekday: "long",
+    });
+
+    const addressRow = patientEmail
+      ? await db.query.user.findFirst({
+          where: eq(sql`lower(${user.email})`, patientEmail.toLowerCase()),
+          columns: { postalCode: true, city: true, streetAddress: true },
+        })
+      : null;
+
+    const html = buildReceptionCancellationEmail({
+      patientName,
+      patientEmail,
+      patientPhone,
+      billingAddress: {
+        postalCode: addressRow?.postalCode ?? null,
+        city: addressRow?.city ?? null,
+        streetAddress: addressRow?.streetAddress ?? null,
+      },
+      serviceName,
+      reservationNumber,
+      date: formattedDate,
+      time: slotTime,
+    });
+
+    await sendEmail({
+      to: RECEPTION_EMAIL,
+      subject: `Páciens lemondás — ${patientName}, ${formattedDate} ${slotTime}`,
+      html,
+    });
+  } catch (err) {
+    console.error("[api/booking-cancel] Failed to send reception notification:", err);
   }
 }

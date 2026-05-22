@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 
 const typeToTags: Record<string, string[]> = {
   homepage: ["homepage"],
+  pricingPage: ["pricingPage"],
   siteSettings: ["siteSettings"],
   service: ["service"],
   serviceCategory: ["serviceCategory"],
@@ -14,6 +15,7 @@ const typeToTags: Record<string, string[]> = {
   privacyPolicy: ["privacyPolicy"],
   customAvailability: ["customAvailability"],
   weeklySchedule: ["weeklySchedule"],
+  seasonalSchedule: ["seasonalSchedule"],
   blockedDate: ["blockedDate"],
   booking: ["booking"],
   slotLock: ["slotLock"],

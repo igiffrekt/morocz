@@ -1,4 +1,7 @@
-﻿import { auth } from "@/lib/auth";
+﻿import { and, eq, lte } from "drizzle-orm";
+import { auth } from "@/lib/auth";
+import { db } from "@/lib/db";
+import { bookingHistory as bookingHistoryTable } from "@/lib/db/schema";
 import { getWriteClient } from "@/lib/sanity-write-client";
 
 export const dynamic = "force-dynamic";
@@ -34,7 +37,7 @@ export type AppointmentHistoryDoc = {
 export async function GET(request: Request): Promise<Response> {
   try {
     const session = await auth.api.getSession({ headers: request.headers });
-    if (!session) return Response.json({ error: "Bejelentkez├⌐s sz├╝ks├⌐ges." }, { status: 401 });
+    if (!session) return Response.json({ error: "Bejelentkezés szükséges." }, { status: 401 });
     if (session.user.role !== "admin") return Response.json({ error: "Jogosulatlan." }, { status: 403 });
 
     const url = new URL(request.url);
@@ -43,19 +46,106 @@ export async function GET(request: Request): Promise<Response> {
     const dateTo = url.searchParams.get("dateTo");
     const search = url.searchParams.get("search")?.toLowerCase();
 
-    let query = `*[_type == "appointmentHistory"`;
+    const today = new Date().toISOString().split("T")[0];
+    const client = getWriteClient();
 
+    // ── 1. Legacy appointmentHistory docs ────────────────────────────────────
+    let importQuery = `*[_type == "appointmentHistory"`;
+    if (email) importQuery += ` && patientEmail == "${email}"`;
+    importQuery += `] | order(matchedAt desc)`;
+    const importedDocs = await client.fetch<AppointmentHistoryDoc[]>(importQuery);
+
+    // ── 2. Past Sanity booking docs (confirmed/completed/cancelled/no-show) ──
+    type SanityBookingRow = {
+      _id: string;
+      _createdAt: string;
+      patientEmail: string;
+      slotDate: string;
+      slotTime: string;
+      serviceName: string | null;
+      serviceDuration: number | null;
+    };
+    const sanityParams: Record<string, string> = { today };
+    let sanityFilter = `_type == "booking" && !(_id in path("drafts.**")) && slotDate <= $today && status in ["confirmed", "completed", "cancelled", "no-show"]`;
     if (email) {
-      query += ` && patientEmail == "${email}"`;
+      sanityFilter += ` && patientEmail == $emailParam`;
+      sanityParams.emailParam = email;
+    }
+    const sanityBookings = await client.fetch<SanityBookingRow[]>(
+      `*[${sanityFilter}] | order(slotDate desc) { _id, _createdAt, patientEmail, slotDate, slotTime, "serviceName": service->name, "serviceDuration": service->appointmentDuration }`,
+      sanityParams,
+    );
+
+    // ── 3. Postgres bookingHistory ────────────────────────────────────────────
+    const pgConditions = [lte(bookingHistoryTable.date, today)];
+    if (email) pgConditions.push(eq(bookingHistoryTable.patientEmail, email));
+    const pgRows = await db
+      .select()
+      .from(bookingHistoryTable)
+      .where(and(...pgConditions));
+
+    // ── 4. Merge into AppointmentHistoryDoc[] keyed by patientEmail ───────────
+    const byEmail = new Map<string, HistoricalAppointment[]>();
+
+    const addApt = (patientEmail: string, apt: HistoricalAppointment) => {
+      if (!byEmail.has(patientEmail)) byEmail.set(patientEmail, []);
+      byEmail.get(patientEmail)!.push(apt);
+    };
+
+    for (const doc of importedDocs) {
+      for (const apt of doc.appointments) {
+        addApt(doc.patientEmail, apt);
+      }
     }
 
-    query += `] | order(matchedAt desc)`;
+    for (const b of sanityBookings) {
+      if (!b.patientEmail) continue;
+      addApt(b.patientEmail, {
+        id: b._id,
+        date: b.slotDate,
+        time: b.slotTime,
+        service: b.serviceName ?? "",
+        duration: b.serviceDuration ?? 0,
+        staff: "",
+        payment: 0,
+        createdAt: b._createdAt,
+        source: "booking",
+      });
+    }
 
-    const docs = await getWriteClient().fetch<AppointmentHistoryDoc[]>(query);
+    for (const h of pgRows) {
+      if (!h.patientEmail) continue;
+      addApt(h.patientEmail, {
+        id: h.id,
+        date: h.date,
+        time: h.time,
+        service: h.serviceName ?? "",
+        duration: 0,
+        staff: "",
+        payment: 0,
+        createdAt: h.createdAt.toISOString(),
+        source: "history",
+      });
+    }
 
-    // Filter by date range and search if needed
-    let results = docs;
+    // Deduplicate by id within each patient
+    let results: AppointmentHistoryDoc[] = Array.from(byEmail.entries()).map(([patientEmail, apts]) => {
+      const seen = new Set<string>();
+      const deduped = apts.filter((a) => {
+        if (seen.has(a.id)) return false;
+        seen.add(a.id);
+        return true;
+      });
+      return {
+        _id: `merged-${patientEmail}`,
+        patientEmail,
+        appointments: deduped,
+        matchedAt: new Date().toISOString(),
+        matchConfidence: "email_match" as const,
+      };
+    });
 
+    // Apply date range filter
     if (dateFrom || dateTo) {
       results = results.map((doc) => ({
         ...doc,
@@ -67,6 +157,7 @@ export async function GET(request: Request): Promise<Response> {
       }));
     }
 
+    // Apply search filter
     if (search) {
       results = results.filter(
         (doc) =>
@@ -78,7 +169,7 @@ export async function GET(request: Request): Promise<Response> {
     return Response.json({ appointments: results, count: results.length });
   } catch (err) {
     console.error("[api/admin/history]", err);
-    return Response.json({ error: "Hiba t├╢rt├⌐nt." }, { status: 500 });
+    return Response.json({ error: "Hiba történt." }, { status: 500 });
   }
 }
 
@@ -90,14 +181,14 @@ export async function GET(request: Request): Promise<Response> {
 export async function POST(request: Request): Promise<Response> {
   try {
     const session = await auth.api.getSession({ headers: request.headers });
-    if (!session) return Response.json({ error: "Bejelentkez├⌐s sz├╝ks├⌐ges." }, { status: 401 });
+    if (!session) return Response.json({ error: "Bejelentkezés szükséges." }, { status: 401 });
     if (session.user.role !== "admin") return Response.json({ error: "Jogosulatlan." }, { status: 403 });
 
     const body = await request.json() as { appointments?: unknown[] };
     const appointments = body.appointments as Array<Record<string, string | number>>;
 
     if (!Array.isArray(appointments) || appointments.length === 0) {
-      return Response.json({ error: "Nincs import├íland├│ adat." }, { status: 400 });
+      return Response.json({ error: "Nincs importálandó adat." }, { status: 400 });
     }
 
     // Group by email

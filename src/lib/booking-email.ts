@@ -967,3 +967,197 @@ export function buildReminderEmail(params: {
 </body>
 </html>`;
 }
+
+/**
+ * Builds a plain HTML notification email sent to the clinic reception
+ * when a Stripe refund succeeded but the offsetting Számlázz.hu credit invoice failed.
+ * Reception must issue the invoice manually.
+ */
+export function buildInvoiceFailedEmail({ patientName }: { patientName: string }): string {
+  return `<!DOCTYPE html>
+<html lang="hu">
+  <body style="font-family: Arial, sans-serif; color: #1A1D2D; line-height: 1.6;">
+    <p>Tisztelt Recepció,</p>
+    <p>
+      ${patientName} páciens részére visszatérítettük a 10.000 Ft-os foglalási díjat,
+      azonban az erről szóló helyesbítő számla rendszerhiba miatt meghiúsult.
+      Kérjük, állítsa ki manuálisan a számlát a Számlázz.hu rendszerében.
+    </p>
+  </body>
+</html>`;
+}
+
+export const INVOICE_FAILED_SUBJECT = "A helyesbítő számla kiállítása meghiúsult";
+
+/**
+ * Builds a branded HTML notification email sent to the clinic reception
+ * when a patient cancels their appointment via the management link.
+ * Includes full patient contact + billing address + booking details.
+ */
+export function buildReceptionCancellationEmail(params: {
+  patientName: string;
+  patientEmail: string;
+  patientPhone: string;
+  billingAddress: { postalCode: string | null; city: string | null; streetAddress: string | null };
+  serviceName: string;
+  reservationNumber: string;
+  date: string;
+  time: string;
+}): string {
+  const {
+    patientName,
+    patientEmail,
+    patientPhone,
+    billingAddress,
+    serviceName,
+    reservationNumber,
+    date,
+    time,
+  } = params;
+
+  const hasAddress = !!(
+    billingAddress.postalCode ||
+    billingAddress.city ||
+    billingAddress.streetAddress
+  );
+  const addressLine1 =
+    [billingAddress.postalCode, billingAddress.city].filter(Boolean).join(" ") || "";
+  const addressLine2 = billingAddress.streetAddress ?? "";
+
+  return `<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Páciens lemondás — ${patientName}</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #F0F2F5; font-family: ui-sans-serif, system-ui, -apple-system, Arial, sans-serif;">
+
+  <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background-color: #F0F2F5; padding: 32px 16px;">
+    <tr>
+      <td align="center">
+
+        <table width="100%" cellpadding="0" cellspacing="0" role="presentation"
+          style="max-width: 560px; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+
+          <tr>
+            <td style="background-color: ${navy}; padding: 28px 40px;">
+              <p style="margin: 0; font-size: 13px; font-weight: 600; color: ${pink}; letter-spacing: 0.08em; text-transform: uppercase;">
+                Recepció — Mórocz Medical
+              </p>
+              <h1 style="margin: 8px 0 0; font-size: 20px; font-weight: 700; color: #ffffff; line-height: 1.3;">
+                Páciens lemondta az időpontját
+              </h1>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding: 28px 40px 0;">
+              <p style="margin: 0; font-size: 14px; color: ${textMuted}; line-height: 1.6;">
+                Az alábbi páciens a foglalási hivatkozáson keresztül lemondta az időpontját. A naptárból a foglalás már eltávolításra került.
+              </p>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding: 24px 40px 0;">
+              <table width="100%" cellpadding="0" cellspacing="0" role="presentation"
+                style="background-color: ${lightGrey}; border-radius: 8px; border-left: 4px solid ${navy};">
+                <tr>
+                  <td style="padding: 20px 24px;">
+
+                    <p style="margin: 0 0 4px; font-size: 11px; font-weight: 700; color: ${textMuted}; text-transform: uppercase; letter-spacing: 0.07em;">
+                      Foglalási szám
+                    </p>
+                    <p style="margin: 0 0 14px; font-size: 15px; font-weight: 700; color: ${textDark}; font-family: monospace, monospace;">
+                      ${reservationNumber}
+                    </p>
+
+                    <p style="margin: 0 0 4px; font-size: 11px; font-weight: 700; color: ${textMuted}; text-transform: uppercase; letter-spacing: 0.07em;">
+                      Szolgáltatás
+                    </p>
+                    <p style="margin: 0 0 14px; font-size: 15px; font-weight: 600; color: ${textDark};">
+                      ${serviceName}
+                    </p>
+
+                    <p style="margin: 0 0 4px; font-size: 11px; font-weight: 700; color: ${textMuted}; text-transform: uppercase; letter-spacing: 0.07em;">
+                      Lemondott időpont
+                    </p>
+                    <p style="margin: 0; font-size: 15px; font-weight: 600; color: ${textDark};">
+                      ${date}, ${time}
+                    </p>
+
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding: 20px 40px 0;">
+              <p style="margin: 0 0 10px; font-size: 13px; font-weight: 700; color: ${navy}; text-transform: uppercase; letter-spacing: 0.06em;">
+                Páciens adatai
+              </p>
+              <table width="100%" cellpadding="0" cellspacing="0" role="presentation"
+                style="background-color: ${lightGrey}; border-radius: 8px;">
+                <tr>
+                  <td style="padding: 18px 22px;">
+
+                    <p style="margin: 0 0 4px; font-size: 11px; font-weight: 700; color: ${textMuted}; text-transform: uppercase; letter-spacing: 0.07em;">
+                      Név
+                    </p>
+                    <p style="margin: 0 0 14px; font-size: 14px; color: ${textDark}; font-weight: 600;">
+                      ${patientName}
+                    </p>
+
+                    <p style="margin: 0 0 4px; font-size: 11px; font-weight: 700; color: ${textMuted}; text-transform: uppercase; letter-spacing: 0.07em;">
+                      E-mail
+                    </p>
+                    <p style="margin: 0 0 14px; font-size: 14px;">
+                      <a href="mailto:${patientEmail}" style="color: ${navy}; text-decoration: none;">${patientEmail}</a>
+                    </p>
+
+                    <p style="margin: 0 0 4px; font-size: 11px; font-weight: 700; color: ${textMuted}; text-transform: uppercase; letter-spacing: 0.07em;">
+                      Telefon
+                    </p>
+                    <p style="margin: 0 0 14px; font-size: 14px;">
+                      <a href="tel:${patientPhone}" style="color: ${navy}; text-decoration: none;">${patientPhone}</a>
+                    </p>
+
+                    <p style="margin: 0 0 4px; font-size: 11px; font-weight: 700; color: ${textMuted}; text-transform: uppercase; letter-spacing: 0.07em;">
+                      Számlázási cím
+                    </p>
+                    ${
+                      hasAddress
+                        ? `<p style="margin: 0; font-size: 14px; color: ${textDark}; line-height: 1.5;">
+                            ${addressLine1}${addressLine2 ? `<br />${addressLine2}` : ""}
+                          </p>`
+                        : `<p style="margin: 0; font-size: 14px; color: ${textMuted}; font-style: italic;">
+                            Nincs megadva
+                          </p>`
+                    }
+
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding: 24px 40px 32px;">
+              <p style="margin: 0; font-size: 12px; color: ${textMuted}; line-height: 1.6;">
+                Ez egy automatikus értesítés a foglalási rendszerből.<br />
+                &copy; Mórocz Medical
+              </p>
+            </td>
+          </tr>
+
+        </table>
+
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>`;
+}

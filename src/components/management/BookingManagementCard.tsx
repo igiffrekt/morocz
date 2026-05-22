@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { hoursUntilBudapestSlot } from "@/lib/refund/slot-time";
 import type { ScheduleForAvailability } from "@/lib/slots";
 import { CancelDialog } from "./CancelDialog";
 import { ReschedulePanel } from "./ReschedulePanel";
@@ -19,19 +20,13 @@ interface BookingManagementCardProps {
     slotTime: string;
     status: string;
     managementToken: string;
+    paymentStatus?: string | null;
   };
   scheduleData: {
     schedule: ScheduleForAvailability;
     blockedDates: string[];
+    bookingWindowDays: number;
   };
-}
-
-function isWithin24Hours(slotDate: string, slotTime: string): boolean {
-  const [h, m] = slotTime.split(":").map(Number);
-  const appt = new Date(
-    `${slotDate}T${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:00`,
-  );
-  return (appt.getTime() - Date.now()) / (1000 * 60 * 60) < 24;
 }
 
 type CardState = "idle" | "cancel-confirm" | "cancelled" | "rescheduled";
@@ -42,7 +37,9 @@ export function BookingManagementCard({ booking, scheduleData }: BookingManageme
   const [showReschedule, setShowReschedule] = useState(false);
   const [rescheduledTo, setRescheduledTo] = useState<{ date: string; time: string } | null>(null);
 
-  const within24h = isWithin24Hours(booking.slotDate, booking.slotTime);
+  // Rescheduling is blocked within 24h; cancellation is always allowed (the cancel
+  // dialog + server own the 48h refund-vs-no-refund decision).
+  const within24h = hoursUntilBudapestSlot(booking.slotDate, booking.slotTime, new Date()) < 24;
 
   const formattedDate = new Date(booking.slotDate).toLocaleDateString("hu-HU", {
     year: "numeric",
@@ -164,32 +161,21 @@ export function BookingManagementCard({ booking, scheduleData }: BookingManageme
         </div>
       </div>
 
-      {/* 24h info or action buttons */}
-      {within24h ? (
-        <div className="rounded-lg bg-gray-50 border border-gray-200 p-4 text-sm text-gray-600">
-          <p>
-            Az időpont módosítása és lemondása már nem lehetséges (kevesebb mint 24 óra van hátra).
-            Kérdés esetén hívjon minket:{" "}
-            <a
-              href="tel:+36706395239"
-              className="font-semibold text-[#23264F] underline hover:no-underline"
-            >
-              +36 70 639 5239
-            </a>
-          </p>
-        </div>
-      ) : (
-        <div className="flex gap-3">
+      {/* Action buttons — cancellation is always available; rescheduling is blocked within 24h. */}
+      <div className="flex gap-3">
+        <button
+          type="button"
+          onClick={() => {
+            setCardState("cancel-confirm");
+            setShowReschedule(false);
+          }}
+          className="rounded-lg border border-red-300 bg-white px-5 py-2.5 text-sm font-semibold text-red-600 transition hover:bg-red-50"
+        >
+          Lemondás
+        </button>
+        {!within24h && (
           <button
-            onClick={() => {
-              setCardState("cancel-confirm");
-              setShowReschedule(false);
-            }}
-            className="rounded-lg border border-red-300 bg-white px-5 py-2.5 text-sm font-semibold text-red-600 transition hover:bg-red-50"
-          >
-            Lemondás
-          </button>
-          <button
+            type="button"
             onClick={() => {
               setShowReschedule((prev) => !prev);
               setCardState("idle");
@@ -203,6 +189,21 @@ export function BookingManagementCard({ booking, scheduleData }: BookingManageme
           >
             Átütemezés
           </button>
+        )}
+      </div>
+
+      {within24h && (
+        <div className="mt-3 rounded-lg bg-gray-50 border border-gray-200 p-3 text-sm text-gray-600">
+          <p>
+            Az időpont átütemezése már nem lehetséges (kevesebb mint 24 óra van hátra). Kérdés
+            esetén hívjon minket:{" "}
+            <a
+              href="tel:+36706395239"
+              className="font-semibold text-[#23264F] underline hover:no-underline"
+            >
+              +36 70 639 5239
+            </a>
+          </p>
         </div>
       )}
 

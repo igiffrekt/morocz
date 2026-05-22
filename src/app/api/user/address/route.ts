@@ -7,6 +7,25 @@ import { user } from "@/lib/db/schema";
 
 export const dynamic = "force-dynamic";
 
+export async function GET(): Promise<Response> {
+  try {
+    const session = await auth.api.getSession({ headers: await headers() });
+    if (!session?.user) {
+      return Response.json({ error: "Nincs hitelesítve" }, { status: 401 });
+    }
+
+    const row = await db.query.user.findFirst({
+      where: eq(user.id, session.user.id),
+      columns: { postalCode: true },
+    });
+
+    return Response.json({ hasAddress: !!row?.postalCode });
+  } catch (err) {
+    console.error("[api/user/address GET]", err);
+    return Response.json({ error: "Hiba történt" }, { status: 500 });
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const session = await auth.api.getSession({ headers: await headers() });

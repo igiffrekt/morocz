@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import AdminPatientDetailModal from "@/components/admin/AdminPatientDetailModal";
 
 type PatientRow = {
   email: string;
@@ -158,8 +159,19 @@ function EmptyState({ search }: { search: string }) {
 
 // ─── Table Row ─────────────────────────────────────────────────────────────────
 
-function PatientRow({ p, i, total }: { p: PatientRow; i: number; total: number }) {
+function PatientRow({
+  p,
+  i,
+  total,
+  onOpenDetail,
+}: {
+  p: PatientRow;
+  i: number;
+  total: number;
+  onOpenDetail: (p: PatientRow) => void;
+}) {
   const [hovered, setHovered] = useState(false);
+  const [actionsHovered, setActionsHovered] = useState(false);
   const avatar = getAvatar(p.email || p.name);
 
   const visitBadgeStyle: React.CSSProperties =
@@ -177,11 +189,13 @@ function PatientRow({ p, i, total }: { p: PatientRow; i: number; total: number }
 
   return (
     <div
+      className="pat-row"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
         display: "grid",
-        gridTemplateColumns: "1.6fr 1.8fr 1fr 90px 120px",
+        gridTemplateColumns: "1.6fr 1.8fr 1fr 90px 120px 40px",
+        gridTemplateAreas: '"name email phone visits last actions"',
         padding: "0.875rem 1.5rem",
         borderBottom: i < total - 1 ? "1px solid rgba(228,232,240,0.7)" : "none",
         gap: "1rem",
@@ -193,7 +207,7 @@ function PatientRow({ p, i, total }: { p: PatientRow; i: number; total: number }
       }}
     >
       {/* Name + avatar */}
-      <div style={{ display: "flex", alignItems: "center", gap: "0.625rem", minWidth: 0 }}>
+      <div className="pat-cell-name" style={{ gridArea: "name", display: "flex", alignItems: "center", gap: "0.625rem", minWidth: 0 }}>
         <div
           style={{
             width: "2.125rem",
@@ -228,7 +242,7 @@ function PatientRow({ p, i, total }: { p: PatientRow; i: number; total: number }
       </div>
 
       {/* Email */}
-      <div style={{ minWidth: 0 }}>
+      <div className="pat-cell-email" style={{ gridArea: "email", minWidth: 0 }}>
         {p.email ? (
           <a
             href={`mailto:${p.email}`}
@@ -252,7 +266,7 @@ function PatientRow({ p, i, total }: { p: PatientRow; i: number; total: number }
       </div>
 
       {/* Phone */}
-      <div>
+      <div className="pat-cell-phone" style={{ gridArea: "phone" }}>
         {p.phone ? (
           <a
             href={`tel:${p.phone}`}
@@ -278,7 +292,7 @@ function PatientRow({ p, i, total }: { p: PatientRow; i: number; total: number }
       </div>
 
       {/* Visit count */}
-      <div>
+      <div className="pat-cell-visits" style={{ gridArea: "visits" }}>
         <span
           style={{
             display: "inline-flex",
@@ -298,7 +312,7 @@ function PatientRow({ p, i, total }: { p: PatientRow; i: number; total: number }
       </div>
 
       {/* Last visit — chip style */}
-      <div>
+      <div className="pat-cell-last" style={{ gridArea: "last" }}>
         {p.lastVisit ? (
           <span
             style={{
@@ -320,6 +334,38 @@ function PatientRow({ p, i, total }: { p: PatientRow; i: number; total: number }
           <span style={{ fontSize: "0.8125rem", color: "#94a3b8" }}>—</span>
         )}
       </div>
+
+      {/* Actions — three-dot button */}
+      <div
+        className="pat-cell-actions"
+        style={{ gridArea: "actions", display: "flex", justifyContent: "flex-end" }}
+      >
+        <button
+          type="button"
+          onClick={() => onOpenDetail(p)}
+          onMouseEnter={() => setActionsHovered(true)}
+          onMouseLeave={() => setActionsHovered(false)}
+          aria-label="Páciens adatainak megtekintése"
+          style={{
+            width: "1.75rem",
+            height: "1.75rem",
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            border: "none",
+            background: actionsHovered ? "rgba(36,42,95,0.08)" : "transparent",
+            borderRadius: "9999px",
+            color: actionsHovered ? "#242a5f" : "#94a3b8",
+            cursor: "pointer",
+            transition: "background 0.15s, color 0.15s",
+            padding: 0,
+            lineHeight: 1,
+            fontSize: "1.125rem",
+          }}
+        >
+          ⋮
+        </button>
+      </div>
     </div>
   );
 }
@@ -335,6 +381,7 @@ export default function AdminPatientsView() {
   const [filter, setFilter] = useState<FilterMode>("all");
   const [searchFocused, setSearchFocused] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [detailPatient, setDetailPatient] = useState<PatientRow | null>(null);
 
   useEffect(() => {
     void fetch("/api/admin/patients")
@@ -382,6 +429,7 @@ export default function AdminPatientsView() {
 
   return (
     <div
+      className="pat-root"
       style={{
         padding: "1.5rem 1rem",
         flex: "none",
@@ -393,38 +441,32 @@ export default function AdminPatientsView() {
       }}
     >
       <style>{`
-        /* Mobile-first responsive for patients view */
+        @keyframes spin { to { transform: rotate(360deg); } }
         @media (max-width: 768px) {
-          /* Tighten padding */
-          [style*="padding: "1.5rem"] {
-            padding: 0.75rem !important;
+          .pat-root { padding: 0.75rem !important; gap: 0.75rem !important; }
+          .pat-header { flex-direction: column !important; align-items: stretch !important; gap: 0.625rem !important; }
+          .pat-search-wrap { width: 100%; }
+          .pat-search-input { width: 100% !important; }
+          .pat-table-header { display: none !important; }
+          .pat-row {
+            grid-template-columns: 1fr auto auto !important;
+            grid-template-areas:
+              "name  visits  actions"
+              "phone last    actions" !important;
+            gap: 0.25rem 0.75rem !important;
+            padding: 0.75rem 0.875rem !important;
           }
-          
-          /* Search input — full width */
-          input[type="text"] {
-            width: 100% !important;
-          }
-          
-          /* Table header — hide some columns on mobile */
-          [style*="gridTemplateColumns: "1.6fr"] {
-            grid-template-columns: 2fr 1fr 100px !important;
-            gap: 0.5rem !important;
-          }
-          
-          /* Table cell padding */
-          [style*="padding: "0.75rem"] {
-            padding: 0.5rem !important;
-          }
-          
-          /* Pagination controls — stack */
-          [style*="justifyContent: "space-between"] {
-            flex-direction: column !important;
-            align-items: flex-start !important;
-          }
+          .pat-cell-email { display: none !important; }
+          .pat-cell-visits { justify-self: end !important; }
+          .pat-cell-last { justify-self: end !important; }
+          .pat-cell-phone { padding-left: 2.75rem !important; }
+          .pat-cell-actions { align-self: center !important; }
+          .pat-footer { padding: 0.75rem 0.875rem !important; flex-wrap: wrap; gap: 0.5rem !important; }
         }
       `}</style>
       {/* ── Header ──────────────────────────────────────────────────────────── */}
       <div
+        className="pat-header"
         style={{
           display: "flex",
           alignItems: "center",
@@ -474,7 +516,7 @@ export default function AdminPatientsView() {
         </div>
 
         {/* Search input */}
-        <div style={{ position: "relative" }}>
+        <div className="pat-search-wrap" style={{ position: "relative" }}>
           <div
             style={{
               position: "absolute",
@@ -494,6 +536,7 @@ export default function AdminPatientsView() {
             onChange={(e) => setSearch(e.target.value)}
             onFocus={() => setSearchFocused(true)}
             onBlur={() => setSearchFocused(false)}
+            className="pat-search-input"
             style={{
               paddingLeft: "2.5rem",
               paddingRight: "1rem",
@@ -507,6 +550,7 @@ export default function AdminPatientsView() {
               backdropFilter: "blur(8px)",
               outline: "none",
               width: "280px",
+              boxSizing: "border-box",
               boxShadow: searchFocused
                 ? "0 0 0 3px rgba(79,110,247,0.12)"
                 : "0 1px 3px rgba(36,42,95,0.06)",
@@ -590,18 +634,19 @@ export default function AdminPatientsView() {
       >
         {/* Table header */}
         <div
+          className="pat-table-header"
           style={{
             display: "grid",
-            gridTemplateColumns: "1.6fr 1.8fr 1fr 90px 120px",
+            gridTemplateColumns: "1.6fr 1.8fr 1fr 90px 120px 40px",
             padding: "0.75rem 1.5rem",
             background: "linear-gradient(180deg,#f8f9fd 0%,#f3f5fb 100%)",
             borderBottom: "1px solid rgba(228,232,240,0.8)",
             gap: "1rem",
           }}
         >
-          {["Név", "E-mail cím", "Telefonszám", "Látogatás", "Utolsó látogatás"].map((h) => (
+          {["Név", "E-mail cím", "Telefonszám", "Látogatás", "Utolsó látogatás", ""].map((h, idx) => (
             <div
-              key={h}
+              key={h || `actions-${idx}`}
               style={{
                 fontSize: "0.6875rem",
                 fontWeight: 700,
@@ -655,7 +700,13 @@ export default function AdminPatientsView() {
             <EmptyState search={search} />
           ) : (
             currentPagePatients.map((p, i) => (
-              <PatientRow key={p.email || `${p.name}-${i}`} p={p} i={i} total={filtered.length} />
+              <PatientRow
+                key={p.email || `${p.name}-${i}`}
+                p={p}
+                i={i}
+                total={filtered.length}
+                onOpenDetail={setDetailPatient}
+              />
             ))
           )}
         </div>
@@ -663,6 +714,7 @@ export default function AdminPatientsView() {
         {/* Footer — pagination controls */}
         {!loading && !error && filtered.length > 0 && (
           <div
+            className="pat-footer"
             style={{
               padding: "1rem 1.5rem",
               borderTop: "1px solid rgba(228,232,240,0.7)",
@@ -727,6 +779,15 @@ export default function AdminPatientsView() {
           </div>
         )}
       </div>
+
+      {detailPatient && (
+        <AdminPatientDetailModal
+          name={detailPatient.name}
+          email={detailPatient.email}
+          phone={detailPatient.phone}
+          onClose={() => setDetailPatient(null)}
+        />
+      )}
     </div>
   );
 }

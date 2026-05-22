@@ -37,6 +37,7 @@ interface BookingResult {
 interface ScheduleData {
   schedule: ScheduleForAvailability;
   blockedDates: string[];
+  bookingWindowDays: number;
 }
 
 interface BookingWizardProps {
@@ -387,7 +388,24 @@ export function BookingWizard({ services, scheduleData }: BookingWizardProps) {
           />
         );
       case 3:
-        return <Step3Auth onSuccess={() => goToStep(4)} onBack={() => goToStep(2)} />;
+        return (
+          <Step3Auth
+            onSuccess={async () => {
+              try {
+                const res = await fetch("/api/user/address");
+                const data = (await res.json()) as { hasAddress?: boolean };
+                if (!data.hasAddress) {
+                  window.location.href = "/profil/cim?next=/idopontfoglalas";
+                  return;
+                }
+              } catch {
+                // network error — let them through, checkout will catch address issues
+              }
+              goToStep(4);
+            }}
+            onBack={() => goToStep(2)}
+          />
+        );
       case 4:
         return (
           <Step4Confirm

@@ -135,6 +135,22 @@ export default function AdminAppointmentHistoryView() {
     groupedByYearMonth[year][month].push(apt);
   });
 
+  // Ensure the current year always has tabs for every month up to today,
+  // even if there are no historical bookings yet for those months.
+  const now = new Date();
+  const currentYearStr = now.getFullYear().toString();
+  const currentMonthIdx = now.getMonth(); // 0-based
+  const monthNames = ["január", "február", "március", "április", "május", "június", "július", "augusztus", "szeptember", "október", "november", "december"];
+  if (!groupedByYearMonth[currentYearStr]) {
+    groupedByYearMonth[currentYearStr] = {};
+  }
+  for (let i = 0; i <= currentMonthIdx; i++) {
+    const m = monthNames[i];
+    if (!groupedByYearMonth[currentYearStr][m]) {
+      groupedByYearMonth[currentYearStr][m] = [];
+    }
+  }
+
   const sortedYears = Object.keys(groupedByYearMonth).sort().reverse();
   
   // Set current year expanded by default, others closed (only on first load)
@@ -182,9 +198,36 @@ export default function AdminAppointmentHistoryView() {
   };
 
   return (
-    <div style={{ padding: "1.25rem 1.5rem", flex: 1, overflow: "auto", display: "flex", flexDirection: "column" }}>
+    <div className="hist-root" style={{ padding: "1.25rem 1.5rem", flex: 1, overflow: "auto", display: "flex", flexDirection: "column" }}>
+      <style>{`
+        @media (max-width: 768px) {
+          .hist-root { padding: 0.75rem !important; }
+          .hist-header { flex-direction: column !important; align-items: stretch !important; gap: 0.625rem !important; margin-bottom: 0.875rem !important; }
+          .hist-controls { width: 100%; display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 0.5rem !important; }
+          .hist-controls > input[type="text"] { grid-column: 1 / -1; width: 100% !important; }
+          .hist-controls > input[type="date"] { width: 100% !important; box-sizing: border-box; }
+          .hist-card-pad { padding: 0.75rem !important; }
+          .hist-table-header { display: none !important; }
+          .hist-row {
+            grid-template-columns: 1fr auto !important;
+            grid-template-areas:
+              "name    date"
+              "service time"
+              "email   email" !important;
+            gap: 0.1875rem 0.75rem !important;
+            padding: 0.75rem 0.875rem !important;
+          }
+          .hist-cell-name { grid-area: name; font-weight: 600 !important; color: #1a1d2d !important; }
+          .hist-cell-email { grid-area: email; font-size: 0.6875rem !important; color: #94a3b8 !important; }
+          .hist-cell-phone { display: none !important; }
+          .hist-cell-date { grid-area: date; justify-self: end; font-weight: 600 !important; color: #242a5f !important; white-space: nowrap; }
+          .hist-cell-time { grid-area: time; justify-self: end; font-size: 0.75rem !important; color: #64748b !important; white-space: nowrap; }
+          .hist-cell-service { grid-area: service; font-size: 0.75rem !important; }
+        }
+      `}</style>
       {/* Header */}
       <div
+        className="hist-header"
         style={{
           display: "flex",
           alignItems: "center",
@@ -204,7 +247,7 @@ export default function AdminAppointmentHistoryView() {
         </div>
 
         {/* Controls */}
-        <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", alignItems: "center" }}>
+        <div className="hist-controls" style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", alignItems: "center" }}>
           <input
             type="text"
             placeholder="Keresés email/szolgáltatás..."
@@ -268,7 +311,7 @@ export default function AdminAppointmentHistoryView() {
             Nincs előzmény.
           </div>
         ) : (
-          <div style={{ overflow: "auto", padding: "1.25rem" }}>
+          <div className="hist-card-pad" style={{ overflow: "auto", padding: "1.25rem" }}>
             {sortedYears.map((year) => {
               const isExpanded = expandedYears.has(year);
               const isLoaded = loadedYears.has(year);
@@ -356,6 +399,7 @@ export default function AdminAppointmentHistoryView() {
                           <div style={{ marginLeft: "0.5rem" }}>
                             {/* Table header */}
                             <div
+                              className="hist-table-header"
                               style={{
                                 display: "grid",
                                 gridTemplateColumns: "1.2fr 1.2fr 1fr 0.8fr 0.7fr 1.2fr",
@@ -387,9 +431,11 @@ export default function AdminAppointmentHistoryView() {
                               monthApts.map((apt, i) => (
                                 <div
                                   key={`${apt.patientEmail}-${apt.date}-${apt.time}-${apt.id}`}
+                                  className="hist-row"
                                   style={{
                                     display: "grid",
                                     gridTemplateColumns: "1.2fr 1.2fr 1fr 0.8fr 0.7fr 1.2fr",
+                                    gridTemplateAreas: '"name email phone date time service"',
                                     padding: "0.625rem 1rem",
                                     borderBottom: i < monthApts.length - 1 ? "1px solid #f1f3f7" : "none",
                                     gap: "0.75rem",
@@ -400,12 +446,12 @@ export default function AdminAppointmentHistoryView() {
                                   onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.backgroundColor = "#f0f4ff"; }}
                                   onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.backgroundColor = i % 2 === 0 ? "transparent" : "#fafbfc"; }}
                                 >
-                                  <span style={{ color: "#475569", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{apt.patientName || "—"}</span>
-                                  <span style={{ color: "#475569", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{apt.patientEmail}</span>
-                                  <span style={{ color: "#475569" }}>{apt.patientPhone || "—"}</span>
-                                  <span style={{ color: "#475569" }}>{formatDate(apt.date)}</span>
-                                  <span style={{ color: "#475569" }}>{apt.time}</span>
-                                  <span style={{ color: "#475569" }}>{apt.service}</span>
+                                  <span className="hist-cell-name" style={{ gridArea: "name", color: "#475569", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{apt.patientName || "—"}</span>
+                                  <span className="hist-cell-email" style={{ gridArea: "email", color: "#475569", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{apt.patientEmail}</span>
+                                  <span className="hist-cell-phone" style={{ gridArea: "phone", color: "#475569" }}>{apt.patientPhone || "—"}</span>
+                                  <span className="hist-cell-date" style={{ gridArea: "date", color: "#475569" }}>{formatDate(apt.date)}</span>
+                                  <span className="hist-cell-time" style={{ gridArea: "time", color: "#475569" }}>{apt.time}</span>
+                                  <span className="hist-cell-service" style={{ gridArea: "service", color: "#475569" }}>{apt.service}</span>
                                 </div>
                               ))
                             ) : (

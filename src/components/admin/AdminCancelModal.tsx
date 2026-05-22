@@ -8,8 +8,9 @@ interface AdminCancelModalProps {
   slotDate: string;
   slotTime: string;
   serviceName: string | null;
+  paymentStatus?: string | null;
   onClose: () => void;
-  onConfirm: (bookingId: string, reason?: string) => void;
+  onConfirm: (bookingId: string, reason?: string, refund?: boolean) => void;
 }
 
 export default function AdminCancelModal({
@@ -18,10 +19,12 @@ export default function AdminCancelModal({
   slotDate,
   slotTime,
   serviceName,
+  paymentStatus,
   onClose,
   onConfirm,
 }: AdminCancelModalProps) {
   const [reason, setReason] = useState("");
+  const [refund, setRefund] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   function formatDate(dateStr: string): string {
@@ -37,7 +40,7 @@ export default function AdminCancelModal({
 
   async function handleConfirm() {
     setIsSubmitting(true);
-    await onConfirm(bookingId, reason.trim() || undefined);
+    await onConfirm(bookingId, reason.trim() || undefined, refund);
     setIsSubmitting(false);
   }
 
@@ -188,6 +191,26 @@ export default function AdminCancelModal({
               Ez az információ el lesz küldve a páciensnek az értesítő e-mailben.
             </p>
           </div>
+          {paymentStatus === "paid" && (
+            <label
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "0.5rem",
+                marginTop: "1rem",
+                fontSize: "0.875rem",
+                color: "#242a5f",
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={refund}
+                disabled={isSubmitting}
+                onChange={(e) => setRefund(e.target.checked)}
+              />
+              Foglalási díj visszatérítése (−10.000 Ft jóváírás)
+            </label>
+          )}
         </div>
 
         {/* Footer */}

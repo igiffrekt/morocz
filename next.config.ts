@@ -20,6 +20,15 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  webpack: (config, { dev }) => {
+    if (dev) {
+      config.watchOptions = {
+        ...config.watchOptions,
+        ignored: /node_modules|\.playwright-mcp/,
+      };
+    }
+    return config;
+  },
 };
 
 export default nextConfig;

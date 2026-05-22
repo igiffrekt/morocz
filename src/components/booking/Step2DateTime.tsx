@@ -7,6 +7,7 @@ import { getAvailableDatesInRange } from "@/lib/slots";
 interface ScheduleData {
   schedule: ScheduleForAvailability;
   blockedDates: string[];
+  bookingWindowDays: number;
 }
 
 interface Step2DateTimeProps {
@@ -49,9 +50,9 @@ function getTodayString(): string {
   return toDateString(today.getFullYear(), today.getMonth(), today.getDate());
 }
 
-function getMaxDateString(): string {
+function getMaxDateString(bookingWindowDays: number): string {
   const max = new Date();
-  max.setDate(max.getDate() + 30);
+  max.setDate(max.getDate() + bookingWindowDays);
   return toDateString(max.getFullYear(), max.getMonth(), max.getDate());
 }
 
@@ -79,7 +80,7 @@ export function Step2DateTime({
   const [holdingSlot, setHoldingSlot] = useState<string | null>(null);
 
   const todayStr = getTodayString();
-  const maxDateStr = getMaxDateString();
+  const maxDateStr = getMaxDateString(scheduleData.bookingWindowDays);
 
   // State for available dates (fetched from API to include custom availability)
   const [availableDatesSet, setAvailableDatesSet] = useState<Set<string>>(new Set());
@@ -185,7 +186,7 @@ export function Step2DateTime({
   const canGoPrev = !(viewYear === today.getFullYear() && viewMonth === today.getMonth());
   const canGoNext = (() => {
     const maxDate = new Date();
-    maxDate.setDate(maxDate.getDate() + 30);
+    maxDate.setDate(maxDate.getDate() + scheduleData.bookingWindowDays);
     return !(
       viewYear > maxDate.getFullYear() ||
       (viewYear === maxDate.getFullYear() && viewMonth >= maxDate.getMonth())
@@ -368,14 +369,7 @@ export function Step2DateTime({
                 avail && avail.total > 0 && avail.available > 0
                   ? avail.available / avail.total
                   : null;
-              const stripeColor =
-                pct === null
-                  ? ""
-                  : pct > 0.6
-                    ? "bg-[#99CEB7]"
-                    : pct > 0.25
-                      ? "bg-amber-400"
-                      : "bg-rose-400";
+              const stripeColor = pct === null ? "" : "bg-[#99CEB7]";
 
               return (
                 <button

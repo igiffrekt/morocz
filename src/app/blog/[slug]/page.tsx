@@ -50,7 +50,7 @@ export async function generateMetadata({
     }),
   ]);
 
-  const title = post?.title ?? "Blog | M├│rocz Medical";
+  const title = post?.title ?? "Blog | Mórocz Medical";
   const description = post?.metaDescription ?? post?.excerpt ?? undefined;
 
   // OG image cascade: ogImage > featuredImage > defaultOgImage
@@ -125,7 +125,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       {
         "@type": "ListItem",
         position: 1,
-        name: "Kezd┼ælap",
+        name: "Kezdőlap",
         item: "https://drmoroczangela.hu",
       },
       {
@@ -176,7 +176,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         <ol className="flex items-center gap-1.5 text-sm text-gray-500">
           <li>
             <Link href="/" className="hover:text-primary transition-colors duration-200">
-              Kezd┼ælap
+              Kezdőlap
             </Link>
           </li>
           <li aria-hidden="true">/</li>
@@ -197,7 +197,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         <div className="aspect-video rounded-2xl overflow-hidden mb-6">
           <Image
             src={urlFor(post.featuredImage).width(768).height(432).url()}
-            alt={post.title ?? "Blog bejegyz├⌐s"}
+            alt={post.title ?? "Blog bejegyzés"}
             width={768}
             height={432}
             className="w-full h-full object-cover"

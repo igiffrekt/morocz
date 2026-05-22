@@ -1,10 +1,11 @@
 import { defineQuery } from "next-sanity";
-import { generateAvailableSlots } from "@/lib/slots";
+import { generateAvailableSlots, resolveScheduleForDate } from "@/lib/slots";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import {
   blockedDatesQuery,
   bookingsForDateQuery,
   customAvailabilityForDateQuery,
+  seasonalScheduleForDateQuery,
   slotLocksForDateQuery,
   weeklyScheduleQuery,
 } from "@/sanity/lib/queries";
@@ -38,10 +39,11 @@ export async function GET(request: Request): Promise<Response> {
 
   try {
     // 2. Fetch all data in parallel
-    const [schedule, blockedDatesDoc, customAvail, bookings, slotLocks, service] = await Promise.all([
+    const [schedule, seasonal, blockedDatesDoc, customAvail, bookings, slotLocks, service] = await Promise.all([
       sanityFetch<{
         defaultSlotDuration: number;
         bufferMinutes: number;
+        bookingWindowDays: number | null;
         days: Array<{
           _key: string;
           dayOfWeek: number;
@@ -52,6 +54,24 @@ export async function GET(request: Request): Promise<Response> {
       } | null>({
         query: weeklyScheduleQuery,
         tags: ["weeklySchedule"],
+      }),
+      sanityFetch<{
+        _id: string;
+        startDate: string;
+        endDate: string;
+        defaultSlotDuration: number;
+        bufferMinutes: number;
+        days: Array<{
+          _key: string;
+          dayOfWeek: number;
+          isDayOff: boolean;
+          startTime: string;
+          endTime: string;
+        }>;
+      } | null>({
+        query: seasonalScheduleForDateQuery,
+        params: { date },
+        tags: ["seasonalSchedule"],
       }),
       sanityFetch<{
         dates: Array<{ _key: string; date: string; isHoliday: boolean }> | null;
@@ -123,11 +143,18 @@ export async function GET(request: Request): Promise<Response> {
       .filter(Boolean);
 
     // 6. Check if custom availability exists for this date and service
-    let scheduleForSlots = schedule ?? {
+    const defaultSchedule = schedule ?? {
       defaultSlotDuration: 20,
       bufferMinutes: 0,
       days: [],
     };
+    // Seasonal schedule (if any) overrides the default for this date.
+    // customAvailability override below still applies on top.
+    let scheduleForSlots = resolveScheduleForDate(
+      date,
+      defaultSchedule,
+      seasonal ? [seasonal] : [],
+    );
 
     // If custom availability exists and applies to this service (or all services)
     if (customAvail) {
@@ -157,7 +184,6 @@ export async function GET(request: Request): Promise<Response> {
         // If the day doesn't exist in schedule, add it
         if (!scheduleForSlots.days.find((d) => d.dayOfWeek === dayOfWeek)) {
           scheduleForSlots.days.push({
-            _key: `custom-${dayOfWeek}`,
             dayOfWeek,
             isDayOff: false,
             startTime: customAvail.startTime,
@@ -188,7 +214,7 @@ export async function GET(request: Request): Promise<Response> {
       heldSlots,
       date,
       serviceDurationMinutes,
-      maxDaysAhead: 30,
+      maxDaysAhead: schedule?.bookingWindowDays ?? 30,
     });
 
     // 8. Return result

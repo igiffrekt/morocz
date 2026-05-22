@@ -145,12 +145,12 @@ export default function AdminDashboard({
     }
   }
 
-  async function handleConfirmCancel(bookingId: string, reason?: string) {
+  async function handleConfirmCancel(bookingId: string, reason?: string, refund?: boolean) {
     try {
       const res = await fetch("/api/admin/booking-cancel", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ bookingId, reason }),
+        body: JSON.stringify({ bookingId, reason, refund }),
       });
 
       if (!res.ok) {
@@ -624,6 +624,7 @@ export default function AdminDashboard({
           slotDate={cancellingBooking.slotDate}
           slotTime={cancellingBooking.slotTime}
           serviceName={cancellingBooking.service?.name ?? null}
+          paymentStatus={cancellingBooking.paymentStatus}
           onClose={() => setCancellingBooking(null)}
           onConfirm={handleConfirmCancel}
         />

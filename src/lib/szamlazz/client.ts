@@ -56,9 +56,13 @@ export async function issueCreditInvoice({
   const invoiceNumber = res.headers.get("szlahu_szamlaszam");
 
   if (!res.ok || (errorCode && errorCode !== "0") || !invoiceNumber) {
-    const message =
-      res.headers.get("szlahu_error_message") ??
-      `Számlázz.hu request failed (HTTP ${res.status})`;
+    // Számlázz returns the real message in the `szlahu_error` header, form-urlencoded
+    // (so `+` means space). `szlahu_error_message` does not exist — reading it left us with
+    // a useless "(HTTP 200)" that hid e.g. "Hiányzó adat: elado elem".
+    const rawError = res.headers.get("szlahu_error");
+    const message = rawError
+      ? decodeURIComponent(rawError.replace(/\+/g, " "))
+      : `Számlázz.hu request failed (HTTP ${res.status})`;
     throw new SzamlazzError(message, errorCode);
   }
 

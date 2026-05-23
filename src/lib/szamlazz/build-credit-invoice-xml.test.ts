@@ -35,8 +35,12 @@ describe("buildCreditInvoiceXml", () => {
     expect(xml).not.toContain('<1>');
   });
 
-  it("omits the <elado> seller block (seller comes from account config)", () => {
+  it("includes the <elado> seller block (required for e-invoices — Számlázz error 'Hiányzó adat: elado elem' without it)", () => {
     const xml = buildCreditInvoiceXml({ agentKey: "K", amountHuf: 10_000, buyer });
-    expect(xml).not.toContain("<elado>");
+    expect(xml).toContain("<elado>");
+    expect(xml).toContain("</elado>");
+    // ordered after <fejlec> and before <vevo> per the xmlszamla XSD sequence
+    expect(xml.indexOf("<elado>")).toBeGreaterThan(xml.indexOf("</fejlec>"));
+    expect(xml.indexOf("<elado>")).toBeLessThan(xml.indexOf("<vevo>"));
   });
 });

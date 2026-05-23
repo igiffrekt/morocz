@@ -10,6 +10,7 @@ import { user } from "@/lib/db/schema";
 import { isEmailConfigured, sendEmail } from "@/lib/email";
 import { createCalendarEvent } from "@/lib/google-calendar";
 import { processRefund, type RefundBooking } from "@/lib/refund/process-refund";
+import { resolveLatestRefundId } from "@/lib/refund/resolve-latest-refund";
 import { getWriteClient } from "@/lib/sanity-write-client";
 import { stripe } from "@/lib/stripe";
 import { issueCreditInvoice } from "@/lib/szamlazz/client";
@@ -186,16 +187,20 @@ export async function POST(request: Request): Promise<Response> {
       typeof charge.payment_intent === "string"
         ? charge.payment_intent
         : (charge.payment_intent?.id ?? null);
-    // Stripe embeds refunds newest-first, so data[0] is the refund that triggered this
-    // event. We only ever issue one full refund per booking, so this is unambiguous.
-    const latestRefund = charge.refunds?.data?.[0];
+    // API version 2026-03-25.dahlia does not embed `refunds` on the charge, so we list the
+    // charge's refunds when absent. Newest-first, and we only ever issue one full refund per
+    // booking, so refunds[0] is unambiguously the refund that triggered this event.
+    const latestRefundId = await resolveLatestRefundId(charge, async (chargeId) => {
+      const list = await stripe.refunds.list({ charge: chargeId, limit: 1 });
+      return list.data;
+    });
 
-    if (paymentIntentId && latestRefund) {
+    if (paymentIntentId && latestRefundId) {
       try {
         await processRefund(
           {
             paymentIntentId,
-            refundId: latestRefund.id,
+            refundId: latestRefundId,
             billingName: charge.billing_details?.name ?? null,
             billingAddress: {
               zip: charge.billing_details?.address?.postal_code ?? null,
@@ -207,7 +212,7 @@ export async function POST(request: Request): Promise<Response> {
             findBooking: (pi) =>
               getWriteClient().fetch<RefundBooking | null>(
                 `*[_type == "booking" && stripePaymentIntentId == $pi][0]{
-                  _id, patientName, patientEmail, stripeRefundId
+                  _id, patientName, patientEmail, creditInvoiceNumber
                 }`,
                 { pi },
               ),

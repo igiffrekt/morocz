@@ -51,6 +51,11 @@ export function buildCreditInvoiceXml({
     <szamlaNyelve>hu</szamlaNyelve>
     <megjegyzes>Foglalási díj visszatérítése</megjegyzes>
   </fejlec>
+  <elado>
+    <emailReplyto>idopontfoglalas@drmoroczangela.hu</emailReplyto>
+    <emailTargy>Helyesbítő számla — foglalási díj visszatérítése</emailTargy>
+    <emailSzoveg>Tisztelt Páciensünk! Mellékelten küldjük a foglalási díj visszatérítéséről szóló helyesbítő számlát.</emailSzoveg>
+  </elado>
   <vevo>
     <nev>${esc(buyer.name)}</nev>
     <irsz>${esc(buyer.zip)}</irsz>

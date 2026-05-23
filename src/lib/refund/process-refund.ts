@@ -11,7 +11,7 @@ export interface RefundBooking {
   _id: string;
   patientName: string;
   patientEmail: string;
-  stripeRefundId: string | null;
+  creditInvoiceNumber: string | null;
 }
 
 export interface ProcessRefundDeps {
@@ -33,8 +33,13 @@ export async function processRefund(charge: RefundCharge, deps: ProcessRefundDep
     console.warn(`[process-refund] No booking for payment intent ${charge.paymentIntentId}`);
     return;
   }
-  if (booking.stripeRefundId === charge.refundId) {
-    console.log(`[process-refund] Refund ${charge.refundId} already processed for ${booking._id}`);
+  // Idempotency: skip only when the credit invoice was actually issued. Keying on the refund
+  // id was a bug — a prior FAILED attempt records stripeRefundId (see the catch below), which
+  // then permanently blocked retries even though no invoice exists.
+  if (booking.creditInvoiceNumber) {
+    console.log(
+      `[process-refund] Credit invoice ${booking.creditInvoiceNumber} already issued for ${booking._id}`,
+    );
     return;
   }
 
@@ -68,6 +73,7 @@ export async function processRefund(charge: RefundCharge, deps: ProcessRefundDep
       creditInvoiceNumber: invoiceNumber,
       creditInvoiceIssuedAt: new Date().toISOString(),
     });
+    console.log(`[process-refund] Credit invoice ${invoiceNumber} issued for ${booking._id}`);
   } catch (err) {
     console.error(`[process-refund] Credit invoice failed for ${booking._id}:`, err);
     // Run both independently: a patchBooking failure must not prevent the reception

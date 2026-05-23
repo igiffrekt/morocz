@@ -13,7 +13,7 @@ function makeDeps(overrides: Partial<ProcessRefundDeps> = {}): ProcessRefundDeps
       _id: "booking-1",
       patientName: "Teszt Páciens",
       patientEmail: "t@e.hu",
-      stripeRefundId: null,
+      creditInvoiceNumber: null,
     }),
     getBuyerAddress: vi
       .fn()
@@ -60,18 +60,33 @@ describe("processRefund", () => {
     expect(deps.sendInvoiceFailedEmail).not.toHaveBeenCalled();
   });
 
-  it("is a no-op when the refund id is already recorded (idempotent)", async () => {
+  it("is a no-op when the credit invoice was already issued (idempotent)", async () => {
     const deps = makeDeps({
       findBooking: vi.fn().mockResolvedValue({
         _id: "booking-1",
         patientName: "X",
         patientEmail: "t@e.hu",
-        stripeRefundId: "re_1",
+        creditInvoiceNumber: "E-CR-1",
       }),
     });
     await processRefund(charge, deps);
     expect(deps.issueCreditInvoice).not.toHaveBeenCalled();
     expect(deps.patchBooking).not.toHaveBeenCalled();
+  });
+
+  it("retries issuing the invoice after a prior failed attempt (no creditInvoiceNumber yet)", async () => {
+    // Regression: a failed attempt records stripeRefundId but no invoice; the old refund-id
+    // guard then blocked retries forever. The guard must key on creditInvoiceNumber instead.
+    const deps = makeDeps({
+      findBooking: vi.fn().mockResolvedValue({
+        _id: "booking-1",
+        patientName: "X",
+        patientEmail: "t@e.hu",
+        creditInvoiceNumber: null,
+      }),
+    });
+    await processRefund(charge, deps);
+    expect(deps.issueCreditInvoice).toHaveBeenCalledTimes(1);
   });
 
   it("does nothing when no booking matches the payment intent", async () => {

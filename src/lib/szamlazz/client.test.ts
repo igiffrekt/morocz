@@ -41,6 +41,21 @@ describe("issueCreditInvoice", () => {
     );
   });
 
+  it("surfaces the Számlázz message from the URL-encoded szlahu_error header", async () => {
+    // Real Számlázz failures put the message in `szlahu_error` (form-urlencoded: + = space),
+    // NOT `szlahu_error_message`. Without decoding it we logged a useless generic message.
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response("[ERR] ...", {
+        status: 200,
+        headers: { szlahu_error_code: "7", szlahu_error: "Hi%C3%A1nyz%C3%B3+adat%3A+elado+elem." },
+      }),
+    );
+    const err = await issueCreditInvoice({ amountHuf: 10_000, buyer }).catch((e) => e);
+    expect(err).toBeInstanceOf(SzamlazzError);
+    expect(err.message).toBe("Hiányzó adat: elado elem.");
+    expect(err.code).toBe("7");
+  });
+
   it("throws when SZAMLA_AGENT_KEY is missing", async () => {
     delete process.env.SZAMLA_AGENT_KEY;
     await expect(issueCreditInvoice({ amountHuf: 10_000, buyer })).rejects.toThrow(

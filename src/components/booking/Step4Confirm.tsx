@@ -410,6 +410,7 @@ export function Step4Confirm({ selections, onBack, onSuccess, onConflict }: Step
                     value={companyName}
                     onChange={(e) => setCompanyName(e.target.value)}
                     placeholder="Cégnév"
+                    aria-label="Cégnév"
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30 focus:border-[var(--color-primary)] transition-colors"
                   />
                   <div className="flex gap-3">
@@ -418,6 +419,7 @@ export function Step4Confirm({ selections, onBack, onSuccess, onConflict }: Step
                       value={companyZip}
                       onChange={(e) => setCompanyZip(e.target.value)}
                       placeholder="Irsz."
+                      aria-label="Irányítószám"
                       className="w-28 px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30 focus:border-[var(--color-primary)] transition-colors"
                     />
                     <input
@@ -425,6 +427,7 @@ export function Step4Confirm({ selections, onBack, onSuccess, onConflict }: Step
                       value={companyCity}
                       onChange={(e) => setCompanyCity(e.target.value)}
                       placeholder="Település"
+                      aria-label="Település"
                       className="flex-1 px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30 focus:border-[var(--color-primary)] transition-colors"
                     />
                   </div>
@@ -433,6 +436,7 @@ export function Step4Confirm({ selections, onBack, onSuccess, onConflict }: Step
                     value={companyAddress}
                     onChange={(e) => setCompanyAddress(e.target.value)}
                     placeholder="Cím (utca, házszám)"
+                    aria-label="Cím"
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30 focus:border-[var(--color-primary)] transition-colors"
                   />
                 </div>

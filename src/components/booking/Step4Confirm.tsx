@@ -5,6 +5,7 @@ import { z } from "zod";
 
 import { useSession, signOut } from "@/lib/auth-client";
 import { CONSENT_LABEL, CONSENT_LINK_TEXT, PRIVACY_POLICY_URL } from "@/lib/consent-text";
+import { isValidHungarianTaxNumber } from "@/lib/szamlazz/tax-number";
 
 interface Step4Props {
   selections: {
@@ -73,6 +74,7 @@ export function Step4Confirm({ selections, onBack, onSuccess, onConflict }: Step
   const [consentChecked, setConsentChecked] = useState(false);
   const [consentError, setConsentError] = useState<string | null>(null);
   const [errors, setErrors] = useState<FormErrors>({});
+  const [businessErrors, setBusinessErrors] = useState<{ taxNumber?: string; company?: string }>({});
   const [submitting, setSubmitting] = useState(false);
   const [globalError, setGlobalError] = useState<string | null>(null);
   const [wantsBusinessInvoice, setWantsBusinessInvoice] = useState(false);
@@ -116,6 +118,24 @@ export function Step4Confirm({ selections, onBack, onSuccess, onConflict }: Step
     }
 
     if (!validate()) return;
+
+    if (wantsBusinessInvoice) {
+      const be: { taxNumber?: string; company?: string } = {};
+      if (!isValidHungarianTaxNumber(taxNumber)) {
+        be.taxNumber = "Érvénytelen adószám. A helyes formátum: 12345678-1-23.";
+      }
+      if (
+        !companySameAsPersonal &&
+        (!companyName.trim() || !companyZip.trim() || !companyCity.trim() || !companyAddress.trim())
+      ) {
+        be.company = "Kérjük, töltse ki a cégnevet és a teljes címet.";
+      }
+      if (be.taxNumber || be.company) {
+        setBusinessErrors(be);
+        return;
+      }
+    }
+    setBusinessErrors({});
 
     if (!consentChecked) {
       setConsentError("Az adatkezelési hozzájárulás elfogadása kötelező.");
@@ -389,6 +409,9 @@ export function Step4Confirm({ selections, onBack, onSuccess, onConflict }: Step
                   placeholder="12345678-1-23"
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30 focus:border-[var(--color-primary)] transition-colors"
                 />
+                {businessErrors.taxNumber && (
+                  <p className="mt-1 text-xs text-red-600">{businessErrors.taxNumber}</p>
+                )}
               </div>
 
               <label className="flex items-start gap-2 cursor-pointer">
@@ -439,6 +462,9 @@ export function Step4Confirm({ selections, onBack, onSuccess, onConflict }: Step
                     aria-label="Cím"
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30 focus:border-[var(--color-primary)] transition-colors"
                   />
+                  {businessErrors.company && (
+                    <p className="mt-1 text-xs text-red-600">{businessErrors.company}</p>
+                  )}
                 </div>
               )}
 

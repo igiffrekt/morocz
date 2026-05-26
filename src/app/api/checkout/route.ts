@@ -1,11 +1,19 @@
 import { headers } from "next/headers";
 import { defineQuery } from "next-sanity";
 import { z } from "zod";
+import { eq } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { assertDayStillOpen } from "@/lib/booking-guards";
+import { db } from "@/lib/db";
+import { user } from "@/lib/db/schema";
 import { getWriteClient } from "@/lib/sanity-write-client";
 import { generateAvailableSlots } from "@/lib/slots";
 import { stripe, BOOKING_FEE_HUF } from "@/lib/stripe";
+import {
+  BusinessInvoiceSchema,
+  buildBusinessInvoiceMetadata,
+  type BusinessInvoiceMetadata,
+} from "@/lib/szamlazz/build-pi-metadata";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import {
   blockedDatesQuery,
@@ -29,6 +37,7 @@ const BookingSchema = z.object({
   patientEmail: z.string().email("Érvénytelen e-mail cím."),
   patientPhone: z.string().min(7, "Kérjük, adja meg telefonszámát."),
   slotLockId: z.string().optional(),
+  businessInvoice: BusinessInvoiceSchema.optional(),
 });
 
 type SlotLock = {
@@ -68,7 +77,40 @@ export async function POST(request: Request): Promise<Response> {
       return Response.json({ error: firstError }, { status: 400 });
     }
 
-    const { serviceId, slotDate, slotTime, patientName, patientEmail, patientPhone, slotLockId: providedSlotLockId } = parsed.data;
+    const {
+      serviceId,
+      slotDate,
+      slotTime,
+      patientName,
+      patientEmail,
+      patientPhone,
+      slotLockId: providedSlotLockId,
+      businessInvoice,
+    } = parsed.data;
+
+    // Resolve a business invoice up front: a 400 here must not leave an orphan
+    // booking/slot lock behind. piMetadata stays null for the ordinary
+    // (magánszemély) path, which then sends exactly what it sends today.
+    let piMetadata: BusinessInvoiceMetadata | null = null;
+    if (businessInvoice) {
+      const profile = await db.query.user.findFirst({
+        where: eq(user.id, session.user.id),
+        columns: { postalCode: true, city: true, streetAddress: true },
+      });
+      const built = buildBusinessInvoiceMetadata(businessInvoice, {
+        patientName,
+        patientEmail,
+        profileAddress: {
+          zip: profile?.postalCode ?? null,
+          city: profile?.city ?? null,
+          address: profile?.streetAddress ?? null,
+        },
+      });
+      if (!built.ok) {
+        return Response.json({ error: built.error }, { status: 400 });
+      }
+      piMetadata = built.metadata;
+    }
 
     const dayLockError = await assertDayStillOpen(slotDate);
     if (dayLockError) return dayLockError;
@@ -155,6 +197,14 @@ export async function POST(request: Request): Promise<Response> {
       status: "confirmed",
       paymentStatus: "pending",
       paymentAmount: BOOKING_FEE_HUF,
+      ...(piMetadata && {
+        businessInvoiceRequested: true,
+        businessTaxNumber: piMetadata.tax_number,
+        businessBuyerName: piMetadata.buyer_name,
+        businessBuyerZip: piMetadata.zip,
+        businessBuyerCity: piMetadata.city,
+        businessBuyerAddress: piMetadata.address,
+      }),
       createdAt: new Date().toISOString(),
     });
 
@@ -204,6 +254,7 @@ export async function POST(request: Request): Promise<Response> {
           patientEmail,
           patientPhone,
         },
+        ...(piMetadata && { payment_intent_data: { metadata: piMetadata } }),
         success_url: `${appUrl}/foglalas/sikeres?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${appUrl}/foglalas/megszakitva?booking_id=${booking._id}`,
         expires_at: Math.floor(Date.now() / 1000) + 2100,

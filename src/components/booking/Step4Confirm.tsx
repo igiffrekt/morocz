@@ -5,6 +5,7 @@ import { z } from "zod";
 
 import { useSession, signOut } from "@/lib/auth-client";
 import { CONSENT_LABEL, CONSENT_LINK_TEXT, PRIVACY_POLICY_URL } from "@/lib/consent-text";
+import { isValidHungarianTaxNumber } from "@/lib/szamlazz/tax-number";
 
 interface Step4Props {
   selections: {
@@ -73,8 +74,16 @@ export function Step4Confirm({ selections, onBack, onSuccess, onConflict }: Step
   const [consentChecked, setConsentChecked] = useState(false);
   const [consentError, setConsentError] = useState<string | null>(null);
   const [errors, setErrors] = useState<FormErrors>({});
+  const [businessErrors, setBusinessErrors] = useState<{ taxNumber?: string; company?: string }>({});
   const [submitting, setSubmitting] = useState(false);
   const [globalError, setGlobalError] = useState<string | null>(null);
+  const [wantsBusinessInvoice, setWantsBusinessInvoice] = useState(false);
+  const [taxNumber, setTaxNumber] = useState("");
+  const [companySameAsPersonal, setCompanySameAsPersonal] = useState(true);
+  const [companyName, setCompanyName] = useState("");
+  const [companyZip, setCompanyZip] = useState("");
+  const [companyCity, setCompanyCity] = useState("");
+  const [companyAddress, setCompanyAddress] = useState("");
 
   const formattedDate = formatDateHungarian(selections.selectedDate);
 
@@ -110,6 +119,24 @@ export function Step4Confirm({ selections, onBack, onSuccess, onConflict }: Step
 
     if (!validate()) return;
 
+    if (wantsBusinessInvoice) {
+      const be: { taxNumber?: string; company?: string } = {};
+      if (!isValidHungarianTaxNumber(taxNumber)) {
+        be.taxNumber = "Érvénytelen adószám. A helyes formátum: 12345678-1-23.";
+      }
+      if (
+        !companySameAsPersonal &&
+        (!companyName.trim() || !companyZip.trim() || !companyCity.trim() || !companyAddress.trim())
+      ) {
+        be.company = "Kérjük, töltse ki a cégnevet és a teljes címet.";
+      }
+      if (be.taxNumber || be.company) {
+        setBusinessErrors(be);
+        return;
+      }
+    }
+    setBusinessErrors({});
+
     if (!consentChecked) {
       setConsentError("Az adatkezelési hozzájárulás elfogadása kötelező.");
       return;
@@ -130,6 +157,18 @@ export function Step4Confirm({ selections, onBack, onSuccess, onConflict }: Step
           patientEmail,
           patientPhone,
           ...(selections.slotLockId && { slotLockId: selections.slotLockId }),
+          ...(wantsBusinessInvoice && {
+            businessInvoice: {
+              taxNumber,
+              sameAsPersonal: companySameAsPersonal,
+              ...(!companySameAsPersonal && {
+                companyName,
+                companyZip,
+                companyCity,
+                companyAddress,
+              }),
+            },
+          }),
         }),
       });
 
@@ -341,6 +380,99 @@ export function Step4Confirm({ selections, onBack, onSuccess, onConflict }: Step
           />
           {errors.patientPhone && (
             <p className="mt-1 text-xs text-red-600">{errors.patientPhone}</p>
+          )}
+        </div>
+
+        {/* Business invoice opt-in */}
+        <div className="rounded-xl border border-gray-200 p-3">
+          <label className="flex items-start gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={wantsBusinessInvoice}
+              onChange={(e) => setWantsBusinessInvoice(e.target.checked)}
+              className="mt-0.5 h-4 w-4 rounded border-gray-300 text-[var(--color-primary)] focus:ring-[var(--color-primary)]/30"
+            />
+            <span className="text-sm font-medium text-gray-700">Céges számlát kérek</span>
+          </label>
+
+          {wantsBusinessInvoice && (
+            <div className="mt-3 space-y-3">
+              <div>
+                <label htmlFor="tax-number" className="block text-xs font-medium text-gray-700 mb-1">
+                  Adószám
+                </label>
+                <input
+                  id="tax-number"
+                  type="text"
+                  value={taxNumber}
+                  onChange={(e) => setTaxNumber(e.target.value)}
+                  placeholder="12345678-1-23"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30 focus:border-[var(--color-primary)] transition-colors"
+                />
+                {businessErrors.taxNumber && (
+                  <p className="mt-1 text-xs text-red-600">{businessErrors.taxNumber}</p>
+                )}
+              </div>
+
+              <label className="flex items-start gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={companySameAsPersonal}
+                  onChange={(e) => setCompanySameAsPersonal(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 rounded border-gray-300 text-[var(--color-primary)] focus:ring-[var(--color-primary)]/30"
+                />
+                <span className="text-xs text-gray-600">
+                  A céges adatok megegyeznek a személyes adatokkal (pl. EV)
+                </span>
+              </label>
+
+              {!companySameAsPersonal && (
+                <div className="space-y-3">
+                  <input
+                    type="text"
+                    value={companyName}
+                    onChange={(e) => setCompanyName(e.target.value)}
+                    placeholder="Cégnév"
+                    aria-label="Cégnév"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30 focus:border-[var(--color-primary)] transition-colors"
+                  />
+                  <div className="flex gap-3">
+                    <input
+                      type="text"
+                      value={companyZip}
+                      onChange={(e) => setCompanyZip(e.target.value)}
+                      placeholder="Irsz."
+                      aria-label="Irányítószám"
+                      className="w-28 px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30 focus:border-[var(--color-primary)] transition-colors"
+                    />
+                    <input
+                      type="text"
+                      value={companyCity}
+                      onChange={(e) => setCompanyCity(e.target.value)}
+                      placeholder="Település"
+                      aria-label="Település"
+                      className="flex-1 px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30 focus:border-[var(--color-primary)] transition-colors"
+                    />
+                  </div>
+                  <input
+                    type="text"
+                    value={companyAddress}
+                    onChange={(e) => setCompanyAddress(e.target.value)}
+                    placeholder="Cím (utca, házszám)"
+                    aria-label="Cím"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30 focus:border-[var(--color-primary)] transition-colors"
+                  />
+                  {businessErrors.company && (
+                    <p className="mt-1 text-xs text-red-600">{businessErrors.company}</p>
+                  )}
+                </div>
+              )}
+
+              <p className="text-xs text-gray-500">
+                A számla hibás adószám esetén nem állítható ki. A részletes ellenőrzést a
+                fizetés indításakor végezzük.
+              </p>
+            </div>
           )}
         </div>
 

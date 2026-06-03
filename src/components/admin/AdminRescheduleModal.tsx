@@ -41,16 +41,27 @@ export default function AdminRescheduleModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // ── Fetch free slots ────────────────────────────────────────────────────────
+  const fetchSlots = async (): Promise<string[]> => {
+    try {
+      const res = await fetch(`/api/slots?date=${date}&serviceId=${encodeURIComponent(serviceId)}`);
+      if (!res.ok) return [];
+      const data = (await res.json()) as { slots?: string[] };
+      return data.slots ?? [];
+    } catch {
+      return [];
+    }
+  };
+
   // ── Fetch free slots whenever the date changes ─────────────────────────────
+  // biome-ignore lint/correctness/useExhaustiveDependencies: fetchSlots closes over date and serviceId
   useEffect(() => {
     if (!date) return;
     setSlotsLoading(true);
     setSelectedTime(null);
     setError(null);
-    void fetch(`/api/slots?date=${date}&serviceId=${encodeURIComponent(serviceId)}`)
-      .then((res) => (res.ok ? res.json() : Promise.reject(res)))
-      .then((data: { slots?: string[] }) => setSlots(data.slots ?? []))
-      .catch(() => setSlots([]))
+    void fetchSlots()
+      .then(setSlots)
       .finally(() => setSlotsLoading(false));
   }, [date, serviceId]);
 
@@ -72,10 +83,7 @@ export default function AdminRescheduleModal({
         // A 409 likely means the slot was just taken — refresh the list.
         if (res.status === 409) {
           setSelectedTime(null);
-          void fetch(`/api/slots?date=${date}&serviceId=${encodeURIComponent(serviceId)}`)
-            .then((r) => (r.ok ? r.json() : Promise.reject(r)))
-            .then((d: { slots?: string[] }) => setSlots(d.slots ?? []))
-            .catch(() => {});
+          void fetchSlots().then(setSlots);
         }
       }
     } catch {
@@ -230,6 +238,7 @@ export default function AdminRescheduleModal({
 
           {/* Notify checkbox */}
           <label
+            htmlFor="reschedule-notify"
             style={{
               display: "flex",
               alignItems: "center",
@@ -240,6 +249,7 @@ export default function AdminRescheduleModal({
             }}
           >
             <input
+              id="reschedule-notify"
               type="checkbox"
               checked={notifyPatient}
               disabled={isSubmitting}

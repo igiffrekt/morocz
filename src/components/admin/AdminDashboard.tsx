@@ -21,6 +21,7 @@ export type AdminBooking = {
   patientPhone: string;
   reservationNumber: string;
   service: { name: string; appointmentDuration: number } | null;
+  serviceId: string | null;
   slotDate: string;
   slotTime: string;
   status: string;

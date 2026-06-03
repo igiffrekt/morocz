@@ -51,6 +51,7 @@ export async function GET(request: Request): Promise<Response> {
       patientPhone: string;
       reservationNumber: string;
       service: { name: string; appointmentDuration: number } | null;
+      serviceId: string | null;
       slotDate: string;
       slotTime: string;
       status: string;
@@ -70,6 +71,7 @@ export async function GET(request: Request): Promise<Response> {
           patientPhone,
           reservationNumber,
           service->{name, appointmentDuration},
+          "serviceId": service._ref,
           slotDate,
           slotTime,
           status,
@@ -95,6 +97,7 @@ export async function GET(request: Request): Promise<Response> {
         patientPhone: "",
         reservationNumber: "",
         service: h.serviceName ? { name: h.serviceName, appointmentDuration: 0 } : null,
+        serviceId: null,
         slotDate: h.date,
         slotTime: h.time,
         status: h.status,
@@ -146,6 +149,7 @@ export async function GET(request: Request): Promise<Response> {
         patientPhone,
         reservationNumber,
         service->{name, appointmentDuration},
+        "serviceId": service._ref,
         slotDate,
         slotTime,
         status,
@@ -170,6 +174,7 @@ export async function GET(request: Request): Promise<Response> {
       patientPhone: "",
       reservationNumber: "",
       service: h.serviceName ? { name: h.serviceName, appointmentDuration: 0 } : null,
+      serviceId: null,
       slotDate: h.date,
       slotTime: h.time,
       status: h.status,

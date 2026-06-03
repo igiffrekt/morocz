@@ -14,7 +14,10 @@ const writeClient = vi.hoisted(() => ({
 }));
 vi.mock("@/lib/sanity-write-client", () => ({ getWriteClient: () => writeClient }));
 
-vi.mock("@/lib/google-calendar", () => ({ createCalendarEvent: vi.fn(), deleteCalendarEvent: vi.fn() }));
+vi.mock("@/lib/google-calendar", () => ({
+  createCalendarEvent: vi.fn(),
+  deleteCalendarEvent: vi.fn(),
+}));
 vi.mock("@/lib/email", () => ({ isEmailConfigured: () => false, sendEmail: vi.fn() }));
 vi.mock("@/lib/booking-email", () => ({ buildRescheduleEmail: vi.fn(() => "<html>") }));
 
@@ -58,44 +61,98 @@ beforeEach(() => {
   writeClient.createIfNotExists.mockReset().mockResolvedValue({});
   writeClient.patch.mockReset().mockImplementation(() => makePatch());
   getSession.mockResolvedValue({ user: { role: "admin" } });
-  getAvailableSlotsForDate.mockResolvedValue({ slots: ["10:00", "10:20"], serviceName: "Vizsgálat", durationMinutes: 20 });
+  getAvailableSlotsForDate.mockResolvedValue({
+    slots: ["10:00", "10:20"],
+    serviceName: "Vizsgálat",
+    durationMinutes: 20,
+  });
 });
 
 describe("POST /api/admin/booking-reschedule", () => {
   it("rejects non-admin sessions with 403", async () => {
     getSession.mockResolvedValue({ user: { role: "user" } });
-    const res = await POST(req({ bookingId: "booking-1", newDate: "2026-07-15", newTime: "10:00", notifyPatient: false }));
+    const res = await POST(
+      req({
+        bookingId: "booking-1",
+        newDate: "2026-07-15",
+        newTime: "10:00",
+        notifyPatient: false,
+      }),
+    );
     expect(res.status).toBe(403);
   });
 
   it("rejects unauthenticated requests with 401", async () => {
     getSession.mockResolvedValue(null);
-    const res = await POST(req({ bookingId: "booking-1", newDate: "2026-07-15", newTime: "10:00", notifyPatient: false }));
+    const res = await POST(
+      req({
+        bookingId: "booking-1",
+        newDate: "2026-07-15",
+        newTime: "10:00",
+        notifyPatient: false,
+      }),
+    );
     expect(res.status).toBe(401);
   });
 
   it("rejects when booking is not confirmed", async () => {
     writeClient.fetch.mockResolvedValueOnce({ ...confirmedBooking, status: "cancelled" });
-    const res = await POST(req({ bookingId: "booking-1", newDate: "2026-07-15", newTime: "10:00", notifyPatient: false }));
+    const res = await POST(
+      req({
+        bookingId: "booking-1",
+        newDate: "2026-07-15",
+        newTime: "10:00",
+        notifyPatient: false,
+      }),
+    );
     expect(res.status).toBe(400);
   });
 
   it("rejects when the booking has no service assigned", async () => {
-    writeClient.fetch.mockResolvedValueOnce({ ...confirmedBooking, status: "confirmed", serviceId: null });
-    const res = await POST(req({ bookingId: "booking-1", newDate: "2026-07-15", newTime: "10:00", notifyPatient: false }));
+    writeClient.fetch.mockResolvedValueOnce({
+      ...confirmedBooking,
+      status: "confirmed",
+      serviceId: null,
+    });
+    const res = await POST(
+      req({
+        bookingId: "booking-1",
+        newDate: "2026-07-15",
+        newTime: "10:00",
+        notifyPatient: false,
+      }),
+    );
     expect(res.status).toBe(400);
   });
 
   it("rejects a no-op (same date and time)", async () => {
     writeClient.fetch.mockResolvedValueOnce({ ...confirmedBooking, status: "confirmed" });
-    const res = await POST(req({ bookingId: "booking-1", newDate: "2026-07-15", newTime: "09:00", notifyPatient: false }));
+    const res = await POST(
+      req({
+        bookingId: "booking-1",
+        newDate: "2026-07-15",
+        newTime: "09:00",
+        notifyPatient: false,
+      }),
+    );
     expect(res.status).toBe(400);
   });
 
   it("rejects when the new slot is not in the available list", async () => {
     writeClient.fetch.mockResolvedValueOnce({ ...confirmedBooking, status: "confirmed" });
-    getAvailableSlotsForDate.mockResolvedValue({ slots: ["11:00"], serviceName: "Vizsgálat", durationMinutes: 20 });
-    const res = await POST(req({ bookingId: "booking-1", newDate: "2026-07-15", newTime: "10:00", notifyPatient: false }));
+    getAvailableSlotsForDate.mockResolvedValue({
+      slots: ["11:00"],
+      serviceName: "Vizsgálat",
+      durationMinutes: 20,
+    });
+    const res = await POST(
+      req({
+        bookingId: "booking-1",
+        newDate: "2026-07-15",
+        newTime: "10:00",
+        notifyPatient: false,
+      }),
+    );
     expect(res.status).toBe(409);
   });
 
@@ -103,7 +160,14 @@ describe("POST /api/admin/booking-reschedule", () => {
     writeClient.fetch
       .mockResolvedValueOnce({ ...confirmedBooking, status: "confirmed" }) // booking
       .mockResolvedValueOnce({ _id: "slotLock-x", _rev: "r1", status: "booked" }); // new slot lock
-    const res = await POST(req({ bookingId: "booking-1", newDate: "2026-07-15", newTime: "10:00", notifyPatient: false }));
+    const res = await POST(
+      req({
+        bookingId: "booking-1",
+        newDate: "2026-07-15",
+        newTime: "10:00",
+        notifyPatient: false,
+      }),
+    );
     expect(res.status).toBe(409);
   });
 
@@ -111,7 +175,14 @@ describe("POST /api/admin/booking-reschedule", () => {
     writeClient.fetch
       .mockResolvedValueOnce({ ...confirmedBooking, status: "confirmed" }) // booking
       .mockResolvedValueOnce({ _id: "slotLock-new", _rev: "r1", status: "available" }); // new slot lock
-    const res = await POST(req({ bookingId: "booking-1", newDate: "2026-07-15", newTime: "10:00", notifyPatient: false }));
+    const res = await POST(
+      req({
+        bookingId: "booking-1",
+        newDate: "2026-07-15",
+        newTime: "10:00",
+        notifyPatient: false,
+      }),
+    );
     expect(res.status).toBe(200);
     // booking patched to new date/time
     expect(writeClient.patch).toHaveBeenCalledWith("booking-1");

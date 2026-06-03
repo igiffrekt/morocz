@@ -84,7 +84,10 @@ export async function POST(request: Request): Promise<Response> {
 
     // ── 5. Server-side authority: the new slot must be genuinely free ──────────
     if (!booking.serviceId) {
-      return Response.json({ error: "A foglaláshoz nincs szolgáltatás rendelve." }, { status: 400 });
+      return Response.json(
+        { error: "A foglaláshoz nincs szolgáltatás rendelve." },
+        { status: 400 },
+      );
     }
     const availability = await getAvailableSlotsForDate(newDate, booking.serviceId);
     if (!availability || !availability.slots.includes(newTime)) {
@@ -174,7 +177,10 @@ export async function POST(request: Request): Promise<Response> {
           durationMinutes: booking.service?.appointmentDuration ?? 20,
         });
         if (newEventId) {
-          await getWriteClient().patch(booking._id).set({ googleCalendarEventId: newEventId }).commit();
+          await getWriteClient()
+            .patch(booking._id)
+            .set({ googleCalendarEventId: newEventId })
+            .commit();
         }
       } catch (err) {
         console.error("[api/admin/booking-reschedule] Calendar update failed:", err);

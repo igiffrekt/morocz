@@ -28,7 +28,12 @@ describe("getAvailableSlotsForDate", () => {
 
   it("returns null when the service is not found", async () => {
     mockSanityByTag({
-      weeklySchedule: { defaultSlotDuration: 20, bufferMinutes: 0, bookingWindowDays: 30, days: [] },
+      weeklySchedule: {
+        defaultSlotDuration: 20,
+        bufferMinutes: 0,
+        bookingWindowDays: 30,
+        days: [],
+      },
       seasonalSchedule: null,
       blockedDate: { dates: [] },
       customAvailability: null,
@@ -43,7 +48,12 @@ describe("getAvailableSlotsForDate", () => {
 
   it("returns slots and threads booked/held times into generateAvailableSlots", async () => {
     mockSanityByTag({
-      weeklySchedule: { defaultSlotDuration: 20, bufferMinutes: 0, bookingWindowDays: 30, days: [] },
+      weeklySchedule: {
+        defaultSlotDuration: 20,
+        bufferMinutes: 0,
+        bookingWindowDays: 30,
+        days: [],
+      },
       seasonalSchedule: null,
       blockedDate: { dates: [{ date: "2026-07-20" }] },
       customAvailability: null,
@@ -54,7 +64,11 @@ describe("getAvailableSlotsForDate", () => {
 
     const result = await getAvailableSlotsForDate("2026-07-15", "svc");
 
-    expect(result).toEqual({ slots: ["09:00", "09:20"], serviceName: "Vizsgálat", durationMinutes: 20 });
+    expect(result).toEqual({
+      slots: ["09:00", "09:20"],
+      serviceName: "Vizsgálat",
+      durationMinutes: 20,
+    });
     const arg = generateAvailableSlots.mock.calls[0][0];
     expect(arg.bookedSlots).toContain("10:00");
     expect(arg.heldSlots).toContain("11:00");

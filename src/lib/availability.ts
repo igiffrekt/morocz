@@ -38,7 +38,13 @@ export async function getAvailableSlotsForDate(
         defaultSlotDuration: number;
         bufferMinutes: number;
         bookingWindowDays: number | null;
-        days: Array<{ _key: string; dayOfWeek: number; isDayOff: boolean; startTime: string; endTime: string }>;
+        days: Array<{
+          _key: string;
+          dayOfWeek: number;
+          isDayOff: boolean;
+          startTime: string;
+          endTime: string;
+        }>;
       } | null>({ query: weeklyScheduleQuery, tags: ["weeklySchedule"] }),
       sanityFetch<{
         _id: string;
@@ -46,9 +52,21 @@ export async function getAvailableSlotsForDate(
         endDate: string;
         defaultSlotDuration: number;
         bufferMinutes: number;
-        days: Array<{ _key: string; dayOfWeek: number; isDayOff: boolean; startTime: string; endTime: string }>;
-      } | null>({ query: seasonalScheduleForDateQuery, params: { date }, tags: ["seasonalSchedule"] }),
-      sanityFetch<{ dates: Array<{ _key: string; date: string; isHoliday: boolean }> | null } | null>({
+        days: Array<{
+          _key: string;
+          dayOfWeek: number;
+          isDayOff: boolean;
+          startTime: string;
+          endTime: string;
+        }>;
+      } | null>({
+        query: seasonalScheduleForDateQuery,
+        params: { date },
+        tags: ["seasonalSchedule"],
+      }),
+      sanityFetch<{
+        dates: Array<{ _key: string; date: string; isHoliday: boolean }> | null;
+      } | null>({
         query: blockedDatesQuery,
         tags: ["blockedDate"],
       }),
@@ -58,13 +76,27 @@ export async function getAvailableSlotsForDate(
         startTime: string;
         endTime: string;
         services: Array<{ _id: string }> | null;
-      } | null>({ query: customAvailabilityForDateQuery, params: { date }, tags: ["customAvailability"] }),
-      sanityFetch<Array<{ _id: string; slotDate: string; slotTime: string; service: { _id: string } | null }>>({
+      } | null>({
+        query: customAvailabilityForDateQuery,
+        params: { date },
+        tags: ["customAvailability"],
+      }),
+      sanityFetch<
+        Array<{ _id: string; slotDate: string; slotTime: string; service: { _id: string } | null }>
+      >({
         query: bookingsForDateQuery,
         params: { date },
         tags: ["booking"],
       }),
-      sanityFetch<Array<{ _id: string; slotDate: string; slotTime: string; status: string; heldUntil: string | null }>>({
+      sanityFetch<
+        Array<{
+          _id: string;
+          slotDate: string;
+          slotTime: string;
+          status: string;
+          heldUntil: string | null;
+        }>
+      >({
         query: slotLocksForDateQuery,
         params: { date },
         tags: ["slotLock"],
@@ -105,7 +137,12 @@ export async function getAvailableSlotsForDate(
       ...scheduleForSlots,
       days: scheduleForSlots.days.map((day) =>
         day.dayOfWeek === dayOfWeek
-          ? { ...day, isDayOff: false, startTime: customAvail.startTime, endTime: customAvail.endTime }
+          ? {
+              ...day,
+              isDayOff: false,
+              startTime: customAvail.startTime,
+              endTime: customAvail.endTime,
+            }
           : day,
       ),
     };

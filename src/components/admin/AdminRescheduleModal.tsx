@@ -100,10 +100,18 @@ export default function AdminRescheduleModal({
       {/* biome-ignore lint/a11y/useKeyWithClickEvents: backdrop close on click */}
       {/* biome-ignore lint/a11y/noStaticElementInteractions: backdrop close on click */}
       <div
-        onClick={onClose}
+        onClick={(e) => {
+          // Stop the click reaching the parent AdminPatientModal backdrop
+          // (which would close the whole modal stack), then close just this one.
+          e.stopPropagation();
+          onClose();
+        }}
         style={{ position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.5)", zIndex: 9998 }}
       />
+      {/* biome-ignore lint/a11y/useKeyWithClickEvents: click trap, not interactive */}
+      {/* biome-ignore lint/a11y/noStaticElementInteractions: click trap, not interactive */}
       <div
+        onClick={(e) => e.stopPropagation()}
         style={{
           position: "fixed",
           top: "50%",

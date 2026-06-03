@@ -78,6 +78,12 @@ export async function getAvailableSlotsForDate(
 
   if (!service) return null;
 
+  const customApplies =
+    !!customAvail &&
+    (!customAvail.services ||
+      customAvail.services.length === 0 ||
+      customAvail.services.some((s) => s._id === serviceId));
+
   const bookedSlots = bookings.map((b) => b.slotTime).filter(Boolean);
 
   const now = new Date().toISOString();
@@ -93,41 +99,28 @@ export async function getAvailableSlotsForDate(
   const defaultSchedule = schedule ?? { defaultSlotDuration: 20, bufferMinutes: 0, days: [] };
   let scheduleForSlots = resolveScheduleForDate(date, defaultSchedule, seasonal ? [seasonal] : []);
 
-  if (customAvail) {
-    const appliesToService =
-      !customAvail.services ||
-      customAvail.services.length === 0 ||
-      customAvail.services.some((s) => s._id === serviceId);
-
-    if (appliesToService) {
-      const dayOfWeek = new Date(date).getDay();
-      scheduleForSlots = {
-        ...scheduleForSlots,
-        days: scheduleForSlots.days.map((day) =>
-          day.dayOfWeek === dayOfWeek
-            ? { ...day, isDayOff: false, startTime: customAvail.startTime, endTime: customAvail.endTime }
-            : day,
-        ),
-      };
-      if (!scheduleForSlots.days.find((d) => d.dayOfWeek === dayOfWeek)) {
-        scheduleForSlots.days.push({
-          dayOfWeek,
-          isDayOff: false,
-          startTime: customAvail.startTime,
-          endTime: customAvail.endTime,
-        });
-      }
+  if (customApplies && customAvail) {
+    const dayOfWeek = new Date(date).getDay();
+    scheduleForSlots = {
+      ...scheduleForSlots,
+      days: scheduleForSlots.days.map((day) =>
+        day.dayOfWeek === dayOfWeek
+          ? { ...day, isDayOff: false, startTime: customAvail.startTime, endTime: customAvail.endTime }
+          : day,
+      ),
+    };
+    if (!scheduleForSlots.days.find((d) => d.dayOfWeek === dayOfWeek)) {
+      scheduleForSlots.days.push({
+        dayOfWeek,
+        isDayOff: false,
+        startTime: customAvail.startTime,
+        endTime: customAvail.endTime,
+      });
     }
   }
 
   let blockedDates = (blockedDatesDoc?.dates ?? []).map((d) => d.date).filter(Boolean);
-  if (customAvail) {
-    const appliesToService =
-      !customAvail.services ||
-      customAvail.services.length === 0 ||
-      customAvail.services.some((s) => s._id === serviceId);
-    if (appliesToService) blockedDates = blockedDates.filter((d) => d !== date);
-  }
+  if (customApplies) blockedDates = blockedDates.filter((d) => d !== date);
 
   const serviceDurationMinutes = service.appointmentDuration ?? 20;
 

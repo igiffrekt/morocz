@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { AdminBooking } from "@/components/admin/AdminDashboard";
 import AdminPatientHistory from "@/components/admin/AdminPatientHistory";
+import AdminRescheduleModal from "@/components/admin/AdminRescheduleModal";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -53,6 +54,7 @@ export default function AdminPatientModal({
   const [view, setView] = useState<ModalView>("detail");
   const [activeTab, setActiveTab] = useState<"bookings" | "history">("bookings");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [showReschedule, setShowReschedule] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
   const [isCancelling, setIsCancelling] = useState(false);
   const [cancelError, setCancelError] = useState<string | null>(null);
@@ -80,6 +82,7 @@ export default function AdminPatientModal({
   const canComplete = !isCancelled && !isCompleted && !isNoShow;
   const canEditCompleted = isCompleted;
   const canMarkNoShow = !isCancelled && !isCompleted && !isNoShow;
+  const canReschedule = !isCancelled && !isCompleted && !isNoShow && booking.serviceId != null;
   const formattedDate = formatHungarianDate(booking.slotDate);
 
   // ── Fetch patient booking history ──────────────────────────────────────────
@@ -272,7 +275,7 @@ export default function AdminPatientModal({
         </button>
 
         {/* ── Three-dot menu button ───────────────────────────────────────── */}
-        {(canCancel || canComplete || canMarkNoShow || canEditCompleted) && (
+        {(canCancel || canComplete || canMarkNoShow || canEditCompleted || canReschedule) && (
           <button
             ref={menuButtonRef}
             type="button"
@@ -285,180 +288,219 @@ export default function AdminPatientModal({
         )}
 
         {/* ── Dropdown menu ───────────────────────────────────────────────── */}
-        {menuOpen && (canCancel || canComplete || canMarkNoShow || canEditCompleted) && (
-          <div
-            ref={menuRef}
-            style={{
-              position: "fixed",
-              top: (() => {
-                const rect = menuButtonRef.current?.getBoundingClientRect();
-                return rect ? `${rect.bottom + 4}px` : "auto";
-              })(),
-              left: (() => {
-                const rect = menuButtonRef.current?.getBoundingClientRect();
-                return rect ? `${rect.left}px` : "auto";
-              })(),
-              backgroundColor: "#ffffff",
-              border: "1px solid #e8eaf0",
-              borderRadius: "0.75rem",
-              boxShadow: "0 8px 24px rgba(36,42,95,0.12)",
-              zIndex: 60,
-              minWidth: "12rem",
-              overflow: "hidden",
-            }}
-          >
-            {canComplete && (
-              <button
-                type="button"
-                onClick={() => {
-                  setMenuOpen(false);
-                  setView("complete");
-                }}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.5rem",
-                  width: "100%",
-                  padding: "0.625rem 0.875rem",
-                  background: "none",
-                  border: "none",
-                  color: "#099268",
-                  fontSize: "0.875rem",
-                  cursor: "pointer",
-                  textAlign: "left" as const,
-                }}
-              >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+        {menuOpen &&
+          (canCancel || canComplete || canMarkNoShow || canEditCompleted || canReschedule) && (
+            <div
+              ref={menuRef}
+              style={{
+                position: "fixed",
+                top: (() => {
+                  const rect = menuButtonRef.current?.getBoundingClientRect();
+                  return rect ? `${rect.bottom + 4}px` : "auto";
+                })(),
+                left: (() => {
+                  const rect = menuButtonRef.current?.getBoundingClientRect();
+                  return rect ? `${rect.left}px` : "auto";
+                })(),
+                backgroundColor: "#ffffff",
+                border: "1px solid #e8eaf0",
+                borderRadius: "0.75rem",
+                boxShadow: "0 8px 24px rgba(36,42,95,0.12)",
+                zIndex: 60,
+                minWidth: "12rem",
+                overflow: "hidden",
+              }}
+            >
+              {canComplete && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    setView("complete");
+                  }}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                    width: "100%",
+                    padding: "0.625rem 0.875rem",
+                    background: "none",
+                    border: "none",
+                    color: "#099268",
+                    fontSize: "0.875rem",
+                    cursor: "pointer",
+                    textAlign: "left" as const,
+                  }}
                 >
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-                Vizit lezárása
-              </button>
-            )}
-            {canEditCompleted && (
-              <button
-                type="button"
-                onClick={() => {
-                  setMenuOpen(false);
-                  setView("complete");
-                }}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.5rem",
-                  width: "100%",
-                  padding: "0.625rem 0.875rem",
-                  background: "none",
-                  border: "none",
-                  color: "#2563eb",
-                  fontSize: "0.875rem",
-                  cursor: "pointer",
-                  textAlign: "left" as const,
-                }}
-              >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Vizit lezárása
+                </button>
+              )}
+              {canEditCompleted && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    setView("complete");
+                  }}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                    width: "100%",
+                    padding: "0.625rem 0.875rem",
+                    background: "none",
+                    border: "none",
+                    color: "#2563eb",
+                    fontSize: "0.875rem",
+                    cursor: "pointer",
+                    textAlign: "left" as const,
+                  }}
                 >
-                  <path d="M12 20h9" />
-                  <path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4Z" />
-                </svg>
-                Vizit szerkesztése
-              </button>
-            )}
-            {canCancel && (
-              <button
-                type="button"
-                onClick={() => {
-                  setMenuOpen(false);
-                  setView("cancel-confirm");
-                }}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.5rem",
-                  width: "100%",
-                  padding: "0.625rem 0.875rem",
-                  background: "none",
-                  border: "none",
-                  borderTop: canComplete ? "1px solid #e8eaf0" : "none",
-                  color: "#9f1239",
-                  fontSize: "0.875rem",
-                  cursor: "pointer",
-                  textAlign: "left" as const,
-                }}
-              >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M12 20h9" />
+                    <path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4Z" />
+                  </svg>
+                  Vizit szerkesztése
+                </button>
+              )}
+              {canReschedule && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    setShowReschedule(true);
+                  }}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                    width: "100%",
+                    padding: "0.625rem 0.875rem",
+                    background: "none",
+                    border: "none",
+                    borderTop: canComplete || canEditCompleted ? "1px solid #e8eaf0" : "none",
+                    color: "#2563eb",
+                    fontSize: "0.875rem",
+                    cursor: "pointer",
+                    textAlign: "left" as const,
+                  }}
                 >
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                  <line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
-                Időpont lemondása
-              </button>
-            )}
-            {canMarkNoShow && (
-              <button
-                type="button"
-                onClick={() => {
-                  setMenuOpen(false);
-                  setView("noshow-confirm");
-                }}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.5rem",
-                  width: "100%",
-                  padding: "0.625rem 0.875rem",
-                  background: "none",
-                  border: "none",
-                  borderTop: "1px solid #e8eaf0",
-                  color: "#d97706",
-                  fontSize: "0.875rem",
-                  cursor: "pointer",
-                  textAlign: "left" as const,
-                }}
-              >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M21 12a9 9 0 1 1-3-6.7L21 8" />
+                    <path d="M21 3v5h-5" />
+                  </svg>
+                  Időpont áthelyezése
+                </button>
+              )}
+              {canCancel && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    setView("cancel-confirm");
+                  }}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                    width: "100%",
+                    padding: "0.625rem 0.875rem",
+                    background: "none",
+                    border: "none",
+                    borderTop: canComplete ? "1px solid #e8eaf0" : "none",
+                    color: "#9f1239",
+                    fontSize: "0.875rem",
+                    cursor: "pointer",
+                    textAlign: "left" as const,
+                  }}
                 >
-                  <circle cx="12" cy="12" r="10" />
-                  <line x1="12" y1="8" x2="12" y2="12" />
-                  <line x1="12" y1="16" x2="12.01" y2="16" />
-                </svg>
-                Nem jelent meg
-              </button>
-            )}
-          </div>
-        )}
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                  Időpont lemondása
+                </button>
+              )}
+              {canMarkNoShow && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    setView("noshow-confirm");
+                  }}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                    width: "100%",
+                    padding: "0.625rem 0.875rem",
+                    background: "none",
+                    border: "none",
+                    borderTop: "1px solid #e8eaf0",
+                    color: "#d97706",
+                    fontSize: "0.875rem",
+                    cursor: "pointer",
+                    textAlign: "left" as const,
+                  }}
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                  </svg>
+                  Nem jelent meg
+                </button>
+              )}
+            </div>
+          )}
 
         {/* ── Patient info section ────────────────────────────────────────── */}
         <div style={{ marginBottom: "1.25rem" }}>
@@ -1428,6 +1470,24 @@ export default function AdminPatientModal({
           />
         )}
       </div>
+
+      {showReschedule && booking.serviceId && (
+        <AdminRescheduleModal
+          bookingId={booking._id}
+          patientName={booking.patientName}
+          serviceId={booking.serviceId}
+          serviceName={booking.service?.name ?? null}
+          currentDate={booking.slotDate}
+          currentTime={booking.slotTime}
+          onClose={() => setShowReschedule(false)}
+          onRescheduled={() => {
+            setShowReschedule(false);
+            // onCancelled is the dashboard's generic "reload bookings" callback,
+            // reused here so the calendar reflects the moved appointment.
+            onCancelled();
+          }}
+        />
+      )}
     </div>
   );
 }

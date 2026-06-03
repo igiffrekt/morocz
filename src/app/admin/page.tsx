@@ -17,6 +17,7 @@ type AdminBooking = {
   patientPhone: string;
   reservationNumber: string;
   service: { name: string; appointmentDuration: number } | null;
+  serviceId: string | null;
   slotDate: string;
   slotTime: string;
   status: string;
@@ -47,6 +48,7 @@ const BOOKINGS_QUERY = `*[_type == "booking" && !(_id in path("drafts.**")) && s
   patientPhone,
   reservationNumber,
   service->{name, appointmentDuration},
+  "serviceId": service._ref,
   slotDate,
   slotTime,
   status,

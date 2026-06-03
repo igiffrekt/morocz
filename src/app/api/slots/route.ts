@@ -1,28 +1,12 @@
-import { defineQuery } from "next-sanity";
-import { generateAvailableSlots, resolveScheduleForDate } from "@/lib/slots";
-import { sanityFetch } from "@/sanity/lib/fetch";
-import {
-  blockedDatesQuery,
-  bookingsForDateQuery,
-  customAvailabilityForDateQuery,
-  seasonalScheduleForDateQuery,
-  slotLocksForDateQuery,
-  weeklyScheduleQuery,
-} from "@/sanity/lib/queries";
+import { getAvailableSlotsForDate } from "@/lib/availability";
 
 export const dynamic = "force-dynamic";
-
-// Inline query for a single service by ID
-const serviceByIdQuery = defineQuery(
-  `*[_type == "service" && _id == $serviceId][0]{name, appointmentDuration}`,
-);
 
 export async function GET(request: Request): Promise<Response> {
   const { searchParams } = new URL(request.url);
   const date = searchParams.get("date");
   const serviceId = searchParams.get("serviceId");
 
-  // 1. Validate query params
   if (!date || !serviceId) {
     return Response.json(
       { error: "A 'date' és 'serviceId' paraméterek megadása kötelező." },
@@ -38,197 +22,18 @@ export async function GET(request: Request): Promise<Response> {
   }
 
   try {
-    // 2. Fetch all data in parallel
-    const [schedule, seasonal, blockedDatesDoc, customAvail, bookings, slotLocks, service] = await Promise.all([
-      sanityFetch<{
-        defaultSlotDuration: number;
-        bufferMinutes: number;
-        bookingWindowDays: number | null;
-        days: Array<{
-          _key: string;
-          dayOfWeek: number;
-          isDayOff: boolean;
-          startTime: string;
-          endTime: string;
-        }>;
-      } | null>({
-        query: weeklyScheduleQuery,
-        tags: ["weeklySchedule"],
-      }),
-      sanityFetch<{
-        _id: string;
-        startDate: string;
-        endDate: string;
-        defaultSlotDuration: number;
-        bufferMinutes: number;
-        days: Array<{
-          _key: string;
-          dayOfWeek: number;
-          isDayOff: boolean;
-          startTime: string;
-          endTime: string;
-        }>;
-      } | null>({
-        query: seasonalScheduleForDateQuery,
-        params: { date },
-        tags: ["seasonalSchedule"],
-      }),
-      sanityFetch<{
-        dates: Array<{ _key: string; date: string; isHoliday: boolean }> | null;
-      } | null>({
-        query: blockedDatesQuery,
-        tags: ["blockedDate"],
-      }),
-      sanityFetch<{
-        _id: string;
-        date: string;
-        startTime: string;
-        endTime: string;
-        services: Array<{ _id: string }> | null;
-      } | null>({
-        query: customAvailabilityForDateQuery,
-        params: { date },
-        tags: ["customAvailability"],
-      }),
-      sanityFetch<
-        Array<{
-          _id: string;
-          slotDate: string;
-          slotTime: string;
-          service: { _id: string } | null;
-        }>
-      >({
-        query: bookingsForDateQuery,
-        params: { date },
-        tags: ["booking"],
-      }),
-      sanityFetch<
-        Array<{
-          _id: string;
-          slotDate: string;
-          slotTime: string;
-          status: string;
-          heldUntil: string | null;
-        }>
-      >({
-        query: slotLocksForDateQuery,
-        params: { date },
-        tags: ["slotLock"],
-      }),
-      sanityFetch<{ name: string; appointmentDuration: number } | null>({
-        query: serviceByIdQuery,
-        params: { serviceId },
-        tags: ["service"],
-      }),
-    ]);
-
-    // 3. Service not found
-    if (!service) {
+    const result = await getAvailableSlotsForDate(date, serviceId);
+    if (!result) {
       return Response.json({ error: "A megadott szolgáltatás nem található." }, { status: 404 });
     }
-
-    // 4. Extract booked times from bookings (all services — doctor can only see one patient at a time)
-    const bookedSlots = bookings
-      .map((b) => b.slotTime)
-      .filter(Boolean);
-
-    // 5. Extract held and booked times from slotLocks (skip expired holds)
-    const now = new Date().toISOString();
-    const heldSlots = slotLocks
-      .filter((lock) =>
-        lock.status === "booked" ||
-        (lock.status === "held" && lock.heldUntil != null && lock.heldUntil > now),
-      )
-      .map((lock) => lock.slotTime)
-      .filter(Boolean);
-
-    // 6. Check if custom availability exists for this date and service
-    const defaultSchedule = schedule ?? {
-      defaultSlotDuration: 20,
-      bufferMinutes: 0,
-      days: [],
-    };
-    // Seasonal schedule (if any) overrides the default for this date.
-    // customAvailability override below still applies on top.
-    let scheduleForSlots = resolveScheduleForDate(
-      date,
-      defaultSchedule,
-      seasonal ? [seasonal] : [],
-    );
-
-    // If custom availability exists and applies to this service (or all services)
-    if (customAvail) {
-      const appliesToService =
-        !customAvail.services || customAvail.services.length === 0 || customAvail.services.some((s) => s._id === serviceId);
-
-      if (appliesToService) {
-        // Override schedule for this specific date with custom availability
-        const dateObj = new Date(date);
-        const dayOfWeek = dateObj.getDay();
-
-        scheduleForSlots = {
-          ...scheduleForSlots,
-          days: scheduleForSlots.days.map((day) => {
-            if (day.dayOfWeek === dayOfWeek) {
-              return {
-                ...day,
-                isDayOff: false,
-                startTime: customAvail.startTime,
-                endTime: customAvail.endTime,
-              };
-            }
-            return day;
-          }),
-        };
-
-        // If the day doesn't exist in schedule, add it
-        if (!scheduleForSlots.days.find((d) => d.dayOfWeek === dayOfWeek)) {
-          scheduleForSlots.days.push({
-            dayOfWeek,
-            isDayOff: false,
-            startTime: customAvail.startTime,
-            endTime: customAvail.endTime,
-          });
-        }
-      }
-    }
-
-    // 7. Generate available slots
-    let blockedDates = (blockedDatesDoc?.dates ?? []).map((d) => d.date).filter(Boolean);
-
-    // If custom availability exists for this date, remove it from blocked dates
-    if (customAvail) {
-      const appliesToService =
-        !customAvail.services || customAvail.services.length === 0 || customAvail.services.some((s) => s._id === serviceId);
-      if (appliesToService) {
-        blockedDates = blockedDates.filter(d => d !== date);
-      }
-    }
-
-    const serviceDurationMinutes = service.appointmentDuration ?? 20;
-
-    const slots = generateAvailableSlots({
-      schedule: scheduleForSlots,
-      blockedDates,
-      bookedSlots,
-      heldSlots,
-      date,
-      serviceDurationMinutes,
-      maxDaysAhead: schedule?.bookingWindowDays ?? 30,
-    });
-
-    // 8. Return result
     return Response.json({
-      slots,
+      slots: result.slots,
       date,
-      serviceName: service.name,
-      durationMinutes: serviceDurationMinutes,
+      serviceName: result.serviceName,
+      durationMinutes: result.durationMinutes,
     });
   } catch (error) {
     console.error("[/api/slots] Error:", error);
-    return Response.json(
-      { error: "Hiba történt az időpontok lekérdezésekor." },
-      { status: 500 },
-    );
+    return Response.json({ error: "Hiba történt az időpontok lekérdezésekor." }, { status: 500 });
   }
 }

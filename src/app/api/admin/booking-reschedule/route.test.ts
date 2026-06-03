@@ -189,5 +189,9 @@ describe("POST /api/admin/booking-reschedule", () => {
     // new slot lock id and old slot lock id both patched
     expect(writeClient.patch).toHaveBeenCalledWith("slotLock-new");
     expect(writeClient.patch).toHaveBeenCalledWith("slotLock-2026-07-15-09-00");
+    // the created lock carries slotDate/slotTime so it stays queryable
+    expect(writeClient.createIfNotExists).toHaveBeenCalledWith(
+      expect.objectContaining({ slotDate: "2026-07-15", slotTime: "10:00" }),
+    );
   });
 });

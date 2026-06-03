@@ -101,10 +101,14 @@ export async function POST(request: Request): Promise<Response> {
     const newSlotId = `${newDate}T${newTime}:00`;
     const newSlotLockDocId = `slotLock-${newDate}-${newTime.replace(":", "-")}`;
 
+    // Include slotDate/slotTime so the lock is visible to slotLocksForDateQuery
+    // (which filters on slotDate), matching slot-hold and checkout writers.
     await getWriteClient().createIfNotExists({
       _id: newSlotLockDocId,
       _type: "slotLock",
       slotId: newSlotId,
+      slotDate: newDate,
+      slotTime: newTime,
       status: "available",
     });
 
@@ -116,6 +120,11 @@ export async function POST(request: Request): Promise<Response> {
     if (!newSlotLock) {
       return Response.json({ error: "Hiba történt. Kérjük, próbálja újra." }, { status: 500 });
     }
+    // Admin is authoritative: unlike the public checkout path we do not verify
+    // hold ownership, so an admin can claim a slot another user is mid-checkout
+    // on. Step 5's availability check already excludes actively-held slots, so
+    // this only matters in the narrow read→claim window; the displaced patient's
+    // own checkout will then 409. We reject only already-booked slots here.
     if (newSlotLock.status === "booked") {
       return Response.json(
         { error: "Ez az időpont már foglalt. Kérjük, válasszon másikat." },

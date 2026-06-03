@@ -68,8 +68,20 @@ describe("POST /api/admin/booking-reschedule", () => {
     expect(res.status).toBe(403);
   });
 
+  it("rejects unauthenticated requests with 401", async () => {
+    getSession.mockResolvedValue(null);
+    const res = await POST(req({ bookingId: "booking-1", newDate: "2026-07-15", newTime: "10:00", notifyPatient: false }));
+    expect(res.status).toBe(401);
+  });
+
   it("rejects when booking is not confirmed", async () => {
     writeClient.fetch.mockResolvedValueOnce({ ...confirmedBooking, status: "cancelled" });
+    const res = await POST(req({ bookingId: "booking-1", newDate: "2026-07-15", newTime: "10:00", notifyPatient: false }));
+    expect(res.status).toBe(400);
+  });
+
+  it("rejects when the booking has no service assigned", async () => {
+    writeClient.fetch.mockResolvedValueOnce({ ...confirmedBooking, status: "confirmed", serviceId: null });
     const res = await POST(req({ bookingId: "booking-1", newDate: "2026-07-15", newTime: "10:00", notifyPatient: false }));
     expect(res.status).toBe(400);
   });

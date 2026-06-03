@@ -48,6 +48,16 @@ export async function reconcilePendingBooking(bookingId: string): Promise<Reconc
   try {
     session = await stripe.checkout.sessions.retrieve(booking.stripeSessionId);
   } catch (err) {
+    // A missing session (404 resource_missing) can never resolve — e.g. a
+    // leftover test-mode session under live keys, or a deleted session. Since
+    // this booking is already stale (>35min pending), treat it as terminal:
+    // cancel it and free the slot so we stop retrying it on every run.
+    const stripeErr = err as { code?: string; statusCode?: number };
+    if (stripeErr?.code === "resource_missing" || stripeErr?.statusCode === 404) {
+      await cancelAndReleaseSlot(booking);
+      return { bookingId, action: "cancelled" };
+    }
+    // Transient error (network/5xx) — leave pending so a later run retries.
     console.error(`[reconciler] Stripe retrieve failed for ${bookingId}:`, err);
     return { bookingId, action: "skipped", reason: "stripe-error" };
   }

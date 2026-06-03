@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { AdminBooking } from "@/components/admin/AdminDashboard";
 import AdminPatientHistory from "@/components/admin/AdminPatientHistory";
+import AdminRescheduleModal from "@/components/admin/AdminRescheduleModal";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -53,6 +54,7 @@ export default function AdminPatientModal({
   const [view, setView] = useState<ModalView>("detail");
   const [activeTab, setActiveTab] = useState<"bookings" | "history">("bookings");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [showReschedule, setShowReschedule] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
   const [isCancelling, setIsCancelling] = useState(false);
   const [cancelError, setCancelError] = useState<string | null>(null);
@@ -80,6 +82,7 @@ export default function AdminPatientModal({
   const canComplete = !isCancelled && !isCompleted && !isNoShow;
   const canEditCompleted = isCompleted;
   const canMarkNoShow = !isCancelled && !isCompleted && !isNoShow;
+  const canReschedule = !isCancelled && !isCompleted && !isNoShow && booking.serviceId != null;
   const formattedDate = formatHungarianDate(booking.slotDate);
 
   // ── Fetch patient booking history ──────────────────────────────────────────
@@ -272,7 +275,7 @@ export default function AdminPatientModal({
         </button>
 
         {/* ── Three-dot menu button ───────────────────────────────────────── */}
-        {(canCancel || canComplete || canMarkNoShow || canEditCompleted) && (
+        {(canCancel || canComplete || canMarkNoShow || canEditCompleted || canReschedule) && (
           <button
             ref={menuButtonRef}
             type="button"
@@ -285,7 +288,7 @@ export default function AdminPatientModal({
         )}
 
         {/* ── Dropdown menu ───────────────────────────────────────────────── */}
-        {menuOpen && (canCancel || canComplete || canMarkNoShow || canEditCompleted) && (
+        {menuOpen && (canCancel || canComplete || canMarkNoShow || canEditCompleted || canReschedule) && (
           <div
             ref={menuRef}
             style={{
@@ -378,6 +381,44 @@ export default function AdminPatientModal({
                   <path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4Z" />
                 </svg>
                 Vizit szerkesztése
+              </button>
+            )}
+            {canReschedule && (
+              <button
+                type="button"
+                onClick={() => {
+                  setMenuOpen(false);
+                  setShowReschedule(true);
+                }}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  width: "100%",
+                  padding: "0.625rem 0.875rem",
+                  background: "none",
+                  border: "none",
+                  borderTop: canComplete || canEditCompleted ? "1px solid #e8eaf0" : "none",
+                  color: "#2563eb",
+                  fontSize: "0.875rem",
+                  cursor: "pointer",
+                  textAlign: "left" as const,
+                }}
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M21 12a9 9 0 1 1-3-6.7L21 8" />
+                  <path d="M21 3v5h-5" />
+                </svg>
+                Időpont áthelyezése
               </button>
             )}
             {canCancel && (
@@ -1428,6 +1469,22 @@ export default function AdminPatientModal({
           />
         )}
       </div>
+
+      {showReschedule && booking.serviceId && (
+        <AdminRescheduleModal
+          bookingId={booking._id}
+          patientName={booking.patientName}
+          serviceId={booking.serviceId}
+          serviceName={booking.service?.name ?? null}
+          currentDate={booking.slotDate}
+          currentTime={booking.slotTime}
+          onClose={() => setShowReschedule(false)}
+          onRescheduled={() => {
+            setShowReschedule(false);
+            onCancelled();
+          }}
+        />
+      )}
     </div>
   );
 }

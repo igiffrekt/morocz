@@ -211,11 +211,11 @@ export function BookingSuccess({
                 Időpontfoglalás lemondása
               </h3>
               <p className="text-sm text-gray-700">
-                Lemondani a foglalt időpontot maximum <span className="font-medium">24 órával</span>{" "}
-                a rendelés előtt lehetséges a visszaigazoló e-mailben található linkre kattintva.
+                A foglalt időpontot bármikor lemondhatja a visszaigazoló e-mailben található linkre
+                kattintva.
               </p>
               <p className="text-xs text-amber-700 mt-2 font-medium">
-                A 24 órán belüli lemondásért készenléti díjat számolunk fel: 10.000 Ft / alkalom.
+                A 48 órán belüli lemondás esetén a 10.000 Ft foglalási díj nem kerül visszatérítésre.
               </p>
             </div>
           </div>

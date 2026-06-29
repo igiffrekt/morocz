@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { defineQuery } from "next-sanity";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
+import { getAvailableSlotsForDate } from "@/lib/availability";
 import { buildConfirmationEmail } from "@/lib/booking-email";
 import { db } from "@/lib/db";
 import { user } from "@/lib/db/schema";
@@ -74,6 +75,25 @@ export async function POST(request: Request): Promise<Response> {
   // ── 2b. Day-lock: reject bookings within 1h of day's start ────────────────
   const dayLockError = await assertDayStillOpen(slotDate);
   if (dayLockError) return dayLockError;
+
+  // ── 2c. Re-validate the slot against the day's allowed window ──────────────
+  // The slotLock below is fabricated on demand from the request, so it cannot
+  // tell whether slotTime is actually within the day's schedule / custom rule.
+  // Re-derive the legal window here; ignoreOccupancy keeps the user's own hold
+  // from excluding the slot they are booking (concurrency stays the lock's job).
+  const availability = await getAvailableSlotsForDate(slotDate, serviceId, undefined, {
+    ignoreOccupancy: true,
+  });
+  if (!availability || !availability.slots.includes(slotTime)) {
+    const alternatives = await getAlternativeSlots(slotDate, slotTime, serviceId);
+    return Response.json(
+      {
+        error: "Ez az időpont már nem foglalható ezen a napon. Kérjük, válasszon másikat.",
+        alternatives,
+      },
+      { status: 409 },
+    );
+  }
 
   // ── 3. Get slotLock — it's the source of truth for availability ──────────────
   const slotId = `${slotDate}T${slotTime}:00`;

@@ -76,4 +76,27 @@ describe("getAvailableSlotsForDate", () => {
     expect(arg.serviceDurationMinutes).toBe(20);
     expect(arg.date).toBe("2026-07-15");
   });
+
+  it("with ignoreOccupancy, does not exclude booked/held slots from the window", async () => {
+    mockSanityByTag({
+      weeklySchedule: {
+        defaultSlotDuration: 20,
+        bufferMinutes: 0,
+        bookingWindowDays: 30,
+        days: [],
+      },
+      seasonalSchedule: null,
+      blockedDate: { dates: [] },
+      customAvailability: null,
+      booking: [{ slotTime: "10:00", service: { _id: "svc" } }],
+      slotLock: [{ slotTime: "11:00", status: "held", heldUntil: "2999-01-01T00:00:00Z" }],
+      service: { name: "Vizsgálat", appointmentDuration: 20 },
+    });
+
+    await getAvailableSlotsForDate("2026-07-15", "svc", undefined, { ignoreOccupancy: true });
+
+    const arg = generateAvailableSlots.mock.calls[0][0];
+    expect(arg.bookedSlots).toEqual([]);
+    expect(arg.heldSlots).toEqual([]);
+  });
 });

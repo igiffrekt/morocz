@@ -26,11 +26,18 @@ export interface DayAvailability {
  * bookings and slot locks. Returns null if the service does not exist.
  *
  * @param nowMs optional clock override forwarded to generateAvailableSlots (tests).
+ * @param opts.ignoreOccupancy when true, booked/held slots are NOT removed, so the
+ *   returned list reflects only the day's structural window (schedule + seasonal +
+ *   custom rule + blocked dates + past-time cutoff). Use this to validate that a
+ *   requested slotTime is within the allowed window at booking time, where the
+ *   slotLock is the authority on occupancy/concurrency and would otherwise exclude
+ *   the user's own freshly-placed hold.
  */
 export async function getAvailableSlotsForDate(
   date: string,
   serviceId: string,
   nowMs?: number,
+  opts?: { ignoreOccupancy?: boolean },
 ): Promise<DayAvailability | null> {
   const [schedule, seasonal, blockedDatesDoc, customAvail, bookings, slotLocks, service] =
     await Promise.all([
@@ -116,17 +123,21 @@ export async function getAvailableSlotsForDate(
       customAvail.services.length === 0 ||
       customAvail.services.some((s) => s._id === serviceId));
 
-  const bookedSlots = bookings.map((b) => b.slotTime).filter(Boolean);
+  const ignoreOccupancy = opts?.ignoreOccupancy ?? false;
+
+  const bookedSlots = ignoreOccupancy ? [] : bookings.map((b) => b.slotTime).filter(Boolean);
 
   const now = new Date().toISOString();
-  const heldSlots = slotLocks
-    .filter(
-      (lock) =>
-        lock.status === "booked" ||
-        (lock.status === "held" && lock.heldUntil != null && lock.heldUntil > now),
-    )
-    .map((lock) => lock.slotTime)
-    .filter(Boolean);
+  const heldSlots = ignoreOccupancy
+    ? []
+    : slotLocks
+        .filter(
+          (lock) =>
+            lock.status === "booked" ||
+            (lock.status === "held" && lock.heldUntil != null && lock.heldUntil > now),
+        )
+        .map((lock) => lock.slotTime)
+        .filter(Boolean);
 
   const defaultSchedule = schedule ?? { defaultSlotDuration: 20, bufferMinutes: 0, days: [] };
   let scheduleForSlots = resolveScheduleForDate(date, defaultSchedule, seasonal ? [seasonal] : []);

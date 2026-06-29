@@ -3,6 +3,7 @@ import { defineQuery } from "next-sanity";
 import { z } from "zod";
 import { eq } from "drizzle-orm";
 import { auth } from "@/lib/auth";
+import { getAvailableSlotsForDate } from "@/lib/availability";
 import { assertDayStillOpen } from "@/lib/booking-guards";
 import { db } from "@/lib/db";
 import { user } from "@/lib/db/schema";
@@ -114,6 +115,27 @@ export async function POST(request: Request): Promise<Response> {
 
     const dayLockError = await assertDayStillOpen(slotDate);
     if (dayLockError) return dayLockError;
+
+    // ── Re-validate the slot against the day's allowed window ─────────────────
+    // The client picked this time from a slot list that may now be stale (e.g. a
+    // custom-availability rule was added afterwards). The slotLock alone cannot
+    // catch this — it is fabricated on demand from the request — so we re-derive
+    // the legal window server-side. ignoreOccupancy keeps the user's own hold
+    // from excluding the very slot they are booking; concurrency stays the
+    // slotLock's job below.
+    const availability = await getAvailableSlotsForDate(slotDate, serviceId, undefined, {
+      ignoreOccupancy: true,
+    });
+    if (!availability || !availability.slots.includes(slotTime)) {
+      const alternatives = await getAlternativeSlots(slotDate, slotTime, serviceId);
+      return Response.json(
+        {
+          error: "Ez az időpont már nem foglalható ezen a napon. Kérjük, válasszon másikat.",
+          alternatives,
+        },
+        { status: 409 },
+      );
+    }
 
     // ── Slot lock acquisition ───────────────────────────────────────────────
     const slotId = `${slotDate}T${slotTime}:00`;

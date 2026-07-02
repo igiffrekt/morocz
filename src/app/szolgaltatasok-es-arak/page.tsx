@@ -65,7 +65,7 @@ const officeHours = [
 // Mirrors the initialValue in src/sanity/schemaTypes/pricingPageType.ts so
 // the page renders sensibly on first deploy before any editor publish.
 const DEFAULT_DATA: NonNullable<PricingPageQueryResult> = {
-  validityNote: "Érvényes 2026. április 1-től",
+  validityNote: "Érvényes 2026. július 1-től",
   gynBaseExam: {
     items: [
       {
@@ -75,7 +75,7 @@ const DEFAULT_DATA: NonNullable<PricingPageQueryResult> = {
         badge: null,
         badgeStyle: null,
         note: null,
-        price: 29900,
+        price: 30000,
       },
       {
         _key: "d2",
@@ -84,7 +84,7 @@ const DEFAULT_DATA: NonNullable<PricingPageQueryResult> = {
         badge: "+ UH",
         badgeStyle: "mint",
         note: null,
-        price: 41990,
+        price: 43000,
       },
       {
         _key: "d3",
@@ -93,16 +93,16 @@ const DEFAULT_DATA: NonNullable<PricingPageQueryResult> = {
         badge: "+ UH + LBC",
         badgeStyle: "pink",
         note: null,
-        price: 49900,
+        price: 52000,
       },
       {
         _key: "d4",
         label: "Kontroll vizsgálat",
         subtitle: null,
-        badge: "-27%",
+        badge: "-17%",
         badgeStyle: "white",
         note: "(3 hónapon belül)",
-        price: 22000,
+        price: 25000,
       },
     ],
   },
@@ -115,7 +115,7 @@ const DEFAULT_DATA: NonNullable<PricingPageQueryResult> = {
         badge: null,
         badgeStyle: null,
         note: null,
-        price: 42900,
+        price: 45000,
       },
       {
         _key: "d6",
@@ -132,14 +132,14 @@ const DEFAULT_DATA: NonNullable<PricingPageQueryResult> = {
   pregnancyCare: {
     label: "Várandósgondozás",
     subtitle: "Tájékozódó ultrahanggal (nem genetikai)",
-    price: 42000,
+    price: 45000,
   },
   screeningPackages: {
     tiers: [
       {
         _key: "t1",
-        name: "Alap",
-        price: 49900,
+        name: "Komplex",
+        price: 52000,
         highlighted: false,
         features: [
           {
@@ -168,8 +168,8 @@ const DEFAULT_DATA: NonNullable<PricingPageQueryResult> = {
       },
       {
         _key: "t2",
-        name: "Komplex",
-        price: 59900,
+        name: "Kiterjesztett komplex",
+        price: 68000,
         highlighted: true,
         features: [
           {
@@ -189,7 +189,7 @@ const DEFAULT_DATA: NonNullable<PricingPageQueryResult> = {
           },
           {
             _key: "f8",
-            text: "HPV DNS tipizálás (15 genotípus)",
+            text: "HPV DNS tipizálás (HPV28, 28 genotípus)",
             subtext: null,
             included: true,
             emphasized: true,
@@ -223,8 +223,9 @@ const DEFAULT_DATA: NonNullable<PricingPageQueryResult> = {
   },
   samplingServices: {
     items: [
-      { _key: "s1", label: "Folyadékalapú méhnyakszűrés (LBC) mintavétel", price: 9900 },
-      { _key: "s2", label: "Endometrium (méhnyálkahártya) szövettani mintavétel", price: 21850 },
+      { _key: "s1", label: "Folyadékalapú méhnyakszűrés (LBC) mintavétel", price: 9000 },
+      { _key: "s3", label: "Hagyományos citológia mintavétel", price: 6500 },
+      { _key: "s2", label: "Endometrium (méhnyálkahártya) szövettani mintavétel", price: 20000 },
     ],
   },
   microbiologyServices: {
@@ -245,9 +246,9 @@ const DEFAULT_DATA: NonNullable<PricingPageQueryResult> = {
     items: [
       {
         _key: "h1",
-        name: "HPV DNS alapú, 15 genotípus meghatározás",
+        name: "HPV DNS alapú, 28 genotípus meghatározás (HPV28)",
         description: "HPV jelenlétét vizsgálja",
-        price: 14000,
+        price: 18000,
       },
       {
         _key: "h2",
@@ -260,8 +261,8 @@ const DEFAULT_DATA: NonNullable<PricingPageQueryResult> = {
   otherServices: {
     items: [
       { _key: "o1", label: "Injekció beadása", price: 6000 },
-      { _key: "o2", label: "Szakorvosi dokumentáció", price: 9900 },
-      { _key: "o3", label: "Sürgősségi fogamzásgátlás", price: 11900 },
+      { _key: "o2", label: "Szakorvosi dokumentáció", price: 12000 },
+      { _key: "o3", label: "Sürgősségi fogamzásgátlás", price: 10000 },
       { _key: "o4", label: "Receptírás", price: 4900 },
     ],
     footnote: "Receptírás vizsgálat alkalmával díjtalan.",

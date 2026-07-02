@@ -65,8 +65,8 @@ export const pricingPageType = defineType({
       name: "validityNote",
       title: "Érvényesség jelzés",
       type: "string",
-      description: 'A hero részben megjelenő dátum címke, pl. "Érvényes 2026. április 1-től"',
-      initialValue: "Érvényes 2026. április 1-től",
+      description: 'A hero részben megjelenő dátum címke, pl. "Érvényes 2026. július 1-től"',
+      initialValue: "Érvényes 2026. július 1-től",
     }),
 
     // === Gynecological exams — base group ===
@@ -84,20 +84,20 @@ export const pricingPageType = defineType({
       ],
       initialValue: {
         items: [
-          { label: "Vizsgálat / tanácsadás", subtitle: "ultrahang nélkül", price: 29900 },
-          { label: "Vizsgálat ultrahanggal", badge: "+ UH", badgeStyle: "mint", price: 41990 },
+          { label: "Vizsgálat / tanácsadás", subtitle: "ultrahang nélkül", price: 30000 },
+          { label: "Vizsgálat ultrahanggal", badge: "+ UH", badgeStyle: "mint", price: 43000 },
           {
             label: "Vizsgálat ultrahanggal és méhnyakszűréssel",
             badge: "+ UH + LBC",
             badgeStyle: "pink",
-            price: 49900,
+            price: 52000,
           },
           {
             label: "Kontroll vizsgálat",
-            badge: "-27%",
+            badge: "-17%",
             badgeStyle: "white",
             note: "(3 hónapon belül)",
-            price: 22000,
+            price: 25000,
           },
         ],
       },
@@ -123,7 +123,7 @@ export const pricingPageType = defineType({
       ],
       initialValue: {
         items: [
-          { label: "Spirál felhelyezés / csere", subtitle: "ultrahanggal", price: 42900 },
+          { label: "Spirál felhelyezés / csere", subtitle: "ultrahanggal", price: 45000 },
           { label: "Spirál eltávolítás", price: 30000 },
         ],
         footnote: "Az eszköz árát nem tartalmazza",
@@ -155,7 +155,7 @@ export const pricingPageType = defineType({
       initialValue: {
         label: "Várandósgondozás",
         subtitle: "Tájékozódó ultrahanggal (nem genetikai)",
-        price: 42000,
+        price: 45000,
       },
     }),
 
@@ -249,8 +249,8 @@ export const pricingPageType = defineType({
       initialValue: {
         tiers: [
           {
-            name: "Alap",
-            price: 49900,
+            name: "Komplex",
+            price: 52000,
             highlighted: false,
             features: [
               { text: "Nőgyógyászati vizsgálat", included: true },
@@ -264,8 +264,8 @@ export const pricingPageType = defineType({
             ],
           },
           {
-            name: "Komplex",
-            price: 59900,
+            name: "Kiterjesztett komplex",
+            price: 68000,
             highlighted: true,
             features: [
               { text: "Nőgyógyászati vizsgálat", included: true },
@@ -275,7 +275,7 @@ export const pricingPageType = defineType({
                 subtext: "(vizsgálat+mintavétel+ultrahang)",
                 included: true,
               },
-              { text: "HPV DNS tipizálás (15 genotípus)", included: true, emphasized: true },
+              { text: "HPV DNS tipizálás (HPV28, 28 genotípus)", included: true, emphasized: true },
             ],
           },
           {
@@ -335,8 +335,9 @@ export const pricingPageType = defineType({
       ],
       initialValue: {
         items: [
-          { label: "Folyadékalapú méhnyakszűrés (LBC) mintavétel", price: 9900 },
-          { label: "Endometrium (méhnyálkahártya) szövettani mintavétel", price: 21850 },
+          { label: "Folyadékalapú méhnyakszűrés (LBC) mintavétel", price: 9000 },
+          { label: "Hagyományos citológia mintavétel", price: 6500 },
+          { label: "Endometrium (méhnyálkahártya) szövettani mintavétel", price: 20000 },
         ],
       },
     }),
@@ -457,9 +458,9 @@ export const pricingPageType = defineType({
           "A különböző HPV-vizsgálatok eltérő módszerrel és eltérő klinikai céllal történnek. A megfelelő vizsgálat kiválasztása orvosi javaslat alapján történik.",
         items: [
           {
-            name: "HPV DNS alapú, 15 genotípus meghatározás",
+            name: "HPV DNS alapú, 28 genotípus meghatározás (HPV28)",
             description: "HPV jelenlétét vizsgálja",
-            price: 14000,
+            price: 18000,
           },
           {
             name: "Aptima mRNS alapú HPV vizsgálat",
@@ -519,8 +520,8 @@ export const pricingPageType = defineType({
       initialValue: {
         items: [
           { label: "Injekció beadása", price: 6000 },
-          { label: "Szakorvosi dokumentáció", price: 9900 },
-          { label: "Sürgősségi fogamzásgátlás", price: 11900 },
+          { label: "Szakorvosi dokumentáció", price: 12000 },
+          { label: "Sürgősségi fogamzásgátlás", price: 10000 },
           { label: "Receptírás", price: 4900 },
         ],
         footnote: "Receptírás vizsgálat alkalmával díjtalan.",

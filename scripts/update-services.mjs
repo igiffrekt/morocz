@@ -1,3 +1,8 @@
+// ⚠️  WARNING — DESTRUCTIVE LEGACY SEED.
+// This script DELETES every service + serviceCategory document and recreates them.
+// Existing bookings reference service docs by _id, so a re-run will orphan those
+// references. Prices are normally maintained via targeted patches, not this seed.
+// Data below mirrors the "Árlista 2026.07.01" prices; keep it in sync if you must run it.
 import { createClient } from "@sanity/client";
 
 const client = createClient({
@@ -23,20 +28,22 @@ const servicesByCategory = {
   "Nőgyógyászati vizsgálatok": [
     { name: "Nőgyógyászati vizsgálat / tanácsadás (ultrahang nélkül)", price: 30000, order: 1 },
     { name: "Nőgyógyászati vizsgálat ultrahanggal", price: 43000, order: 2 },
-    { name: "Kontroll vizsgálat (3 hónapon belül, rövidített)", price: 22000, order: 3 },
-    { name: "Spirál felhelyezés vagy csere ultrahanggal", price: 43000, description: "Az eszköz árát nem tartalmazza. Az aktuálisan elérhető eszközökről rendelőnk elérhetőségein érdeklődhet.", order: 4 },
-    { name: "Spirál eltávolítás (ultrahang nélkül)", price: 30000, order: 5 },
-    { name: "Várandósgondozás", price: 42000, description: "Várandósgondozás során tájékozódó ultrahangot végzek, mely nem minősül genetikai ultrahangnak!", order: 6 },
+    { name: "Nőgyógyászati vizsgálat ultrahanggal és méhnyakszűréssel", price: 52000, order: 3 },
+    { name: "Kontroll vizsgálat (3 hónapon belül, rövidített)", price: 25000, order: 4 },
+    { name: "Spirál felhelyezés vagy csere ultrahanggal", price: 45000, description: "Az eszköz árát nem tartalmazza. Az aktuálisan elérhető eszközökről rendelőnk elérhetőségein érdeklődhet.", order: 5 },
+    { name: "Spirál eltávolítás (ultrahang nélkül)", price: 30000, order: 6 },
+    { name: "Várandósgondozás", price: 45000, description: "Várandósgondozás során tájékozódó ultrahangot végzek, mely nem minősül genetikai ultrahangnak!", order: 7 },
   ],
   "Egyéb szolgáltatások": [
     { name: "Szakorvosi dokumentáció kiállítása (vizsgálaton kívül)", price: 12000, order: 1 },
-    { name: "Sürgősségi fogamzásgátlás", price: 12000, order: 2 },
-    { name: "Receptírás rendelőnk páciensei részére", price: 6000, description: "Receptírás a vizsgálat alkalmával díjtalan.", order: 3 },
+    { name: "Sürgősségi fogamzásgátlás", price: 10000, order: 2 },
+    { name: "Receptírás rendelőnk páciensei részére", price: 4900, description: "Receptírás a vizsgálat alkalmával díjtalan.", order: 3 },
   ],
   "Mintavételek (Felárak)": [
-    { name: "Folyadékalapú méhnyakszűrés (LBC) mintavétel", price: 11500, description: "A folyadékalapú citológia egy korszerűbb méhnyakszűrési módszer.", order: 1 },
-    { name: "Endometrium (méhnyálkahártya) szövettani mintavétel", price: 22000, order: 2 },
-    { name: "Injekció beadása", price: 6000, order: 3 },
+    { name: "Folyadékalapú méhnyakszűrés (LBC) mintavétel", price: 9000, description: "A folyadékalapú citológia egy korszerűbb méhnyakszűrési módszer.", order: 1 },
+    { name: "Hagyományos citológia mintavétel", price: 6500, order: 2 },
+    { name: "Endometrium (méhnyálkahártya) szövettani mintavétel", price: 20000, order: 3 },
+    { name: "Injekció beadása", price: 6000, order: 4 },
   ],
   "Mikrobiológiai vizsgálatok": [
     { name: "Hüvelyváladék tenyésztés (aerob baktérium + gomba + kenet)", price: 8500, order: 1 },
@@ -44,13 +51,13 @@ const servicesByCategory = {
     { name: "GBS szűrés", price: 7500, order: 3 },
   ],
   "HPV vizsgálatok": [
-    { name: "HPV DNS alapú, 21 genotípus meghatározás", price: 18000, description: "HPV jelenlétét vizsgálja", order: 1 },
+    { name: "HPV DNS alapú, 28 genotípus meghatározás (HPV28)", price: 18000, description: "HPV jelenlétét vizsgálja", order: 1 },
     { name: "Aptima mRNS alapú HPV vizsgálat", price: 16000, description: "Magas kockázatú típusok aktivitásának kimutatására szolgál", order: 2 },
   ],
   "Éves Szűrőcsomagok": [
-    { name: "Alap Szűrőcsomag", price: 52000, description: "Nőgyógyászati vizsgálat + ultrahang vizsgálat, Folyadékalapú méhnyakszűrés (LBC). Évente egy alkalommal igénybe vehető.", order: 1 },
-    { name: "Komplex Szűrőcsomag", price: 64000, description: "Nőgyógyászati vizsgálat + ultrahang, Folyadékalapú méhnyakszűrés, HPV DNS tipizálás (21 típus). Évente egy alkalommal igénybe vehető.", order: 2 },
-    { name: "Prémium Szűrőcsomag", price: 74000, description: "Nőgyógyászati vizsgálat, Nőgyógyászati Ultrahang, Folyadékalapú méhnyakszűrés, Aptima mRNS alapú HPV vizsgálat, Hüvelyváladék tenyésztés (baktérium + gomba). Évente egy alkalommal igénybe vehető.", order: 3 },
+    { name: "🌿 Komplex Szűrővizsgálat", price: 52000, description: "Nőgyógyászati vizsgálat + ultrahang vizsgálat, Folyadékalapú méhnyakszűrés (LBC). Évente egy alkalommal igénybe vehető.", order: 1 },
+    { name: "🌸 Kiterjesztett Komplex Szűrés", price: 68000, description: "Nőgyógyászati vizsgálat + ultrahang, Folyadékalapú méhnyakszűrés, HPV DNS tipizálás (HPV28, 28 genotípus). Évente egy alkalommal igénybe vehető.", order: 2 },
+    { name: "💎 Prémium Szűrőcsomag", price: 71900, description: "Nőgyógyászati vizsgálat, Nőgyógyászati Ultrahang, Folyadékalapú méhnyakszűrés, Aptima mRNS alapú HPV vizsgálat, Hüvelyváladék tenyésztés (baktérium + gomba). Évente egy alkalommal igénybe vehető.", order: 3 },
   ],
 };
 

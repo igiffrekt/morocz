@@ -187,36 +187,6 @@ const DEFAULT_DATA: NonNullable<PricingPageQueryResult> = {
             included: true,
             emphasized: false,
           },
-          {
-            _key: "f8",
-            text: "HPV DNS tipizálás (HPV28, 28 genotípus)",
-            subtext: null,
-            included: true,
-            emphasized: true,
-          },
-        ],
-      },
-      {
-        _key: "t3",
-        name: "Prémium",
-        price: 71900,
-        highlighted: false,
-        features: [
-          {
-            _key: "f9",
-            text: "Minden a Komplexből +",
-            subtext: null,
-            included: true,
-            emphasized: false,
-          },
-          { _key: "f10", text: "Aptima mRNS HPV", subtext: null, included: true, emphasized: true },
-          {
-            _key: "f11",
-            text: "Hüvelyváladék tenyésztés",
-            subtext: null,
-            included: true,
-            emphasized: true,
-          },
         ],
       },
     ],
@@ -480,7 +450,7 @@ export default async function SzolgaltatasokEsArakPage() {
             </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {tiers.map((tier, idx) => {
               const style = TIER_STYLES[idx] ?? TIER_STYLES[0];
               return (

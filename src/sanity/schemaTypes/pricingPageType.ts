@@ -243,7 +243,7 @@ export const pricingPageType = defineType({
               },
             },
           ],
-          validation: (rule) => rule.length(3).error("Pontosan 3 csomag szükséges"),
+          validation: (rule) => rule.length(2).error("Pontosan 2 csomag szükséges"),
         }),
       ],
       initialValue: {
@@ -275,17 +275,6 @@ export const pricingPageType = defineType({
                 subtext: "(vizsgálat+mintavétel+ultrahang)",
                 included: true,
               },
-              { text: "HPV DNS tipizálás (HPV28, 28 genotípus)", included: true, emphasized: true },
-            ],
-          },
-          {
-            name: "Prémium",
-            price: 71900,
-            highlighted: false,
-            features: [
-              { text: "Minden a Komplexből +", included: true },
-              { text: "Aptima mRNS HPV", included: true, emphasized: true },
-              { text: "Hüvelyváladék tenyésztés", included: true, emphasized: true },
             ],
           },
         ],

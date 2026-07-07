@@ -443,18 +443,11 @@ export const pricingPageType = defineType({
         }),
       ],
       initialValue: {
-        intro:
-          "A különböző HPV-vizsgálatok eltérő módszerrel és eltérő klinikai céllal történnek. A megfelelő vizsgálat kiválasztása orvosi javaslat alapján történik.",
         items: [
           {
             name: "HPV DNS alapú, 28 genotípus meghatározás (HPV28)",
             description: "HPV jelenlétét vizsgálja",
             price: 18000,
-          },
-          {
-            name: "Aptima mRNS alapú HPV vizsgálat",
-            description: "Magas kockázatú típusok aktivitásának kimutatására szolgál",
-            price: 16000,
           },
         ],
       },

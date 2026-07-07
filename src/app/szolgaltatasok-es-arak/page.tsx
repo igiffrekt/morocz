@@ -211,20 +211,13 @@ const DEFAULT_DATA: NonNullable<PricingPageQueryResult> = {
     ],
   },
   hpvTests: {
-    intro:
-      "A különböző HPV-vizsgálatok eltérő módszerrel és eltérő klinikai céllal történnek. A megfelelő vizsgálat kiválasztása orvosi javaslat alapján történik.",
+    intro: null,
     items: [
       {
         _key: "h1",
         name: "HPV DNS alapú, 28 genotípus meghatározás (HPV28)",
         description: "HPV jelenlétét vizsgálja",
         price: 18000,
-      },
-      {
-        _key: "h2",
-        name: "Aptima mRNS alapú HPV vizsgálat",
-        description: "Magas kockázatú típusok aktivitásának kimutatására szolgál",
-        price: 16000,
       },
     ],
   },
@@ -311,19 +304,11 @@ const TIER_STYLES = [
     bg: cardStyles.blue.bg,
     checkColor: "text-[#76c8b6]",
     emphColor: "text-[#1e2952]",
-    shadow: "shadow-lg",
   },
   {
     bg: cardStyles.mint.bg,
     checkColor: "text-[#1e2952]",
     emphColor: "text-[#1e2952]",
-    shadow: "shadow-xl",
-  },
-  {
-    bg: cardStyles.pink.bg,
-    checkColor: "text-[#76c8b6]",
-    emphColor: "text-[#1e2952]",
-    shadow: "shadow-lg",
   },
 ];
 
@@ -450,84 +435,81 @@ export default async function SzolgaltatasokEsArakPage() {
             </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {tiers.map((tier, idx) => {
-              const style = TIER_STYLES[idx] ?? TIER_STYLES[0];
-              return (
-                <div
-                  key={tier._key}
-                  className={`${style.bg} rounded-3xl p-6 ${style.shadow} ${
-                    tier.highlighted ? "relative transform md:scale-105 z-10" : ""
-                  }`}
-                >
-                  {tier.highlighted ? (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                      <span className="px-4 py-1 rounded-full bg-[#1e2952] text-white text-xs font-bold uppercase">
-                        Ajánlott
-                      </span>
+          <div className="rounded-3xl shadow-xl overflow-hidden">
+            <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-[#1e2952]/10">
+              {tiers.map((tier, idx) => {
+                const style = TIER_STYLES[idx] ?? TIER_STYLES[0];
+                return (
+                  <div key={tier._key} className={`${style.bg} p-8 md:p-10`}>
+                    <div className="flex items-start justify-between gap-3 mb-6">
+                      <div>
+                        <span className="text-sm font-bold text-[#1e2952]/60 uppercase tracking-wide">
+                          {tier.name}
+                        </span>
+                        <div className="text-4xl font-black text-[#1e2952] mt-2">
+                          {typeof tier.price === "number" ? tier.price.toLocaleString("hu-HU") : ""}{" "}
+                          <span className="text-lg">Ft</span>
+                        </div>
+                      </div>
+                      {tier.highlighted ? (
+                        <span className="px-3 py-1 rounded-full bg-[#1e2952] text-white text-xs font-bold uppercase whitespace-nowrap">
+                          Ajánlott
+                        </span>
+                      ) : null}
                     </div>
-                  ) : null}
-                  <div className="text-center mb-6">
-                    <span className="text-sm font-bold text-[#1e2952]/60 uppercase tracking-wide">
-                      {tier.name}
-                    </span>
-                    <div className="text-4xl font-black text-[#1e2952] mt-2">
-                      {typeof tier.price === "number" ? tier.price.toLocaleString("hu-HU") : ""}{" "}
-                      <span className="text-lg">Ft</span>
-                    </div>
+                    <ul className="space-y-4">
+                      {(tier.features ?? []).map((feature) => {
+                        const included = feature.included !== false;
+                        const iconColor = included
+                          ? feature.emphasized
+                            ? style.emphColor
+                            : style.checkColor
+                          : "";
+                        const textClass = included
+                          ? `text-[#1e2952] ${feature.emphasized ? "font-medium" : ""}`
+                          : "text-[#1e2952]/40";
+                        return (
+                          <li
+                            key={feature._key}
+                            className={`flex ${feature.subtext ? "items-start" : "items-center"} gap-2 ${textClass}`}
+                          >
+                            {included ? (
+                              <svg
+                                className={`w-5 h-5 ${iconColor} ${feature.subtext ? "flex-shrink-0 mt-0.5" : ""}`}
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                            ) : (
+                              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path
+                                  fillRule="evenodd"
+                                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                            )}
+                            {feature.subtext ? (
+                              <div>
+                                <div>{feature.text}</div>
+                                <p className="text-xs text-[#1e2952]/60">{feature.subtext}</p>
+                              </div>
+                            ) : (
+                              <span>{feature.text}</span>
+                            )}
+                          </li>
+                        );
+                      })}
+                    </ul>
                   </div>
-                  <ul className="space-y-3">
-                    {(tier.features ?? []).map((feature) => {
-                      const included = feature.included !== false;
-                      const iconColor = included
-                        ? feature.emphasized
-                          ? style.emphColor
-                          : style.checkColor
-                        : "";
-                      const textClass = included
-                        ? `text-[#1e2952] ${feature.emphasized ? "font-medium" : ""}`
-                        : "text-[#1e2952]/40";
-                      return (
-                        <li
-                          key={feature._key}
-                          className={`flex ${feature.subtext ? "items-start" : "items-center"} gap-2 ${textClass}`}
-                        >
-                          {included ? (
-                            <svg
-                              className={`w-5 h-5 ${iconColor} ${feature.subtext ? "flex-shrink-0 mt-0.5" : ""}`}
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                          ) : (
-                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                              <path
-                                fillRule="evenodd"
-                                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                          )}
-                          {feature.subtext ? (
-                            <div>
-                              <div>{feature.text}</div>
-                              <p className="text-xs text-[#1e2952]/60">{feature.subtext}</p>
-                            </div>
-                          ) : (
-                            <span>{feature.text}</span>
-                          )}
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         </div>
 
@@ -593,35 +575,9 @@ export default async function SzolgaltatasokEsArakPage() {
               ))}
             </div>
           </div>
-
-          {/* HPV Tests */}
-          <div className={`${cardStyles.coral.bg} rounded-3xl p-6 shadow-lg lg:col-span-2`}>
-            <div className="flex items-center gap-3 mb-4">
-              <span className="text-2xl">🧬</span>
-              <h3 className="text-xl font-bold text-white">HPV vizsgálatok</h3>
-            </div>
-            {data.hpvTests?.intro ? (
-              <p className="text-white/85 text-sm leading-relaxed mb-5">{data.hpvTests.intro}</p>
-            ) : null}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {hpvItems.map((item) => (
-                <div key={item._key} className="bg-white/10 backdrop-blur rounded-xl p-4">
-                  <div className="flex justify-between items-start mb-2 gap-3">
-                    <span className="font-bold text-white">{item.name}</span>
-                    <span className="text-xl font-bold text-white whitespace-nowrap">
-                      {formatPrice(item.price)}
-                    </span>
-                  </div>
-                  {item.description ? (
-                    <p className="text-white/70 text-sm">{item.description}</p>
-                  ) : null}
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
 
-        {/* === OTHER SERVICES === */}
+        {/* === OTHER SERVICES (bento, HPV test featured alongside) === */}
         <div className="mb-6">
           <div className="flex items-center gap-3">
             <span className="text-3xl">📋</span>
@@ -629,22 +585,41 @@ export default async function SzolgaltatasokEsArakPage() {
           </div>
         </div>
 
-        <div className={`${cardStyles.pink.bg} rounded-3xl p-6 md:p-8 shadow-lg mb-12`}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
+        <div className="mb-12">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {hpvItems.map((item) => (
+              <div
+                key={item._key}
+                className={`${cardStyles.coral.bg} rounded-3xl p-6 shadow-lg sm:col-span-2 flex flex-col justify-between`}
+              >
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-xl">🧬</span>
+                  <span className="font-bold text-white text-lg">{item.name}</span>
+                </div>
+                <div className="flex items-end justify-between gap-4">
+                  {item.description ? (
+                    <p className="text-white/80 text-sm leading-relaxed">{item.description}</p>
+                  ) : null}
+                  <span className="text-2xl font-bold text-white whitespace-nowrap">
+                    {formatPrice(item.price)}
+                  </span>
+                </div>
+              </div>
+            ))}
             {otherItems.map((item) => (
               <div
                 key={item._key}
-                className="flex justify-between items-center py-2 border-b border-[#1e2952]/10"
+                className={`${cardStyles.pink.bg} rounded-3xl p-5 shadow-lg flex flex-col justify-between`}
               >
-                <span className="text-[#1e2952]">{item.label}</span>
-                <span className="font-bold text-[#1e2952] whitespace-nowrap ml-4">
+                <span className="text-[#1e2952] font-medium">{item.label}</span>
+                <span className="font-bold text-[#1e2952] text-xl mt-3">
                   {formatPrice(item.price)}
                 </span>
               </div>
             ))}
           </div>
           {data.otherServices?.footnote ? (
-            <p className="text-[#1e2952]/60 text-sm pt-4">{data.otherServices.footnote}</p>
+            <p className="text-[#1e2952]/60 text-sm mt-4">{data.otherServices.footnote}</p>
           ) : null}
         </div>
       </section>

@@ -187,6 +187,13 @@ const DEFAULT_DATA: NonNullable<PricingPageQueryResult> = {
             included: true,
             emphasized: false,
           },
+          {
+            _key: "f8",
+            text: "HPV28 tipizálás",
+            subtext: null,
+            included: true,
+            emphasized: false,
+          },
         ],
       },
     ],

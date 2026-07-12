@@ -19,6 +19,7 @@ import {
   homepageQuery,
   latestBlogPostsQuery,
   siteSettingsQuery,
+  weeklyScheduleQuery,
   yogaScheduleQuery,
 } from "@/sanity/lib/queries";
 import type {
@@ -27,6 +28,7 @@ import type {
   AllServiceCategoriesQueryResult,
   AllServicesQueryResult,
   SiteSettings,
+  WeeklyScheduleQueryResult,
   YogaScheduleQueryResult,
 } from "../../sanity.types";
 
@@ -77,10 +79,36 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+// ─── Structured data helpers ──────────────────────────────────────────────────
+
+const SCHEMA_DAYS = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+] as const;
+
+// Opening hours come from the same weeklySchedule doc that drives the booking system,
+// so what Google and the answer engines quote can never drift from the bookable reality.
+function toOpeningHours(schedule: WeeklyScheduleQueryResult) {
+  return (schedule?.days ?? [])
+    .filter((day) => !day.isDayOff && day.dayOfWeek != null && day.startTime && day.endTime)
+    .sort((a, b) => (a.dayOfWeek ?? 0) - (b.dayOfWeek ?? 0))
+    .map((day) => ({
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: SCHEMA_DAYS[day.dayOfWeek as number],
+      opens: day.startTime,
+      closes: day.endTime,
+    }));
+}
+
 // ─── Homepage Page ────────────────────────────────────────────────────────────
 
 export default async function Home() {
-  const [homepage, settings, categories, services, yogaSchedule, latestPosts] =
+  const [homepage, settings, categories, services, yogaSchedule, latestPosts, weeklySchedule] =
     await Promise.all([
       sanityFetch<HomepageQueryResult | null>({ query: homepageQuery, tags: ["homepage"] }),
       sanityFetch<SiteSettings | null>({ query: siteSettingsQuery, tags: ["siteSettings"] }),
@@ -91,6 +119,10 @@ export default async function Home() {
       sanityFetch<AllServicesQueryResult>({ query: allServicesQuery, tags: ["service"] }),
       sanityFetch<YogaScheduleQueryResult>({ query: yogaScheduleQuery, tags: ["yogaSchedule"] }),
       sanityFetch<LatestBlogPostsQueryResult>({ query: latestBlogPostsQuery, tags: ["blogPost"] }),
+      sanityFetch<WeeklyScheduleQueryResult>({
+        query: weeklyScheduleQuery,
+        tags: ["weeklySchedule"],
+      }),
     ]);
 
   // Transform homepage: convert null to undefined for type compatibility
@@ -169,6 +201,20 @@ export default async function Home() {
     content: post.content,
   }));
 
+  const clinicPhone = settings?.phone ?? "+36 70 639 5239";
+  const clinicAddress = {
+    "@type": "PostalAddress",
+    streetAddress: "Martsa Alajos utca 6/c.",
+    addressLocality: "Esztergom",
+    addressRegion: "Komárom-Esztergom",
+    postalCode: "2500",
+    addressCountry: "HU",
+  };
+  const clinicImage = settings?.defaultOgImage?.asset
+    ? urlFor(settings.defaultOgImage).width(1200).height(630).url()
+    : undefined;
+  const openingHours = toOpeningHours(weeklySchedule);
+
   const clinicJsonLd = {
     "@context": "https://schema.org",
     "@graph": [
@@ -179,49 +225,23 @@ export default async function Home() {
         description:
           "Szülészet, nőgyógyászati vizsgálatok és várandósgondozás Esztergomban.",
         url: "https://drmoroczangela.hu",
-        telephone: settings?.phone ?? "+36 70 639 5239",
+        telephone: clinicPhone,
         email: settings?.email ?? "",
-        address: {
-          "@type": "PostalAddress",
-          streetAddress: "Martsa Alajos utca 6/c.",
-          addressLocality: "Esztergom",
-          addressRegion: "Komárom-Esztergom",
-          postalCode: "2500",
-          addressCountry: "HU",
-        },
+        address: clinicAddress,
         geo: {
           "@type": "GeoCoordinates",
           latitude: 47.8007963,
           longitude: 18.7430918,
         },
-        openingHoursSpecification: [
-          {
-            "@type": "OpeningHoursSpecification",
-            dayOfWeek: "Monday",
-            opens: "12:00",
-            closes: "15:00",
-          },
-          {
-            "@type": "OpeningHoursSpecification",
-            dayOfWeek: "Tuesday",
-            opens: "11:00",
-            closes: "14:00",
-          },
-          {
-            "@type": "OpeningHoursSpecification",
-            dayOfWeek: "Thursday",
-            opens: "13:20",
-            closes: "17:00",
-          },
-        ],
-        image: settings?.defaultOgImage?.asset
-          ? urlFor(settings.defaultOgImage).width(1200).height(630).url()
-          : undefined,
+        ...(openingHours.length ? { openingHoursSpecification: openingHours } : {}),
+        image: clinicImage,
         priceRange: "$$",
         medicalSpecialty: "Gynecology",
         inLanguage: "hu",
       },
       {
+        // Physician is a LocalBusiness subtype: Google expects the contact fields on
+        // this node too, not only on the clinic it links to.
         "@type": "Physician",
         "@id": "https://drmoroczangela.hu/#physician",
         name: "Dr. Mórocz Angéla",
@@ -229,6 +249,11 @@ export default async function Home() {
         medicalSpecialty: "Gynecology",
         worksFor: { "@id": "https://drmoroczangela.hu/#clinic" },
         url: "https://drmoroczangela.hu",
+        telephone: clinicPhone,
+        address: clinicAddress,
+        image: clinicImage,
+        priceRange: "$$",
+        ...(openingHours.length ? { openingHoursSpecification: openingHours } : {}),
         inLanguage: "hu",
       },
     ],

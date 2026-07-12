@@ -275,6 +275,7 @@ export const pricingPageType = defineType({
                 subtext: "(vizsgálat+mintavétel+ultrahang)",
                 included: true,
               },
+              { text: "HPV28 tipizálás", included: true },
             ],
           },
         ],

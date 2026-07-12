@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import { pricingPageQuery } from "@/sanity/lib/queries";
@@ -319,6 +320,53 @@ const TIER_STYLES = [
   },
 ];
 
+// ─── Structured data ──────────────────────────────────────────────────────────
+
+const PAGE_URL = "https://drmoroczangela.hu/szolgaltatasok-es-arak";
+const CLINIC_NAME = "Dr. Mórocz Angéla Nőgyógyászati Rendelő";
+
+type PricedItem = {
+  label?: string | null;
+  name?: string | null;
+  subtitle?: string | null;
+  description?: string | null;
+  suffix?: string | null;
+  price?: number | null;
+};
+
+// Search and answer engines read prices from Offer/priceSpecification, so every priced
+// row is mirrored into the catalog from the same Sanity data the page renders.
+function toOffers(items: PricedItem[], category: string) {
+  return items
+    .filter((item) => typeof item.price === "number" && (item.label ?? item.name))
+    .map((item) => {
+      const name = (item.label ?? item.name) as string;
+      const description = item.subtitle ?? item.description;
+
+      return {
+        "@type": "Offer",
+        name,
+        ...(description ? { description } : {}),
+        category,
+        price: item.price,
+        priceCurrency: "HUF",
+        availability: "https://schema.org/InStock",
+        url: PAGE_URL,
+        priceSpecification: {
+          "@type": "UnitPriceSpecification",
+          price: item.price,
+          priceCurrency: "HUF",
+          // e.g. "/kórokozó" — the price is per unit, not per visit.
+          ...(item.suffix ? { unitText: item.suffix.replace(/^\//, "") } : {}),
+        },
+        itemOffered: {
+          "@type": "MedicalProcedure",
+          name,
+        },
+      };
+    });
+}
+
 export default async function SzolgaltatasokEsArakPage() {
   const fetched = await sanityFetch<PricingPageQueryResult | null>({
     query: pricingPageQuery,
@@ -334,8 +382,85 @@ export default async function SzolgaltatasokEsArakPage() {
   const hpvItems = data.hpvTests?.items ?? [];
   const otherItems = data.otherServices?.items ?? [];
 
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Kezdőlap",
+        item: "https://drmoroczangela.hu",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Szolgáltatások és Árak",
+        item: PAGE_URL,
+      },
+    ],
+  };
+
+  // Screening tiers are packages: the included features describe what the price covers.
+  const tierOffers = tiers
+    .filter((tier) => typeof tier.price === "number" && tier.name)
+    .map((tier) => {
+      const included = (tier.features ?? [])
+        .filter((feature) => feature.included && feature.text)
+        .map((feature) => feature.text)
+        .join(", ");
+
+      return {
+        "@type": "Offer",
+        name: tier.name,
+        ...(included ? { description: `Tartalmazza: ${included}` } : {}),
+        category: "Szűrőcsomagok",
+        price: tier.price,
+        priceCurrency: "HUF",
+        availability: "https://schema.org/InStock",
+        url: PAGE_URL,
+        priceSpecification: {
+          "@type": "UnitPriceSpecification",
+          price: tier.price,
+          priceCurrency: "HUF",
+        },
+        itemOffered: {
+          "@type": "MedicalProcedure",
+          name: tier.name,
+        },
+      };
+    });
+
+  const pregnancyCare = data.pregnancyCare;
+
+  const offerCatalogJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "OfferCatalog",
+    name: "Szolgáltatások és árak — Dr. Mórocz Angéla Nőgyógyászati Rendelő",
+    url: PAGE_URL,
+    inLanguage: "hu",
+    ...(data.validityNote ? { description: data.validityNote } : {}),
+    provider: {
+      "@type": "MedicalClinic",
+      name: CLINIC_NAME,
+      url: "https://drmoroczangela.hu",
+    },
+    itemListElement: [
+      ...toOffers(gynItems, "Nőgyógyászati vizsgálatok"),
+      ...tierOffers,
+      ...toOffers(hpvItems, "HPV vizsgálatok"),
+      ...toOffers(samplingItems, "Mintavételek"),
+      ...toOffers(microItems, "Mikrobiológiai vizsgálatok"),
+      ...toOffers(spiralItems, "Spirál"),
+      ...toOffers(pregnancyCare ? [pregnancyCare] : [], "Várandósgondozás"),
+      ...toOffers(otherItems, "Egyéb szolgáltatások"),
+    ],
+  };
+
   return (
     <main className="min-h-screen bg-[#FAF8F3] text-primary rounded-[40px] overflow-hidden">
+      <JsonLd data={breadcrumbJsonLd} />
+      <JsonLd data={offerCatalogJsonLd} />
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-[#1e2952] to-[#2B3674] rounded-b-[40px] relative overflow-hidden pt-28 pb-16 -mt-10">
         <div className="absolute right-0 top-0 w-96 h-96 bg-[#a8d5ba] opacity-5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />

@@ -3,7 +3,9 @@ import { defineQuery } from "next-sanity";
 import {
   buildConfirmationEmail,
   buildInvoiceFailedEmail,
+  buildInvoiceResolvedEmail,
   INVOICE_FAILED_SUBJECT,
+  INVOICE_RESOLVED_SUBJECT,
 } from "@/lib/booking-email";
 import { db } from "@/lib/db";
 import { user } from "@/lib/db/schema";
@@ -212,7 +214,8 @@ export async function POST(request: Request): Promise<Response> {
             findBooking: (pi) =>
               getWriteClient().fetch<RefundBooking | null>(
                 `*[_type == "booking" && stripePaymentIntentId == $pi][0]{
-                  _id, patientName, patientEmail, creditInvoiceNumber
+                  _id, patientName, patientEmail, reservationNumber, refundStatus,
+                  creditInvoiceNumber
                 }`,
                 { pi },
               ),
@@ -229,12 +232,20 @@ export async function POST(request: Request): Promise<Response> {
             patchBooking: async (bookingId, fields) => {
               await getWriteClient().patch(bookingId).set(fields).commit();
             },
-            sendInvoiceFailedEmail: async ({ patientName }) => {
+            sendInvoiceFailedEmail: async (notice) => {
               if (!isEmailConfigured()) return;
               await sendEmail({
                 to: RECEPTION_EMAIL,
                 subject: INVOICE_FAILED_SUBJECT,
-                html: buildInvoiceFailedEmail({ patientName }),
+                html: buildInvoiceFailedEmail(notice),
+              });
+            },
+            sendInvoiceResolvedEmail: async (notice) => {
+              if (!isEmailConfigured()) return;
+              await sendEmail({
+                to: RECEPTION_EMAIL,
+                subject: INVOICE_RESOLVED_SUBJECT,
+                html: buildInvoiceResolvedEmail(notice),
               });
             },
           },

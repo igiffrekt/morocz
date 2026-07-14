@@ -11,7 +11,25 @@ export interface RefundBooking {
   _id: string;
   patientName: string;
   patientEmail: string;
+  reservationNumber: string | null;
+  refundStatus: string | null;
   creditInvoiceNumber: string | null;
+}
+
+/** Identifying fields reception needs to actually find the payment in Stripe/Számlázz. */
+export interface InvoiceFailedNotice {
+  patientName: string;
+  reservationNumber: string | null;
+  /** Stripe cardholder — often NOT the patient (a relative may pay), which is what makes a
+   *  Stripe/Számlázz search by patient name come up empty. */
+  buyerName: string | null;
+  paymentIntentId: string;
+}
+
+export interface InvoiceResolvedNotice {
+  patientName: string;
+  reservationNumber: string | null;
+  invoiceNumber: string;
 }
 
 export interface ProcessRefundDeps {
@@ -24,7 +42,9 @@ export interface ProcessRefundDeps {
     buyer: { name: string; zip: string; city: string; address: string; email: string };
   }) => Promise<{ invoiceNumber: string }>;
   patchBooking: (bookingId: string, fields: Record<string, unknown>) => Promise<void>;
-  sendInvoiceFailedEmail: (input: { patientName: string }) => Promise<void>;
+  sendInvoiceFailedEmail: (input: InvoiceFailedNotice) => Promise<void>;
+  /** Retracts a previously sent invoice-failed email once a retry issues the invoice. */
+  sendInvoiceResolvedEmail: (input: InvoiceResolvedNotice) => Promise<void>;
 }
 
 export async function processRefund(charge: RefundCharge, deps: ProcessRefundDeps): Promise<void> {
@@ -42,6 +62,10 @@ export async function processRefund(charge: RefundCharge, deps: ProcessRefundDep
     );
     return;
   }
+
+  // A prior attempt failed and already told reception to invoice by hand. If this attempt
+  // succeeds we owe them a retraction — otherwise they issue a second credit invoice.
+  const receptionWasAskedToInvoiceManually = booking.refundStatus === "invoice_failed";
 
   // A buyer-address lookup failure must not abort invoicing — fall back to the Stripe
   // billing address. (Throwing here would skip the invoice + the reception fallback.)
@@ -74,6 +98,20 @@ export async function processRefund(charge: RefundCharge, deps: ProcessRefundDep
       creditInvoiceIssuedAt: new Date().toISOString(),
     });
     console.log(`[process-refund] Credit invoice ${invoiceNumber} issued for ${booking._id}`);
+
+    if (receptionWasAskedToInvoiceManually) {
+      // The invoice IS issued at this point, so a mail failure must never throw: throwing
+      // would make Stripe retry a webhook that has no work left to do.
+      try {
+        await deps.sendInvoiceResolvedEmail({
+          patientName: booking.patientName,
+          reservationNumber: booking.reservationNumber,
+          invoiceNumber,
+        });
+      } catch (err) {
+        console.error(`[process-refund] Resolved-notice email failed for ${booking._id}:`, err);
+      }
+    }
   } catch (err) {
     console.error(`[process-refund] Credit invoice failed for ${booking._id}:`, err);
     // Run both independently: a patchBooking failure must not prevent the reception
@@ -83,7 +121,12 @@ export async function processRefund(charge: RefundCharge, deps: ProcessRefundDep
         refundStatus: "invoice_failed",
         stripeRefundId: charge.refundId,
       }),
-      deps.sendInvoiceFailedEmail({ patientName: booking.patientName }),
+      deps.sendInvoiceFailedEmail({
+        patientName: booking.patientName,
+        reservationNumber: booking.reservationNumber,
+        buyerName: charge.billingName,
+        paymentIntentId: charge.paymentIntentId,
+      }),
     ]);
   }
 }

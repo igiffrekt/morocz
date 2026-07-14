@@ -972,22 +972,98 @@ export function buildReminderEmail(params: {
  * Builds a plain HTML notification email sent to the clinic reception
  * when a Stripe refund succeeded but the offsetting Számlázz.hu credit invoice failed.
  * Reception must issue the invoice manually.
+ *
+ * The identifiers matter: the card is often paid by a relative, so the Stripe/Számlázz
+ * record does NOT carry the patient's name. Without the cardholder name and the
+ * reservation number, a search by patient name comes up empty and the payment looks
+ * like it never happened.
  */
-export function buildInvoiceFailedEmail({ patientName }: { patientName: string }): string {
+export function buildInvoiceFailedEmail({
+  patientName,
+  reservationNumber,
+  buyerName,
+  paymentIntentId,
+}: {
+  patientName: string;
+  reservationNumber: string | null;
+  buyerName: string | null;
+  paymentIntentId: string;
+}): string {
+  const payerRow =
+    buyerName && buyerName !== patientName
+      ? `<li><strong>Fizető (kártyabirtokos):</strong> ${buyerName} — a Stripe/Számlázz rendszerben EZEN a néven keresse, nem a páciens nevén!</li>`
+      : `<li><strong>Fizető (kártyabirtokos):</strong> ${buyerName ?? "ismeretlen"}</li>`;
+
   return `<!DOCTYPE html>
 <html lang="hu">
+  <head><meta charset="UTF-8" /></head>
   <body style="font-family: Arial, sans-serif; color: #1A1D2D; line-height: 1.6;">
     <p>Tisztelt Recepció,</p>
     <p>
       ${patientName} páciens részére visszatérítettük a 10.000 Ft-os foglalási díjat,
       azonban az erről szóló helyesbítő számla rendszerhiba miatt meghiúsult.
-      Kérjük, állítsa ki manuálisan a számlát a Számlázz.hu rendszerében.
     </p>
+    <ul>
+      <li><strong>Páciens:</strong> ${patientName}</li>
+      ${payerRow}
+      <li><strong>Foglalási azonosító:</strong> ${reservationNumber ?? "ismeretlen"}</li>
+      <li><strong>Stripe fizetés azonosító:</strong> ${paymentIntentId}</li>
+    </ul>
+    <p>
+      <strong>Mielőtt kiállítja:</strong> a rendszer automatikusan újrapróbálkozik. Kérjük,
+      előbb ellenőrizze a Számlázz.hu-ban (a fenti fizető nevére keresve), hogy a helyesbítő
+      számla nem készült-e el időközben — ha megérkezett a „${INVOICE_RESOLVED_SUBJECT}” tárgyú
+      levelünk, akkor NE állítson ki kézi számlát, mert az dupla jóváírást eredményezne.
+    </p>
+    <p>Ha nincs ilyen számla, kérjük, állítsa ki manuálisan a Számlázz.hu rendszerében.</p>
   </body>
 </html>`;
 }
 
 export const INVOICE_FAILED_SUBJECT = "A helyesbítő számla kiállítása meghiúsult";
+
+/**
+ * Retraction of a previously sent {@link buildInvoiceFailedEmail}: the automatic retry
+ * succeeded, so reception must NOT issue the invoice by hand — doing so would credit the
+ * patient twice.
+ */
+export function buildInvoiceResolvedEmail({
+  patientName,
+  reservationNumber,
+  invoiceNumber,
+}: {
+  patientName: string;
+  reservationNumber: string | null;
+  invoiceNumber: string;
+}): string {
+  return `<!DOCTYPE html>
+<html lang="hu">
+  <head><meta charset="UTF-8" /></head>
+  <body style="font-family: Arial, sans-serif; color: #1A1D2D; line-height: 1.6;">
+    <p>Tisztelt Recepció,</p>
+    <p>
+      <strong>Nincs teendő — a korábbi hibaüzenetünk tárgytalan.</strong>
+    </p>
+    <p>
+      ${patientName} páciens helyesbítő számlája a rendszer automatikus újrapróbálkozása során
+      <strong>sikeresen elkészült</strong>. Korábban erről hibaüzenetet küldtünk („${INVOICE_FAILED_SUBJECT}”) —
+      azt kérjük, tekintse tárgytalannak.
+    </p>
+    <ul>
+      <li><strong>Páciens:</strong> ${patientName}</li>
+      <li><strong>Foglalási azonosító:</strong> ${reservationNumber ?? "ismeretlen"}</li>
+      <li><strong>Helyesbítő számla száma:</strong> ${invoiceNumber}</li>
+    </ul>
+    <p>
+      <strong>Kérjük, NE állítson ki kézi számlát ehhez a visszatérítéshez</strong> — az dupla
+      jóváírást eredményezne.
+    </p>
+  </body>
+</html>`;
+}
+
+export const INVOICE_RESOLVED_SUBJECT =
+  "Nincs teendő — a helyesbítő számla elkészült (korábbi hibaüzenet tárgytalan)";
 
 /**
  * Builds a branded HTML notification email sent to the clinic reception

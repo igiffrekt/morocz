@@ -37,9 +37,13 @@ export interface ProcessRefundDeps {
   getBuyerAddress: (
     email: string,
   ) => Promise<{ zip: string | null; city: string | null; address: string | null } | null>;
+  /** Resolves an invoice already issued for this booking. Throws if it cannot tell. */
+  findExistingCreditInvoice: (bookingId: string) => Promise<{ invoiceNumber: string } | null>;
   issueCreditInvoice: (input: {
     amountHuf: number;
     buyer: { name: string; zip: string; city: string; address: string; email: string };
+    bookingId: string;
+    reservationNumber?: string | null;
   }) => Promise<{ invoiceNumber: string }>;
   patchBooking: (bookingId: string, fields: Record<string, unknown>) => Promise<void>;
   sendInvoiceFailedEmail: (input: InvoiceFailedNotice) => Promise<void>;
@@ -67,6 +71,57 @@ export async function processRefund(charge: RefundCharge, deps: ProcessRefundDep
   // succeeds we owe them a retraction — otherwise they issue a second credit invoice.
   const receptionWasAskedToInvoiceManually = booking.refundStatus === "invoice_failed";
 
+  const recordInvoice = async (invoiceNumber: string): Promise<void> => {
+    await deps.patchBooking(booking._id, {
+      refundStatus: "refunded",
+      stripeRefundId: charge.refundId,
+      creditInvoiceNumber: invoiceNumber,
+      creditInvoiceIssuedAt: new Date().toISOString(),
+    });
+
+    if (receptionWasAskedToInvoiceManually) {
+      // The invoice is issued and recorded, so a mail failure must never throw: throwing
+      // would make Stripe retry a webhook that has no work left to do.
+      try {
+        await deps.sendInvoiceResolvedEmail({
+          patientName: booking.patientName,
+          reservationNumber: booking.reservationNumber,
+          invoiceNumber,
+        });
+      } catch (err) {
+        console.error(`[process-refund] Resolved-notice email failed for ${booking._id}:`, err);
+      }
+    }
+  };
+
+  // ── Ask Számlázz before issuing ────────────────────────────────────────────────────────
+  // `creditInvoiceNumber` alone cannot make a retry safe: Számlázz can create the invoice and
+  // still leave us with nothing to record (a slow response trips the client's 15s timeout, so
+  // the call throws even though the invoice exists). The retry then saw a null invoice number
+  // and issued a SECOND one — that is how booking rMg6ouqZ… got both E-MRCZ-2026-9 and -10 on
+  // 2026-07-14, double-crediting the books by 10.000 Ft against a single Stripe refund.
+  //
+  // Fail closed: if we cannot determine whether an invoice exists, throw and let Stripe retry.
+  // A late credit invoice is recoverable; a duplicate one is a manual accounting correction.
+  let existing: { invoiceNumber: string } | null;
+  try {
+    existing = await deps.findExistingCreditInvoice(booking._id);
+  } catch (err) {
+    console.error(
+      `[process-refund] Cannot verify whether a credit invoice exists for ${booking._id}; refusing to issue (would risk a duplicate):`,
+      err,
+    );
+    throw err;
+  }
+
+  if (existing) {
+    console.warn(
+      `[process-refund] Credit invoice ${existing.invoiceNumber} already exists at Számlázz for ${booking._id} but was never recorded — adopting it instead of issuing a duplicate.`,
+    );
+    await recordInvoice(existing.invoiceNumber);
+    return;
+  }
+
   // A buyer-address lookup failure must not abort invoicing — fall back to the Stripe
   // billing address. (Throwing here would skip the invoice + the reception fallback.)
   let userAddr: { zip: string | null; city: string | null; address: string | null } | null = null;
@@ -79,8 +134,9 @@ export async function processRefund(charge: RefundCharge, deps: ProcessRefundDep
   const city = userAddr?.city ?? charge.billingAddress.city ?? "";
   const address = userAddr?.address ?? charge.billingAddress.address ?? "";
 
+  let invoiceNumber: string;
   try {
-    const { invoiceNumber } = await deps.issueCreditInvoice({
+    ({ invoiceNumber } = await deps.issueCreditInvoice({
       amountHuf: BOOKING_FEE_HUF,
       buyer: {
         name: charge.billingName ?? booking.patientName,
@@ -89,29 +145,9 @@ export async function processRefund(charge: RefundCharge, deps: ProcessRefundDep
         address,
         email: booking.patientEmail,
       },
-    });
-
-    await deps.patchBooking(booking._id, {
-      refundStatus: "refunded",
-      stripeRefundId: charge.refundId,
-      creditInvoiceNumber: invoiceNumber,
-      creditInvoiceIssuedAt: new Date().toISOString(),
-    });
-    console.log(`[process-refund] Credit invoice ${invoiceNumber} issued for ${booking._id}`);
-
-    if (receptionWasAskedToInvoiceManually) {
-      // The invoice IS issued at this point, so a mail failure must never throw: throwing
-      // would make Stripe retry a webhook that has no work left to do.
-      try {
-        await deps.sendInvoiceResolvedEmail({
-          patientName: booking.patientName,
-          reservationNumber: booking.reservationNumber,
-          invoiceNumber,
-        });
-      } catch (err) {
-        console.error(`[process-refund] Resolved-notice email failed for ${booking._id}:`, err);
-      }
-    }
+      bookingId: booking._id,
+      reservationNumber: booking.reservationNumber,
+    }));
   } catch (err) {
     console.error(`[process-refund] Credit invoice failed for ${booking._id}:`, err);
     // Run both independently: a patchBooking failure must not prevent the reception
@@ -128,5 +164,12 @@ export async function processRefund(charge: RefundCharge, deps: ProcessRefundDep
         paymentIntentId: charge.paymentIntentId,
       }),
     ]);
+    return;
   }
+
+  // The invoice now EXISTS. Recording it is a separate concern: a Sanity failure here must not
+  // be reported as an invoice failure (that is what would ask reception to issue it by hand).
+  // It rethrows instead, so Stripe retries — and the lookup above adopts the invoice.
+  console.log(`[process-refund] Credit invoice ${invoiceNumber} issued for ${booking._id}`);
+  await recordInvoice(invoiceNumber);
 }

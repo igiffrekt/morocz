@@ -15,7 +15,8 @@ import { processRefund, type RefundBooking } from "@/lib/refund/process-refund";
 import { resolveLatestRefundId } from "@/lib/refund/resolve-latest-refund";
 import { getWriteClient } from "@/lib/sanity-write-client";
 import { stripe } from "@/lib/stripe";
-import { issueCreditInvoice } from "@/lib/szamlazz/client";
+import { creditInvoiceExternalId } from "@/lib/szamlazz/build-credit-invoice-xml";
+import { findCreditInvoiceByExternalId, issueCreditInvoice } from "@/lib/szamlazz/client";
 import { sanityFetch } from "@/sanity/lib/fetch";
 
 export const dynamic = "force-dynamic";
@@ -228,6 +229,8 @@ export async function POST(request: Request): Promise<Response> {
                 ? { zip: row.postalCode, city: row.city, address: row.streetAddress }
                 : null;
             },
+            findExistingCreditInvoice: (bookingId) =>
+              findCreditInvoiceByExternalId(creditInvoiceExternalId(bookingId)),
             issueCreditInvoice,
             patchBooking: async (bookingId, fields) => {
               await getWriteClient().patch(bookingId).set(fields).commit();

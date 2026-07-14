@@ -20,6 +20,7 @@ function makeDeps(overrides: Partial<ProcessRefundDeps> = {}): ProcessRefundDeps
     getBuyerAddress: vi
       .fn()
       .mockResolvedValue({ zip: "2500", city: "Esztergom", address: "Fő u. 1." }),
+    findExistingCreditInvoice: vi.fn().mockResolvedValue(null),
     issueCreditInvoice: vi.fn().mockResolvedValue({ invoiceNumber: "E-CR-1" }),
     patchBooking: vi.fn().mockResolvedValue(undefined),
     sendInvoiceFailedEmail: vi.fn().mockResolvedValue(undefined),
@@ -50,6 +51,8 @@ describe("processRefund", () => {
         address: "Fő u. 1.",
         email: "t@e.hu",
       },
+      bookingId: "booking-1",
+      reservationNumber: "M-TESZT1",
     });
     expect(deps.patchBooking).toHaveBeenCalledWith(
       "booking-1",
@@ -141,6 +144,65 @@ describe("processRefund", () => {
       "booking-1",
       expect.objectContaining({ creditInvoiceNumber: "E-CR-1" }),
     );
+    expect(deps.sendInvoiceFailedEmail).not.toHaveBeenCalled();
+  });
+
+  // ── Duplicate-invoice prevention ─────────────────────────────────────────────────────────
+  // Live incident 2026-07-14: Számlázz created E-MRCZ-2026-9, our call still failed (slow
+  // response → 15s timeout), nothing was recorded, and Stripe's retry issued E-MRCZ-2026-10.
+  // One Stripe refund, two credit invoices, books off by 10.000 Ft.
+
+  it("adopts an invoice that exists at Számlázz but was never recorded, instead of issuing a duplicate", async () => {
+    const deps = makeDeps({
+      findBooking: vi.fn().mockResolvedValue({
+        _id: "booking-1",
+        patientName: "Teszt Páciens",
+        patientEmail: "t@e.hu",
+        reservationNumber: "M-TESZT1",
+        refundStatus: "invoice_failed",
+        creditInvoiceNumber: null,
+      }),
+      findExistingCreditInvoice: vi.fn().mockResolvedValue({ invoiceNumber: "E-CR-9" }),
+    });
+    await processRefund(charge, deps);
+
+    expect(deps.issueCreditInvoice).not.toHaveBeenCalled();
+    expect(deps.patchBooking).toHaveBeenCalledWith(
+      "booking-1",
+      expect.objectContaining({ refundStatus: "refunded", creditInvoiceNumber: "E-CR-9" }),
+    );
+    expect(deps.sendInvoiceResolvedEmail).toHaveBeenCalledWith(
+      expect.objectContaining({ invoiceNumber: "E-CR-9" }),
+    );
+  });
+
+  it("refuses to issue when it cannot determine whether an invoice already exists (fail closed)", async () => {
+    // A duplicate credit invoice needs a manual accounting correction; a late one does not.
+    // So when the lookup itself fails, throw and let Stripe retry rather than risk a second.
+    const deps = makeDeps({
+      findExistingCreditInvoice: vi.fn().mockRejectedValue(new Error("szamlazz unreachable")),
+    });
+    await expect(processRefund(charge, deps)).rejects.toThrow("szamlazz unreachable");
+    expect(deps.issueCreditInvoice).not.toHaveBeenCalled();
+    expect(deps.sendInvoiceFailedEmail).not.toHaveBeenCalled();
+  });
+
+  it("passes the booking id so the invoice carries its idempotency key", async () => {
+    const deps = makeDeps();
+    await processRefund(charge, deps);
+    expect(deps.findExistingCreditInvoice).toHaveBeenCalledWith("booking-1");
+    expect(deps.issueCreditInvoice).toHaveBeenCalledWith(
+      expect.objectContaining({ bookingId: "booking-1", reservationNumber: "M-TESZT1" }),
+    );
+  });
+
+  it("rethrows (does NOT ask reception to invoice by hand) when the invoice succeeds but recording fails", async () => {
+    // The old code caught this in the same try as the invoice call, so a Sanity outage looked
+    // exactly like an invoice failure: reception was told to issue one that already existed.
+    const deps = makeDeps({
+      patchBooking: vi.fn().mockRejectedValue(new Error("sanity down")),
+    });
+    await expect(processRefund(charge, deps)).rejects.toThrow("sanity down");
     expect(deps.sendInvoiceFailedEmail).not.toHaveBeenCalled();
   });
 

@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect } from "react";
+import { readConsent } from "@/lib/consent";
 
 interface Props {
   reservationNumber: string;
@@ -32,6 +34,27 @@ export function PaymentSuccessClient({
   serviceName,
 }: Props) {
   const formattedDate = formatDateHungarian(slotDate);
+
+  // Verified paid booking → signal to GTM (Google Ads conversion fires on this event).
+  // This page only renders after Stripe confirms payment, so it's the true conversion.
+  // Guarded per reservation so a refresh / StrictMode re-render can't double-count.
+  useEffect(() => {
+    if (!reservationNumber) return;
+    const key = `conv_foglalas_${reservationNumber}`;
+    if (sessionStorage.getItem(key)) return;
+    sessionStorage.setItem(key, "1");
+    const payload: Record<string, unknown> = {
+      event: "foglalas_sikeres",
+      reservation_number: reservationNumber,
+    };
+    // Enhanced Conversions: include the booking email only with marketing consent. GTM hashes
+    // it (SHA-256) in the browser before send, and Consent Mode still gates transmission.
+    if (readConsent()?.marketing && patientEmail) {
+      payload.user_data = { email: patientEmail.trim().toLowerCase() };
+    }
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push(payload);
+  }, [reservationNumber, patientEmail]);
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">

@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect } from "react";
+import { readConsent } from "@/lib/consent";
 
 interface SuccessProps {
   serviceName: string;
@@ -59,6 +61,27 @@ export function BookingSuccess({
     durationMinutes,
     `Foglalási szám: ${reservationNumber}\nHelyszín: 2500 Esztergom, Martsa Alajos utca 6/c.\nTelefon: +36 70 639 5239`,
   );
+
+  // Signal a completed booking to GTM (Google Ads conversion fires on this event).
+  // Guarded per reservation so a remount / StrictMode double-render can't double-count.
+  useEffect(() => {
+    if (!reservationNumber) return;
+    const key = `conv_foglalas_${reservationNumber}`;
+    if (sessionStorage.getItem(key)) return;
+    sessionStorage.setItem(key, "1");
+    const payload: Record<string, unknown> = {
+      event: "foglalas_sikeres",
+      reservation_number: reservationNumber,
+    };
+    // Enhanced Conversions: include the booking email only with marketing consent. GTM hashes
+    // it (SHA-256) in the browser before send, and Consent Mode still gates transmission.
+    if (readConsent()?.marketing && patientEmail) {
+      payload.user_data = { email: patientEmail.trim().toLowerCase() };
+    }
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push(payload);
+  }, [reservationNumber, patientEmail]);
+
   return (
     <div className="py-6 text-center">
       {/* Green checkmark icon */}

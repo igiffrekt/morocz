@@ -69,17 +69,15 @@ export function BookingSuccess({
     const key = `conv_foglalas_${reservationNumber}`;
     if (sessionStorage.getItem(key)) return;
     sessionStorage.setItem(key, "1");
-    const payload: Record<string, unknown> = {
-      event: "foglalas_sikeres",
-      reservation_number: reservationNumber,
-    };
-    // Enhanced Conversions: include the booking email only with marketing consent. GTM hashes
-    // it (SHA-256) in the browser before send, and Consent Mode still gates transmission.
+    // Enhanced Conversions: hand the booking email to the Google tag BEFORE the conversion
+    // fires — gtag hashes it (SHA-256) client-side and Consent Mode still gates whether it is
+    // sent. Only with marketing consent. This GTM/tag version exposes no user-data toggle, so
+    // the gtag layer is how EC data reaches the GTM-fired Google Ads conversion.
     if (readConsent()?.marketing && patientEmail) {
-      payload.user_data = { email: patientEmail.trim().toLowerCase() };
+      window.gtag?.("set", "user_data", { email: patientEmail.trim().toLowerCase() });
     }
     window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push(payload);
+    window.dataLayer.push({ event: "foglalas_sikeres", reservation_number: reservationNumber });
   }, [reservationNumber, patientEmail]);
 
   return (

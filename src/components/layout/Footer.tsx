@@ -22,6 +22,8 @@ interface FooterProps {
   }>;
   privacyPolicyUrl?: string;
   cookiePolicyUrl?: string;
+  termsOfServiceUrl?: string;
+  bookingPolicyUrl?: string;
 }
 
 export default function Footer({
@@ -32,8 +34,20 @@ export default function Footer({
   socialLinks,
   privacyPolicyUrl,
   cookiePolicyUrl,
+  termsOfServiceUrl,
+  bookingPolicyUrl,
 }: FooterProps) {
   const displayName = clinicName ?? "Mórocz Medical";
+
+  const legalLinks = [
+    { label: "Adatkezelési tájékoztató", href: privacyPolicyUrl ?? "/adatkezelesi-tajekoztato" },
+    { label: "Cookie Szabályzat", href: cookiePolicyUrl ?? "/cookie-szabalyzat" },
+    { label: "Felhasználási Feltételek", href: termsOfServiceUrl ?? "/felhasznalasi-feltetelek" },
+    {
+      label: "Foglalási és Lemondási Szabályzat",
+      href: bookingPolicyUrl ?? "/foglalasi-es-lemondasi-szabalyzat",
+    },
+  ];
 
   const activeSocials = (socialLinks ?? []).filter(
     (s): s is { _key: string; platform: NonNullable<(typeof s)["platform"]>; url: string } =>
@@ -118,20 +132,18 @@ export default function Footer({
               <p>
                 &copy;{new Date().getFullYear()} {displayName}. Minden jog fenntartva.
               </p>
-              <div className="flex gap-4">
-                <Link
-                  href={privacyPolicyUrl ?? "/adatkezelesi-tajekoztato"}
-                  className="hover:text-white transition-colors"
-                >
-                  Adatkezelési tájékoztató
-                </Link>
-                <span className="text-white/30">|</span>
-                <Link
-                  href={cookiePolicyUrl ?? "/cookie-szabalyzat"}
-                  className="hover:text-white transition-colors"
-                >
-                  Cookie Szabályzat
-                </Link>
+              {/* No "|" separators here: with four links the row wraps, and a separator
+                  rendered per item leaves a dangling pipe at the start of the second line. */}
+              <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
+                {legalLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="hover:text-white transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
               </div>
             </div>
           </div>

@@ -101,6 +101,8 @@ export default async function RootLayout({
               socialLinks={settings?.socialLinks as any}
               privacyPolicyUrl={settings?.privacyPolicyUrl ?? undefined}
               cookiePolicyUrl={settings?.cookiePolicyUrl ?? undefined}
+              termsOfServiceUrl={settings?.termsOfServiceUrl ?? undefined}
+              bookingPolicyUrl={settings?.bookingPolicyUrl ?? undefined}
             />
           </div>
           <CookieNotice />

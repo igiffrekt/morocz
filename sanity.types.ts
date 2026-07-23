@@ -301,6 +301,12 @@ export type Booking = {
   stripeRefundId?: string;
   creditInvoiceNumber?: string;
   creditInvoiceIssuedAt?: string;
+  businessInvoiceRequested?: boolean;
+  businessTaxNumber?: string;
+  businessBuyerName?: string;
+  businessBuyerZip?: string;
+  businessBuyerCity?: string;
+  businessBuyerAddress?: string;
   createdAt?: string;
   reminderSent?: boolean;
   completedServices?: Array<{
@@ -381,6 +387,90 @@ export type WeeklySchedule = {
     endTime?: string;
     _key: string;
   }>;
+};
+
+export type BookingPolicy = {
+  _id: string;
+  _type: "bookingPolicy";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  body?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h2" | "h3" | "h4" | "blockquote";
+    listItem?: "bullet" | "number";
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  } | {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    caption?: string;
+    _type: "image";
+    _key: string;
+  }>;
+  lastUpdated?: string;
+};
+
+export type TermsOfService = {
+  _id: string;
+  _type: "termsOfService";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  body?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h2" | "h3" | "h4" | "blockquote";
+    listItem?: "bullet" | "number";
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  } | {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    caption?: string;
+    _type: "image";
+    _key: string;
+  }>;
+  lastUpdated?: string;
 };
 
 export type CookiePolicy = {
@@ -708,6 +798,8 @@ export type SiteSettings = {
   }>;
   privacyPolicyUrl?: string;
   cookiePolicyUrl?: string;
+  termsOfServiceUrl?: string;
+  bookingPolicyUrl?: string;
   financeResetDate?: string;
   metaDescription?: string;
   siteName?: string;
@@ -1075,7 +1167,7 @@ export type Geopoint = {
   alt?: number;
 };
 
-export type AllSanitySchemaTypes = Popup | SanityImageCrop | SanityImageHotspot | YogaPage | YogaSchedule | YogaClass | Slug | YogaInstructor | AppointmentHistory | Patient | SlotLock | Booking | CustomAvailability | BlockedDate | SeasonalSchedule | WeeklySchedule | CookiePolicy | PrivacyPolicy | BlogPost | BlogCategory | Testimonial | LabTest | Service | ServiceCategory | SiteSettings | Kapcsolat | PricingPage | Homepage | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageMetadata | SanityFileAsset | SanityAssetSourceData | SanityImageAsset | Geopoint;
+export type AllSanitySchemaTypes = Popup | SanityImageCrop | SanityImageHotspot | YogaPage | YogaSchedule | YogaClass | Slug | YogaInstructor | AppointmentHistory | Patient | SlotLock | Booking | CustomAvailability | BlockedDate | SeasonalSchedule | WeeklySchedule | BookingPolicy | TermsOfService | CookiePolicy | PrivacyPolicy | BlogPost | BlogCategory | Testimonial | LabTest | Service | ServiceCategory | SiteSettings | Kapcsolat | PricingPage | Homepage | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageMetadata | SanityFileAsset | SanityAssetSourceData | SanityImageAsset | Geopoint;
 export declare const internalGroqTypeReferenceTo: unique symbol;
 // Source: ./src/app/api/booking/route.ts
 // Variable: serviceForEmailQuery
@@ -1210,7 +1302,7 @@ export type HomepageQueryResult = {
   } | null;
 } | null;
 // Variable: siteSettingsQuery
-// Query: *[_type == "siteSettings" && _id == "siteSettings"][0]{  logo,  clinicName,  phone,  email,  address,  navigationLinks[]{    _key,    label,    href  },  socialLinks[]{    _key,    platform,    url  },  footerColumns[]{    _key,    heading,    links[]{      _key,      label,      href    }  },  privacyPolicyUrl,  cookiePolicyUrl,  metaDescription,  siteName,  defaultOgImage}
+// Query: *[_type == "siteSettings" && _id == "siteSettings"][0]{  logo,  clinicName,  phone,  email,  address,  navigationLinks[]{    _key,    label,    href  },  socialLinks[]{    _key,    platform,    url  },  footerColumns[]{    _key,    heading,    links[]{      _key,      label,      href    }  },  privacyPolicyUrl,  cookiePolicyUrl,  termsOfServiceUrl,  bookingPolicyUrl,  metaDescription,  siteName,  defaultOgImage}
 export type SiteSettingsQueryResult = {
   logo: {
     asset?: {
@@ -1249,6 +1341,8 @@ export type SiteSettingsQueryResult = {
   }> | null;
   privacyPolicyUrl: string | null;
   cookiePolicyUrl: string | null;
+  termsOfServiceUrl: string | null;
+  bookingPolicyUrl: string | null;
   metaDescription: string | null;
   siteName: string | null;
   defaultOgImage: {
@@ -1683,6 +1777,82 @@ export type CookiePolicyQueryResult = {
   }> | null;
   lastUpdated: string | null;
 } | null;
+// Variable: termsOfServiceQuery
+// Query: *[_type == "termsOfService" && _id == "termsOfService"][0]{  title,  body,  lastUpdated}
+export type TermsOfServiceQueryResult = {
+  title: string | null;
+  body: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "blockquote" | "h2" | "h3" | "h4" | "normal";
+    listItem?: "bullet" | "number";
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  } | {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    caption?: string;
+    _type: "image";
+    _key: string;
+  }> | null;
+  lastUpdated: string | null;
+} | null;
+// Variable: bookingPolicyQuery
+// Query: *[_type == "bookingPolicy" && _id == "bookingPolicy"][0]{  title,  body,  lastUpdated}
+export type BookingPolicyQueryResult = {
+  title: string | null;
+  body: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "blockquote" | "h2" | "h3" | "h4" | "normal";
+    listItem?: "bullet" | "number";
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  } | {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    caption?: string;
+    _type: "image";
+    _key: string;
+  }> | null;
+  lastUpdated: string | null;
+} | null;
 // Variable: weeklyScheduleQuery
 // Query: *[_type == "weeklySchedule" && _id == "weeklySchedule"][0]{  defaultSlotDuration,  bufferMinutes,  bookingWindowDays,  days[]{    _key,    dayOfWeek,    isDayOff,    startTime,    endTime  }}
 export type WeeklyScheduleQueryResult = {
@@ -2075,7 +2245,7 @@ declare module "@sanity/client" {
     "*[_type == \"customAvailability\" && date >= $startDate && date <= $endDate]{\n    _id, date, startTime, endTime, services[]->{_id}\n  }": CustomAvailabilityForMonthQueryResult;
     "*[_type == \"service\" && _id == $serviceId][0]{appointmentDuration}": ServiceByIdQueryResult;
     "*[_type == \"homepage\" && _id == \"homepage\"][0]{\n  heroHeadline,\n  heroSubtitle,\n  heroBadges[]{\n    _key,\n    emoji,\n    text\n  },\n  heroDoctorImage,\n  heroCards[]{\n    _key,\n    title,\n    subtitle,\n    icon\n  },\n  servicesHeadline,\n  servicesSubtitle,\n  labTestsHeadline,\n  labTestsSubtitle,\n  testimonialsHeadline,\n  testimonialsCtaText,\n  testimonialsCtaUrl,\n  testimonials[]->{\n    _id,\n    patientName,\n    photo,\n    text,\n    condition,\n    order\n  },\n  blogHeadline,\n  ctaHeadline,\n  ctaDescription,\n  metaDescription,\n  ogImage\n}": HomepageQueryResult;
-    "*[_type == \"siteSettings\" && _id == \"siteSettings\"][0]{\n  logo,\n  clinicName,\n  phone,\n  email,\n  address,\n  navigationLinks[]{\n    _key,\n    label,\n    href\n  },\n  socialLinks[]{\n    _key,\n    platform,\n    url\n  },\n  footerColumns[]{\n    _key,\n    heading,\n    links[]{\n      _key,\n      label,\n      href\n    }\n  },\n  privacyPolicyUrl,\n  cookiePolicyUrl,\n  metaDescription,\n  siteName,\n  defaultOgImage\n}": SiteSettingsQueryResult;
+    "*[_type == \"siteSettings\" && _id == \"siteSettings\"][0]{\n  logo,\n  clinicName,\n  phone,\n  email,\n  address,\n  navigationLinks[]{\n    _key,\n    label,\n    href\n  },\n  socialLinks[]{\n    _key,\n    platform,\n    url\n  },\n  footerColumns[]{\n    _key,\n    heading,\n    links[]{\n      _key,\n      label,\n      href\n    }\n  },\n  privacyPolicyUrl,\n  cookiePolicyUrl,\n  termsOfServiceUrl,\n  bookingPolicyUrl,\n  metaDescription,\n  siteName,\n  defaultOgImage\n}": SiteSettingsQueryResult;
     "*[_type == \"pricingPage\" && _id == \"pricingPage\"][0]{\n  validityNote,\n  gynBaseExam{\n    items[]{ _key, label, subtitle, badge, badgeStyle, note, price }\n  },\n  spiralServices{\n    items[]{ _key, label, subtitle, badge, badgeStyle, note, price },\n    footnote\n  },\n  pregnancyCare{ label, subtitle, price },\n  screeningPackages{\n    tiers[]{\n      _key,\n      name,\n      price,\n      highlighted,\n      features[]{ _key, text, subtext, included, emphasized }\n    }\n  },\n  samplingServices{\n    items[]{ _key, label, price }\n  },\n  microbiologyServices{\n    items[]{ _key, label, suffix, price }\n  },\n  hpvTests{\n    intro,\n    items[]{ _key, name, description, price }\n  },\n  otherServices{\n    items[]{ _key, label, price },\n    footnote\n  }\n}": PricingPageQueryResult;
     "*[_type == \"service\" && isHidden != true] | order(order asc){\n  _id,\n  name,\n  description,\n  price,\n  icon,\n  category->{_id, name, emoji},\n  order\n}": AllServicesQueryResult;
     "*[_type == \"serviceCategory\"] | order(order asc){\n  _id,\n  name,\n  emoji,\n  order\n}": AllServiceCategoriesQueryResult;
@@ -2088,6 +2258,8 @@ declare module "@sanity/client" {
     "*[_type == \"blogPost\" && category._ref == $categoryId && _id != $currentPostId] | order(publishedAt desc)[0...3]{\n  _id,\n  title,\n  slug,\n  featuredImage,\n  excerpt\n}": RelatedBlogPostsQueryResult;
     "*[_type == \"privacyPolicy\" && _id == \"privacyPolicy\"][0]{\n  title,\n  body,\n  lastUpdated\n}": PrivacyPolicyQueryResult;
     "*[_type == \"cookiePolicy\" && _id == \"cookiePolicy\"][0]{\n  title,\n  body,\n  lastUpdated\n}": CookiePolicyQueryResult;
+    "*[_type == \"termsOfService\" && _id == \"termsOfService\"][0]{\n  title,\n  body,\n  lastUpdated\n}": TermsOfServiceQueryResult;
+    "*[_type == \"bookingPolicy\" && _id == \"bookingPolicy\"][0]{\n  title,\n  body,\n  lastUpdated\n}": BookingPolicyQueryResult;
     "*[_type == \"weeklySchedule\" && _id == \"weeklySchedule\"][0]{\n  defaultSlotDuration,\n  bufferMinutes,\n  bookingWindowDays,\n  days[]{\n    _key,\n    dayOfWeek,\n    isDayOff,\n    startTime,\n    endTime\n  }\n}": WeeklyScheduleQueryResult;
     "*[_type == \"blockedDate\" && _id == \"blockedDate\"][0]{\n  dates[]{\n    _key,\n    date,\n    isHoliday\n  }\n}": BlockedDatesQueryResult;
     "*[_type == \"slotLock\" && _id == $slotLockId][0]{\n  _id, _rev, status, heldUntil, userId\n}": SlotLockByIdQueryResult;

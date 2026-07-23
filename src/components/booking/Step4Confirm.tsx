@@ -4,7 +4,16 @@ import { useEffect, useState } from "react";
 import { z } from "zod";
 
 import { useSession, signOut } from "@/lib/auth-client";
-import { CONSENT_LABEL, CONSENT_LINK_TEXT, PRIVACY_POLICY_URL } from "@/lib/consent-text";
+import {
+  BOOKING_POLICY_LABEL,
+  BOOKING_POLICY_LINK_TEXT,
+  BOOKING_POLICY_URL,
+  CONSENT_LABEL,
+  CONSENT_LINK_TEXT,
+  PRIVACY_POLICY_URL,
+  TERMS_OF_SERVICE_LINK_TEXT,
+  TERMS_OF_SERVICE_URL,
+} from "@/lib/consent-text";
 import { isValidHungarianTaxNumber } from "@/lib/szamlazz/tax-number";
 
 interface Step4Props {
@@ -73,6 +82,8 @@ export function Step4Confirm({ selections, onBack, onSuccess, onConflict }: Step
   const [showPhoneModal, setShowPhoneModal] = useState(false);
   const [consentChecked, setConsentChecked] = useState(false);
   const [consentError, setConsentError] = useState<string | null>(null);
+  const [policyChecked, setPolicyChecked] = useState(false);
+  const [policyError, setPolicyError] = useState<string | null>(null);
   const [errors, setErrors] = useState<FormErrors>({});
   const [businessErrors, setBusinessErrors] = useState<{ taxNumber?: string; company?: string }>({});
   const [submitting, setSubmitting] = useState(false);
@@ -137,11 +148,17 @@ export function Step4Confirm({ selections, onBack, onSuccess, onConflict }: Step
     }
     setBusinessErrors({});
 
-    if (!consentChecked) {
-      setConsentError("Az adatkezelési hozzájárulás elfogadása kötelező.");
+    // Both gates are evaluated before returning, so a patient who missed both
+    // checkboxes sees both errors at once instead of one per submit attempt.
+    setConsentError(consentChecked ? null : "Az adatkezelési hozzájárulás elfogadása kötelező.");
+    setPolicyError(
+      policyChecked
+        ? null
+        : "A Foglalási és Lemondási Szabályzat elfogadása kötelező a foglaláshoz.",
+    );
+    if (!consentChecked || !policyChecked) {
       return;
     }
-    setConsentError(null);
 
     setSubmitting(true);
 
@@ -501,6 +518,44 @@ export function Step4Confirm({ selections, onBack, onSuccess, onConflict }: Step
             </span>
           </label>
           {consentError && <p className="mt-1 text-xs text-red-600">{consentError}</p>}
+        </div>
+
+        {/* Booking & cancellation policy checkbox */}
+        <div>
+          <label className="flex items-start gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={policyChecked}
+              onChange={(e) => {
+                setPolicyChecked(e.target.checked);
+                if (e.target.checked) setPolicyError(null);
+              }}
+              className="mt-0.5 h-4 w-4 rounded border-gray-300 text-[var(--color-primary)] focus:ring-[var(--color-primary)]/30"
+            />
+            <span className="text-xs text-gray-600">
+              {BOOKING_POLICY_LABEL}{" "}
+              <a
+                href={BOOKING_POLICY_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[var(--color-primary)] underline hover:no-underline"
+              >
+                {BOOKING_POLICY_LINK_TEXT}
+              </a>{" "}
+              és a{" "}
+              <a
+                href={TERMS_OF_SERVICE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[var(--color-primary)] underline hover:no-underline"
+              >
+                {TERMS_OF_SERVICE_LINK_TEXT}
+              </a>
+              . Tudomásul veszem, hogy a 10.000 Ft foglalási díj a foglalt időpontot megelőző 48
+              órán belüli lemondás vagy meg nem jelenés esetén nem jár vissza.
+            </span>
+          </label>
+          {policyError && <p className="mt-1 text-xs text-red-600">{policyError}</p>}
         </div>
 
         {/* Navigation buttons */}

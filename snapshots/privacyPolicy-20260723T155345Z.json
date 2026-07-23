@@ -1,0 +1,907 @@
+{
+  "_createdAt": "2026-03-10T15:45:02Z",
+  "_id": "privacyPolicy",
+  "_rev": "N7Me2Oh32pqUbeBZ7Zhd4B",
+  "_system": {
+    "base": {
+      "id": "privacyPolicy",
+      "rev": "rnU2k7VvwxtoYpS60u0h2J"
+    }
+  },
+  "_type": "privacyPolicy",
+  "_updatedAt": "2026-07-21T12:50:40Z",
+  "body": [
+    {
+      "_key": "f178fc9ee204",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "c41298d04025",
+          "_type": "span",
+          "marks": [],
+          "text": "Miről szól a tájékoztató?"
+        }
+      ],
+      "markDefs": [],
+      "style": "h2"
+    },
+    {
+      "_key": "6e1818fc7b9f",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "cf09b4cefb41",
+          "_type": "span",
+          "marks": [],
+          "text": "Az Ön személyes adatait az Mórocz Medical Kft., (székhely: 2500 Esztergom, Martsa Alajos utca 6/c., adószám: 32637926-1-11) kezeli, mint adatkezelő (a továbbiakban: „mi”, „bennünket” vagy „Mórocz Medical”)."
+        }
+      ],
+      "markDefs": [],
+      "style": "normal"
+    },
+    {
+      "_key": "d194b5d4f6d8",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "0dbd1add1ff7",
+          "_type": "span",
+          "marks": [],
+          "text": "Tekintettel arra, hogy szolgáltatásaink igénybevétele és nyújtása szükségszerűen együtt jár személyes adatok kezelésével, a jelen adatkezelési tájékoztató („"
+        },
+        {
+          "_key": "6e15da9be950",
+          "_type": "span",
+          "marks": [
+            "strong"
+          ],
+          "text": "Adatvédelmi Tájékoztató"
+        },
+        {
+          "_key": "19fd49adb54f",
+          "_type": "span",
+          "marks": [],
+          "text": "”) útján teszünk eleget az alkalmazandó adatvédelmi jogszabályok szerinti tájékoztatási kötelezettségeknek. Az Adatkezelési Tájékoztatóban részletesen bemutatjuk különösen az adatkezelés jellemzőit és körülményeit, az Önt (mint érintettet) megillető jogokat, valamint azt, hogy a szolgáltatásaink nyújtása során pontosan mely személyes adatokat, milyen célból és mennyi ideig kezelünk."
+        }
+      ],
+      "markDefs": [],
+      "style": "normal"
+    },
+    {
+      "_key": "f024941b5ef9",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "4d4fbaa77dc0",
+          "_type": "span",
+          "marks": [],
+          "text": "Adatkezelési Tájékoztató abban az esetben vonatkozik Önre, ha Ön igénybe veszi bizonyos szolgáltatásainkat (a továbbiakban: „"
+        },
+        {
+          "_key": "d4011f039bd3",
+          "_type": "span",
+          "marks": [
+            "strong"
+          ],
+          "text": "Szolgáltatás"
+        },
+        {
+          "_key": "ff523dedbc29",
+          "_type": "span",
+          "marks": [],
+          "text": "”). A jelen Adatkezelési Tájékoztatóban Szolgáltatás az alábbiakat jelenti:"
+        }
+      ],
+      "markDefs": [],
+      "style": "normal"
+    },
+    {
+      "_key": "37e9c29585a2",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "b6206a5db45b",
+          "_type": "span",
+          "marks": [],
+          "text": "a honlapon, vagy egyéb nyomtatványban szereplő szolgáltatás megrendelése;"
+        }
+      ],
+      "level": 1,
+      "listItem": "bullet",
+      "markDefs": [],
+      "style": "normal"
+    },
+    {
+      "_key": "af4aeafe3a66",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "c41d3ed8499e",
+          "_type": "span",
+          "marks": [],
+          "text": "elektronikus direkt marketing kommunikációt, amit Ön kaphat tőlünk (így például hírleveleket), erre történő feliratkozás esetén;"
+        }
+      ],
+      "level": 1,
+      "listItem": "bullet",
+      "markDefs": [],
+      "style": "normal"
+    },
+    {
+      "_key": "49f4f3a3daea",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "4dc2e4683cef",
+          "_type": "span",
+          "marks": [],
+          "text": "az általunk szervezett piackutatásokban, nyereményjátékokban vagy eseményekben való részvételt."
+        }
+      ],
+      "level": 1,
+      "listItem": "bullet",
+      "markDefs": [],
+      "style": "normal"
+    },
+    {
+      "_key": "14adf0d1a889",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "a9e0518f4973",
+          "_type": "span",
+          "marks": [],
+          "text": "Kérjük, hogy a jelen Adatkezelési Tájékoztatót figyelmesen olvassa végig, és kérdés esetén vegye fel velünk a kapcsolatot elektronikusan az info@drmoroczangela.hu címen vagy postai úton (Mórocz Medical Kft. – 2500 Esztergom, Martsa Alajos utca 6/c.)."
+        }
+      ],
+      "markDefs": [],
+      "style": "normal"
+    },
+    {
+      "_key": "cd7e884336e1",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "e50f3448da6b",
+          "_type": "span",
+          "marks": [],
+          "text": "Adatkezelő elérhetőségei"
+        }
+      ],
+      "markDefs": [],
+      "style": "h2"
+    },
+    {
+      "_key": "e59cdb72a23c",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "9dfa9ba12867",
+          "_type": "span",
+          "marks": [
+            "strong"
+          ],
+          "text": "Adatkezelő neve"
+        },
+        {
+          "_key": "524c7caa6adf",
+          "_type": "span",
+          "marks": [],
+          "text": ": Mórocz Medical Kft."
+        }
+      ],
+      "markDefs": [],
+      "style": "normal"
+    },
+    {
+      "_key": "d80cc1ad0d1f",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "1203d4704475",
+          "_type": "span",
+          "marks": [
+            "strong"
+          ],
+          "text": "Adatkezelő székhelye és levelezési címe"
+        },
+        {
+          "_key": "2e0c1553868a",
+          "_type": "span",
+          "marks": [],
+          "text": ": 2500 Esztergom, Martsa Alajos utca 6/c."
+        }
+      ],
+      "markDefs": [],
+      "style": "normal"
+    },
+    {
+      "_key": "3092d822a1c4",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "5349d201794d",
+          "_type": "span",
+          "marks": [],
+          "text": "Önt, mint érintettet megillető jogok"
+        }
+      ],
+      "markDefs": [],
+      "style": "h2"
+    },
+    {
+      "_key": "af9ddd106fa9",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "be32fa452d00",
+          "_type": "span",
+          "marks": [],
+          "text": "Ön, mint érintett bármikor kérhet részletes tájékoztatást személyes adatai kezeléséről, illetve hozzáférhet a személyes adataihoz, kérheti azok helyesbítését, valamint a GDPR-ban meghatározott esetekben kérheti azok törlését vagy kezelésének korlátozását, tiltakozhat a személyes adatok kezelése ellen, valamint élhet adathordozhatósághoz való jogával. Jogosult továbbá panaszt tenni bármely felügyeleti hatóságnál, amennyiben úgy ítéli meg, hogy Társaságunk megsérti a GDPR rendelkezéseit az Önre vonatkozó személyes adatok kezelése során. Egyes jogait az alábbiak szerint gyakorolhatja:"
+        }
+      ],
+      "markDefs": [],
+      "style": "normal"
+    },
+    {
+      "_key": "0d0eb32f4f4f",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "b883d30c0d15",
+          "_type": "span",
+          "marks": [
+            "strong"
+          ],
+          "text": "Tájékoztatáshoz és hozzáféréshez való jog (GDPR 15. cikk)"
+        }
+      ],
+      "markDefs": [],
+      "style": "normal"
+    },
+    {
+      "_key": "4f5e0fc4cc85",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "a8dd2cd1aa8f",
+          "_type": "span",
+          "marks": [],
+          "text": "Ön jogosult arra, hogy a Társaságtól kérésére visszajelzést kapjon arra vonatkozóan, hogy személyes adatainak kezelése folyamatban van-e, és ha ilyen adatkezelés folyamatban van, jogosult arra, hogy a személyes adatokhoz és információkhoz hozzáférést kapjon. A vonatkozó jogszabályok alapján az Ön személyes adatokról való tájékoztatását ingyenesen biztosítjuk. Kérésére egy hónapon belül írásban válaszolunk."
+        }
+      ],
+      "markDefs": [],
+      "style": "normal"
+    },
+    {
+      "_key": "c66dbadd4d52",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "02aa1968b8cb",
+          "_type": "span",
+          "marks": [
+            "strong"
+          ],
+          "text": "A helyesbítéshez való jog (GDPR 16. cikk)"
+        }
+      ],
+      "markDefs": [],
+      "style": "normal"
+    },
+    {
+      "_key": "c6eba6e38d71",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "01263a1d4a67",
+          "_type": "span",
+          "marks": [],
+          "text": "Ha az általunk kezelt személyes adatok nem pontosak, akkor az Ön kérésére indokolatlan késedelem nélkül kijavítjuk őket. Ön jogosult arra is, hogy kérje a hiányos személyes adatai kiegészítését erre vonatkozó nyilatkozat útján."
+        }
+      ],
+      "markDefs": [],
+      "style": "normal"
+    },
+    {
+      "_key": "607ee12490d5",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "b4b3f71b2ff0",
+          "_type": "span",
+          "marks": [
+            "strong"
+          ],
+          "text": "Törléshez való jog (GDPR 17. cikk)"
+        }
+      ],
+      "markDefs": [],
+      "style": "normal"
+    },
+    {
+      "_key": "e6fcc22969ea",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "c43ecd3f2b26",
+          "_type": "span",
+          "marks": [],
+          "text": "A Társaság késedelem nélkül törli a személyes adatait, amennyiben:"
+        }
+      ],
+      "markDefs": [],
+      "style": "normal"
+    },
+    {
+      "_key": "6b2f219ad66f",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "066d3a6a8cef",
+          "_type": "span",
+          "marks": [],
+          "text": "személyes adatokra már nincs szükség abból a célból, amelyből azokat gyűjtötték vagy más módon kezelték;"
+        }
+      ],
+      "level": 1,
+      "listItem": "bullet",
+      "markDefs": [],
+      "style": "normal"
+    },
+    {
+      "_key": "910dbe466a26",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "2e4892d753b0",
+          "_type": "span",
+          "marks": [],
+          "text": "a személyes adatok kezelése jogellenes;"
+        }
+      ],
+      "level": 1,
+      "listItem": "bullet",
+      "markDefs": [],
+      "style": "normal"
+    },
+    {
+      "_key": "be3a1da01b74",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "e96f315b5a79",
+          "_type": "span",
+          "marks": [],
+          "text": "a Társaságra vonatkozó jogi kötelezettség teljesítése okán szükséges az adatok törlése;"
+        }
+      ],
+      "level": 1,
+      "listItem": "bullet",
+      "markDefs": [],
+      "style": "normal"
+    },
+    {
+      "_key": "0e30035d6dba",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "eef69f3915be",
+          "_type": "span",
+          "marks": [],
+          "text": "amennyiben a 16. életévét be nem töltött gyermek adatainak kezeléséhez információs társadalommal összefüggő szolgáltatások kínálásával kapcsolatosan a hozzájárulást a gyermek feletti szülői felügyeletet gyakorló személy nem adta meg, illetve nem engedélyezte;"
+        }
+      ],
+      "level": 1,
+      "listItem": "bullet",
+      "markDefs": [],
+      "style": "normal"
+    },
+    {
+      "_key": "9b66d04604f1",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "f4930fe669e4",
+          "_type": "span",
+          "marks": [],
+          "text": "amennyiben a Társaság nyilvánosságra hozta a személyes adatot."
+        }
+      ],
+      "level": 1,
+      "listItem": "bullet",
+      "markDefs": [],
+      "style": "normal"
+    },
+    {
+      "_key": "b9359bc23d82",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "1a57b6634267",
+          "_type": "span",
+          "marks": [
+            "strong"
+          ],
+          "text": "Az adatkezelés korlátozásához való jog (GDPR 18. cikk)"
+        }
+      ],
+      "markDefs": [],
+      "style": "normal"
+    },
+    {
+      "_key": "03ced0a152d1",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "b35356a3166d",
+          "_type": "span",
+          "marks": [],
+          "text": "Az adatkezelés korlátozására abban az esetben kerülhet sor, amennyiben:"
+        }
+      ],
+      "markDefs": [],
+      "style": "normal"
+    },
+    {
+      "_key": "399fe1975498",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "3f8404798c27",
+          "_type": "span",
+          "marks": [],
+          "text": "Ön vitatja adatainak pontosságát; ebben az esetben az adatok helyességének megállapításáig terjedő időtartamra a Társaság korlátozza személyes adatainak kezelését;"
+        }
+      ],
+      "level": 1,
+      "listItem": "bullet",
+      "markDefs": [],
+      "style": "normal"
+    },
+    {
+      "_key": "7697b4bdcc72",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "c7a3b3825bb2",
+          "_type": "span",
+          "marks": [],
+          "text": "az adatkezelés jogellenes és Ön törlés helyett a felhasználás korlátozását kéri;"
+        }
+      ],
+      "level": 1,
+      "listItem": "bullet",
+      "markDefs": [],
+      "style": "normal"
+    },
+    {
+      "_key": "a104c292a0bc",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "59d6106db0d5",
+          "_type": "span",
+          "marks": [],
+          "text": "a Társaságnak már nincs szüksége az adatokra, de Ön igényli azokat jogi igények előterjesztéséhez;"
+        }
+      ],
+      "level": 1,
+      "listItem": "bullet",
+      "markDefs": [],
+      "style": "normal"
+    },
+    {
+      "_key": "81c48164a15d",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "7bb555fdd5b0",
+          "_type": "span",
+          "marks": [],
+          "text": "Ön tiltakozott személyes adatainak kezelése ellen, a tiltakozással kapcsolatos mérlegelés elvégzésének erejéig."
+        }
+      ],
+      "level": 1,
+      "listItem": "bullet",
+      "markDefs": [],
+      "style": "normal"
+    },
+    {
+      "_key": "d61328b99405",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "da02e8c4af82",
+          "_type": "span",
+          "marks": [
+            "strong"
+          ],
+          "text": "Adathordozhatósághoz való jog (GDPR 20. cikk)"
+        }
+      ],
+      "markDefs": [],
+      "style": "normal"
+    },
+    {
+      "_key": "85e3abbda080",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "f5b86bbbb010",
+          "_type": "span",
+          "marks": [],
+          "text": "A Társaság az adatkezelés tárgyát képező személyes adatok másolatát kérésére az Ön rendelkezésére bocsátja. Amennyiben Ön elektronikus úton nyújtotta be a kérelmet, az információkat széles körben használt elektronikus formátumban (pl. .doc vagy .pdf formátumban) kell rendelkezésre bocsátani, kivéve, ha Ön ezt másként kéri."
+        }
+      ],
+      "markDefs": [],
+      "style": "normal"
+    },
+    {
+      "_key": "2f462b3e37f4",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "2fde095a05d6",
+          "_type": "span",
+          "marks": [
+            "strong"
+          ],
+          "text": "A tiltakozáshoz való jog (GDPR 21. cikk)"
+        },
+        {
+          "_key": "60229695174a",
+          "_type": "span",
+          "marks": [],
+          "text": " Az érintett jelen tájékoztatóban megjelölt elérhetőségeken keresztül saját helyzetével kapcsolatos okokból bármikor tiltakozhat az adatkezelés ellen, ha:"
+        }
+      ],
+      "markDefs": [],
+      "style": "normal"
+    },
+    {
+      "_key": "23b457ee2151",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "c0f1411b6bfe",
+          "_type": "span",
+          "marks": [],
+          "text": "álláspontja szerint a Társaság a személyes adatát a jelen adatkezelési tájékoztatóban megjelölt céllal összefüggésben nem megfelelően kezelné;"
+        }
+      ],
+      "level": 1,
+      "listItem": "bullet",
+      "markDefs": [],
+      "style": "normal"
+    },
+    {
+      "_key": "99e4259f7679",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "960218f96d9b",
+          "_type": "span",
+          "marks": [],
+          "text": "ha az jogos érdek alapján történik, mely esetben az adatkezelés nem folytatható, kivéve, ha az érintett érdekeivel, jogaival és szabadságaival szemben elsőbbséget élvező kényszerítő erejű jogos okok, vagy olyan okok indokolják, amelyek jogi igények előterjesztéséhez, érvényesítéséhez vagy védelméhez kapcsolódnak;"
+        }
+      ],
+      "level": 1,
+      "listItem": "bullet",
+      "markDefs": [],
+      "style": "normal"
+    },
+    {
+      "_key": "87bb501a3821",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "a7d7a1210610",
+          "_type": "span",
+          "marks": [
+            "strong"
+          ],
+          "text": "Jogorvoslathoz való jog"
+        }
+      ],
+      "markDefs": [],
+      "style": "normal"
+    },
+    {
+      "_key": "4bbef355b67e",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "222490385421",
+          "_type": "span",
+          "marks": [],
+          "text": "Milyen jogorvoslati lehetőségek állnak az Ön rendelkezésére"
+        }
+      ],
+      "markDefs": [],
+      "style": "normal"
+    },
+    {
+      "_key": "d3a6042e981f",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "3b6d2ff48b1d",
+          "_type": "span",
+          "marks": [],
+          "text": "Ha az Ön megítélése szerint személyes adatainak kezelése során a Társaság megsérti a GDPR rendelkezéseit, úgy Ön, mint érintett jogosult arra, hogy panaszt tegyen egy felügyeleti hatóságnál (azaz az EU bármely tagállama által a GDPR 51. cikke alapján létrehozott közhatalmi szervnél) – különösen az Ön szokásos tartózkodási helye, a munkahelye vagy a feltételezett jogsértés helye szerinti tagállamban. Magyarországon a GDPR 51. cikkében foglalt kritériumoknak megfelelően létrehozott felügyeleti szerv a Nemzeti Adatvédelmi és Információszabadság Hatóság (a továbbiakban: „"
+        },
+        {
+          "_key": "22d5deff2f83",
+          "_type": "span",
+          "marks": [
+            "strong"
+          ],
+          "text": "NAIH"
+        },
+        {
+          "_key": "d3d6c2ddc88e",
+          "_type": "span",
+          "marks": [],
+          "text": "” vagy „"
+        },
+        {
+          "_key": "7134c8fe60e3",
+          "_type": "span",
+          "marks": [
+            "strong"
+          ],
+          "text": "Hatóság"
+        },
+        {
+          "_key": "79d240cd2e3c",
+          "_type": "span",
+          "marks": [],
+          "text": "”). Ennek megfelelően az alábbi pontban a NAIH részére panasztétel lehetőségének részleteiről tájékoztatjuk."
+        }
+      ],
+      "markDefs": [],
+      "style": "normal"
+    },
+    {
+      "_key": "8dcb27c510a8",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "be4a7d6529f7",
+          "_type": "span",
+          "marks": [],
+          "text": "Felhívjuk azonban a figyelmét, hogy ettől függetlenül Ön a fentieknek megfelelően nem csak a Hatóságnál jogosult panasztételre, hanem az EU tagállamában létrehozott bármely felügyeleti hatóságnál."
+        }
+      ],
+      "markDefs": [],
+      "style": "normal"
+    },
+    {
+      "_key": "5dce12addb99",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "0bb37b7907d5",
+          "_type": "span",
+          "marks": [],
+          "text": "Bejelentés a Nemzeti Adatvédelmi és Információszabadság Hatósághoz"
+        }
+      ],
+      "markDefs": [],
+      "style": "normal"
+    },
+    {
+      "_key": "d694d377d4e2",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "b01ae0aa67c1",
+          "_type": "span",
+          "marks": [],
+          "text": "Az adatvédelmi jogszabályok betartását a Nemzeti Adatvédelmi és Információszabadság Hatóság felügyeli. Ha Ön úgy ítéli meg, hogy az adatkezelésünk nem felel meg a vonatkozó jogszabályoknak, vagy ha úgy ítéli meg, hogy ennek közvetlen veszélye fennáll, akkor bejelentést tehet a Hatóságnál a következő elérhetőségeken."
+        }
+      ],
+      "markDefs": [],
+      "style": "normal"
+    },
+    {
+      "_key": "2bf7481c6419",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "ea5000ca28bd",
+          "_type": "span",
+          "marks": [
+            "strong"
+          ],
+          "text": "Hatóság neve"
+        },
+        {
+          "_key": "84062a074b28",
+          "_type": "span",
+          "marks": [],
+          "text": ": Nemzeti Adatvédelmi és Információszabadság Hatóság"
+        }
+      ],
+      "markDefs": [],
+      "style": "normal"
+    },
+    {
+      "_key": "dec0fa92393f",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "d05165ce42ee",
+          "_type": "span",
+          "marks": [
+            "strong"
+          ],
+          "text": "Postacím"
+        },
+        {
+          "_key": "9efe08e042a3",
+          "_type": "span",
+          "marks": [],
+          "text": ": 1363 Budapest, Pf.: 9."
+        }
+      ],
+      "markDefs": [],
+      "style": "normal"
+    },
+    {
+      "_key": "4f817adef077",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "fd9909c084b9",
+          "_type": "span",
+          "marks": [
+            "strong"
+          ],
+          "text": "E-mail-cím"
+        },
+        {
+          "_key": "022843c6e232",
+          "_type": "span",
+          "marks": [],
+          "text": ": ugyfelszolgalat@naih.hu"
+        }
+      ],
+      "markDefs": [],
+      "style": "normal"
+    },
+    {
+      "_key": "2fd898a47277",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "cae7c5f3248a",
+          "_type": "span",
+          "marks": [
+            "strong"
+          ],
+          "text": "Telefonszám"
+        },
+        {
+          "_key": "b974d3eba0f5",
+          "_type": "span",
+          "marks": [],
+          "text": ": +36 1 391 1400"
+        }
+      ],
+      "markDefs": [],
+      "style": "normal"
+    },
+    {
+      "_key": "dead7a37a57a",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "2e34da884c2a",
+          "_type": "span",
+          "marks": [
+            "strong"
+          ],
+          "text": "Fax szám"
+        },
+        {
+          "_key": "1fa4584fbeaa",
+          "_type": "span",
+          "marks": [],
+          "text": ": +36 1 391 1410"
+        }
+      ],
+      "markDefs": [],
+      "style": "normal"
+    },
+    {
+      "_key": "dba74d965f9a",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "646a81c60b6c",
+          "_type": "span",
+          "marks": [],
+          "text": "Adatvédelmi kérdésekkel kapcsolatban további információ található a Hatóság honlapján: "
+        },
+        {
+          "_key": "9a25c9b0ac6d",
+          "_type": "span",
+          "marks": [
+            "b7f611431cdb"
+          ],
+          "text": "http://naih.hu/"
+        }
+      ],
+      "markDefs": [
+        {
+          "_key": "b7f611431cdb",
+          "_type": "link",
+          "href": "http://naih.hu/"
+        }
+      ],
+      "style": "normal"
+    },
+    {
+      "_key": "23b1b6e86379",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "e45c172440ba",
+          "_type": "span",
+          "marks": [
+            "strong"
+          ],
+          "text": "Bírósági jogérvényesítés"
+        }
+      ],
+      "markDefs": [],
+      "style": "normal"
+    },
+    {
+      "_key": "2af0a4d5a14f",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "2cfcbdcdb08f",
+          "_type": "span",
+          "marks": [],
+          "text": "Önnek lehetősége van adatainak védelme érdekében bírósághoz fordulni, amely az ügyben soron kívül jár el. Ebben az esetben szabadon eldöntheti, hogy a lakóhelye (állandó lakcím) vagy a tartózkodási helye (ideiglenes lakcím), illetve a Hatóság székhelye szerint illetékes törvényszéknél nyújtja-e be keresetét. A lakóhelye vagy tartózkodási helye szerinti törvényszéket megkeresheti a http://birosag.hu/ugyfelkapcsolatiportal/birosag-kereso oldalon."
+        }
+      ],
+      "markDefs": [],
+      "style": "normal"
+    },
+    {
+      "_key": "a82b5ff2b25f",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "15a0b83b870c",
+          "_type": "span",
+          "marks": [],
+          "text": "Sütik és webes nyomkövetés (Google Analytics, Google Ads)"
+        }
+      ],
+      "markDefs": [],
+      "style": "h3"
+    },
+    {
+      "_key": "de317e9d47d1",
+      "_type": "block",
+      "children": [
+        {
+          "_key": "81e14f39cefe",
+          "_type": "span",
+          "marks": [],
+          "text": "Weboldalunkon a Google Analytics (GA4) névtelen látogatottsági statisztikát készít, a Google Ads pedig a hirdetéseink konverzióit méri; ezeket a Google Tag Managert használva töltjük be. Ezek a sütik és adatkezelések kizárólag az Ön kifejezett hozzájárulása után aktiválódnak (a süti-sáv Elfogad mind gombja, illetve a Marketing kategória bekapcsolása); hozzájárulás hiányában a Google Consent Mode v2 tiltja a hirdetési adatok tárolását és továbbítását. A Google Ads konverziómérésénél, kizárólag hozzájárulás esetén, az online foglaláshoz megadott e-mail-címét a böngészőjében titkosítva (SHA-256) továbbítjuk a Google felé (Enhanced Conversions), a mérés pontosítása céljából. A használt sütik részletes felsorolását a Cookie Szabályzat tartalmazza; hozzájárulását a süti-beállításokban bármikor visszavonhatja."
+        }
+      ],
+      "markDefs": [],
+      "style": "normal"
+    }
+  ],
+  "lastUpdated": "2026-07-17T22:28:05.354Z",
+  "title": "Adatvédelmi Tájékoztató"
+}

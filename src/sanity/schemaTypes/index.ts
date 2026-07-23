@@ -3,6 +3,7 @@ import { appointmentHistoryType } from "./appointmentHistoryType";
 import { blockedDateType } from "./blockedDateType";
 import { blogCategoryType } from "./blogCategoryType";
 import { blogPostType } from "./blogPostType";
+import { bookingPolicyType } from "./bookingPolicyType";
 import { bookingType } from "./bookingType";
 import { cookiePolicyType } from "./cookiePolicyType";
 import { customAvailabilityType } from "./customAvailabilityType";
@@ -18,6 +19,7 @@ import { serviceCategoryType } from "./serviceCategoryType";
 import { serviceType } from "./serviceType";
 import { siteSettingsType } from "./siteSettingsType";
 import { slotLockType } from "./slotLockType";
+import { termsOfServiceType } from "./termsOfServiceType";
 import { testimonialType } from "./testimonialType";
 import { weeklyScheduleType } from "./weeklyScheduleType";
 import { yogaClassType } from "./yogaClassType";
@@ -38,6 +40,8 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   blogPostType,
   privacyPolicyType,
   cookiePolicyType,
+  termsOfServiceType,
+  bookingPolicyType,
   weeklyScheduleType,
   seasonalScheduleType,
   blockedDateType,

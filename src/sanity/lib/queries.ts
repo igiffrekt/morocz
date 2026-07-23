@@ -71,6 +71,8 @@ export const siteSettingsQuery =
   },
   privacyPolicyUrl,
   cookiePolicyUrl,
+  termsOfServiceUrl,
+  bookingPolicyUrl,
   metaDescription,
   siteName,
   defaultOgImage
@@ -256,6 +258,24 @@ export const privacyPolicyQuery = defineQuery(
 
 export const cookiePolicyQuery = defineQuery(
   `*[_type == "cookiePolicy" && _id == "cookiePolicy"][0]{
+  title,
+  body,
+  lastUpdated
+}`,
+);
+
+// Revalidation tag: "termsOfService"
+export const termsOfServiceQuery = defineQuery(
+  `*[_type == "termsOfService" && _id == "termsOfService"][0]{
+  title,
+  body,
+  lastUpdated
+}`,
+);
+
+// Revalidation tag: "bookingPolicy"
+export const bookingPolicyQuery = defineQuery(
+  `*[_type == "bookingPolicy" && _id == "bookingPolicy"][0]{
   title,
   body,
   lastUpdated

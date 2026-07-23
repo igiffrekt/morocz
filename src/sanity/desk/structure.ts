@@ -185,6 +185,26 @@ export const structure: StructureResolver = (S) =>
             .title("Cookie Szabályzat szerkesztése"),
         ),
 
+      // Felhasználási Feltételek (termsOfService singleton)
+      S.listItem()
+        .title("Felhasználási Feltételek")
+        .child(
+          S.document()
+            .schemaType("termsOfService")
+            .documentId("termsOfService")
+            .title("Felhasználási Feltételek szerkesztése"),
+        ),
+
+      // Foglalási és Lemondási Szabályzat (bookingPolicy singleton)
+      S.listItem()
+        .title("Foglalási és Lemondási Szabályzat")
+        .child(
+          S.document()
+            .schemaType("bookingPolicy")
+            .documentId("bookingPolicy")
+            .title("Foglalási és Lemondási Szabályzat szerkesztése"),
+        ),
+
       S.divider(),
 
       // Felugró ablakok (Popups)

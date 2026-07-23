@@ -23,6 +23,8 @@ const STATIC_ROUTES: Array<{
   { path: "/kapcsolat", priority: 0.7, changeFrequency: "monthly" },
   { path: "/adatkezelesi-tajekoztato", priority: 0.3, changeFrequency: "yearly" },
   { path: "/cookie-szabalyzat", priority: 0.3, changeFrequency: "yearly" },
+  { path: "/felhasznalasi-feltetelek", priority: 0.3, changeFrequency: "yearly" },
+  { path: "/foglalasi-es-lemondasi-szabalyzat", priority: 0.3, changeFrequency: "yearly" },
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

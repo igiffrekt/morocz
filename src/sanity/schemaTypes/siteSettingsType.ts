@@ -161,6 +161,16 @@ export const siteSettingsType = defineType({
       type: "string",
     }),
     defineField({
+      name: "termsOfServiceUrl",
+      title: "Felhasználási feltételek URL",
+      type: "string",
+    }),
+    defineField({
+      name: "bookingPolicyUrl",
+      title: "Foglalási és lemondási szabályzat URL",
+      type: "string",
+    }),
+    defineField({
       name: "financeResetDate",
       title: "Pénzügyi nulla pont dátuma",
       type: "date",

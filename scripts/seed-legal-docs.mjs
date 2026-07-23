@@ -117,9 +117,16 @@ function termsBody() {
 
     h2("5. Lemondási feltételek"),
     p(
-      "A lefoglalt időpont díjmentesen lemondható vagy módosítható legkésőbb ",
-      { b: "48 órával" },
-      " a foglalt időpont előtt.",
+      "A lefoglalt időpont a visszaigazoló e-mailben szereplő foglaláskezelő hivatkozáson keresztül ",
+      { b: "bármikor lemondható" },
+      " – a foglalt időpontot megelőző 48 órán belül is. A lemondás lehetősége tehát nincs határidőhöz kötve; a lemondás időpontja kizárólag azt határozza meg, hogy a foglalási díj visszajár-e.",
+    ),
+    p(
+      "A megfizetett foglalási díj akkor kerül visszatérítésre, ha a lemondás a foglalt időpontot megelőzően ",
+      { b: "legalább 48 órával" },
+      " megtörténik. Ebben az esetben a Szolgáltató a ",
+      { b: "teljes 10.000 Ft foglalási díjat visszatéríti" },
+      " arra a bankkártyára, amellyel a fizetés eredetileg történt.",
     ),
     p("Amennyiben a lemondás:"),
     li("48 órán belül történik,"),
@@ -127,12 +134,17 @@ function termsBody() {
     li("vagy nem jelzi távolmaradását,"),
     p("a megfizetett ", { b: "10.000 Ft foglalási díj nem kerül visszatérítésre." }),
     p(
-      "Korábbi lemondás esetén a foglalási díj a Szolgáltató ",
+      "A lefoglalt időpont ezen felül díjmentesen áthelyezhető egy másik szabad időpontra, legkésőbb a foglalt időpontot megelőző ",
+      { b: "24 óráig" },
+      "; ilyenkor a megfizetett foglalási díj az új időpontra kerül átvezetésre, újabb foglalási díj megfizetése nem szükséges.",
+    ),
+    p(
+      "A lemondás és a visszatérítés részletes szabályait – ideértve a méltányossági és a rendkívüli eseteket is – a ",
       {
-        a: "részleges visszatérítési szabályzata",
+        a: "Foglalási és Lemondási Szabályzat",
         href: "https://drmoroczangela.hu/foglalasi-es-lemondasi-szabalyzat",
       },
-      " szerint kerül visszatérítésre vagy – a Szolgáltató döntése alapján – új időpontra átvezethető.",
+      " tartalmazza.",
     ),
 
     h2("6. Fizetés"),
@@ -298,7 +310,9 @@ function bookingPolicyBody() {
 
     h2("5. Lemondás és a foglalási díj visszatérítése"),
     p(
-      "A lefoglalt időpont a foglaláskezelő hivatkozáson keresztül bármikor lemondható. A megfizetett foglalási díj sorsa a lemondás időpontjától függ:",
+      "A lefoglalt időpont a foglaláskezelő hivatkozáson keresztül ",
+      { b: "bármikor, határidő nélkül lemondható" },
+      " – a foglalt időpontot megelőző 48 órán belül is. A lemondás lehetőségét a Szolgáltató nem korlátozza; a lemondás időpontja kizárólag a megfizetett foglalási díj sorsát befolyásolja:",
     ),
     li(
       "Ha a lemondás a foglalt időpontot megelőzően ",

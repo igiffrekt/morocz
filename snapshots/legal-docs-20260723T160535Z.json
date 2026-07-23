@@ -1,0 +1,2598 @@
+{
+  "termsOfService": {
+    "_createdAt": "2026-07-23T15:53:48Z",
+    "_id": "termsOfService",
+    "_rev": "PSUqcFq8IorVWPU9yi8cGv",
+    "_type": "termsOfService",
+    "_updatedAt": "2026-07-23T15:53:48Z",
+    "body": [
+      {
+        "_key": "t001",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t000",
+            "_type": "span",
+            "marks": [],
+            "text": "1. Üzemeltető adatai"
+          }
+        ],
+        "markDefs": [],
+        "style": "h2"
+      },
+      {
+        "_key": "t005",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t002",
+            "_type": "span",
+            "marks": [],
+            "text": "A jelen Felhasználási Feltételek a Mórocz Medical Kft. (a továbbiakban: „Szolgáltató”) által üzemeltetett "
+          },
+          {
+            "_key": "t003",
+            "_type": "span",
+            "marks": [
+              "strong"
+            ],
+            "text": "drmoroczangela.hu"
+          },
+          {
+            "_key": "t004",
+            "_type": "span",
+            "marks": [],
+            "text": " weboldal használatára, valamint az azon keresztül igénybe vehető egészségügyi szolgáltatások online időpontfoglalására vonatkoznak."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t008",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t006",
+            "_type": "span",
+            "marks": [
+              "strong"
+            ],
+            "text": "Szolgáltató neve:"
+          },
+          {
+            "_key": "t007",
+            "_type": "span",
+            "marks": [],
+            "text": " Mórocz Medical Kft."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t00b",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t009",
+            "_type": "span",
+            "marks": [
+              "strong"
+            ],
+            "text": "Székhely:"
+          },
+          {
+            "_key": "t00a",
+            "_type": "span",
+            "marks": [],
+            "text": " 2500 Esztergom, Martsa Alajos utca 6/C."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t00g",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t00c",
+            "_type": "span",
+            "marks": [
+              "strong"
+            ],
+            "text": "E-mail:"
+          },
+          {
+            "_key": "t00d",
+            "_type": "span",
+            "marks": [],
+            "text": " "
+          },
+          {
+            "_key": "t00f",
+            "_type": "span",
+            "marks": [
+              "tl00e"
+            ],
+            "text": "recepcio@drmoroczangela.hu"
+          }
+        ],
+        "markDefs": [
+          {
+            "_key": "tl00e",
+            "_type": "link",
+            "href": "mailto:recepcio@drmoroczangela.hu"
+          }
+        ],
+        "style": "normal"
+      },
+      {
+        "_key": "t00j",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t00h",
+            "_type": "span",
+            "marks": [
+              "strong"
+            ],
+            "text": "Telefon:"
+          },
+          {
+            "_key": "t00i",
+            "_type": "span",
+            "marks": [],
+            "text": " +36 70 639 5239"
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t00l",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t00k",
+            "_type": "span",
+            "marks": [],
+            "text": "A weboldal használatával a Felhasználó elfogadja a jelen Felhasználási Feltételek rendelkezéseit."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t00n",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t00m",
+            "_type": "span",
+            "marks": [],
+            "text": "2. A szolgáltatás tárgya"
+          }
+        ],
+        "markDefs": [],
+        "style": "h2"
+      },
+      {
+        "_key": "t00p",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t00o",
+            "_type": "span",
+            "marks": [],
+            "text": "A weboldal célja, hogy a Felhasználók tájékozódhassanak a Szolgáltató által nyújtott egészségügyi szolgáltatásokról, valamint online időpontot foglaljanak azok igénybevételére."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t00r",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t00q",
+            "_type": "span",
+            "marks": [],
+            "text": "A weboldalon történő időpontfoglalás kizárólag előzetes regisztráció és a szükséges személyes adatok megadásával lehetséges."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t00t",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t00s",
+            "_type": "span",
+            "marks": [],
+            "text": "3. Időpontfoglalás"
+          }
+        ],
+        "markDefs": [],
+        "style": "h2"
+      },
+      {
+        "_key": "t00v",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t00u",
+            "_type": "span",
+            "marks": [],
+            "text": "Az időpontfoglalás online foglalási rendszeren keresztül történik."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t00x",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t00w",
+            "_type": "span",
+            "marks": [],
+            "text": "A foglalás során a Felhasználó köteles:"
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t00z",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t00y",
+            "_type": "span",
+            "marks": [],
+            "text": "valós és pontos adatokat megadni,"
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t011",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t010",
+            "_type": "span",
+            "marks": [],
+            "text": "saját elérhetőségeit használni,"
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t013",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t012",
+            "_type": "span",
+            "marks": [],
+            "text": "a foglalási feltételeket elfogadni,"
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t015",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t014",
+            "_type": "span",
+            "marks": [],
+            "text": "a foglalási díjat megfizetni."
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t017",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t016",
+            "_type": "span",
+            "marks": [],
+            "text": "A Szolgáltató jogosult a hibás vagy valótlan adatokkal létrehozott foglalásokat törölni."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t019",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t018",
+            "_type": "span",
+            "marks": [],
+            "text": "4. Foglalási díj"
+          }
+        ],
+        "markDefs": [],
+        "style": "h2"
+      },
+      {
+        "_key": "t01d",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t01a",
+            "_type": "span",
+            "marks": [],
+            "text": "Az időpont véglegesítésének feltétele "
+          },
+          {
+            "_key": "t01b",
+            "_type": "span",
+            "marks": [
+              "strong"
+            ],
+            "text": "10.000 Ft összegű foglalási díj"
+          },
+          {
+            "_key": "t01c",
+            "_type": "span",
+            "marks": [],
+            "text": " megfizetése."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t01f",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t01e",
+            "_type": "span",
+            "marks": [],
+            "text": "A fizetés a Stripe biztonságos online fizetési rendszerén keresztül történik."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t01h",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t01g",
+            "_type": "span",
+            "marks": [],
+            "text": "A bankkártyaadatokat a Szolgáltató nem kezeli és nem tárolja."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t01j",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t01i",
+            "_type": "span",
+            "marks": [],
+            "text": "A foglalási díj a vizsgálat vagy konzultáció díjába beszámításra kerül."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t01l",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t01k",
+            "_type": "span",
+            "marks": [],
+            "text": "5. Lemondási feltételek"
+          }
+        ],
+        "markDefs": [],
+        "style": "h2"
+      },
+      {
+        "_key": "t01p",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t01m",
+            "_type": "span",
+            "marks": [],
+            "text": "A lefoglalt időpont díjmentesen lemondható vagy módosítható legkésőbb "
+          },
+          {
+            "_key": "t01n",
+            "_type": "span",
+            "marks": [
+              "strong"
+            ],
+            "text": "48 órával"
+          },
+          {
+            "_key": "t01o",
+            "_type": "span",
+            "marks": [],
+            "text": " a foglalt időpont előtt."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t01r",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t01q",
+            "_type": "span",
+            "marks": [],
+            "text": "Amennyiben a lemondás:"
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t01t",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t01s",
+            "_type": "span",
+            "marks": [],
+            "text": "48 órán belül történik,"
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t01v",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t01u",
+            "_type": "span",
+            "marks": [],
+            "text": "a Páciens nem jelenik meg,"
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t01x",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t01w",
+            "_type": "span",
+            "marks": [],
+            "text": "vagy nem jelzi távolmaradását,"
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t020",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t01y",
+            "_type": "span",
+            "marks": [],
+            "text": "a megfizetett "
+          },
+          {
+            "_key": "t01z",
+            "_type": "span",
+            "marks": [
+              "strong"
+            ],
+            "text": "10.000 Ft foglalási díj nem kerül visszatérítésre."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t025",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t021",
+            "_type": "span",
+            "marks": [],
+            "text": "Korábbi lemondás esetén a foglalási díj a Szolgáltató "
+          },
+          {
+            "_key": "t023",
+            "_type": "span",
+            "marks": [
+              "tl022"
+            ],
+            "text": "részleges visszatérítési szabályzata"
+          },
+          {
+            "_key": "t024",
+            "_type": "span",
+            "marks": [],
+            "text": " szerint kerül visszatérítésre vagy – a Szolgáltató döntése alapján – új időpontra átvezethető."
+          }
+        ],
+        "markDefs": [
+          {
+            "_key": "tl022",
+            "_type": "link",
+            "href": "https://drmoroczangela.hu/foglalasi-es-lemondasi-szabalyzat"
+          }
+        ],
+        "style": "normal"
+      },
+      {
+        "_key": "t027",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t026",
+            "_type": "span",
+            "marks": [],
+            "text": "6. Fizetés"
+          }
+        ],
+        "markDefs": [],
+        "style": "h2"
+      },
+      {
+        "_key": "t029",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t028",
+            "_type": "span",
+            "marks": [],
+            "text": "Az online fizetés Stripe rendszerén keresztül történik."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t02b",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t02a",
+            "_type": "span",
+            "marks": [],
+            "text": "A Stripe saját biztonsági és adatkezelési szabályai szerint dolgozza fel a fizetési tranzakciókat."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t02d",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t02c",
+            "_type": "span",
+            "marks": [],
+            "text": "A Szolgáltató bankkártyaadatokat nem kezel."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t02f",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t02e",
+            "_type": "span",
+            "marks": [],
+            "text": "7. Egészségügyi szolgáltatások"
+          }
+        ],
+        "markDefs": [],
+        "style": "h2"
+      },
+      {
+        "_key": "t02h",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t02g",
+            "_type": "span",
+            "marks": [],
+            "text": "A weboldalon található információk kizárólag tájékoztató jellegűek."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t02j",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t02i",
+            "_type": "span",
+            "marks": [],
+            "text": "A weboldalon megjelenő tartalom:"
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t02l",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t02k",
+            "_type": "span",
+            "marks": [],
+            "text": "nem minősül orvosi diagnózisnak,"
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t02n",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t02m",
+            "_type": "span",
+            "marks": [],
+            "text": "nem helyettesíti a személyes szakorvosi vizsgálatot,"
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t02p",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t02o",
+            "_type": "span",
+            "marks": [],
+            "text": "nem alapoz meg orvos-beteg jogviszonyt."
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t02r",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t02q",
+            "_type": "span",
+            "marks": [],
+            "text": "Orvosi diagnózis kizárólag személyes vizsgálat alapján állítható fel."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t02t",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t02s",
+            "_type": "span",
+            "marks": [],
+            "text": "8. A Felhasználó kötelezettségei"
+          }
+        ],
+        "markDefs": [],
+        "style": "h2"
+      },
+      {
+        "_key": "t02v",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t02u",
+            "_type": "span",
+            "marks": [],
+            "text": "A Felhasználó köteles:"
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t02x",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t02w",
+            "_type": "span",
+            "marks": [],
+            "text": "valós adatokat megadni;"
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t02z",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t02y",
+            "_type": "span",
+            "marks": [],
+            "text": "az időpontján pontosan megjelenni;"
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t031",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t030",
+            "_type": "span",
+            "marks": [],
+            "text": "a vizsgálathoz szükséges dokumentumokat magával hozni;"
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t033",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t032",
+            "_type": "span",
+            "marks": [],
+            "text": "az egészségügyi személyzet utasításait betartani."
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t035",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t034",
+            "_type": "span",
+            "marks": [],
+            "text": "9. Személyes adatok kezelése"
+          }
+        ],
+        "markDefs": [],
+        "style": "h2"
+      },
+      {
+        "_key": "t03a",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t036",
+            "_type": "span",
+            "marks": [],
+            "text": "A személyes adatok kezelésére az "
+          },
+          {
+            "_key": "t038",
+            "_type": "span",
+            "marks": [
+              "tl037"
+            ],
+            "text": "Adatkezelési Tájékoztató"
+          },
+          {
+            "_key": "t039",
+            "_type": "span",
+            "marks": [],
+            "text": " rendelkezései irányadók."
+          }
+        ],
+        "markDefs": [
+          {
+            "_key": "tl037",
+            "_type": "link",
+            "href": "https://drmoroczangela.hu/adatkezelesi-tajekoztato"
+          }
+        ],
+        "style": "normal"
+      },
+      {
+        "_key": "t03c",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t03b",
+            "_type": "span",
+            "marks": [],
+            "text": "Az adatkezelési tájékoztató a weboldalon külön dokumentumban érhető el."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t03e",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t03d",
+            "_type": "span",
+            "marks": [],
+            "text": "10. Szellemi tulajdon"
+          }
+        ],
+        "markDefs": [],
+        "style": "h2"
+      },
+      {
+        "_key": "t03g",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t03f",
+            "_type": "span",
+            "marks": [],
+            "text": "A weboldalon található:"
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t03i",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t03h",
+            "_type": "span",
+            "marks": [],
+            "text": "szövegek,"
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t03k",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t03j",
+            "_type": "span",
+            "marks": [],
+            "text": "képek,"
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t03m",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t03l",
+            "_type": "span",
+            "marks": [],
+            "text": "grafikai elemek,"
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t03o",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t03n",
+            "_type": "span",
+            "marks": [],
+            "text": "logók,"
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t03q",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t03p",
+            "_type": "span",
+            "marks": [],
+            "text": "videók,"
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t03s",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t03r",
+            "_type": "span",
+            "marks": [],
+            "text": "dokumentumok,"
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t03u",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t03t",
+            "_type": "span",
+            "marks": [],
+            "text": "arculati elemek"
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t03w",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t03v",
+            "_type": "span",
+            "marks": [],
+            "text": "a Szolgáltató tulajdonát képezik vagy jogszerű felhasználás alatt állnak."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t03y",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t03x",
+            "_type": "span",
+            "marks": [],
+            "text": "Ezek előzetes írásbeli engedély nélkül nem másolhatók, nem terjeszthetők és nem használhatók fel."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t040",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t03z",
+            "_type": "span",
+            "marks": [],
+            "text": "11. Felelősség kizárása"
+          }
+        ],
+        "markDefs": [],
+        "style": "h2"
+      },
+      {
+        "_key": "t042",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t041",
+            "_type": "span",
+            "marks": [],
+            "text": "A Szolgáltató minden tőle elvárható intézkedést megtesz annak érdekében, hogy a weboldal folyamatosan elérhető legyen."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t044",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t043",
+            "_type": "span",
+            "marks": [],
+            "text": "Nem vállal azonban felelősséget:"
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t046",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t045",
+            "_type": "span",
+            "marks": [],
+            "text": "internetes szolgáltatás kieséséért,"
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t048",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t047",
+            "_type": "span",
+            "marks": [],
+            "text": "technikai hibákért,"
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t04a",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t049",
+            "_type": "span",
+            "marks": [],
+            "text": "harmadik fél rendszereinek (például Stripe vagy időpontfoglaló rendszer) működéséből eredő hibákért,"
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t04c",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t04b",
+            "_type": "span",
+            "marks": [],
+            "text": "vis maior eseményekért."
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t04e",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t04d",
+            "_type": "span",
+            "marks": [],
+            "text": "12. Harmadik felek szolgáltatásai"
+          }
+        ],
+        "markDefs": [],
+        "style": "h2"
+      },
+      {
+        "_key": "t04g",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t04f",
+            "_type": "span",
+            "marks": [],
+            "text": "A weboldal harmadik felek szolgáltatásait használhatja, különösen:"
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t04i",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t04h",
+            "_type": "span",
+            "marks": [],
+            "text": "Stripe (online fizetés)"
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t04k",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t04j",
+            "_type": "span",
+            "marks": [],
+            "text": "online időpontfoglaló rendszer"
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t04m",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t04l",
+            "_type": "span",
+            "marks": [],
+            "text": "Google szolgáltatások"
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t04o",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t04n",
+            "_type": "span",
+            "marks": [],
+            "text": "sütik (cookie-k)"
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t04q",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t04p",
+            "_type": "span",
+            "marks": [],
+            "text": "Ezek működésére saját felhasználási és adatkezelési feltételeik irányadók."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t04s",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t04r",
+            "_type": "span",
+            "marks": [],
+            "text": "13. Panaszkezelés"
+          }
+        ],
+        "markDefs": [],
+        "style": "h2"
+      },
+      {
+        "_key": "t04x",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t04t",
+            "_type": "span",
+            "marks": [],
+            "text": "A Felhasználó panaszát írásban a "
+          },
+          {
+            "_key": "t04v",
+            "_type": "span",
+            "marks": [
+              "tl04u"
+            ],
+            "text": "recepcio@drmoroczangela.hu"
+          },
+          {
+            "_key": "t04w",
+            "_type": "span",
+            "marks": [],
+            "text": " e-mail címen vagy postai úton nyújthatja be."
+          }
+        ],
+        "markDefs": [
+          {
+            "_key": "tl04u",
+            "_type": "link",
+            "href": "mailto:recepcio@drmoroczangela.hu"
+          }
+        ],
+        "style": "normal"
+      },
+      {
+        "_key": "t04z",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t04y",
+            "_type": "span",
+            "marks": [],
+            "text": "A Szolgáltató a panaszokat a vonatkozó jogszabályok szerint vizsgálja ki."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t051",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t050",
+            "_type": "span",
+            "marks": [],
+            "text": "14. Irányadó jog"
+          }
+        ],
+        "markDefs": [],
+        "style": "h2"
+      },
+      {
+        "_key": "t053",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t052",
+            "_type": "span",
+            "marks": [],
+            "text": "A jelen Felhasználási Feltételekre Magyarország joga irányadó."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t055",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t054",
+            "_type": "span",
+            "marks": [],
+            "text": "A jelen dokumentumban nem szabályozott kérdésekben különösen:"
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t057",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t056",
+            "_type": "span",
+            "marks": [],
+            "text": "a Polgári Törvénykönyv,"
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t059",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t058",
+            "_type": "span",
+            "marks": [],
+            "text": "az elektronikus kereskedelmi szolgáltatásokról szóló jogszabályok,"
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t05b",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t05a",
+            "_type": "span",
+            "marks": [],
+            "text": "a fogyasztóvédelmi rendelkezések,"
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t05d",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t05c",
+            "_type": "span",
+            "marks": [],
+            "text": "az egészségügyi jogszabályok,"
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t05f",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t05e",
+            "_type": "span",
+            "marks": [],
+            "text": "valamint a GDPR rendelkezései alkalmazandók."
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t05h",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t05g",
+            "_type": "span",
+            "marks": [],
+            "text": "15. A Felhasználási Feltételek módosítása"
+          }
+        ],
+        "markDefs": [],
+        "style": "h2"
+      },
+      {
+        "_key": "t05j",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t05i",
+            "_type": "span",
+            "marks": [],
+            "text": "A Szolgáltató jogosult a jelen Felhasználási Feltételeket egyoldalúan módosítani."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t05l",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t05k",
+            "_type": "span",
+            "marks": [],
+            "text": "Az aktuális változat mindig a drmoroczangela.hu weboldalon érhető el."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "t05n",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "t05m",
+            "_type": "span",
+            "marks": [],
+            "text": "A módosítás a közzététel napján lép hatályba."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      }
+    ],
+    "lastUpdated": "2026-07-21",
+    "title": "Felhasználási Feltételek"
+  },
+  "bookingPolicy": {
+    "_createdAt": "2026-07-23T15:53:49Z",
+    "_id": "bookingPolicy",
+    "_rev": "Snndcq5XL7aebHzeQPNiHQ",
+    "_type": "bookingPolicy",
+    "_updatedAt": "2026-07-23T15:53:49Z",
+    "body": [
+      {
+        "_key": "f05p",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f05o",
+            "_type": "span",
+            "marks": [],
+            "text": "1. A Szabályzat célja és hatálya"
+          }
+        ],
+        "markDefs": [],
+        "style": "h2"
+      },
+      {
+        "_key": "f05t",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f05q",
+            "_type": "span",
+            "marks": [],
+            "text": "A jelen Foglalási és Lemondási Szabályzat (a továbbiakban: „Szabályzat”) a Mórocz Medical Kft. (székhely: 2500 Esztergom, Martsa Alajos utca 6/C.; a továbbiakban: „Szolgáltató”) által a "
+          },
+          {
+            "_key": "f05r",
+            "_type": "span",
+            "marks": [
+              "strong"
+            ],
+            "text": "drmoroczangela.hu"
+          },
+          {
+            "_key": "f05s",
+            "_type": "span",
+            "marks": [],
+            "text": " weboldalon üzemeltetett online időpontfoglaló rendszeren keresztül létrejövő időpontfoglalásokra vonatkozik."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "f05y",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f05u",
+            "_type": "span",
+            "marks": [],
+            "text": "A Szabályzat a "
+          },
+          {
+            "_key": "f05w",
+            "_type": "span",
+            "marks": [
+              "fl05v"
+            ],
+            "text": "Felhasználási Feltételek"
+          },
+          {
+            "_key": "f05x",
+            "_type": "span",
+            "marks": [],
+            "text": " elválaszthatatlan részét képezi. A Páciens a foglalás során a Szabályzatot külön jelölőnégyzet bejelölésével, kifejezetten elfogadja; a Szabályzat elfogadása a foglalás létrejöttének feltétele."
+          }
+        ],
+        "markDefs": [
+          {
+            "_key": "fl05v",
+            "_type": "link",
+            "href": "https://drmoroczangela.hu/felhasznalasi-feltetelek"
+          }
+        ],
+        "style": "normal"
+      },
+      {
+        "_key": "f063",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f05z",
+            "_type": "span",
+            "marks": [],
+            "text": "A személyes adatok kezelésére az "
+          },
+          {
+            "_key": "f061",
+            "_type": "span",
+            "marks": [
+              "fl060"
+            ],
+            "text": "Adatkezelési Tájékoztató"
+          },
+          {
+            "_key": "f062",
+            "_type": "span",
+            "marks": [],
+            "text": " rendelkezései irányadók."
+          }
+        ],
+        "markDefs": [
+          {
+            "_key": "fl060",
+            "_type": "link",
+            "href": "https://drmoroczangela.hu/adatkezelesi-tajekoztato"
+          }
+        ],
+        "style": "normal"
+      },
+      {
+        "_key": "f065",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f064",
+            "_type": "span",
+            "marks": [],
+            "text": "2. Az időpontfoglalás menete és létrejötte"
+          }
+        ],
+        "markDefs": [],
+        "style": "h2"
+      },
+      {
+        "_key": "f067",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f066",
+            "_type": "span",
+            "marks": [],
+            "text": "Az online időpontfoglalás lépései:"
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "f069",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f068",
+            "_type": "span",
+            "marks": [],
+            "text": "regisztráció, illetve bejelentkezés a foglalói fiókba;"
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "f06b",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f06a",
+            "_type": "span",
+            "marks": [],
+            "text": "a kívánt szolgáltatás, valamint a szabad időpont kiválasztása;"
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "f06d",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f06c",
+            "_type": "span",
+            "marks": [],
+            "text": "a foglaláshoz szükséges adatok (név, e-mail cím, telefonszám) megadása;"
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "f06f",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f06e",
+            "_type": "span",
+            "marks": [],
+            "text": "a jelen Szabályzat és az adatkezelési tájékoztató elfogadása;"
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "f06h",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f06g",
+            "_type": "span",
+            "marks": [],
+            "text": "a foglalási díj online megfizetése."
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "f06j",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f06i",
+            "_type": "span",
+            "marks": [],
+            "text": "A foglalás akkor jön létre és az időpont akkor válik véglegessé, amikor a foglalási díj megfizetése sikeresen megtörtént. A sikeres fizetést követően a Páciens e-mailben visszaigazolást kap, amely tartalmazza a foglalási azonosítót, valamint a foglalás kezelésére (módosítás, lemondás) szolgáló egyedi hivatkozást. Ezt a hivatkozást kérjük megőrizni."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "f06l",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f06k",
+            "_type": "span",
+            "marks": [],
+            "text": "A kiválasztott időpontot a rendszer a fizetési folyamat elindításától kezdve csak korlátozott ideig tartja fenn. Amennyiben a fizetés ezen az időn belül nem zárul le sikeresen, az időpont automatikusan felszabadul, és azt más Páciens lefoglalhatja."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "f06n",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f06m",
+            "_type": "span",
+            "marks": [],
+            "text": "3. A foglalási díj"
+          }
+        ],
+        "markDefs": [],
+        "style": "h2"
+      },
+      {
+        "_key": "f06r",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f06o",
+            "_type": "span",
+            "marks": [],
+            "text": "Az időpont lefoglalásának és véglegesítésének feltétele "
+          },
+          {
+            "_key": "f06p",
+            "_type": "span",
+            "marks": [
+              "strong"
+            ],
+            "text": "10.000 Ft összegű foglalási díj"
+          },
+          {
+            "_key": "f06q",
+            "_type": "span",
+            "marks": [],
+            "text": " megfizetése. A foglalási díj minden szolgáltatás esetén azonos összegű, és nem függ a kiválasztott vizsgálat vagy konzultáció árától."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "f06t",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f06s",
+            "_type": "span",
+            "marks": [],
+            "text": "A foglalási díj a megjelenéskor a vizsgálat vagy konzultáció díjába teljes egészében beszámításra kerül, azaz a helyszínen a szolgáltatás árából a már megfizetett 10.000 Ft levonásra kerül."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "f06v",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f06u",
+            "_type": "span",
+            "marks": [],
+            "text": "A foglalási díj célja az időpont fenntartása és a meg nem jelenésből eredő kapacitásvesztés mérséklése; a foglalási díj nem előleg a szolgáltatás teljes ellenértékére, és nem minősül foglalónak a Polgári Törvénykönyv szerinti értelemben."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "f06x",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f06w",
+            "_type": "span",
+            "marks": [],
+            "text": "A fizetés a Stripe biztonságos online fizetési rendszerén keresztül történik. A Szolgáltató bankkártyaadatokat nem kezel és nem tárol. A foglalási díjról a Szolgáltató elektronikus számlát állít ki, amelyet e-mailben küld meg a Páciens részére."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "f06z",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f06y",
+            "_type": "span",
+            "marks": [],
+            "text": "4. Az időpont módosítása (áthelyezése)"
+          }
+        ],
+        "markDefs": [],
+        "style": "h2"
+      },
+      {
+        "_key": "f075",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f070",
+            "_type": "span",
+            "marks": [],
+            "text": "A lefoglalt időpont "
+          },
+          {
+            "_key": "f071",
+            "_type": "span",
+            "marks": [
+              "strong"
+            ],
+            "text": "díjmentesen áthelyezhető"
+          },
+          {
+            "_key": "f072",
+            "_type": "span",
+            "marks": [],
+            "text": " egy másik szabad időpontra, legkésőbb a foglalt időpontot megelőző "
+          },
+          {
+            "_key": "f073",
+            "_type": "span",
+            "marks": [
+              "strong"
+            ],
+            "text": "24 óráig"
+          },
+          {
+            "_key": "f074",
+            "_type": "span",
+            "marks": [],
+            "text": ". Az áthelyezés a visszaigazoló e-mailben szereplő foglaláskezelő hivatkozáson keresztül, önállóan elvégezhető."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "f077",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f076",
+            "_type": "span",
+            "marks": [],
+            "text": "Áthelyezés esetén a már megfizetett foglalási díj automatikusan átvezetésre kerül az új időpontra; újabb foglalási díj megfizetése nem szükséges. Az új időpontra a jelen Szabályzat rendelkezései változatlanul irányadók, a lemondási határidőket az új időponthoz kell számítani."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "f079",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f078",
+            "_type": "span",
+            "marks": [],
+            "text": "A foglalt időpontot megelőző 24 órán belül az online áthelyezés már nem lehetséges. Ebben az esetben kérjük, hívja a rendelőt a +36 70 639 5239 telefonszámon."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "f07b",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f07a",
+            "_type": "span",
+            "marks": [],
+            "text": "5. Lemondás és a foglalási díj visszatérítése"
+          }
+        ],
+        "markDefs": [],
+        "style": "h2"
+      },
+      {
+        "_key": "f07d",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f07c",
+            "_type": "span",
+            "marks": [],
+            "text": "A lefoglalt időpont a foglaláskezelő hivatkozáson keresztül bármikor lemondható. A megfizetett foglalási díj sorsa a lemondás időpontjától függ:"
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "f07h",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f07e",
+            "_type": "span",
+            "marks": [],
+            "text": "Ha a lemondás a foglalt időpontot megelőzően "
+          },
+          {
+            "_key": "f07f",
+            "_type": "span",
+            "marks": [
+              "strong"
+            ],
+            "text": "legalább 48 órával"
+          },
+          {
+            "_key": "f07g",
+            "_type": "span",
+            "marks": [],
+            "text": " megtörténik, a Szolgáltató a teljes 10.000 Ft foglalási díjat visszatéríti."
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "f07l",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f07i",
+            "_type": "span",
+            "marks": [],
+            "text": "Ha a lemondás a foglalt időpontot megelőző "
+          },
+          {
+            "_key": "f07j",
+            "_type": "span",
+            "marks": [
+              "strong"
+            ],
+            "text": "48 órán belül"
+          },
+          {
+            "_key": "f07k",
+            "_type": "span",
+            "marks": [],
+            "text": " történik, a foglalási díj nem kerül visszatérítésre."
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "f07n",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f07m",
+            "_type": "span",
+            "marks": [],
+            "text": "A 48 órás határidő számítása minden esetben a foglalt időpont magyarországi (Europe/Budapest) helyi ideje szerint történik. A rendszer a lemondás során egyértelműen jelzi, ha a lemondás a díj elvesztésével jár, és a lemondás ilyenkor csak a Páciens külön megerősítése után hajtódik végre."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "f07p",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f07o",
+            "_type": "span",
+            "marks": [],
+            "text": "A visszatérítés minden esetben a Stripe rendszerén keresztül, arra a bankkártyára történik, amellyel a fizetés eredetileg történt; készpénzes vagy más fizetési módra történő visszatérítésre nincs mód. A visszatérítés a Szolgáltató oldalán haladéktalanul elindul, azonban az összeg jóváírásának ideje a kártyakibocsátó banktól függ, és jellemzően 5–10 munkanapot vesz igénybe."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "f07r",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f07q",
+            "_type": "span",
+            "marks": [],
+            "text": "A visszatérített foglalási díjról a Szolgáltató jóváíró (helyesbítő) számlát állít ki, amelyet e-mailben küld meg a Páciens részére."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "f07t",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f07s",
+            "_type": "span",
+            "marks": [],
+            "text": "6. Meg nem jelenés (no-show) és késés"
+          }
+        ],
+        "markDefs": [],
+        "style": "h2"
+      },
+      {
+        "_key": "f07x",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f07u",
+            "_type": "span",
+            "marks": [],
+            "text": "Amennyiben a Páciens a lefoglalt időpontban nem jelenik meg, és távolmaradását előzetesen nem jelezte, a foglalás meg nem jelenésnek minősül. Ebben az esetben a megfizetett "
+          },
+          {
+            "_key": "f07v",
+            "_type": "span",
+            "marks": [
+              "strong"
+            ],
+            "text": "10.000 Ft foglalási díj nem kerül visszatérítésre"
+          },
+          {
+            "_key": "f07w",
+            "_type": "span",
+            "marks": [],
+            "text": ", és az új időpontra nem vezethető át."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "f07z",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f07y",
+            "_type": "span",
+            "marks": [],
+            "text": "Amennyiben a Páciens a lefoglalt időponthoz képest késve érkezik, a vizsgálat elvégzése nem garantált, mert az a további Pácienseket is érintő csúszást okozna. A rendelő törekszik arra, hogy a késve érkező Pácienst is fogadja, erre azonban kizárólag az aznapi beosztás függvényében van lehetőség. Ha a vizsgálat a késés miatt nem végezhető el, az meg nem jelenésnek minősül."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "f081",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f080",
+            "_type": "span",
+            "marks": [],
+            "text": "Az ismételt, előzetes jelzés nélküli meg nem jelenés esetén a Szolgáltató fenntartja a jogot, hogy a Páciens további online foglalási lehetőségét korlátozza, és a további időpontokat kizárólag telefonos egyeztetés alapján biztosítsa."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "f083",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f082",
+            "_type": "span",
+            "marks": [],
+            "text": "7. Részleges visszatérítés és méltányossági elbírálás"
+          }
+        ],
+        "markDefs": [],
+        "style": "h2"
+      },
+      {
+        "_key": "f085",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f084",
+            "_type": "span",
+            "marks": [],
+            "text": "A Szolgáltató a 48 órás határidőn belüli lemondás, illetve meg nem jelenés esetén is méltányosságot gyakorolhat, és a foglalási díjat egészben vagy részben visszatérítheti, illetve azt – a Páciens kérésére – új időpontra átvezetheti. Ilyen, méltányosságot megalapozó eset lehet különösen:"
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "f087",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f086",
+            "_type": "span",
+            "marks": [],
+            "text": "a Páciens vagy közeli hozzátartozója hirtelen fellépő betegsége, kórházi felvétele;"
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "f089",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f088",
+            "_type": "span",
+            "marks": [],
+            "text": "közeli hozzátartozó halála;"
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "f08b",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f08a",
+            "_type": "span",
+            "marks": [],
+            "text": "a Páciensen kívül álló, elháríthatatlan akadály (például igazolt közlekedési üzemzavar, természeti katasztrófa, hatósági intézkedés);"
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "f08d",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f08c",
+            "_type": "span",
+            "marks": [],
+            "text": "olyan technikai hiba, amely a Pácienst a határidőn belüli lemondásban bizonyíthatóan megakadályozta."
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "f08i",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f08e",
+            "_type": "span",
+            "marks": [],
+            "text": "A méltányossági kérelmet a lemondást vagy az elmaradt időpontot követő 8 napon belül, írásban, a "
+          },
+          {
+            "_key": "f08g",
+            "_type": "span",
+            "marks": [
+              "fl08f"
+            ],
+            "text": "recepcio@drmoroczangela.hu"
+          },
+          {
+            "_key": "f08h",
+            "_type": "span",
+            "marks": [],
+            "text": " e-mail címre kell benyújtani, a foglalási azonosító megadásával és a körülmények rövid ismertetésével. A Szolgáltató a kérelmet egyedileg bírálja el, és döntéséről a kérelem beérkezésétől számított 15 napon belül írásban tájékoztatja a Pácienst. A méltányosság gyakorlása a Szolgáltató mérlegelési jogkörébe tartozik, arra a Páciens alanyi jogosultsággal nem rendelkezik."
+          }
+        ],
+        "markDefs": [
+          {
+            "_key": "fl08f",
+            "_type": "link",
+            "href": "mailto:recepcio@drmoroczangela.hu"
+          }
+        ],
+        "style": "normal"
+      },
+      {
+        "_key": "f08k",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f08j",
+            "_type": "span",
+            "marks": [],
+            "text": "8. Rendkívüli esetek – a Szolgáltató oldalán felmerülő akadály"
+          }
+        ],
+        "markDefs": [],
+        "style": "h2"
+      },
+      {
+        "_key": "f08m",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f08l",
+            "_type": "span",
+            "marks": [],
+            "text": "Amennyiben a lefoglalt időpont a Szolgáltató érdekkörében felmerülő okból (például az orvos betegsége, sürgős szülészeti ellátás, a rendelő működését akadályozó műszaki hiba, hatósági intézkedés vagy vis maior esemény miatt) marad el, a Szolgáltató erről a Pácienst a rendelkezésre álló elérhetőségén haladéktalanul értesíti, és a Páciens választása szerint:"
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "f08o",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f08n",
+            "_type": "span",
+            "marks": [],
+            "text": "díjmentesen új időpontot biztosít, amelyre a foglalási díj átvezetésre kerül; vagy"
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "f08q",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f08p",
+            "_type": "span",
+            "marks": [],
+            "text": "a teljes 10.000 Ft foglalási díjat visszatéríti."
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "f08s",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f08r",
+            "_type": "span",
+            "marks": [],
+            "text": "Vis maior eseménynek minősül minden olyan, a felek érdekkörén kívül eső, előre nem látható és elháríthatatlan körülmény, amely a szolgáltatás nyújtását akadályozza (így különösen természeti katasztrófa, járvány, hatósági korlátozás, tartós áramkimaradás vagy távközlési üzemzavar)."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "f08u",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f08t",
+            "_type": "span",
+            "marks": [],
+            "text": "9. A foglalás Szolgáltató általi törlése"
+          }
+        ],
+        "markDefs": [],
+        "style": "h2"
+      },
+      {
+        "_key": "f08w",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f08v",
+            "_type": "span",
+            "marks": [],
+            "text": "A Szolgáltató jogosult a foglalást egyoldalúan törölni, ha:"
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "f08y",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f08x",
+            "_type": "span",
+            "marks": [],
+            "text": "a foglalás nyilvánvalóan valótlan vagy hiányos adatokkal jött létre;"
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "f090",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f08z",
+            "_type": "span",
+            "marks": [],
+            "text": "a foglalási díj megfizetése nem történt meg, vagy a fizetés sikertelen volt;"
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "f092",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f091",
+            "_type": "span",
+            "marks": [],
+            "text": "a foglalás visszaélésszerű (például ugyanarra az időpontra több, párhuzamos foglalás jött létre);"
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "f094",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f093",
+            "_type": "span",
+            "marks": [],
+            "text": "a Páciens az egészségügyi személyzettel szemben tanúsított magatartásával a rendelő működését akadályozza."
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "f096",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f095",
+            "_type": "span",
+            "marks": [],
+            "text": "Ha a törlésre nem a Páciensnek felróható okból kerül sor, a Szolgáltató a megfizetett foglalási díjat teljes egészében visszatéríti."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "f098",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f097",
+            "_type": "span",
+            "marks": [],
+            "text": "10. Kapcsolat és panaszkezelés"
+          }
+        ],
+        "markDefs": [],
+        "style": "h2"
+      },
+      {
+        "_key": "f09a",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f099",
+            "_type": "span",
+            "marks": [],
+            "text": "A foglalással, lemondással vagy visszatérítéssel kapcsolatos kérdéseit és panaszait az alábbi elérhetőségeken jelezheti:"
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "f09f",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f09b",
+            "_type": "span",
+            "marks": [
+              "strong"
+            ],
+            "text": "E-mail:"
+          },
+          {
+            "_key": "f09c",
+            "_type": "span",
+            "marks": [],
+            "text": " "
+          },
+          {
+            "_key": "f09e",
+            "_type": "span",
+            "marks": [
+              "fl09d"
+            ],
+            "text": "recepcio@drmoroczangela.hu"
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [
+          {
+            "_key": "fl09d",
+            "_type": "link",
+            "href": "mailto:recepcio@drmoroczangela.hu"
+          }
+        ],
+        "style": "normal"
+      },
+      {
+        "_key": "f09i",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f09g",
+            "_type": "span",
+            "marks": [
+              "strong"
+            ],
+            "text": "Telefon:"
+          },
+          {
+            "_key": "f09h",
+            "_type": "span",
+            "marks": [],
+            "text": " +36 70 639 5239"
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "f09l",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f09j",
+            "_type": "span",
+            "marks": [
+              "strong"
+            ],
+            "text": "Postai cím:"
+          },
+          {
+            "_key": "f09k",
+            "_type": "span",
+            "marks": [],
+            "text": " Mórocz Medical Kft., 2500 Esztergom, Martsa Alajos utca 6/C."
+          }
+        ],
+        "level": 1,
+        "listItem": "bullet",
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "f09n",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f09m",
+            "_type": "span",
+            "marks": [],
+            "text": "A Szolgáltató a panaszt a beérkezéstől számított 30 napon belül kivizsgálja, és álláspontjáról írásban tájékoztatja a Pácienst."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      },
+      {
+        "_key": "f09p",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f09o",
+            "_type": "span",
+            "marks": [],
+            "text": "11. A Szabályzat módosítása"
+          }
+        ],
+        "markDefs": [],
+        "style": "h2"
+      },
+      {
+        "_key": "f09r",
+        "_type": "block",
+        "children": [
+          {
+            "_key": "f09q",
+            "_type": "span",
+            "marks": [],
+            "text": "A Szolgáltató jogosult a jelen Szabályzatot egyoldalúan módosítani. A mindenkor hatályos változat a drmoroczangela.hu weboldalon érhető el. A már létrejött foglalásokra minden esetben a foglalás időpontjában hatályos Szabályzat rendelkezései irányadók."
+          }
+        ],
+        "markDefs": [],
+        "style": "normal"
+      }
+    ],
+    "lastUpdated": "2026-07-21",
+    "title": "Foglalási és Lemondási Szabályzat"
+  }
+}

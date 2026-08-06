@@ -5,6 +5,19 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { type Consent, readConsent, saveConsent } from "@/lib/consent";
 
+/**
+ * z-[60]: a hozzájárulási sáv MINDEN más rétegen felül van.
+ *
+ * z-50-nel a PopupModal teljes képernyős backdropja (szintén z-50, de a DOM-ban
+ * később renderelődik, ezért felül fest) letakarta ezt a sávot: amíg a látogató be
+ * nem zárta a felugró ablakot, az „Elfogad mind" gombra fizikailag nem lehetett
+ * kattintani — a document.elementFromPoint a gomb közepén a backdropot adta vissza.
+ *
+ * Ez nem csak kényelmetlenség: hozzájárulás nélkül a Google Ads konverziómérés nem
+ * fut (gcs=G100), tehát egy letakart cookie-sáv közvetlenül mérési kiesés.
+ */
+const NOTICE_CLASS = "fixed bottom-4 right-4 z-[60] w-full max-w-sm rounded-2xl bg-white p-4 shadow-lg";
+
 export function CookieNotice() {
   const [visible, setVisible] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -29,7 +42,7 @@ export function CookieNotice() {
     <motion.div
       role="dialog"
       aria-label="Cookie beállítások"
-      className="fixed bottom-4 right-4 z-50 w-full max-w-sm rounded-2xl bg-white p-4 shadow-lg"
+      className={NOTICE_CLASS}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: "easeOut" }}

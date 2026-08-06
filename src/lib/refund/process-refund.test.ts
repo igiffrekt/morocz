@@ -13,14 +13,18 @@ function makeDeps(overrides: Partial<ProcessRefundDeps> = {}): ProcessRefundDeps
       _id: "booking-1",
       patientName: "Teszt Páciens",
       patientEmail: "t@e.hu",
+      reservationNumber: "M-TESZT1",
+      refundStatus: null,
       creditInvoiceNumber: null,
     }),
     getBuyerAddress: vi
       .fn()
       .mockResolvedValue({ zip: "2500", city: "Esztergom", address: "Fő u. 1." }),
+    findExistingCreditInvoice: vi.fn().mockResolvedValue(null),
     issueCreditInvoice: vi.fn().mockResolvedValue({ invoiceNumber: "E-CR-1" }),
     patchBooking: vi.fn().mockResolvedValue(undefined),
     sendInvoiceFailedEmail: vi.fn().mockResolvedValue(undefined),
+    sendInvoiceResolvedEmail: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   };
 }
@@ -47,6 +51,8 @@ describe("processRefund", () => {
         address: "Fő u. 1.",
         email: "t@e.hu",
       },
+      bookingId: "booking-1",
+      reservationNumber: "M-TESZT1",
     });
     expect(deps.patchBooking).toHaveBeenCalledWith(
       "booking-1",
@@ -66,6 +72,8 @@ describe("processRefund", () => {
         _id: "booking-1",
         patientName: "X",
         patientEmail: "t@e.hu",
+        reservationNumber: "M-TESZT1",
+        refundStatus: "refunded",
         creditInvoiceNumber: "E-CR-1",
       }),
     });
@@ -82,11 +90,120 @@ describe("processRefund", () => {
         _id: "booking-1",
         patientName: "X",
         patientEmail: "t@e.hu",
+        reservationNumber: "M-TESZT1",
+        refundStatus: "invoice_failed",
         creditInvoiceNumber: null,
       }),
     });
     await processRefund(charge, deps);
     expect(deps.issueCreditInvoice).toHaveBeenCalledTimes(1);
+  });
+
+  it("retracts the manual-invoice request when a retry succeeds after invoice_failed", async () => {
+    // Live incident 2026-07-14 (booking rMg6ouqZ…, invoice E-MRCZ-2026-10): attempt 1 failed and
+    // emailed reception "issue it by hand"; Stripe's retry then issued the invoice, but nothing
+    // withdrew the request — reception was one click away from a second credit invoice.
+    const deps = makeDeps({
+      findBooking: vi.fn().mockResolvedValue({
+        _id: "booking-1",
+        patientName: "Teszt Páciens",
+        patientEmail: "t@e.hu",
+        reservationNumber: "M-TESZT1",
+        refundStatus: "invoice_failed",
+        creditInvoiceNumber: null,
+      }),
+    });
+    await processRefund(charge, deps);
+    expect(deps.sendInvoiceResolvedEmail).toHaveBeenCalledWith({
+      patientName: "Teszt Páciens",
+      reservationNumber: "M-TESZT1",
+      invoiceNumber: "E-CR-1",
+    });
+  });
+
+  it("does not send a retraction when no prior attempt failed", async () => {
+    const deps = makeDeps();
+    await processRefund(charge, deps);
+    expect(deps.sendInvoiceResolvedEmail).not.toHaveBeenCalled();
+  });
+
+  it("keeps the invoice when the retraction email fails (must not trigger a Stripe retry)", async () => {
+    const deps = makeDeps({
+      findBooking: vi.fn().mockResolvedValue({
+        _id: "booking-1",
+        patientName: "Teszt Páciens",
+        patientEmail: "t@e.hu",
+        reservationNumber: "M-TESZT1",
+        refundStatus: "invoice_failed",
+        creditInvoiceNumber: null,
+      }),
+      sendInvoiceResolvedEmail: vi.fn().mockRejectedValue(new Error("smtp down")),
+    });
+    await expect(processRefund(charge, deps)).resolves.toBeUndefined();
+    expect(deps.patchBooking).toHaveBeenCalledWith(
+      "booking-1",
+      expect.objectContaining({ creditInvoiceNumber: "E-CR-1" }),
+    );
+    expect(deps.sendInvoiceFailedEmail).not.toHaveBeenCalled();
+  });
+
+  // ── Duplicate-invoice prevention ─────────────────────────────────────────────────────────
+  // Live incident 2026-07-14: Számlázz created E-MRCZ-2026-9, our call still failed (slow
+  // response → 15s timeout), nothing was recorded, and Stripe's retry issued E-MRCZ-2026-10.
+  // One Stripe refund, two credit invoices, books off by 10.000 Ft.
+
+  it("adopts an invoice that exists at Számlázz but was never recorded, instead of issuing a duplicate", async () => {
+    const deps = makeDeps({
+      findBooking: vi.fn().mockResolvedValue({
+        _id: "booking-1",
+        patientName: "Teszt Páciens",
+        patientEmail: "t@e.hu",
+        reservationNumber: "M-TESZT1",
+        refundStatus: "invoice_failed",
+        creditInvoiceNumber: null,
+      }),
+      findExistingCreditInvoice: vi.fn().mockResolvedValue({ invoiceNumber: "E-CR-9" }),
+    });
+    await processRefund(charge, deps);
+
+    expect(deps.issueCreditInvoice).not.toHaveBeenCalled();
+    expect(deps.patchBooking).toHaveBeenCalledWith(
+      "booking-1",
+      expect.objectContaining({ refundStatus: "refunded", creditInvoiceNumber: "E-CR-9" }),
+    );
+    expect(deps.sendInvoiceResolvedEmail).toHaveBeenCalledWith(
+      expect.objectContaining({ invoiceNumber: "E-CR-9" }),
+    );
+  });
+
+  it("refuses to issue when it cannot determine whether an invoice already exists (fail closed)", async () => {
+    // A duplicate credit invoice needs a manual accounting correction; a late one does not.
+    // So when the lookup itself fails, throw and let Stripe retry rather than risk a second.
+    const deps = makeDeps({
+      findExistingCreditInvoice: vi.fn().mockRejectedValue(new Error("szamlazz unreachable")),
+    });
+    await expect(processRefund(charge, deps)).rejects.toThrow("szamlazz unreachable");
+    expect(deps.issueCreditInvoice).not.toHaveBeenCalled();
+    expect(deps.sendInvoiceFailedEmail).not.toHaveBeenCalled();
+  });
+
+  it("passes the booking id so the invoice carries its idempotency key", async () => {
+    const deps = makeDeps();
+    await processRefund(charge, deps);
+    expect(deps.findExistingCreditInvoice).toHaveBeenCalledWith("booking-1");
+    expect(deps.issueCreditInvoice).toHaveBeenCalledWith(
+      expect.objectContaining({ bookingId: "booking-1", reservationNumber: "M-TESZT1" }),
+    );
+  });
+
+  it("rethrows (does NOT ask reception to invoice by hand) when the invoice succeeds but recording fails", async () => {
+    // The old code caught this in the same try as the invoice call, so a Sanity outage looked
+    // exactly like an invoice failure: reception was told to issue one that already existed.
+    const deps = makeDeps({
+      patchBooking: vi.fn().mockRejectedValue(new Error("sanity down")),
+    });
+    await expect(processRefund(charge, deps)).rejects.toThrow("sanity down");
+    expect(deps.sendInvoiceFailedEmail).not.toHaveBeenCalled();
   });
 
   it("does nothing when no booking matches the payment intent", async () => {
@@ -106,7 +223,26 @@ describe("processRefund", () => {
       refundStatus: "invoice_failed",
       stripeRefundId: "re_1",
     });
-    expect(deps.sendInvoiceFailedEmail).toHaveBeenCalledWith({ patientName: "Teszt Páciens" });
+    expect(deps.sendInvoiceFailedEmail).toHaveBeenCalledWith({
+      patientName: "Teszt Páciens",
+      reservationNumber: "M-TESZT1",
+      buyerName: "Teszt Páciens",
+      paymentIntentId: "pi_1",
+    });
+  });
+
+  it("tells reception the cardholder name when the payer is not the patient", async () => {
+    // The payer is often a relative; without the cardholder name a Stripe/Számlázz search by
+    // patient name finds nothing and the payment looks like it never happened.
+    const deps = makeDeps({
+      issueCreditInvoice: vi.fn().mockImplementation(async () => {
+        throw new Error("boom");
+      }),
+    });
+    await processRefund({ ...charge, billingName: "Fizető Rokon" }, deps);
+    expect(deps.sendInvoiceFailedEmail).toHaveBeenCalledWith(
+      expect.objectContaining({ patientName: "Teszt Páciens", buyerName: "Fizető Rokon" }),
+    );
   });
 
   it("still emails reception when the invoice_failed patch also fails", async () => {
@@ -117,7 +253,9 @@ describe("processRefund", () => {
       patchBooking: vi.fn().mockRejectedValue(new Error("sanity down")),
     });
     await processRefund(charge, deps);
-    expect(deps.sendInvoiceFailedEmail).toHaveBeenCalledWith({ patientName: "Teszt Páciens" });
+    expect(deps.sendInvoiceFailedEmail).toHaveBeenCalledWith(
+      expect.objectContaining({ patientName: "Teszt Páciens" }),
+    );
   });
 
   it("prefers Stripe billing address when the user record has none", async () => {

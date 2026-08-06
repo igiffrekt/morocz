@@ -11,7 +11,12 @@ const buyer = {
 
 describe("buildCreditInvoiceXml", () => {
   it("includes the agent key, AAM vat code and negative amounts", () => {
-    const xml = buildCreditInvoiceXml({ agentKey: "AGENT-KEY", amountHuf: 10_000, buyer });
+    const xml = buildCreditInvoiceXml({
+      agentKey: "AGENT-KEY",
+      amountHuf: 10_000,
+      buyer,
+      bookingId: "booking-1",
+    });
     expect(xml).toContain("<szamlaagentkulcs>AGENT-KEY</szamlaagentkulcs>");
     expect(xml).toContain("<penznem>HUF</penznem>");
     expect(xml).toContain("<afakulcs>AAM</afakulcs>");
@@ -26,17 +31,53 @@ describe("buildCreditInvoiceXml", () => {
     const xml = buildCreditInvoiceXml({
       agentKey: 'K&<"key',
       amountHuf: 10_000,
+      bookingId: "booking-1",
       buyer: { ...buyer, name: "Tom & <Co>", address: 'Fő "u" <1>' },
     });
     expect(xml).toContain("<nev>Tom &amp; &lt;Co&gt;</nev>");
     expect(xml).toContain("<cim>Fő &quot;u&quot; &lt;1&gt;</cim>");
     expect(xml).toContain("<szamlaagentkulcs>K&amp;&lt;&quot;key</szamlaagentkulcs>");
     expect(xml).not.toContain("Tom & <Co>");
-    expect(xml).not.toContain('<1>');
+    expect(xml).not.toContain("<1>");
+  });
+
+  it("carries the booking id as szamlaKulsoAzon — the idempotency key a retry looks up", () => {
+    const xml = buildCreditInvoiceXml({
+      agentKey: "K",
+      amountHuf: 10_000,
+      buyer,
+      bookingId: "rMg6ouqZ",
+      reservationNumber: "M-BJAVHT",
+    });
+    expect(xml).toContain("<szamlaKulsoAzon>refund-rMg6ouqZ</szamlaKulsoAzon>");
+    expect(xml).toContain("<rendelesSzam>M-BJAVHT</rendelesSzam>");
+    // xmlszamla XSD is a <sequence>: szamlaKulsoAzon is the LAST beallitasok element, and
+    // rendelesSzam comes after megjegyzes in fejlec. Wrong order → schema rejection.
+    expect(xml.indexOf("<szamlaKulsoAzon>")).toBeLessThan(xml.indexOf("</beallitasok>"));
+    expect(xml.indexOf("<szamlaKulsoAzon>")).toBeGreaterThan(xml.indexOf("<szamlaLetoltes>"));
+    expect(xml.indexOf("<rendelesSzam>")).toBeGreaterThan(xml.indexOf("<megjegyzes>"));
+    expect(xml.indexOf("<rendelesSzam>")).toBeLessThan(xml.indexOf("</fejlec>"));
+  });
+
+  it("omits rendelesSzam when there is no reservation number (empty element would fail the XSD)", () => {
+    const xml = buildCreditInvoiceXml({
+      agentKey: "K",
+      amountHuf: 10_000,
+      buyer,
+      bookingId: "b1",
+      reservationNumber: null,
+    });
+    expect(xml).not.toContain("<rendelesSzam>");
+    expect(xml).toContain("<szamlaKulsoAzon>refund-b1</szamlaKulsoAzon>");
   });
 
   it("includes the <elado> seller block (required for e-invoices — Számlázz error 'Hiányzó adat: elado elem' without it)", () => {
-    const xml = buildCreditInvoiceXml({ agentKey: "K", amountHuf: 10_000, buyer });
+    const xml = buildCreditInvoiceXml({
+      agentKey: "K",
+      amountHuf: 10_000,
+      buyer,
+      bookingId: "booking-1",
+    });
     expect(xml).toContain("<elado>");
     expect(xml).toContain("</elado>");
     // ordered after <fejlec> and before <vevo> per the xmlszamla XSD sequence

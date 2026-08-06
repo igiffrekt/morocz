@@ -10,7 +10,21 @@ export interface BuildCreditInvoiceXmlInput {
   agentKey: string;
   amountHuf: number; // positive magnitude; rendered negative on the invoice
   buyer: CreditInvoiceBuyer;
+  /** Sanity booking._id — becomes the invoice's szamlaKulsoAzon idempotency key. */
+  bookingId: string;
+  /** Human-facing handle (M-XXXXXX) so reception can find the invoice in the Számlázz UI. */
+  reservationNumber?: string | null;
   now?: Date;
+}
+
+/**
+ * Számlázz's external-id (`szamlaKulsoAzon`) for a booking's credit invoice. This is the
+ * idempotency key: it lets a retry ask "did I already issue this?" instead of blindly
+ * issuing a second one. Számlázz can look an invoice up by it (query error code 7 =
+ * no such external id).
+ */
+export function creditInvoiceExternalId(bookingId: string): string {
+  return `refund-${bookingId}`;
 }
 
 function esc(value: string): string {
@@ -26,6 +40,8 @@ export function buildCreditInvoiceXml({
   agentKey,
   amountHuf,
   buyer,
+  bookingId,
+  reservationNumber,
   now,
 }: BuildCreditInvoiceXmlInput): string {
   // Invoice date must be the Hungarian local date — toISOString() is UTC and would
@@ -41,6 +57,7 @@ export function buildCreditInvoiceXml({
     <szamlaagentkulcs>${esc(agentKey)}</szamlaagentkulcs>
     <eszamla>true</eszamla>
     <szamlaLetoltes>false</szamlaLetoltes>
+    <szamlaKulsoAzon>${esc(creditInvoiceExternalId(bookingId))}</szamlaKulsoAzon>
   </beallitasok>
   <fejlec>
     <keltDatum>${today}</keltDatum>
@@ -49,7 +66,9 @@ export function buildCreditInvoiceXml({
     <fizmod>bankkártya</fizmod>
     <penznem>HUF</penznem>
     <szamlaNyelve>hu</szamlaNyelve>
-    <megjegyzes>Foglalási díj visszatérítése</megjegyzes>
+    <megjegyzes>Foglalási díj visszatérítése</megjegyzes>${
+      reservationNumber ? `\n    <rendelesSzam>${esc(reservationNumber)}</rendelesSzam>` : ""
+    }
   </fejlec>
   <elado>
     <emailReplyto>idopontfoglalas@drmoroczangela.hu</emailReplyto>

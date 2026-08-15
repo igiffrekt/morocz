@@ -15,6 +15,22 @@ const mapsUrl =
   "https://www.google.com/maps/place/47%C2%B048'02.9%22N+18%C2%B044'44.4%22E/@47.8007963,18.7430918,17z/data=!3m1!4b1!4m4!3m3!8m2!3d47.8007927!4d18.7456667?entry=ttu&g_ep=EgoyMDI1MDkyOC4wIKXMDSoASAFQAw%3D%3D";
 
 /**
+ * Escapes a value for interpolation into email HTML. Patient name/email/phone/address come
+ * from the public booking form and the buyer name from the Stripe cardholder field — all
+ * attacker-typed free text, and unescaped markup in them renders in the recipient's mail
+ * client. System-generated values (reservation numbers, invoice numbers, Stripe ids) are
+ * escaped too so no interpolation in this file depends on where its value came from.
+ */
+function escHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+/**
  * Builds a branded HTML confirmation email for a successful booking.
  */
 export function buildConfirmationEmail(params: {
@@ -27,16 +43,9 @@ export function buildConfirmationEmail(params: {
   clinicPhone: string;
   clinicAddress: string;
 }): string {
-  const {
-    patientName,
-    serviceName,
-    reservationNumber,
-    date,
-    time,
-    manageUrl,
-    clinicPhone,
-    clinicAddress,
-  } = params;
+  const { serviceName, reservationNumber, date, time, manageUrl, clinicPhone, clinicAddress } =
+    params;
+  const patientName = escHtml(params.patientName);
 
   return `<!DOCTYPE html>
 <html lang="hu">
@@ -219,16 +228,9 @@ export function buildCancellationEmail(params: {
   clinicAddress: string;
   newBookingUrl: string; // /idopontfoglalas
 }): string {
-  const {
-    patientName,
-    serviceName,
-    reservationNumber,
-    date,
-    time,
-    clinicPhone,
-    clinicAddress,
-    newBookingUrl,
-  } = params;
+  const { serviceName, reservationNumber, date, time, clinicPhone, clinicAddress, newBookingUrl } =
+    params;
+  const patientName = escHtml(params.patientName);
 
   return `<!DOCTYPE html>
 <html lang="hu">
@@ -386,7 +388,6 @@ export function buildRescheduleEmail(params: {
   clinicAddress: string;
 }): string {
   const {
-    patientName,
     serviceName,
     reservationNumber,
     oldDate,
@@ -397,6 +398,7 @@ export function buildRescheduleEmail(params: {
     clinicPhone,
     clinicAddress,
   } = params;
+  const patientName = escHtml(params.patientName);
 
   return `<!DOCTYPE html>
 <html lang="hu">
@@ -602,17 +604,10 @@ export function buildAdminCancellationEmail(params: {
   clinicAddress: string;
   newBookingUrl: string;
 }): string {
-  const {
-    patientName,
-    serviceName,
-    reservationNumber,
-    date,
-    time,
-    reason,
-    clinicPhone,
-    clinicAddress,
-    newBookingUrl,
-  } = params;
+  const { serviceName, reservationNumber, date, time, clinicPhone, clinicAddress, newBookingUrl } =
+    params;
+  const patientName = escHtml(params.patientName);
+  const reason = params.reason === undefined ? undefined : escHtml(params.reason);
 
   return `<!DOCTYPE html>
 <html lang="hu">
@@ -978,17 +973,18 @@ export function buildReminderEmail(params: {
  * reservation number, a search by patient name comes up empty and the payment looks
  * like it never happened.
  */
-export function buildInvoiceFailedEmail({
-  patientName,
-  reservationNumber,
-  buyerName,
-  paymentIntentId,
-}: {
+export function buildInvoiceFailedEmail(params: {
   patientName: string;
   reservationNumber: string | null;
   buyerName: string | null;
   paymentIntentId: string;
 }): string {
+  const patientName = escHtml(params.patientName);
+  const buyerName = params.buyerName === null ? null : escHtml(params.buyerName);
+  const reservationNumber =
+    params.reservationNumber === null ? null : escHtml(params.reservationNumber);
+  const paymentIntentId = escHtml(params.paymentIntentId);
+
   const payerRow =
     buyerName && buyerName !== patientName
       ? `<li><strong>Fizető (kártyabirtokos):</strong> ${buyerName} — a Stripe/Számlázz rendszerben EZEN a néven keresse, nem a páciens nevén!</li>`
@@ -1027,15 +1023,16 @@ export const INVOICE_FAILED_SUBJECT = "A helyesbítő számla kiállítása megh
  * succeeded, so reception must NOT issue the invoice by hand — doing so would credit the
  * patient twice.
  */
-export function buildInvoiceResolvedEmail({
-  patientName,
-  reservationNumber,
-  invoiceNumber,
-}: {
+export function buildInvoiceResolvedEmail(params: {
   patientName: string;
   reservationNumber: string | null;
   invoiceNumber: string;
 }): string {
+  const patientName = escHtml(params.patientName);
+  const reservationNumber =
+    params.reservationNumber === null ? null : escHtml(params.reservationNumber);
+  const invoiceNumber = escHtml(params.invoiceNumber);
+
   return `<!DOCTYPE html>
 <html lang="hu">
   <head><meta charset="UTF-8" /></head>
@@ -1080,25 +1077,20 @@ export function buildReceptionCancellationEmail(params: {
   date: string;
   time: string;
 }): string {
-  const {
-    patientName,
-    patientEmail,
-    patientPhone,
-    billingAddress,
-    serviceName,
-    reservationNumber,
-    date,
-    time,
-  } = params;
+  const { billingAddress, serviceName, reservationNumber, date, time } = params;
+  const patientName = escHtml(params.patientName);
+  const patientEmail = escHtml(params.patientEmail);
+  const patientPhone = escHtml(params.patientPhone);
 
   const hasAddress = !!(
     billingAddress.postalCode ||
     billingAddress.city ||
     billingAddress.streetAddress
   );
-  const addressLine1 =
-    [billingAddress.postalCode, billingAddress.city].filter(Boolean).join(" ") || "";
-  const addressLine2 = billingAddress.streetAddress ?? "";
+  const addressLine1 = escHtml(
+    [billingAddress.postalCode, billingAddress.city].filter(Boolean).join(" ") || "",
+  );
+  const addressLine2 = escHtml(billingAddress.streetAddress ?? "");
 
   return `<!DOCTYPE html>
 <html lang="hu">

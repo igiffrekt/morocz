@@ -37,18 +37,23 @@ type BlogPostBodyImage = {
   caption?: string;
 };
 
-type PortableTextTable = {
-  _type: "table";
+type PortableTextStyledTable = {
+  _type: "styledTable";
   _key: string;
-  rows?: Array<{
-    _type: "tableRow";
-    _key: string;
-    cells?: Array<string>;
-  }>;
+  headerRow?: boolean;
+  zebraStripes?: boolean;
+  align?: "left" | "center" | "right";
+  table?: {
+    rows?: Array<{
+      _type: "tableRow";
+      _key: string;
+      cells?: Array<string>;
+    }>;
+  };
 };
 
 interface PortableTextRendererProps {
-  body: Array<PortableTextBlock | BlogPostBodyImage | PortableTextTable>;
+  body: Array<PortableTextBlock | BlogPostBodyImage | PortableTextStyledTable>;
 }
 
 const components: Partial<PortableTextReactComponents> = {
@@ -111,22 +116,41 @@ const components: Partial<PortableTextReactComponents> = {
         </figure>
       );
     },
-    table: ({ value }: { value: PortableTextTable }) => {
-      const rows = value?.rows ?? [];
+    styledTable: ({ value }: { value: PortableTextStyledTable }) => {
+      const rows = value?.table?.rows ?? [];
       if (rows.length === 0) return null;
+      const alignClass =
+        value.align === "center"
+          ? "text-center"
+          : value.align === "right"
+            ? "text-right"
+            : "text-left";
       return (
         <div className="my-6 overflow-x-auto">
           <table className="w-full border-collapse text-sm text-gray-700">
             <tbody>
-              {rows.map((row) => (
-                <tr key={row._key}>
-                  {(row.cells ?? []).map((cell, i) => (
-                    <td key={i} className="border border-gray-300 px-3 py-2 align-top">
-                      {cell}
-                    </td>
-                  ))}
-                </tr>
-              ))}
+              {rows.map((row, rowIndex) => {
+                const isHeaderRow = value.headerRow && rowIndex === 0;
+                const isStriped =
+                  value.zebraStripes && !isHeaderRow && (rowIndex - (value.headerRow ? 1 : 0)) % 2 === 1;
+                return (
+                  <tr
+                    key={row._key}
+                    className={
+                      isHeaderRow ? "bg-primary/10 font-semibold" : isStriped ? "bg-gray-50" : undefined
+                    }
+                  >
+                    {(row.cells ?? []).map((cell, i) => (
+                      <td
+                        key={i}
+                        className={`border border-gray-300 px-3 py-2 align-top ${alignClass}`}
+                      >
+                        {cell}
+                      </td>
+                    ))}
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

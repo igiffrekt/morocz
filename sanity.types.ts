@@ -328,6 +328,8 @@ export type CustomAvailability = {
   date?: string;
   startTime?: string;
   endTime?: string;
+  breakStart?: string;
+  breakEnd?: string;
   services?: Array<{
     _ref: string;
     _type: "reference";
@@ -367,6 +369,8 @@ export type SeasonalSchedule = {
     isDayOff?: boolean;
     startTime?: string;
     endTime?: string;
+    breakStart?: string;
+    breakEnd?: string;
     _key: string;
   }>;
 };
@@ -385,6 +389,8 @@ export type WeeklySchedule = {
     isDayOff?: boolean;
     startTime?: string;
     endTime?: string;
+    breakStart?: string;
+    breakEnd?: string;
     _key: string;
   }>;
 };
@@ -1259,12 +1265,14 @@ export type SlotLocksForRangeQueryResult = Array<{
   heldUntil: null;
 }>;
 // Variable: customAvailabilityForMonthQuery
-// Query: *[_type == "customAvailability" && date >= $startDate && date <= $endDate]{    _id, date, startTime, endTime, services[]->{_id}  }
+// Query: *[_type == "customAvailability" && date >= $startDate && date <= $endDate]{    _id, date, startTime, endTime, breakStart, breakEnd, services[]->{_id}  }
 export type CustomAvailabilityForMonthQueryResult = Array<{
   _id: string;
   date: string | null;
   startTime: string | null;
   endTime: string | null;
+  breakStart: string | null;
+  breakEnd: string | null;
   services: Array<{
     _id: string;
   }> | null;
@@ -1952,7 +1960,7 @@ export type GeneralPatientInfoQueryResult = {
   lastUpdated: string | null;
 } | null;
 // Variable: weeklyScheduleQuery
-// Query: *[_type == "weeklySchedule" && _id == "weeklySchedule"][0]{  defaultSlotDuration,  bufferMinutes,  bookingWindowDays,  days[]{    _key,    dayOfWeek,    isDayOff,    startTime,    endTime  }}
+// Query: *[_type == "weeklySchedule" && _id == "weeklySchedule"][0]{  defaultSlotDuration,  bufferMinutes,  bookingWindowDays,  days[]{    _key,    dayOfWeek,    isDayOff,    startTime,    endTime,    breakStart,    breakEnd  }}
 export type WeeklyScheduleQueryResult = {
   defaultSlotDuration: 10 | 15 | 20 | 30 | 45 | 60 | null;
   bufferMinutes: number | null;
@@ -1963,6 +1971,8 @@ export type WeeklyScheduleQueryResult = {
     isDayOff: boolean | null;
     startTime: string | null;
     endTime: string | null;
+    breakStart: string | null;
+    breakEnd: string | null;
   }> | null;
 } | null;
 // Variable: blockedDatesQuery
@@ -1995,12 +2005,14 @@ export type BookingsForDateQueryResult = Array<{
   } | null;
 }>;
 // Variable: customAvailabilityForDateQuery
-// Query: *[_type == "customAvailability" && date == $date][0]{  _id,  date,  startTime,  endTime,  services[]->{_id}}
+// Query: *[_type == "customAvailability" && date == $date][0]{  _id,  date,  startTime,  endTime,  breakStart,  breakEnd,  services[]->{_id}}
 export type CustomAvailabilityForDateQueryResult = {
   _id: string;
   date: string | null;
   startTime: string | null;
   endTime: string | null;
+  breakStart: string | null;
+  breakEnd: string | null;
   services: Array<{
     _id: string;
   }> | null;
@@ -2298,7 +2310,7 @@ export type ActivePopupQueryResult = {
   showOncePerSession: boolean | null;
 } | null;
 // Variable: seasonalScheduleForDateQuery
-// Query: *[_type == "seasonalSchedule" && startDate <= $date && endDate >= $date]    | order(startDate asc)[0]{    _id,    name,    startDate,    endDate,    defaultSlotDuration,    bufferMinutes,    days[]{      _key,      dayOfWeek,      isDayOff,      startTime,      endTime    }  }
+// Query: *[_type == "seasonalSchedule" && startDate <= $date && endDate >= $date]    | order(startDate asc)[0]{    _id,    name,    startDate,    endDate,    defaultSlotDuration,    bufferMinutes,    days[]{      _key,      dayOfWeek,      isDayOff,      startTime,      endTime,      breakStart,      breakEnd    }  }
 export type SeasonalScheduleForDateQueryResult = {
   _id: string;
   name: string | null;
@@ -2312,10 +2324,12 @@ export type SeasonalScheduleForDateQueryResult = {
     isDayOff: boolean | null;
     startTime: string | null;
     endTime: string | null;
+    breakStart: string | null;
+    breakEnd: string | null;
   }> | null;
 } | null;
 // Variable: seasonalSchedulesForRangeQuery
-// Query: *[_type == "seasonalSchedule" && startDate <= $endDate && endDate >= $startDate]    | order(startDate asc){    _id,    name,    startDate,    endDate,    defaultSlotDuration,    bufferMinutes,    days[]{      _key,      dayOfWeek,      isDayOff,      startTime,      endTime    }  }
+// Query: *[_type == "seasonalSchedule" && startDate <= $endDate && endDate >= $startDate]    | order(startDate asc){    _id,    name,    startDate,    endDate,    defaultSlotDuration,    bufferMinutes,    days[]{      _key,      dayOfWeek,      isDayOff,      startTime,      endTime,      breakStart,      breakEnd    }  }
 export type SeasonalSchedulesForRangeQueryResult = Array<{
   _id: string;
   name: string | null;
@@ -2329,6 +2343,8 @@ export type SeasonalSchedulesForRangeQueryResult = Array<{
     isDayOff: boolean | null;
     startTime: string | null;
     endTime: string | null;
+    breakStart: string | null;
+    breakEnd: string | null;
   }> | null;
 }>;
 
@@ -2340,7 +2356,7 @@ declare module "@sanity/client" {
     "*[_type == \"service\" && _id == $serviceId][0]{name, appointmentDuration, price}": ServiceForCheckoutQueryResult;
     "*[_type == \"booking\" && slotDate >= $startDate && slotDate <= $endDate && status == \"confirmed\"]{\n  slotDate,\n  slotTime\n}": BookingsForRangeQueryResult;
     "*[_type == \"slotLock\" && slotDate >= $startDate && slotDate <= $endDate && (status == \"booked\" || status == \"held\")]{\n  slotDate,\n  slotTime,\n  status,\n  heldUntil\n}": SlotLocksForRangeQueryResult;
-    "*[_type == \"customAvailability\" && date >= $startDate && date <= $endDate]{\n    _id, date, startTime, endTime, services[]->{_id}\n  }": CustomAvailabilityForMonthQueryResult;
+    "*[_type == \"customAvailability\" && date >= $startDate && date <= $endDate]{\n    _id, date, startTime, endTime, breakStart, breakEnd, services[]->{_id}\n  }": CustomAvailabilityForMonthQueryResult;
     "*[_type == \"service\" && _id == $serviceId][0]{appointmentDuration}": ServiceByIdQueryResult;
     "*[_type == \"homepage\" && _id == \"homepage\"][0]{\n  heroHeadline,\n  heroSubtitle,\n  heroBadges[]{\n    _key,\n    emoji,\n    text\n  },\n  heroDoctorImage,\n  heroCards[]{\n    _key,\n    title,\n    subtitle,\n    icon\n  },\n  servicesHeadline,\n  servicesSubtitle,\n  labTestsHeadline,\n  labTestsSubtitle,\n  testimonialsHeadline,\n  testimonialsCtaText,\n  testimonialsCtaUrl,\n  testimonials[]->{\n    _id,\n    patientName,\n    photo,\n    text,\n    condition,\n    order\n  },\n  blogHeadline,\n  ctaHeadline,\n  ctaDescription,\n  metaDescription,\n  ogImage\n}": HomepageQueryResult;
     "*[_type == \"siteSettings\" && _id == \"siteSettings\"][0]{\n  logo,\n  clinicName,\n  phone,\n  email,\n  address,\n  navigationLinks[]{\n    _key,\n    label,\n    href\n  },\n  socialLinks[]{\n    _key,\n    platform,\n    url\n  },\n  footerColumns[]{\n    _key,\n    heading,\n    links[]{\n      _key,\n      label,\n      href\n    }\n  },\n  privacyPolicyUrl,\n  cookiePolicyUrl,\n  termsOfServiceUrl,\n  bookingPolicyUrl,\n  generalPatientInfoUrl,\n  metaDescription,\n  siteName,\n  defaultOgImage\n}": SiteSettingsQueryResult;
@@ -2359,11 +2375,11 @@ declare module "@sanity/client" {
     "*[_type == \"termsOfService\" && _id == \"termsOfService\"][0]{\n  title,\n  body,\n  lastUpdated\n}": TermsOfServiceQueryResult;
     "*[_type == \"bookingPolicy\" && _id == \"bookingPolicy\"][0]{\n  title,\n  body,\n  lastUpdated\n}": BookingPolicyQueryResult;
     "*[_type == \"generalPatientInfo\" && _id == \"generalPatientInfo\"][0]{\n  title,\n  body,\n  lastUpdated\n}": GeneralPatientInfoQueryResult;
-    "*[_type == \"weeklySchedule\" && _id == \"weeklySchedule\"][0]{\n  defaultSlotDuration,\n  bufferMinutes,\n  bookingWindowDays,\n  days[]{\n    _key,\n    dayOfWeek,\n    isDayOff,\n    startTime,\n    endTime\n  }\n}": WeeklyScheduleQueryResult;
+    "*[_type == \"weeklySchedule\" && _id == \"weeklySchedule\"][0]{\n  defaultSlotDuration,\n  bufferMinutes,\n  bookingWindowDays,\n  days[]{\n    _key,\n    dayOfWeek,\n    isDayOff,\n    startTime,\n    endTime,\n    breakStart,\n    breakEnd\n  }\n}": WeeklyScheduleQueryResult;
     "*[_type == \"blockedDate\" && _id == \"blockedDate\"][0]{\n  dates[]{\n    _key,\n    date,\n    isHoliday\n  }\n}": BlockedDatesQueryResult;
     "*[_type == \"slotLock\" && _id == $slotLockId][0]{\n  _id, _rev, status, heldUntil, userId\n}": SlotLockByIdQueryResult;
     "*[_type == \"booking\" && slotDate == $date && status == \"confirmed\"]{\n  _id, slotDate, slotTime, patientEmail, service->{_id}\n}": BookingsForDateQueryResult;
-    "*[_type == \"customAvailability\" && date == $date][0]{\n  _id,\n  date,\n  startTime,\n  endTime,\n  services[]->{_id}\n}": CustomAvailabilityForDateQueryResult;
+    "*[_type == \"customAvailability\" && date == $date][0]{\n  _id,\n  date,\n  startTime,\n  endTime,\n  breakStart,\n  breakEnd,\n  services[]->{_id}\n}": CustomAvailabilityForDateQueryResult;
     "*[_type == \"slotLock\" && slotDate == $date]{\n  _id, slotDate, slotTime, status, heldUntil\n}": SlotLocksForDateQueryResult;
     "*[_type == \"service\" && isHidden != true] | order(order asc){\n  _id, name, duration, price\n}": ServicesForBookingQueryResult;
     "*[_type == \"kapcsolat\"][0]{\n  heroTitle,\n  heroDescription,\n  heroImage{\n    asset->{url, alt},\n    hotspot\n  },\n  phoneNumbers[]{label, number, iconName},\n  heroEmailAddresses[]{label, email, iconName},\n  emailAddresses[]{label, email, iconName, _key},\n  address,\n  officeHoursTitle,\n  officeHoursIconName,\n  officeHours,\n  locationTitle,\n  locationIconName,\n  locationImage{\n    asset->{url, alt},\n    hotspot\n  },\n  locationLat,\n  locationLng,\n  goodToKnowLabel,\n  goodToKnowTitle,\n  goodToKnowSubtitle,\n  goodToKnowCards[]{iconName, title, description, url},\n  hasznos_label,\n  hasznos_title,\n  hasznos_subtitle,\n  hasznos_items[]{title, body, iconName, _key},\n  fontos_label,\n  fontos_title,\n  fontos_subtitle,\n  fontos_items[]{title, body, iconName, _key}\n}": KAPCSOLAT_QUERYResult;
@@ -2372,7 +2388,7 @@ declare module "@sanity/client" {
     "*[_type == \"yogaInstructor\" && isActive == true] | order(name asc){\n  _id,\n  name,\n  slug,\n  photo,\n  bio,\n  phone,\n  email,\n  color\n}": YogaInstructorsQueryResult;
     "*[_type == \"yogaClass\"] | order(name asc){\n  _id,\n  name,\n  slug,\n  description,\n  icon,\n  color,\n  instructors[]->{\n    _id,\n    name,\n    photo\n  }\n}": YogaClassesQueryResult;
     "*[_type == \"popup\" && isActive == true][0]{\n  _id,\n  headline,\n  content,\n  image,\n  ctaButton{\n    label,\n    href\n  },\n  showOnPages,\n  displayDelay,\n  showOncePerSession\n}": ActivePopupQueryResult;
-    "*[_type == \"seasonalSchedule\" && startDate <= $date && endDate >= $date]\n    | order(startDate asc)[0]{\n    _id,\n    name,\n    startDate,\n    endDate,\n    defaultSlotDuration,\n    bufferMinutes,\n    days[]{\n      _key,\n      dayOfWeek,\n      isDayOff,\n      startTime,\n      endTime\n    }\n  }": SeasonalScheduleForDateQueryResult;
-    "*[_type == \"seasonalSchedule\" && startDate <= $endDate && endDate >= $startDate]\n    | order(startDate asc){\n    _id,\n    name,\n    startDate,\n    endDate,\n    defaultSlotDuration,\n    bufferMinutes,\n    days[]{\n      _key,\n      dayOfWeek,\n      isDayOff,\n      startTime,\n      endTime\n    }\n  }": SeasonalSchedulesForRangeQueryResult;
+    "*[_type == \"seasonalSchedule\" && startDate <= $date && endDate >= $date]\n    | order(startDate asc)[0]{\n    _id,\n    name,\n    startDate,\n    endDate,\n    defaultSlotDuration,\n    bufferMinutes,\n    days[]{\n      _key,\n      dayOfWeek,\n      isDayOff,\n      startTime,\n      endTime,\n      breakStart,\n      breakEnd\n    }\n  }": SeasonalScheduleForDateQueryResult;
+    "*[_type == \"seasonalSchedule\" && startDate <= $endDate && endDate >= $startDate]\n    | order(startDate asc){\n    _id,\n    name,\n    startDate,\n    endDate,\n    defaultSlotDuration,\n    bufferMinutes,\n    days[]{\n      _key,\n      dayOfWeek,\n      isDayOff,\n      startTime,\n      endTime,\n      breakStart,\n      breakEnd\n    }\n  }": SeasonalSchedulesForRangeQueryResult;
   }
 }

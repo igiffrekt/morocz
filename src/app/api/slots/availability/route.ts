@@ -23,7 +23,7 @@ const slotLocksForRangeQuery = defineQuery(
 
 const customAvailabilityForMonthQuery = defineQuery(
   `*[_type == "customAvailability" && date >= $startDate && date <= $endDate]{
-    _id, date, startTime, endTime, services[]->{_id}
+    _id, date, startTime, endTime, breakStart, breakEnd, services[]->{_id}
   }`
 );
 
@@ -65,6 +65,8 @@ export async function GET(request: Request): Promise<Response> {
         isDayOff: boolean;
         startTime: string;
         endTime: string;
+        breakStart: string | null;
+        breakEnd: string | null;
       }>;
     } | null>({
       query: weeklyScheduleQuery,
@@ -83,6 +85,8 @@ export async function GET(request: Request): Promise<Response> {
           isDayOff: boolean;
           startTime: string;
           endTime: string;
+          breakStart: string | null;
+          breakEnd: string | null;
         }>;
       }>
     >({
@@ -112,6 +116,8 @@ export async function GET(request: Request): Promise<Response> {
         date: string;
         startTime: string;
         endTime: string;
+        breakStart: string | null;
+        breakEnd: string | null;
         services: Array<{ _id: string }> | null;
       }>
     >({
@@ -203,6 +209,8 @@ export async function GET(request: Request): Promise<Response> {
               isDayOff: false,
               startTime: customAvail.startTime,
               endTime: customAvail.endTime,
+              breakStart: customAvail.breakStart ?? null,
+              breakEnd: customAvail.breakEnd ?? null,
             };
           }
           return day;
@@ -216,6 +224,8 @@ export async function GET(request: Request): Promise<Response> {
           isDayOff: false,
           startTime: customAvail.startTime,
           endTime: customAvail.endTime,
+          breakStart: customAvail.breakStart ?? null,
+          breakEnd: customAvail.breakEnd ?? null,
         });
       }
     }

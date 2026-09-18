@@ -1,5 +1,49 @@
 import { defineField } from "sanity";
 
+const TIME_RE = /^([0-1][0-9]|2[0-3]):[0-5][0-9]$/;
+
+type BreakParent = {
+  isDayOff?: boolean;
+  startTime?: string;
+  endTime?: string;
+  breakStart?: string;
+  breakEnd?: string;
+};
+
+function validateBreak(value: string | undefined, context: { parent?: unknown }, which: "start" | "end") {
+  const parent = context.parent as BreakParent;
+  if (parent?.isDayOff) return true;
+
+  const other = which === "start" ? parent?.breakEnd : parent?.breakStart;
+  if (!value) {
+    if (other) {
+      return "Mindkét szünet-időpontot meg kell adni (kezdete és vége), vagy hagyja üresen mindkettőt.";
+    }
+    return true;
+  }
+  if (!TIME_RE.test(value)) {
+    return "Érvénytelen formátum. Használjon HH:MM alakot (pl. 12:00).";
+  }
+
+  if (which === "end") {
+    const { breakStart: bs, breakEnd: be, startTime: st, endTime: et } = parent;
+    if (bs && be && be <= bs) {
+      return "A szünet vége későbbi kell legyen, mint a kezdete.";
+    }
+    if (st && bs && bs < st) {
+      return `A szünet nem kezdődhet a rendelés kezdete (${st}) előtt.`;
+    }
+    if (et && be && be > et) {
+      return `A szünet nem tarthat a rendelés vége (${et}) után.`;
+    }
+    if (st && et && bs && be && bs <= st && be >= et) {
+      return 'A szünet a teljes rendelési időt kitölti. Ha ezen a napon nincs rendelés, használja a „Szabadnap" jelölőt.';
+    }
+  }
+
+  return true;
+}
+
 export const defaultSlotDurationField = defineField({
   name: "defaultSlotDuration",
   title: "Alapértelmezett időpont hossz (perc)",
@@ -25,6 +69,25 @@ export const bufferMinutesField = defineField({
   description: "Perc szünet két időpont között (0 = nincs szünet)",
   initialValue: 0,
   validation: (rule) => rule.min(0),
+});
+
+export const breakStartField = defineField({
+  name: "breakStart",
+  title: "Napi szünet kezdete",
+  type: "string",
+  description:
+    "Ebben az idősávban nem lehet időpontot foglalni (pl. ebédszünet). Hagyja üresen, ha nincs szünet. Formátum: HH:MM (pl. 12:00). Kerek időt adjon meg (0/20/40 perc), mert az időpontok 20 perces rácson állnak.",
+  hidden: ({ parent }) => !!(parent as BreakParent)?.isDayOff,
+  validation: (rule) => rule.custom((value, context) => validateBreak(value, context, "start")),
+});
+
+export const breakEndField = defineField({
+  name: "breakEnd",
+  title: "Napi szünet vége",
+  type: "string",
+  description: "A szünet vége. Ettől az időponttól újra lehet foglalni. Formátum: HH:MM (pl. 13:00).",
+  hidden: ({ parent }) => !!(parent as BreakParent)?.isDayOff,
+  validation: (rule) => rule.custom((value, context) => validateBreak(value, context, "end")),
 });
 
 export const daysField = defineField({
@@ -83,6 +146,8 @@ export const daysField = defineField({
               return true;
             }),
         }),
+        breakStartField,
+        breakEndField,
       ],
       preview: {
         select: {
@@ -90,8 +155,10 @@ export const daysField = defineField({
           isDayOff: "isDayOff",
           startTime: "startTime",
           endTime: "endTime",
+          breakStart: "breakStart",
+          breakEnd: "breakEnd",
         },
-        prepare({ dayOfWeek, isDayOff, startTime, endTime }) {
+        prepare({ dayOfWeek, isDayOff, startTime, endTime, breakStart, breakEnd }) {
           const dayNames: Record<number, string> = {
             0: "Vasárnap",
             1: "Hétfő",
@@ -105,7 +172,9 @@ export const daysField = defineField({
           const subtitle = isDayOff
             ? "Szabadnap"
             : startTime && endTime
-              ? `${startTime} – ${endTime}`
+              ? breakStart && breakEnd
+                ? `${startTime} – ${endTime} · szünet ${breakStart}–${breakEnd}`
+                : `${startTime} – ${endTime}`
               : "Nincs beállítva";
           return { title: dayName, subtitle };
         },

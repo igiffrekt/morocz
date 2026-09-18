@@ -13,6 +13,8 @@ export interface SlotGenerationInput {
       isDayOff: boolean;
       startTime: string;
       endTime: string;
+      breakStart?: string | null;
+      breakEnd?: string | null;
     }>;
   };
   /** ISO date strings like "2026-03-15" */
@@ -45,6 +47,31 @@ function minutesToTime(totalMinutes: number): string {
   const hours = Math.floor(totalMinutes / 60);
   const minutes = totalMinutes % 60;
   return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+}
+
+export interface BreakInterval {
+  startMin: number;
+  endMin: number;
+}
+
+/**
+ * Normalize a day's break fields into a list of half-open [startMin, endMin)
+ * minute intervals. Incomplete, malformed or inverted pairs are ignored — the
+ * Studio validator is the place that tells the editor about them; the runtime
+ * must never throw or silently block a whole day because of bad data.
+ * Returns a list so a future multi-break schema only changes this function.
+ */
+export function getBreakIntervals(day: {
+  breakStart?: string | null;
+  breakEnd?: string | null;
+}): BreakInterval[] {
+  const { breakStart, breakEnd } = day;
+  if (!breakStart || !breakEnd) return [];
+  const startMin = timeToMinutes(breakStart);
+  const endMin = timeToMinutes(breakEnd);
+  if (!Number.isFinite(startMin) || !Number.isFinite(endMin)) return [];
+  if (endMin <= startMin) return [];
+  return [{ startMin, endMin }];
 }
 
 /**
@@ -150,6 +177,7 @@ export function generateAvailableSlots(input: SlotGenerationInput): string[] {
 
   const startMinutes = timeToMinutes(dayConfig.startTime);
   const endMinutes = timeToMinutes(dayConfig.endTime);
+  const breaks = getBreakIntervals(dayConfig);
 
   const bufferMinutes = schedule.bufferMinutes ?? 0;
 
@@ -181,6 +209,10 @@ export function generateAvailableSlots(input: SlotGenerationInput): string[] {
     currentMinutes + serviceDurationMinutes <= endMinutes;
     currentMinutes += BASE_GRANULARITY
   ) {
+    // Reject candidates that overlap the day's break window, if any.
+    const slotEnd = currentMinutes + serviceDurationMinutes;
+    if (breaks.some((b) => currentMinutes < b.endMin && slotEnd > b.startMin)) continue;
+
     // Check all 20-minute sub-slots within the service window
     let slotIsClear = true;
     for (
@@ -208,6 +240,8 @@ export interface ScheduleForAvailability {
     isDayOff: boolean;
     startTime: string;
     endTime: string;
+    breakStart?: string | null;
+    breakEnd?: string | null;
   }>;
 }
 

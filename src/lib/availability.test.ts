@@ -99,4 +99,138 @@ describe("getAvailableSlotsForDate", () => {
     expect(arg.bookedSlots).toEqual([]);
     expect(arg.heldSlots).toEqual([]);
   });
+
+  it("passes the resolved day's break through to generateAvailableSlots", async () => {
+    resolveScheduleForDate.mockReturnValue({
+      defaultSlotDuration: 20,
+      bufferMinutes: 0,
+      days: [
+        {
+          dayOfWeek: 3,
+          isDayOff: false,
+          startTime: "08:00",
+          endTime: "16:00",
+          breakStart: "12:00",
+          breakEnd: "13:00",
+        },
+      ],
+    });
+    mockSanityByTag({
+      weeklySchedule: { defaultSlotDuration: 20, bufferMinutes: 0, bookingWindowDays: 30, days: [] },
+      seasonalSchedule: null,
+      blockedDate: { dates: [] },
+      customAvailability: null,
+      booking: [],
+      slotLock: [],
+      service: { name: "Vizsgálat", appointmentDuration: 20 },
+    });
+
+    await getAvailableSlotsForDate("2026-07-15", "svc");
+
+    const arg = generateAvailableSlots.mock.calls[0][0];
+    expect(arg.schedule.days[0]).toMatchObject({ breakStart: "12:00", breakEnd: "13:00" });
+  });
+
+  it("replaces the schedule day's break with the customAvailability break", async () => {
+    resolveScheduleForDate.mockReturnValue({
+      defaultSlotDuration: 20,
+      bufferMinutes: 0,
+      days: [
+        {
+          dayOfWeek: 3,
+          isDayOff: false,
+          startTime: "08:00",
+          endTime: "16:00",
+          breakStart: "12:00",
+          breakEnd: "13:00",
+        },
+      ],
+    });
+    mockSanityByTag({
+      weeklySchedule: { defaultSlotDuration: 20, bufferMinutes: 0, bookingWindowDays: 30, days: [] },
+      seasonalSchedule: null,
+      blockedDate: { dates: [] },
+      customAvailability: {
+        startTime: "08:00",
+        endTime: "14:00",
+        breakStart: "11:00",
+        breakEnd: "11:30",
+        services: [],
+      },
+      booking: [],
+      slotLock: [],
+      service: { name: "Vizsgálat", appointmentDuration: 20 },
+    });
+
+    await getAvailableSlotsForDate("2026-07-15", "svc");
+
+    const arg = generateAvailableSlots.mock.calls[0][0];
+    expect(arg.schedule.days[0]).toMatchObject({ breakStart: "11:00", breakEnd: "11:30" });
+  });
+
+  it("clears the schedule day's break when customAvailability applies without a break", async () => {
+    resolveScheduleForDate.mockReturnValue({
+      defaultSlotDuration: 20,
+      bufferMinutes: 0,
+      days: [
+        {
+          dayOfWeek: 3,
+          isDayOff: false,
+          startTime: "08:00",
+          endTime: "16:00",
+          breakStart: "12:00",
+          breakEnd: "13:00",
+        },
+      ],
+    });
+    mockSanityByTag({
+      weeklySchedule: { defaultSlotDuration: 20, bufferMinutes: 0, bookingWindowDays: 30, days: [] },
+      seasonalSchedule: null,
+      blockedDate: { dates: [] },
+      customAvailability: {
+        startTime: "08:00",
+        endTime: "14:00",
+        breakStart: null,
+        breakEnd: null,
+        services: [],
+      },
+      booking: [],
+      slotLock: [],
+      service: { name: "Vizsgálat", appointmentDuration: 20 },
+    });
+
+    await getAvailableSlotsForDate("2026-07-15", "svc");
+
+    const arg = generateAvailableSlots.mock.calls[0][0];
+    expect(arg.schedule.days[0].breakStart).toBeNull();
+    expect(arg.schedule.days[0].breakEnd).toBeNull();
+  });
+
+  it("adds a break-bearing day when the resolved schedule has no entry for that weekday", async () => {
+    resolveScheduleForDate.mockReturnValue({ defaultSlotDuration: 20, bufferMinutes: 0, days: [] });
+    mockSanityByTag({
+      weeklySchedule: { defaultSlotDuration: 20, bufferMinutes: 0, bookingWindowDays: 30, days: [] },
+      seasonalSchedule: null,
+      blockedDate: { dates: [] },
+      customAvailability: {
+        startTime: "08:00",
+        endTime: "14:00",
+        breakStart: "11:00",
+        breakEnd: "11:30",
+        services: [],
+      },
+      booking: [],
+      slotLock: [],
+      service: { name: "Vizsgálat", appointmentDuration: 20 },
+    });
+
+    await getAvailableSlotsForDate("2026-07-15", "svc");
+
+    const arg = generateAvailableSlots.mock.calls[0][0];
+    expect(arg.schedule.days[0]).toMatchObject({
+      dayOfWeek: 3,
+      breakStart: "11:00",
+      breakEnd: "11:30",
+    });
+  });
 });

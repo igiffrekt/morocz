@@ -51,6 +51,8 @@ export async function getAvailableSlotsForDate(
           isDayOff: boolean;
           startTime: string;
           endTime: string;
+          breakStart: string | null;
+          breakEnd: string | null;
         }>;
       } | null>({ query: weeklyScheduleQuery, tags: ["weeklySchedule"] }),
       sanityFetch<{
@@ -65,6 +67,8 @@ export async function getAvailableSlotsForDate(
           isDayOff: boolean;
           startTime: string;
           endTime: string;
+          breakStart: string | null;
+          breakEnd: string | null;
         }>;
       } | null>({
         query: seasonalScheduleForDateQuery,
@@ -82,6 +86,8 @@ export async function getAvailableSlotsForDate(
         date: string;
         startTime: string;
         endTime: string;
+        breakStart: string | null;
+        breakEnd: string | null;
         services: Array<{ _id: string }> | null;
       } | null>({
         query: customAvailabilityForDateQuery,
@@ -153,6 +159,8 @@ export async function getAvailableSlotsForDate(
               isDayOff: false,
               startTime: customAvail.startTime,
               endTime: customAvail.endTime,
+              breakStart: customAvail.breakStart ?? null,
+              breakEnd: customAvail.breakEnd ?? null,
             }
           : day,
       ),
@@ -163,6 +171,8 @@ export async function getAvailableSlotsForDate(
         isDayOff: false,
         startTime: customAvail.startTime,
         endTime: customAvail.endTime,
+        breakStart: customAvail.breakStart ?? null,
+        breakEnd: customAvail.breakEnd ?? null,
       });
     }
   }

@@ -1,4 +1,5 @@
 import { defineField, defineType } from "sanity";
+import { breakEndField, breakStartField } from "./_weeklyFields";
 
 export const customAvailabilityType = defineType({
   name: "customAvailability",
@@ -9,7 +10,8 @@ export const customAvailabilityType = defineType({
       name: "date",
       title: "Dátum",
       type: "date",
-      description: "Válassza ki a dátumot, amikor egyedi időpontokat szeretne biztosítani",
+      description:
+        'Válassza ki a dátumot, amikor egyedi időpontokat szeretne biztosítani. Ez a nap teljesen felülírja a heti és a szezonális beosztást: ami itt szerepel, az érvényes — amit üresen hagy (pl. a szünetet), az ezen a napon nincs.',
       validation: (rule) => rule.required(),
     }),
     defineField({
@@ -34,6 +36,8 @@ export const customAvailabilityType = defineType({
           invert: false,
         }),
     }),
+    breakStartField,
+    breakEndField,
     defineField({
       name: "services",
       title: "Elérhető szolgáltatások",
@@ -54,11 +58,14 @@ export const customAvailabilityType = defineType({
       date: "date",
       startTime: "startTime",
       endTime: "endTime",
+      breakStart: "breakStart",
+      breakEnd: "breakEnd",
       services: "services",
     },
-    prepare({ date, startTime, endTime, services }) {
+    prepare({ date, startTime, endTime, breakStart, breakEnd, services }) {
       const serviceCount = services?.length || 0;
-      const subtitle = `${startTime} – ${endTime}${serviceCount > 0 ? ` · ${serviceCount} szolgáltatás` : " · Minden szolgáltatás"}`;
+      const breakPart = breakStart && breakEnd ? ` · szünet ${breakStart}–${breakEnd}` : "";
+      const subtitle = `${startTime} – ${endTime}${breakPart}${serviceCount > 0 ? ` · ${serviceCount} szolgáltatás` : " · Minden szolgáltatás"}`;
       return {
         title: date || "Nincs dátum",
         subtitle,

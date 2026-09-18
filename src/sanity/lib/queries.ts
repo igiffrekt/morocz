@@ -304,7 +304,9 @@ export const weeklyScheduleQuery =
     dayOfWeek,
     isDayOff,
     startTime,
-    endTime
+    endTime,
+    breakStart,
+    breakEnd
   }
 }`);
 
@@ -331,6 +333,8 @@ export const customAvailabilityForDateQuery =
   date,
   startTime,
   endTime,
+  breakStart,
+  breakEnd,
   services[]->{_id}
 }`);
 
@@ -490,7 +494,9 @@ export const seasonalScheduleForDateQuery =
       dayOfWeek,
       isDayOff,
       startTime,
-      endTime
+      endTime,
+      breakStart,
+      breakEnd
     }
   }`);
 
@@ -510,6 +516,8 @@ export const seasonalSchedulesForRangeQuery =
       dayOfWeek,
       isDayOff,
       startTime,
-      endTime
+      endTime,
+      breakStart,
+      breakEnd
     }
   }`);

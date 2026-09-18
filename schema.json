@@ -2081,6 +2081,20 @@
         },
         "optional": true
       },
+      "breakStart": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "breakEnd": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
       "services": {
         "type": "objectAttribute",
         "value": {
@@ -2368,6 +2382,20 @@
                   "type": "string"
                 },
                 "optional": true
+              },
+              "breakStart": {
+                "type": "objectAttribute",
+                "value": {
+                  "type": "string"
+                },
+                "optional": true
+              },
+              "breakEnd": {
+                "type": "objectAttribute",
+                "value": {
+                  "type": "string"
+                },
+                "optional": true
               }
             },
             "rest": {
@@ -2528,6 +2556,20 @@
                 "optional": true
               },
               "endTime": {
+                "type": "objectAttribute",
+                "value": {
+                  "type": "string"
+                },
+                "optional": true
+              },
+              "breakStart": {
+                "type": "objectAttribute",
+                "value": {
+                  "type": "string"
+                },
+                "optional": true
+              },
+              "breakEnd": {
                 "type": "objectAttribute",
                 "value": {
                   "type": "string"

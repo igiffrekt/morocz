@@ -171,6 +171,11 @@ export const siteSettingsType = defineType({
       type: "string",
     }),
     defineField({
+      name: "generalPatientInfoUrl",
+      title: "Általános betegtájékoztató URL",
+      type: "string",
+    }),
+    defineField({
       name: "financeResetDate",
       title: "Pénzügyi nulla pont dátuma",
       type: "date",

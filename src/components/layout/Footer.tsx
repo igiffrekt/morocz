@@ -24,6 +24,7 @@ interface FooterProps {
   cookiePolicyUrl?: string;
   termsOfServiceUrl?: string;
   bookingPolicyUrl?: string;
+  generalPatientInfoUrl?: string;
 }
 
 export default function Footer({
@@ -36,6 +37,7 @@ export default function Footer({
   cookiePolicyUrl,
   termsOfServiceUrl,
   bookingPolicyUrl,
+  generalPatientInfoUrl,
 }: FooterProps) {
   const displayName = clinicName ?? "Mórocz Medical";
 
@@ -46,6 +48,10 @@ export default function Footer({
     {
       label: "Foglalási és Lemondási Szabályzat",
       href: bookingPolicyUrl ?? "/foglalasi-es-lemondasi-szabalyzat",
+    },
+    {
+      label: "Általános Betegtájékoztató",
+      href: generalPatientInfoUrl ?? "/altalanos-betegtajekoztato",
     },
   ];
 

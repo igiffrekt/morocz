@@ -73,6 +73,7 @@ export const siteSettingsQuery =
   cookiePolicyUrl,
   termsOfServiceUrl,
   bookingPolicyUrl,
+  generalPatientInfoUrl,
   metaDescription,
   siteName,
   defaultOgImage
@@ -276,6 +277,15 @@ export const termsOfServiceQuery = defineQuery(
 // Revalidation tag: "bookingPolicy"
 export const bookingPolicyQuery = defineQuery(
   `*[_type == "bookingPolicy" && _id == "bookingPolicy"][0]{
+  title,
+  body,
+  lastUpdated
+}`,
+);
+
+// Revalidation tag: "generalPatientInfo"
+export const generalPatientInfoQuery = defineQuery(
+  `*[_type == "generalPatientInfo" && _id == "generalPatientInfo"][0]{
   title,
   body,
   lastUpdated

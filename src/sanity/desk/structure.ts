@@ -205,6 +205,16 @@ export const structure: StructureResolver = (S) =>
             .title("Foglalási és Lemondási Szabályzat szerkesztése"),
         ),
 
+      // Általános Betegtájékoztató (generalPatientInfo singleton)
+      S.listItem()
+        .title("Általános Betegtájékoztató")
+        .child(
+          S.document()
+            .schemaType("generalPatientInfo")
+            .documentId("generalPatientInfo")
+            .title("Általános Betegtájékoztató szerkesztése"),
+        ),
+
       S.divider(),
 
       // Felugró ablakok (Popups)

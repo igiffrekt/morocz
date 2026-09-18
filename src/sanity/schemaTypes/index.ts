@@ -7,6 +7,7 @@ import { bookingPolicyType } from "./bookingPolicyType";
 import { bookingType } from "./bookingType";
 import { cookiePolicyType } from "./cookiePolicyType";
 import { customAvailabilityType } from "./customAvailabilityType";
+import { generalPatientInfoType } from "./generalPatientInfoType";
 import { homepageType } from "./homepageType";
 import { kapcsolatType } from "./kapcsolatType";
 import { labTestType } from "./labTestType";
@@ -42,6 +43,7 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   cookiePolicyType,
   termsOfServiceType,
   bookingPolicyType,
+  generalPatientInfoType,
   weeklyScheduleType,
   seasonalScheduleType,
   blockedDateType,

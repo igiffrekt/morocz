@@ -103,6 +103,7 @@ export default async function RootLayout({
               cookiePolicyUrl={settings?.cookiePolicyUrl ?? undefined}
               termsOfServiceUrl={settings?.termsOfServiceUrl ?? undefined}
               bookingPolicyUrl={settings?.bookingPolicyUrl ?? undefined}
+              generalPatientInfoUrl={settings?.generalPatientInfoUrl ?? undefined}
             />
           </div>
           <CookieNotice />

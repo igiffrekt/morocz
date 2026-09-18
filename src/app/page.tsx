@@ -97,12 +97,18 @@ function toOpeningHours(schedule: WeeklyScheduleQueryResult) {
   return (schedule?.days ?? [])
     .filter((day) => !day.isDayOff && day.dayOfWeek != null && day.startTime && day.endTime)
     .sort((a, b) => (a.dayOfWeek ?? 0) - (b.dayOfWeek ?? 0))
-    .map((day) => ({
-      "@type": "OpeningHoursSpecification",
-      dayOfWeek: SCHEMA_DAYS[day.dayOfWeek as number],
-      opens: day.startTime,
-      closes: day.endTime,
-    }));
+    .flatMap((day) => {
+      const dayOfWeek = SCHEMA_DAYS[day.dayOfWeek as number];
+      // A break splits the day into two published windows so opening hours
+      // never claim the clinic is open during the lunch break.
+      if (day.breakStart && day.breakEnd) {
+        return [
+          { "@type": "OpeningHoursSpecification", dayOfWeek, opens: day.startTime, closes: day.breakStart },
+          { "@type": "OpeningHoursSpecification", dayOfWeek, opens: day.breakEnd, closes: day.endTime },
+        ];
+      }
+      return [{ "@type": "OpeningHoursSpecification", dayOfWeek, opens: day.startTime, closes: day.endTime }];
+    });
 }
 
 // ─── Homepage Page ────────────────────────────────────────────────────────────

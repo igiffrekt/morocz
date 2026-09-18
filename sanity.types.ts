@@ -389,6 +389,14 @@ export type WeeklySchedule = {
   }>;
 };
 
+export type StyledTable = {
+  _type: "styledTable";
+  headerRow?: boolean;
+  zebraStripes?: boolean;
+  align?: "left" | "center" | "right";
+  table?: Table;
+};
+
 export type GeneralPatientInfo = {
   _id: string;
   _type: "generalPatientInfo";
@@ -429,8 +437,15 @@ export type GeneralPatientInfo = {
     _key: string;
   } | {
     _key: string;
-  } & Table>;
+  } & StyledTable>;
   lastUpdated?: string;
+};
+
+export type Table = {
+  _type: "table";
+  rows?: Array<{
+    _key: string;
+  } & TableRow>;
 };
 
 export type BookingPolicy = {
@@ -1116,13 +1131,6 @@ export type Homepage = {
   };
 };
 
-export type Table = {
-  _type: "table";
-  rows?: Array<{
-    _key: string;
-  } & TableRow>;
-};
-
 export type TableRow = {
   _type: "tableRow";
   cells?: Array<string>;
@@ -1224,7 +1232,7 @@ export type Geopoint = {
   alt?: number;
 };
 
-export type AllSanitySchemaTypes = Popup | SanityImageCrop | SanityImageHotspot | YogaPage | YogaSchedule | YogaClass | Slug | YogaInstructor | AppointmentHistory | Patient | SlotLock | Booking | CustomAvailability | BlockedDate | SeasonalSchedule | WeeklySchedule | GeneralPatientInfo | BookingPolicy | TermsOfService | CookiePolicy | PrivacyPolicy | BlogPost | BlogCategory | Testimonial | LabTest | Service | ServiceCategory | SiteSettings | Kapcsolat | PricingPage | Homepage | Table | TableRow | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageMetadata | SanityFileAsset | SanityAssetSourceData | SanityImageAsset | Geopoint;
+export type AllSanitySchemaTypes = Popup | SanityImageCrop | SanityImageHotspot | YogaPage | YogaSchedule | YogaClass | Slug | YogaInstructor | AppointmentHistory | Patient | SlotLock | Booking | CustomAvailability | BlockedDate | SeasonalSchedule | WeeklySchedule | StyledTable | GeneralPatientInfo | Table | BookingPolicy | TermsOfService | CookiePolicy | PrivacyPolicy | BlogPost | BlogCategory | Testimonial | LabTest | Service | ServiceCategory | SiteSettings | Kapcsolat | PricingPage | Homepage | TableRow | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageMetadata | SanityFileAsset | SanityAssetSourceData | SanityImageAsset | Geopoint;
 export declare const internalGroqTypeReferenceTo: unique symbol;
 // Source: ./src/app/api/booking/route.ts
 // Variable: serviceForEmailQuery
@@ -1917,7 +1925,7 @@ export type GeneralPatientInfoQueryResult = {
   title: string | null;
   body: Array<{
     _key: string;
-  } & Table | {
+  } & StyledTable | {
     children?: Array<{
       marks?: Array<string>;
       text?: string;

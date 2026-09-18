@@ -62,7 +62,7 @@ export const generalPatientInfoType = defineType({
             { name: "caption", type: "string", title: "Képaláírás" },
           ],
         },
-        { type: "table", title: "Táblázat" },
+        { type: "styledTable" },
       ],
     }),
     defineField({

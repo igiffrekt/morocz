@@ -20,6 +20,7 @@ import { serviceCategoryType } from "./serviceCategoryType";
 import { serviceType } from "./serviceType";
 import { siteSettingsType } from "./siteSettingsType";
 import { slotLockType } from "./slotLockType";
+import { styledTableType } from "./styledTableType";
 import { termsOfServiceType } from "./termsOfServiceType";
 import { testimonialType } from "./testimonialType";
 import { weeklyScheduleType } from "./weeklyScheduleType";
@@ -44,6 +45,7 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   termsOfServiceType,
   bookingPolicyType,
   generalPatientInfoType,
+  styledTableType,
   weeklyScheduleType,
   seasonalScheduleType,
   blockedDateType,

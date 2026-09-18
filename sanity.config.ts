@@ -1,3 +1,4 @@
+import { table } from "@sanity/table";
 import { visionTool } from "@sanity/vision";
 import { defineConfig } from "sanity";
 import { structureTool } from "sanity/structure";
@@ -11,5 +12,9 @@ export default defineConfig({
   dataset,
   title: "Morocz Medical",
   schema: { types: schemaTypes },
-  plugins: [structureTool({ structure }), visionTool({ defaultApiVersion: apiVersion })],
+  plugins: [
+    structureTool({ structure }),
+    visionTool({ defaultApiVersion: apiVersion }),
+    table(),
+  ],
 });

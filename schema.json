@@ -39,7 +39,7 @@
         "value": {
           "type": "string"
         },
-        "optional": false
+        "optional": true
       },
       "isActive": {
         "type": "objectAttribute",
@@ -53,7 +53,7 @@
         "value": {
           "type": "string"
         },
-        "optional": false
+        "optional": true
       },
       "content": {
         "type": "objectAttribute",
@@ -357,28 +357,28 @@
           "value": {
             "type": "number"
           },
-          "optional": false
+          "optional": true
         },
         "bottom": {
           "type": "objectAttribute",
           "value": {
             "type": "number"
           },
-          "optional": false
+          "optional": true
         },
         "left": {
           "type": "objectAttribute",
           "value": {
             "type": "number"
           },
-          "optional": false
+          "optional": true
         },
         "right": {
           "type": "objectAttribute",
           "value": {
             "type": "number"
           },
-          "optional": false
+          "optional": true
         }
       }
     }
@@ -401,28 +401,28 @@
           "value": {
             "type": "number"
           },
-          "optional": false
+          "optional": true
         },
         "y": {
           "type": "objectAttribute",
           "value": {
             "type": "number"
           },
-          "optional": false
+          "optional": true
         },
         "height": {
           "type": "objectAttribute",
           "value": {
             "type": "number"
           },
-          "optional": false
+          "optional": true
         },
         "width": {
           "type": "objectAttribute",
           "value": {
             "type": "number"
           },
-          "optional": false
+          "optional": true
         }
       }
     }
@@ -467,7 +467,7 @@
         "value": {
           "type": "string"
         },
-        "optional": false
+        "optional": true
       },
       "heroSubtitle": {
         "type": "objectAttribute",
@@ -723,7 +723,7 @@
           },
           "dereferencesTo": "yogaClass"
         },
-        "optional": false
+        "optional": true
       },
       "instructor": {
         "type": "objectAttribute",
@@ -753,7 +753,7 @@
           },
           "dereferencesTo": "yogaInstructor"
         },
-        "optional": false
+        "optional": true
       },
       "dayOfWeek": {
         "type": "objectAttribute",
@@ -790,21 +790,21 @@
             }
           ]
         },
-        "optional": false
+        "optional": true
       },
       "startTime": {
         "type": "objectAttribute",
         "value": {
           "type": "string"
         },
-        "optional": false
+        "optional": true
       },
       "endTime": {
         "type": "objectAttribute",
         "value": {
           "type": "string"
         },
-        "optional": false
+        "optional": true
       },
       "recurrence": {
         "type": "objectAttribute",
@@ -825,7 +825,7 @@
             }
           ]
         },
-        "optional": false
+        "optional": true
       },
       "location": {
         "type": "objectAttribute",
@@ -897,7 +897,7 @@
         "value": {
           "type": "string"
         },
-        "optional": false
+        "optional": true
       },
       "slug": {
         "type": "objectAttribute",
@@ -905,7 +905,7 @@
           "type": "inline",
           "name": "slug"
         },
-        "optional": false
+        "optional": true
       },
       "description": {
         "type": "objectAttribute",
@@ -1144,7 +1144,7 @@
           "value": {
             "type": "string"
           },
-          "optional": false
+          "optional": true
         },
         "source": {
           "type": "objectAttribute",
@@ -1196,7 +1196,7 @@
         "value": {
           "type": "string"
         },
-        "optional": false
+        "optional": true
       },
       "slug": {
         "type": "objectAttribute",
@@ -1204,7 +1204,7 @@
           "type": "inline",
           "name": "slug"
         },
-        "optional": false
+        "optional": true
       },
       "photo": {
         "type": "objectAttribute",
@@ -1352,7 +1352,7 @@
         "value": {
           "type": "string"
         },
-        "optional": false
+        "optional": true
       },
       "appointments": {
         "type": "objectAttribute",
@@ -1506,7 +1506,7 @@
         "value": {
           "type": "string"
         },
-        "optional": false
+        "optional": true
       },
       "email": {
         "type": "objectAttribute",
@@ -1602,14 +1602,14 @@
         "value": {
           "type": "string"
         },
-        "optional": false
+        "optional": true
       },
       "slotTime": {
         "type": "objectAttribute",
         "value": {
           "type": "string"
         },
-        "optional": false
+        "optional": true
       },
       "status": {
         "type": "objectAttribute",
@@ -1734,42 +1734,42 @@
           },
           "dereferencesTo": "service"
         },
-        "optional": false
+        "optional": true
       },
       "slotDate": {
         "type": "objectAttribute",
         "value": {
           "type": "string"
         },
-        "optional": false
+        "optional": true
       },
       "slotTime": {
         "type": "objectAttribute",
         "value": {
           "type": "string"
         },
-        "optional": false
+        "optional": true
       },
       "patientName": {
         "type": "objectAttribute",
         "value": {
           "type": "string"
         },
-        "optional": false
+        "optional": true
       },
       "patientEmail": {
         "type": "objectAttribute",
         "value": {
           "type": "string"
         },
-        "optional": false
+        "optional": true
       },
       "patientPhone": {
         "type": "objectAttribute",
         "value": {
           "type": "string"
         },
-        "optional": false
+        "optional": true
       },
       "reservationNumber": {
         "type": "objectAttribute",
@@ -2065,21 +2065,21 @@
         "value": {
           "type": "string"
         },
-        "optional": false
+        "optional": true
       },
       "startTime": {
         "type": "objectAttribute",
         "value": {
           "type": "string"
         },
-        "optional": false
+        "optional": true
       },
       "endTime": {
         "type": "objectAttribute",
         "value": {
           "type": "string"
         },
-        "optional": false
+        "optional": true
       },
       "services": {
         "type": "objectAttribute",
@@ -2181,7 +2181,7 @@
                 "value": {
                   "type": "string"
                 },
-                "optional": false
+                "optional": true
               },
               "isHoliday": {
                 "type": "objectAttribute",
@@ -2248,21 +2248,21 @@
         "value": {
           "type": "string"
         },
-        "optional": false
+        "optional": true
       },
       "startDate": {
         "type": "objectAttribute",
         "value": {
           "type": "string"
         },
-        "optional": false
+        "optional": true
       },
       "endDate": {
         "type": "objectAttribute",
         "value": {
           "type": "string"
         },
-        "optional": false
+        "optional": true
       },
       "defaultSlotDuration": {
         "type": "objectAttribute",
@@ -2295,7 +2295,7 @@
             }
           ]
         },
-        "optional": false
+        "optional": true
       },
       "bufferMinutes": {
         "type": "objectAttribute",
@@ -2346,7 +2346,7 @@
                     }
                   ]
                 },
-                "optional": false
+                "optional": true
               },
               "isDayOff": {
                 "type": "objectAttribute",
@@ -2453,7 +2453,7 @@
             }
           ]
         },
-        "optional": false
+        "optional": true
       },
       "bufferMinutes": {
         "type": "objectAttribute",
@@ -2467,7 +2467,7 @@
         "value": {
           "type": "number"
         },
-        "optional": false
+        "optional": true
       },
       "days": {
         "type": "objectAttribute",
@@ -2511,7 +2511,7 @@
                     }
                   ]
                 },
-                "optional": false
+                "optional": true
               },
               "isDayOff": {
                 "type": "objectAttribute",
@@ -2592,7 +2592,7 @@
         "value": {
           "type": "string"
         },
-        "optional": false
+        "optional": true
       },
       "body": {
         "type": "objectAttribute",
@@ -2850,6 +2850,21 @@
                     }
                   }
                 }
+              },
+              {
+                "type": "object",
+                "attributes": {
+                  "_key": {
+                    "type": "objectAttribute",
+                    "value": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "rest": {
+                  "type": "inline",
+                  "name": "table"
+                }
               }
             ]
           }
@@ -2905,7 +2920,7 @@
         "value": {
           "type": "string"
         },
-        "optional": false
+        "optional": true
       },
       "body": {
         "type": "objectAttribute",
@@ -3218,7 +3233,7 @@
         "value": {
           "type": "string"
         },
-        "optional": false
+        "optional": true
       },
       "body": {
         "type": "objectAttribute",
@@ -3531,7 +3546,7 @@
         "value": {
           "type": "string"
         },
-        "optional": false
+        "optional": true
       },
       "slug": {
         "type": "objectAttribute",
@@ -3539,7 +3554,7 @@
           "type": "inline",
           "name": "slug"
         },
-        "optional": false
+        "optional": true
       },
       "body": {
         "type": "objectAttribute",
@@ -3852,7 +3867,7 @@
         "value": {
           "type": "string"
         },
-        "optional": false
+        "optional": true
       },
       "body": {
         "type": "objectAttribute",
@@ -4165,7 +4180,7 @@
         "value": {
           "type": "string"
         },
-        "optional": false
+        "optional": true
       },
       "slug": {
         "type": "objectAttribute",
@@ -4173,7 +4188,7 @@
           "type": "inline",
           "name": "slug"
         },
-        "optional": false
+        "optional": true
       },
       "category": {
         "type": "objectAttribute",
@@ -4668,7 +4683,7 @@
         "value": {
           "type": "string"
         },
-        "optional": false
+        "optional": true
       },
       "slug": {
         "type": "objectAttribute",
@@ -4676,7 +4691,7 @@
           "type": "inline",
           "name": "slug"
         },
-        "optional": false
+        "optional": true
       },
       "order": {
         "type": "objectAttribute",
@@ -4727,7 +4742,7 @@
         "value": {
           "type": "string"
         },
-        "optional": false
+        "optional": true
       },
       "photo": {
         "type": "objectAttribute",
@@ -4803,7 +4818,7 @@
         "value": {
           "type": "string"
         },
-        "optional": false
+        "optional": true
       },
       "condition": {
         "type": "objectAttribute",
@@ -4861,7 +4876,7 @@
         "value": {
           "type": "string"
         },
-        "optional": false
+        "optional": true
       },
       "slug": {
         "type": "objectAttribute",
@@ -4869,7 +4884,7 @@
           "type": "inline",
           "name": "slug"
         },
-        "optional": false
+        "optional": true
       },
       "description": {
         "type": "objectAttribute",
@@ -5180,7 +5195,7 @@
         "value": {
           "type": "string"
         },
-        "optional": false
+        "optional": true
       },
       "description": {
         "type": "objectAttribute",
@@ -5377,7 +5392,7 @@
         "value": {
           "type": "string"
         },
-        "optional": false
+        "optional": true
       },
       "emoji": {
         "type": "objectAttribute",
@@ -5497,14 +5512,14 @@
             }
           }
         },
-        "optional": false
+        "optional": true
       },
       "clinicName": {
         "type": "objectAttribute",
         "value": {
           "type": "string"
         },
-        "optional": false
+        "optional": true
       },
       "phone": {
         "type": "objectAttribute",
@@ -5539,14 +5554,14 @@
                 "value": {
                   "type": "string"
                 },
-                "optional": false
+                "optional": true
               },
               "href": {
                 "type": "objectAttribute",
                 "value": {
                   "type": "string"
                 },
-                "optional": false
+                "optional": true
               }
             },
             "rest": {
@@ -5857,7 +5872,7 @@
         "value": {
           "type": "string"
         },
-        "optional": false
+        "optional": true
       },
       "heroDescription": {
         "type": "objectAttribute",
@@ -6513,7 +6528,7 @@
                       "value": {
                         "type": "string"
                       },
-                      "optional": false
+                      "optional": true
                     },
                     "subtitle": {
                       "type": "objectAttribute",
@@ -6562,7 +6577,7 @@
                       "value": {
                         "type": "number"
                       },
-                      "optional": false
+                      "optional": true
                     }
                   },
                   "rest": {
@@ -6601,7 +6616,7 @@
                       "value": {
                         "type": "string"
                       },
-                      "optional": false
+                      "optional": true
                     },
                     "subtitle": {
                       "type": "objectAttribute",
@@ -6650,7 +6665,7 @@
                       "value": {
                         "type": "number"
                       },
-                      "optional": false
+                      "optional": true
                     }
                   },
                   "rest": {
@@ -6726,14 +6741,14 @@
                       "value": {
                         "type": "string"
                       },
-                      "optional": false
+                      "optional": true
                     },
                     "price": {
                       "type": "objectAttribute",
                       "value": {
                         "type": "number"
                       },
-                      "optional": false
+                      "optional": true
                     },
                     "highlighted": {
                       "type": "objectAttribute",
@@ -6754,7 +6769,7 @@
                               "value": {
                                 "type": "string"
                               },
-                              "optional": false
+                              "optional": true
                             },
                             "subtext": {
                               "type": "objectAttribute",
@@ -6830,14 +6845,14 @@
                       "value": {
                         "type": "string"
                       },
-                      "optional": false
+                      "optional": true
                     },
                     "price": {
                       "type": "objectAttribute",
                       "value": {
                         "type": "number"
                       },
-                      "optional": false
+                      "optional": true
                     }
                   },
                   "rest": {
@@ -6876,7 +6891,7 @@
                       "value": {
                         "type": "string"
                       },
-                      "optional": false
+                      "optional": true
                     },
                     "suffix": {
                       "type": "objectAttribute",
@@ -6890,7 +6905,7 @@
                       "value": {
                         "type": "number"
                       },
-                      "optional": false
+                      "optional": true
                     }
                   },
                   "rest": {
@@ -6936,7 +6951,7 @@
                       "value": {
                         "type": "string"
                       },
-                      "optional": false
+                      "optional": true
                     },
                     "description": {
                       "type": "objectAttribute",
@@ -6950,7 +6965,7 @@
                       "value": {
                         "type": "number"
                       },
-                      "optional": false
+                      "optional": true
                     }
                   },
                   "rest": {
@@ -6989,14 +7004,14 @@
                       "value": {
                         "type": "string"
                       },
-                      "optional": false
+                      "optional": true
                     },
                     "price": {
                       "type": "objectAttribute",
                       "value": {
                         "type": "number"
                       },
-                      "optional": false
+                      "optional": true
                     }
                   },
                   "rest": {
@@ -7067,7 +7082,7 @@
         "value": {
           "type": "string"
         },
-        "optional": false
+        "optional": true
       },
       "heroSubtitle": {
         "type": "objectAttribute",
@@ -7095,7 +7110,7 @@
                 "value": {
                   "type": "string"
                 },
-                "optional": false
+                "optional": true
               }
             },
             "rest": {
@@ -7194,7 +7209,7 @@
                 "value": {
                   "type": "string"
                 },
-                "optional": false
+                "optional": true
               },
               "subtitle": {
                 "type": "objectAttribute",
@@ -7481,6 +7496,70 @@
     }
   },
   {
+    "name": "table",
+    "type": "type",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "table"
+          }
+        },
+        "rows": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "array",
+            "of": {
+              "type": "object",
+              "attributes": {
+                "_key": {
+                  "type": "objectAttribute",
+                  "value": {
+                    "type": "string"
+                  }
+                }
+              },
+              "rest": {
+                "type": "inline",
+                "name": "tableRow"
+              }
+            }
+          },
+          "optional": true
+        }
+      }
+    }
+  },
+  {
+    "name": "tableRow",
+    "type": "type",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "tableRow"
+          }
+        },
+        "cells": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "array",
+            "of": {
+              "type": "string"
+            }
+          },
+          "optional": true
+        }
+      }
+    }
+  },
+  {
     "name": "sanity.imagePaletteSwatch",
     "type": "type",
     "value": {
@@ -7614,21 +7693,21 @@
           "value": {
             "type": "number"
           },
-          "optional": false
+          "optional": true
         },
         "width": {
           "type": "objectAttribute",
           "value": {
             "type": "number"
           },
-          "optional": false
+          "optional": true
         },
         "aspectRatio": {
           "type": "objectAttribute",
           "value": {
             "type": "number"
           },
-          "optional": false
+          "optional": true
         }
       }
     }

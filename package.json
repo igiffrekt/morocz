@@ -19,6 +19,7 @@
     "@neondatabase/serverless": "^1.0.2",
     "@portabletext/react": "^6.0.2",
     "@sanity/image-url": "^2.0.3",
+    "@sanity/table": "^2.0.1",
     "@sanity/vision": "^4.22.0",
     "@stripe/stripe-js": "^9.2.0",
     "bcryptjs": "^3.0.3",

@@ -37,8 +37,18 @@ type BlogPostBodyImage = {
   caption?: string;
 };
 
+type PortableTextTable = {
+  _type: "table";
+  _key: string;
+  rows?: Array<{
+    _type: "tableRow";
+    _key: string;
+    cells?: Array<string>;
+  }>;
+};
+
 interface PortableTextRendererProps {
-  body: Array<PortableTextBlock | BlogPostBodyImage>;
+  body: Array<PortableTextBlock | BlogPostBodyImage | PortableTextTable>;
 }
 
 const components: Partial<PortableTextReactComponents> = {
@@ -99,6 +109,27 @@ const components: Partial<PortableTextReactComponents> = {
             </figcaption>
           )}
         </figure>
+      );
+    },
+    table: ({ value }: { value: PortableTextTable }) => {
+      const rows = value?.rows ?? [];
+      if (rows.length === 0) return null;
+      return (
+        <div className="my-6 overflow-x-auto">
+          <table className="w-full border-collapse text-sm text-gray-700">
+            <tbody>
+              {rows.map((row) => (
+                <tr key={row._key}>
+                  {(row.cells ?? []).map((cell, i) => (
+                    <td key={i} className="border border-gray-300 px-3 py-2 align-top">
+                      {cell}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       );
     },
   },

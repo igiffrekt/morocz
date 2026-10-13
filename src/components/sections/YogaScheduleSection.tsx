@@ -264,7 +264,19 @@ export function YogaScheduleSection({
 
         {/* Legend / Filter */}
         <FadeIn direction="up" delay={0.1}>
-          <div className="flex flex-wrap justify-center gap-3 mb-8">
+          <div className="flex flex-wrap items-center justify-start gap-3 mb-8">
+            <svg
+              className="w-5 h-5 text-primary/50 shrink-0"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z" />
+            </svg>
             {Array.from(classColors.entries()).map(([name, color]) => {
               const isActive = activeFilter === null || activeFilter === name;
               return (

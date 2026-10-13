@@ -4,7 +4,6 @@ import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import type { ScheduleForAvailability } from "@/lib/slots";
 import { BookingSuccess } from "./BookingSuccess";
-import { Step1Service } from "./Step1Service";
 import { Step2DateTime } from "./Step2DateTime";
 import { Step3Auth } from "./Step3Auth";
 import { Step4Confirm } from "./Step4Confirm";
@@ -45,8 +44,8 @@ interface BookingWizardProps {
   scheduleData: ScheduleData;
 }
 
-const STEP_LABELS = ["Szolgáltatás", "Időpont", "Bejelentkezés", "Megerősítés"];
-const STORAGE_KEY = "morocz-booking-wizard";
+const STEP_LABELS = ["Időpont", "Bejelentkezés", "Megerősítés"];
+const STORAGE_KEY = "morocz-booking-wizard-v2";
 
 const slideVariants = {
   enter: (dir: number) => ({ x: dir > 0 ? 300 : -300, opacity: 0 }),
@@ -66,13 +65,19 @@ function formatDateHungarian(dateStr: string): string {
 }
 
 export function BookingWizard({ services, scheduleData }: BookingWizardProps) {
+  // Service selection step was removed: always book the first (default) service.
+  const defaultService = services[0];
+  const defaultSelections = {
+    serviceId: defaultService?._id ?? null,
+    serviceName: defaultService?.name ?? null,
+    serviceDuration: defaultService?.appointmentDuration ?? 20,
+  };
+
   const [currentStep, setCurrentStep] = useState(1);
   const direction = useRef<number>(0);
 
   const [selections, setSelections] = useState<BookingSelections>({
-    serviceId: null,
-    serviceName: null,
-    serviceDuration: null,
+    ...defaultSelections,
     selectedDate: null,
     selectedTime: null,
     slotLockId: null,
@@ -102,9 +107,9 @@ export function BookingWizard({ services, scheduleData }: BookingWizardProps) {
         };
         if (parsed.timestamp && Date.now() - parsed.timestamp < 30 * 60 * 1000) {
           if (parsed.selections) {
-            setSelections(parsed.selections);
+            setSelections({ ...parsed.selections, ...defaultSelections });
           }
-          if (parsed.currentStep && parsed.currentStep >= 3) {
+          if (parsed.currentStep && parsed.currentStep >= 2) {
             setCurrentStep(parsed.currentStep);
           }
         } else {
@@ -159,15 +164,6 @@ export function BookingWizard({ services, scheduleData }: BookingWizardProps) {
     setCurrentStep(next);
   }
 
-  function handleServiceSelect(id: string, name: string, duration: number) {
-    setSelections((prev) => ({
-      ...prev,
-      serviceId: id,
-      serviceName: name,
-      serviceDuration: duration,
-    }));
-  }
-
   function handleDateSelect(date: string) {
     setSelections((prev) => ({
       ...prev,
@@ -199,7 +195,7 @@ export function BookingWizard({ services, scheduleData }: BookingWizardProps) {
   ) {
     sessionStorage.removeItem(STORAGE_KEY);
     setBookingResult({ bookingId, reservationNumber, patientName, patientEmail });
-    setCurrentStep(5); // Show success
+    setCurrentStep(4); // Show success
   }
 
   function handleConflict(alternatives: string[]) {
@@ -219,9 +215,7 @@ export function BookingWizard({ services, scheduleData }: BookingWizardProps) {
   function resetWizard() {
     sessionStorage.removeItem(STORAGE_KEY);
     setSelections({
-      serviceId: null,
-      serviceName: null,
-      serviceDuration: null,
+      ...defaultSelections,
       selectedDate: null,
       selectedTime: null,
       slotLockId: null,
@@ -238,17 +232,16 @@ export function BookingWizard({ services, scheduleData }: BookingWizardProps) {
   // Step key strings to avoid AnimatePresence key=0 bug (RESEARCH.md pitfall 6)
   function getStepKey(step: number): string {
     const keys: Record<number, string> = {
-      1: "service",
-      2: "datetime",
-      3: "auth",
-      4: "confirm",
-      5: "success",
+      1: "datetime",
+      2: "auth",
+      3: "confirm",
+      4: "success",
     };
     return keys[step] ?? `step-${step}`;
   }
 
   // ── Success state ─────────────────────────────────────────────────────────
-  if (currentStep === 5 && bookingResult) {
+  if (currentStep === 4 && bookingResult) {
     return (
       <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 md:p-8">
         <BookingSuccess
@@ -300,7 +293,7 @@ export function BookingWizard({ services, scheduleData }: BookingWizardProps) {
             onClick={() => {
               setHoldExpired(false);
               setSelections((prev) => ({ ...prev, selectedTime: null, slotLockId: null, heldUntil: null }));
-              goToStep(2);
+              goToStep(1);
             }}
             className="w-full px-4 py-2.5 text-sm font-semibold bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors"
           >
@@ -365,15 +358,6 @@ export function BookingWizard({ services, scheduleData }: BookingWizardProps) {
     switch (step) {
       case 1:
         return (
-          <Step1Service
-            services={services}
-            selectedServiceId={selections.serviceId}
-            onSelect={handleServiceSelect}
-            onNext={() => goToStep(2)}
-          />
-        );
-      case 2:
-        return (
           <Step2DateTime
             selectedDate={selections.selectedDate}
             selectedTime={selections.selectedTime}
@@ -383,11 +367,10 @@ export function BookingWizard({ services, scheduleData }: BookingWizardProps) {
             onSelectDate={handleDateSelect}
             onSelectTime={handleTimeSelect}
             onSlotHold={handleSlotHold}
-            onNext={() => goToStep(3)}
-            onBack={() => goToStep(1)}
+            onNext={() => goToStep(2)}
           />
         );
-      case 3:
+      case 2:
         return (
           <Step3Auth
             onSuccess={async () => {
@@ -401,12 +384,12 @@ export function BookingWizard({ services, scheduleData }: BookingWizardProps) {
               } catch {
                 // network error — let them through, checkout will catch address issues
               }
-              goToStep(4);
+              goToStep(3);
             }}
-            onBack={() => goToStep(2)}
+            onBack={() => goToStep(1)}
           />
         );
-      case 4:
+      case 3:
         return (
           <Step4Confirm
             selections={{
@@ -416,7 +399,7 @@ export function BookingWizard({ services, scheduleData }: BookingWizardProps) {
               selectedDate: selections.selectedDate ?? "",
               selectedTime: selections.selectedTime ?? "",
             }}
-            onBack={() => goToStep(3)}
+            onBack={() => goToStep(2)}
             onSuccess={handleBookingSuccess}
             onConflict={handleConflict}
           />

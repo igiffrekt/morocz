@@ -20,7 +20,7 @@ interface Step2DateTimeProps {
   onSelectTime: (time: string) => void;
   onSlotHold: (slotDate: string, slotTime: string, slotLockId: string, heldUntil: string) => void;
   onNext: () => void;
-  onBack: () => void;
+  onBack?: () => void;
 }
 
 // Hungarian weekday abbreviations, Monday-first
@@ -492,13 +492,17 @@ export function Step2DateTime({
 
       {/* Navigation buttons */}
       <div className="flex items-center justify-between pt-2">
-        <button
-          type="button"
-          onClick={onBack}
-          className="px-6 py-3 text-sm font-medium text-gray-600 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
-        >
-          Vissza
-        </button>
+        {onBack ? (
+          <button
+            type="button"
+            onClick={onBack}
+            className="px-6 py-3 text-sm font-medium text-gray-600 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
+          >
+            Vissza
+          </button>
+        ) : (
+          <span />
+        )}
 
         <button
           type="button"

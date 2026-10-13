@@ -129,7 +129,9 @@ export function Header({ clinicName, navigationLinks, phone, address }: HeaderPr
               key={link._key}
               href={link.href ?? "#"}
               className={[
-                "transition-colors",
+                "relative py-1 transition-colors",
+                "after:absolute after:left-0 after:-bottom-1 after:h-[3px] after:w-full after:rounded-full after:bg-[#76c8b6]",
+                "after:origin-left after:scale-x-0 after:transition-transform after:duration-300 after:ease-out hover:after:scale-x-100",
                 i === 0 ? "text-primary" : "hover:text-primary",
               ].join(" ")}
             >
@@ -231,7 +233,9 @@ export function Header({ clinicName, navigationLinks, phone, address }: HeaderPr
               key={link._key}
               href={link.href ?? "#"}
               className={[
-                "transition-colors",
+                "relative py-1 transition-colors",
+                "after:absolute after:left-0 after:-bottom-1 after:h-[3px] after:w-full after:rounded-full after:bg-[#76c8b6]",
+                "after:origin-left after:scale-x-0 after:transition-transform after:duration-300 after:ease-out hover:after:scale-x-100",
                 i === 0 ? "text-primary" : "hover:text-primary",
               ].join(" ")}
             >

@@ -4,6 +4,8 @@ import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import type { ScheduleForAvailability } from "@/lib/slots";
 import { BookingSuccess } from "./BookingSuccess";
+import { PrenatalNoticeModal } from "./PrenatalNoticeModal";
+import { ServiceSelector } from "./ServiceSelector";
 import { Step2DateTime } from "./Step2DateTime";
 import { Step3Auth } from "./Step3Auth";
 import { Step4Confirm } from "./Step4Confirm";
@@ -65,24 +67,21 @@ function formatDateHungarian(dateStr: string): string {
 }
 
 export function BookingWizard({ services, scheduleData }: BookingWizardProps) {
-  // Service selection step was removed: always book the first (default) service.
-  const defaultService = services[0];
-  const defaultSelections = {
-    serviceId: defaultService?._id ?? null,
-    serviceName: defaultService?.name ?? null,
-    serviceDuration: defaultService?.appointmentDuration ?? 20,
-  };
-
   const [currentStep, setCurrentStep] = useState(1);
   const direction = useRef<number>(0);
 
   const [selections, setSelections] = useState<BookingSelections>({
-    ...defaultSelections,
+    serviceId: null,
+    serviceName: null,
+    serviceDuration: null,
     selectedDate: null,
     selectedTime: null,
     slotLockId: null,
     heldUntil: null,
   });
+
+  // Prenatal care requires acknowledging a notice before it is selected
+  const [pendingService, setPendingService] = useState<ServiceItem | null>(null);
 
   const [bookingResult, setBookingResult] = useState<BookingResult | null>(null);
 
@@ -92,8 +91,6 @@ export function BookingWizard({ services, scheduleData }: BookingWizardProps) {
 
   // Hold expiration check
   const [holdExpired, setHoldExpired] = useState(false);
-
-
 
   // ── Restore wizard state from sessionStorage on mount ──────────────────────
   useEffect(() => {
@@ -107,7 +104,7 @@ export function BookingWizard({ services, scheduleData }: BookingWizardProps) {
         };
         if (parsed.timestamp && Date.now() - parsed.timestamp < 30 * 60 * 1000) {
           if (parsed.selections) {
-            setSelections({ ...parsed.selections, ...defaultSelections });
+            setSelections(parsed.selections);
           }
           if (parsed.currentStep && parsed.currentStep >= 2) {
             setCurrentStep(parsed.currentStep);
@@ -157,11 +154,37 @@ export function BookingWizard({ services, scheduleData }: BookingWizardProps) {
     );
   }, [currentStep, selections, bookingResult]);
 
-
-
   function goToStep(next: number) {
     direction.current = next > currentStep ? 1 : -1;
     setCurrentStep(next);
+  }
+
+  function applyService(service: ServiceItem) {
+    setSelections((prev) => ({
+      ...prev,
+      serviceId: service._id,
+      serviceName: service.name ?? "",
+      serviceDuration: service.appointmentDuration ?? 20,
+      // slots and holds belong to the previous service
+      selectedDate: null,
+      selectedTime: null,
+      slotLockId: null,
+      heldUntil: null,
+    }));
+  }
+
+  function handleServiceSelect(service: ServiceItem) {
+    if (service._id === selections.serviceId) return;
+    if (service.name === "Várandósgondozás") {
+      setPendingService(service);
+      return;
+    }
+    applyService(service);
+  }
+
+  function handleNoticeAcknowledge() {
+    if (pendingService) applyService(pendingService);
+    setPendingService(null);
   }
 
   function handleDateSelect(date: string) {
@@ -176,7 +199,12 @@ export function BookingWizard({ services, scheduleData }: BookingWizardProps) {
     setSelections((prev) => ({ ...prev, selectedTime: time }));
   }
 
-  function handleSlotHold(slotDate: string, slotTime: string, slotLockId: string, heldUntil: string) {
+  function handleSlotHold(
+    slotDate: string,
+    slotTime: string,
+    slotLockId: string,
+    heldUntil: string,
+  ) {
     // Store the hold info (API will check expiration on booking)
     setSelections((prev) => ({
       ...prev,
@@ -215,7 +243,9 @@ export function BookingWizard({ services, scheduleData }: BookingWizardProps) {
   function resetWizard() {
     sessionStorage.removeItem(STORAGE_KEY);
     setSelections({
-      ...defaultSelections,
+      serviceId: null,
+      serviceName: null,
+      serviceDuration: null,
       selectedDate: null,
       selectedTime: null,
       slotLockId: null,
@@ -261,6 +291,7 @@ export function BookingWizard({ services, scheduleData }: BookingWizardProps) {
 
   return (
     <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 md:p-8">
+      {pendingService && <PrenatalNoticeModal onAcknowledge={handleNoticeAcknowledge} />}
       <StepIndicator currentStep={currentStep} steps={STEP_LABELS} />
 
       {/* Show ONLY expiration banner when hold expires — hide everything else */}
@@ -282,9 +313,12 @@ export function BookingWizard({ services, scheduleData }: BookingWizardProps) {
               />
             </svg>
             <div className="flex-1">
-              <h3 className="text-base font-semibold text-amber-900">Az időpont foglalása lejárt</h3>
+              <h3 className="text-base font-semibold text-amber-900">
+                Az időpont foglalása lejárt
+              </h3>
               <p className="text-sm text-amber-700 mt-1">
-                Az Ön által kiválasztott időpont foglalásának ideje (5 perc) lejárt. Kérjük, válasszon új időpontot.
+                Az Ön által kiválasztott időpont foglalásának ideje (5 perc) lejárt. Kérjük,
+                válasszon új időpontot.
               </p>
             </div>
           </div>
@@ -292,7 +326,12 @@ export function BookingWizard({ services, scheduleData }: BookingWizardProps) {
             type="button"
             onClick={() => {
               setHoldExpired(false);
-              setSelections((prev) => ({ ...prev, selectedTime: null, slotLockId: null, heldUntil: null }));
+              setSelections((prev) => ({
+                ...prev,
+                selectedTime: null,
+                slotLockId: null,
+                heldUntil: null,
+              }));
               goToStep(1);
             }}
             className="w-full px-4 py-2.5 text-sm font-semibold bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors"
@@ -303,52 +342,50 @@ export function BookingWizard({ services, scheduleData }: BookingWizardProps) {
       ) : (
         <>
           {/* Conflict panel */}
-      {conflictMessage && alternativeSlots && (
-        <div className="mb-4 px-4 py-4 bg-red-50 border border-red-200 rounded-xl">
-          <p className="text-sm text-red-700 font-medium mb-3">{conflictMessage}</p>
-          <p className="text-xs text-gray-600 mb-2">Elérhető alternatív időpontok:</p>
-          <div className="flex flex-wrap gap-2">
-            {alternativeSlots.map((time) => (
+          {conflictMessage && alternativeSlots && (
+            <div className="mb-4 px-4 py-4 bg-red-50 border border-red-200 rounded-xl">
+              <p className="text-sm text-red-700 font-medium mb-3">{conflictMessage}</p>
+              <p className="text-xs text-gray-600 mb-2">Elérhető alternatív időpontok:</p>
+              <div className="flex flex-wrap gap-2">
+                {alternativeSlots.map((time) => (
+                  <button
+                    key={time}
+                    type="button"
+                    onClick={() => handleAlternativeSelect(time)}
+                    className="px-4 py-2 text-sm font-semibold bg-white border border-red-300 text-red-700 rounded-lg hover:bg-red-700 hover:text-white transition-colors"
+                  >
+                    {time}
+                  </button>
+                ))}
+              </div>
               <button
-                key={time}
                 type="button"
-                onClick={() => handleAlternativeSelect(time)}
-                className="px-4 py-2 text-sm font-semibold bg-white border border-red-300 text-red-700 rounded-lg hover:bg-red-700 hover:text-white transition-colors"
+                onClick={() => {
+                  setAlternativeSlots(null);
+                  setConflictMessage(null);
+                }}
+                className="mt-3 text-xs text-gray-500 underline hover:no-underline"
               >
-                {time}
+                Bezárás
               </button>
-            ))}
+            </div>
+          )}
+
+          <div className="overflow-hidden">
+            <AnimatePresence mode="wait" custom={direction.current}>
+              <motion.div
+                key={getStepKey(currentStep)}
+                custom={direction.current}
+                variants={slideVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.25, ease: "easeInOut" }}
+              >
+                {renderStep(currentStep)}
+              </motion.div>
+            </AnimatePresence>
           </div>
-          <button
-            type="button"
-            onClick={() => {
-              setAlternativeSlots(null);
-              setConflictMessage(null);
-            }}
-            className="mt-3 text-xs text-gray-500 underline hover:no-underline"
-          >
-            Bezárás
-          </button>
-        </div>
-      )}
-
-
-
-      <div className="overflow-hidden">
-        <AnimatePresence mode="wait" custom={direction.current}>
-          <motion.div
-            key={getStepKey(currentStep)}
-            custom={direction.current}
-            variants={slideVariants}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            transition={{ duration: 0.25, ease: "easeInOut" }}
-          >
-            {renderStep(currentStep)}
-          </motion.div>
-        </AnimatePresence>
-      </div>
         </>
       )}
     </div>
@@ -358,17 +395,27 @@ export function BookingWizard({ services, scheduleData }: BookingWizardProps) {
     switch (step) {
       case 1:
         return (
-          <Step2DateTime
-            selectedDate={selections.selectedDate}
-            selectedTime={selections.selectedTime}
-            serviceId={selections.serviceId ?? ""}
-            serviceDuration={selections.serviceDuration ?? 20}
-            scheduleData={scheduleData}
-            onSelectDate={handleDateSelect}
-            onSelectTime={handleTimeSelect}
-            onSlotHold={handleSlotHold}
-            onNext={() => goToStep(2)}
-          />
+          <>
+            <ServiceSelector
+              services={services}
+              selectedServiceId={selections.serviceId}
+              onSelect={handleServiceSelect}
+            />
+            {selections.serviceId && (
+              <Step2DateTime
+                key={selections.serviceId}
+                selectedDate={selections.selectedDate}
+                selectedTime={selections.selectedTime}
+                serviceId={selections.serviceId ?? ""}
+                serviceDuration={selections.serviceDuration ?? 20}
+                scheduleData={scheduleData}
+                onSelectDate={handleDateSelect}
+                onSelectTime={handleTimeSelect}
+                onSlotHold={handleSlotHold}
+                onNext={() => goToStep(2)}
+              />
+            )}
+          </>
         );
       case 2:
         return (

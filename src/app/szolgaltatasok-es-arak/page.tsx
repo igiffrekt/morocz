@@ -57,9 +57,9 @@ const importantInfo = [
 ];
 
 const officeHours = [
-  { day: "Hétfő", hours: "12:00-15:00" },
-  { day: "Kedd", hours: "12:00-15:00" },
-  { day: "Csütörtök", hours: "13:00-17:00" },
+  { day: "Kedd", hours: "12:00-16:00" },
+  { day: "Szerda", hours: "11:00-15:00" },
+  { day: "Csütörtök", hours: "12:00-16:00" },
 ];
 
 // Fallback data used until the pricingPage singleton is published in Studio.
@@ -190,7 +190,7 @@ const DEFAULT_DATA: NonNullable<PricingPageQueryResult> = {
           },
           {
             _key: "f8",
-            text: "HPV28 tipizálás",
+            text: "HPV 14 tipizálás",
             subtext: null,
             included: true,
             emphasized: false,
@@ -223,7 +223,7 @@ const DEFAULT_DATA: NonNullable<PricingPageQueryResult> = {
     items: [
       {
         _key: "h1",
-        name: "HPV DNS alapú, 28 genotípus meghatározás (HPV28)",
+        name: "HPV DNS alapú, 14 genotípus meghatározás (HPV14)",
         description: "HPV jelenlétét vizsgálja",
         price: 18000,
       },

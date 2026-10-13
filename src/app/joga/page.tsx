@@ -15,10 +15,10 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 
   return {
-    title: page?.heroHeadline || "Jóga",
+    title: page?.heroHeadline || "Lélekző",
     description: page?.metaDescription || "Fedezd fel jógaóráinkat és csatlakozz heti foglalkozásainkhoz.",
     openGraph: {
-      title: page?.heroHeadline || "Jóga",
+      title: page?.heroHeadline || "Lélekző",
       description: page?.metaDescription || "Fedezd fel jógaóráinkat.",
     },
   };

@@ -275,7 +275,7 @@ export const pricingPageType = defineType({
                 subtext: "(vizsgálat+mintavétel+ultrahang)",
                 included: true,
               },
-              { text: "HPV28 tipizálás", included: true },
+              { text: "HPV 14 tipizálás", included: true },
             ],
           },
         ],
@@ -446,7 +446,7 @@ export const pricingPageType = defineType({
       initialValue: {
         items: [
           {
-            name: "HPV DNS alapú, 28 genotípus meghatározás (HPV28)",
+            name: "HPV DNS alapú, 14 genotípus meghatározás (HPV14)",
             description: "HPV jelenlétét vizsgálja",
             price: 18000,
           },

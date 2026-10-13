@@ -208,12 +208,12 @@ export function YogaScheduleSection({
           <div className="mb-12">
             <span className="inline-flex items-center gap-3 text-xs font-semibold tracking-[0.2em] uppercase text-primary/40 mb-4">
               <span className="w-8 h-px bg-primary/20" />
-              Jóga
+              Lélekző
             </span>
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
                 <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight text-primary">
-                  Órarend
+                  Jóga órarend
                 </h2>
                 <p className="mt-3 text-lg text-primary/60">
                   Jógaközpontunk eseményei

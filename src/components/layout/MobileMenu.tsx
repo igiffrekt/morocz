@@ -1,5 +1,7 @@
 "use client";
 
+import { NavLinkContent } from "./NavLinkContent";
+
 interface MobileMenuProps {
   isOpen: boolean;
   navigationLinks?: Array<{ _key: string; label?: string; href?: string }>;
@@ -34,7 +36,7 @@ export function MobileMenu({
             onClick={onClose}
             className="py-4 px-4 text-text-light font-semibold text-lg border-b border-gray-100 min-h-[52px] flex items-center hover:text-primary transition-colors"
           >
-            {link.label}
+            <NavLinkContent label={link.label} href={link.href} />
           </a>
         ))}
 

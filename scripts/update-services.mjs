@@ -51,12 +51,12 @@ const servicesByCategory = {
     { name: "GBS szűrés", price: 7500, order: 3 },
   ],
   "HPV vizsgálatok": [
-    { name: "HPV DNS alapú, 28 genotípus meghatározás (HPV28)", price: 18000, description: "HPV jelenlétét vizsgálja", order: 1 },
+    { name: "HPV DNS alapú, 14 genotípus meghatározás (HPV14)", price: 18000, description: "HPV jelenlétét vizsgálja", order: 1 },
     { name: "Aptima mRNS alapú HPV vizsgálat", price: 16000, description: "Magas kockázatú típusok aktivitásának kimutatására szolgál", order: 2 },
   ],
   "Éves Szűrőcsomagok": [
     { name: "🌿 Komplex Szűrővizsgálat", price: 52000, description: "Nőgyógyászati vizsgálat + ultrahang vizsgálat, Folyadékalapú méhnyakszűrés (LBC). Évente egy alkalommal igénybe vehető.", order: 1 },
-    { name: "🌸 Kiterjesztett Komplex Szűrés", price: 68000, description: "Nőgyógyászati vizsgálat + ultrahang, Folyadékalapú méhnyakszűrés, HPV DNS tipizálás (HPV28, 28 genotípus). Évente egy alkalommal igénybe vehető.", order: 2 },
+    { name: "🌸 Kiterjesztett Komplex Szűrés", price: 68000, description: "Nőgyógyászati vizsgálat + ultrahang, Folyadékalapú méhnyakszűrés, HPV DNS tipizálás (HPV14, 14 genotípus). Évente egy alkalommal igénybe vehető.", order: 2 },
     { name: "💎 Prémium Szűrőcsomag", price: 71900, description: "Nőgyógyászati vizsgálat, Nőgyógyászati Ultrahang, Folyadékalapú méhnyakszűrés, Aptima mRNS alapú HPV vizsgálat, Hüvelyváladék tenyésztés (baktérium + gomba). Évente egy alkalommal igénybe vehető.", order: 3 },
   ],
 };

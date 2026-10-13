@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { PhoneCallDialog } from "@/components/ui/PhoneCallDialog";
 import { MobileMenu } from "./MobileMenu";
+import { NavLinkContent } from "./NavLinkContent";
 
 interface HeaderProps {
   clinicName?: string;
@@ -132,7 +133,7 @@ export function Header({ clinicName, navigationLinks, phone, address }: HeaderPr
                 i === 0 ? "text-primary" : "hover:text-primary",
               ].join(" ")}
             >
-              {link.label}
+              <NavLinkContent label={link.label} href={link.href} />
             </a>
           ))}
         </nav>
@@ -234,7 +235,7 @@ export function Header({ clinicName, navigationLinks, phone, address }: HeaderPr
                 i === 0 ? "text-primary" : "hover:text-primary",
               ].join(" ")}
             >
-              {link.label}
+              <NavLinkContent label={link.label} href={link.href} />
             </a>
           ))}
         </nav>

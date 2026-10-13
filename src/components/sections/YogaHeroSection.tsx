@@ -76,7 +76,7 @@ export function YogaHeroSection({
               id="yoga-hero-cim-mobile"
               className="text-3xl font-extrabold leading-tight text-white mb-2"
             >
-              {headline || "Fedezd fel a jóga nyugalmát"}
+              {headline || "Lélekző"}
             </h1>
           </FadeIn>
 
@@ -114,7 +114,7 @@ export function YogaHeroSection({
                 id="yoga-hero-cim"
                 className="text-5xl lg:text-6xl font-extrabold leading-tight mb-6"
               >
-                {headline || "Fedezd fel a jóga nyugalmát"}
+                {headline || "Lélekző"}
               </h1>
             </FadeIn>
 

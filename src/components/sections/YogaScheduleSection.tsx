@@ -1,6 +1,7 @@
 "use client";
 
 import { FadeIn } from "@/components/motion/FadeIn";
+import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "motion/react";
 import { useState, useEffect } from "react";
@@ -39,6 +40,9 @@ interface YogaScheduleSectionProps {
   showCta?: boolean;
   /** When true, opens modal in place without navigating to /joga */
   inlineModal?: boolean;
+  /** /joga page header: page title plus a banner image on the right */
+  pageTitle?: string;
+  bannerImage?: any;
 }
 
 const DAYS = [
@@ -125,6 +129,8 @@ export function YogaScheduleSection({
   schedule,
   showCta = false,
   inlineModal = false,
+  pageTitle,
+  bannerImage,
 }: YogaScheduleSectionProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -208,17 +214,29 @@ export function YogaScheduleSection({
           <div className="mb-12">
             <span className="inline-flex items-center gap-3 text-xs font-semibold tracking-[0.2em] uppercase text-primary/40 mb-4">
               <span className="w-8 h-px bg-primary/20" />
-              Lélekző
+              {pageTitle ? "Jóga órarend" : "Lélekző"}
             </span>
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
                 <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight text-primary">
-                  Jóga órarend
+                  {pageTitle ?? "Jóga órarend"}
                 </h2>
                 <p className="mt-3 text-lg text-primary/60">
                   Jógaközpontunk eseményei
                 </p>
               </div>
+              {bannerImage && (
+                <div className="relative w-full md:w-[46%] max-w-[610px] aspect-[3.5/1] shrink-0 overflow-hidden rounded-[2rem] md:rounded-[2.5rem]">
+                  <Image
+                    src={urlFor(bannerImage).width(1220).height(350).fit("crop").url()}
+                    alt="Jóga"
+                    fill
+                    priority
+                    className="object-cover"
+                    sizes="(min-width: 768px) 610px, 100vw"
+                  />
+                </div>
+              )}
               {/* Desktop CTA - hidden on mobile, only shown when showCta is true */}
               {showCta && (
                 <Link href="/joga" className="hidden md:inline-flex group relative items-center self-center">
@@ -269,11 +287,11 @@ export function YogaScheduleSection({
         <FadeIn direction="up" delay={0.2}>
           <div className="hidden lg:block bg-white rounded-3xl border border-gray-100 overflow-hidden shadow-sm">
             <div className="grid border-b border-gray-300/75" style={{ gridTemplateColumns: "60px repeat(7, 1fr)" }}>
-              <div className="p-2 bg-gray-50"></div>
+              <div className="p-2 bg-[#76c8b6]"></div>
               {DAYS.map((day) => (
                 <div
                   key={day.key}
-                  className="p-4 bg-gray-50 font-semibold text-center text-primary"
+                  className="p-4 bg-[#76c8b6] font-semibold text-center text-primary"
                 >
                   {day.label}
                 </div>

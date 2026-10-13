@@ -2,7 +2,6 @@ import { Metadata } from "next";
 import { Suspense } from "react";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import { yogaPageQuery, yogaScheduleQuery, yogaInstructorsQuery } from "@/sanity/lib/queries";
-import { YogaHeroSection } from "@/components/sections/YogaHeroSection";
 import { YogaScheduleSection } from "@/components/sections/YogaScheduleSection";
 import { YogaInstructorsSection } from "@/components/sections/YogaInstructorsSection";
 
@@ -36,17 +35,13 @@ export default async function JogaPage() {
       {/* Spacing for header */}
       <div className="h-4 md:h-6" />
 
-      {/* Hero Section */}
-      <YogaHeroSection
-        headline={page?.heroHeadline}
-        subtitle={page?.heroSubtitle}
-        badges={page?.heroBadges}
-        heroImage={page?.heroImage}
-      />
-
       {/* Schedule Section */}
       <Suspense fallback={<div className="min-h-[400px]" />}>
-        <YogaScheduleSection schedule={schedule || []} />
+        <YogaScheduleSection
+          schedule={schedule || []}
+          pageTitle={page?.heroHeadline || "Lélekző"}
+          bannerImage={page?.heroImage}
+        />
       </Suspense>
 
       {/* Instructors Section */}

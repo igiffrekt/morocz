@@ -8,6 +8,7 @@ import { deleteCalendarEvent } from "@/lib/google-calendar";
 import { issueRefund } from "@/lib/refund/issue-refund";
 import { resolveRefund } from "@/lib/refund/policy";
 import { getWriteClient } from "@/lib/sanity-write-client";
+import { releaseSlotLock } from "@/lib/slot-lock";
 
 const RECEPTION_EMAIL = "recepcio@drmoroczangela.hu";
 
@@ -118,13 +119,8 @@ export async function POST(request: Request): Promise<Response> {
     }
 
     // ── 5. Release the slot — patch slotLock to available ─────────────────────
-    const slotLockDocId = `slotLock-${booking.slotDate}-${booking.slotTime.replace(":", "-")}`;
     try {
-      await getWriteClient()
-        .patch(slotLockDocId)
-        .set({ status: "available" })
-        .unset(["bookingRef"])
-        .commit();
+      await releaseSlotLock(booking);
     } catch (slotErr) {
       // If slotLock doesn't exist or fails, log warning but do not fail the cancellation
       console.warn("[api/booking-cancel] Failed to release slotLock:", slotErr);

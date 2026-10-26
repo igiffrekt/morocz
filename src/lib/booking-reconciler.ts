@@ -2,6 +2,7 @@ import { buildConfirmationEmail } from "@/lib/booking-email";
 import { isEmailConfigured, sendEmail } from "@/lib/email";
 import { createCalendarEvent } from "@/lib/google-calendar";
 import { getWriteClient } from "@/lib/sanity-write-client";
+import { releaseSlotLock } from "@/lib/slot-lock";
 import { stripe } from "@/lib/stripe";
 
 // Grace period before a pending booking is considered stale.
@@ -172,14 +173,9 @@ async function cancelAndReleaseSlot(booking: PendingBooking): Promise<void> {
     .set({ status: "cancelled", paymentStatus: "failed" })
     .commit();
 
-  const slotLockDocId = `slotLock-${booking.slotDate}-${booking.slotTime.replace(":", "-")}`;
   try {
-    await getWriteClient()
-      .patch(slotLockDocId)
-      .set({ status: "available" })
-      .unset(["bookingRef"])
-      .commit();
+    await releaseSlotLock(booking);
   } catch (err) {
-    console.warn(`[reconciler] Failed to release slotLock ${slotLockDocId}:`, err);
+    console.warn(`[reconciler] Failed to release slotLock for ${booking._id}:`, err);
   }
 }

@@ -5,6 +5,7 @@ import { isEmailConfigured, sendEmail } from "@/lib/email";
 import { deleteCalendarEvent } from "@/lib/google-calendar";
 import { issueRefund } from "@/lib/refund/issue-refund";
 import { getWriteClient } from "@/lib/sanity-write-client";
+import { releaseSlotLock } from "@/lib/slot-lock";
 
 export const dynamic = "force-dynamic";
 
@@ -103,7 +104,9 @@ export async function POST(request: Request): Promise<Response> {
     if (booking.googleCalendarEventId) {
       try {
         await deleteCalendarEvent(booking.googleCalendarEventId);
-        console.log(`[admin/booking-cancel] Deleted calendar event: ${booking.googleCalendarEventId}`);
+        console.log(
+          `[admin/booking-cancel] Deleted calendar event: ${booking.googleCalendarEventId}`,
+        );
       } catch (calErr) {
         console.error("[admin/booking-cancel] Failed to delete calendar event:", calErr);
       }
@@ -112,13 +115,8 @@ export async function POST(request: Request): Promise<Response> {
     }
 
     // ── 7. Release the slot — patch slotLock to available ─────────────────────
-    const slotLockDocId = `slotLock-${booking.slotDate}-${booking.slotTime.replace(":", "-")}`;
     try {
-      await getWriteClient()
-        .patch(slotLockDocId)
-        .set({ status: "available" })
-        .unset(["bookingRef"])
-        .commit();
+      await releaseSlotLock(booking);
     } catch (slotErr) {
       // If slotLock doesn't exist or fails, log warning but do not fail the cancellation
       console.warn("[api/admin/booking-cancel] Failed to release slotLock:", slotErr);

@@ -174,7 +174,8 @@ describe("POST /api/admin/booking-reschedule", () => {
   it("patches the booking and swaps slot locks on success", async () => {
     writeClient.fetch
       .mockResolvedValueOnce({ ...confirmedBooking, status: "confirmed" }) // booking
-      .mockResolvedValueOnce({ _id: "slotLock-new", _rev: "r1", status: "available" }); // new slot lock
+      .mockResolvedValueOnce({ _id: "slotLock-new", _rev: "r1", status: "available" }) // new slot lock
+      .mockResolvedValueOnce({ lock: { _rev: "r0", status: "booked" }, otherBookings: 0 }); // old slot lock
     const res = await POST(
       req({
         bookingId: "booking-1",

@@ -19,6 +19,7 @@ function makePatch() {
   const chain: Record<string, unknown> = {};
   chain.set = vi.fn(() => chain);
   chain.unset = vi.fn(() => chain);
+  chain.ifRevisionId = vi.fn(() => chain);
   chain.commit = vi.fn(() => Promise.resolve({}));
   return chain;
 }
@@ -52,6 +53,9 @@ describe("reconcilePendingBooking — Stripe retrieve failures", () => {
         statusCode: 404,
       }),
     );
+    writeClient.fetch
+      .mockResolvedValueOnce(pendingBooking)
+      .mockResolvedValueOnce({ lock: { _rev: "r1", status: "booked" }, otherBookings: 0 });
 
     const result = await reconcilePendingBooking("booking-1");
 

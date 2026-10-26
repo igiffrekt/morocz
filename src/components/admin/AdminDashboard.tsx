@@ -178,8 +178,7 @@ export default function AdminDashboard({
     }
   }
 
-  async function handleCancelRefresh() {
-    setSelectedBooking(null);
+  async function refreshBookings() {
     const updatedDay = await fetchBookings(selectedDate, selectedDate);
     setDayBookings(updatedDay);
     const currentDate = new Date(selectedDate);
@@ -189,6 +188,18 @@ export default function AdminDashboard({
     );
     const updatedMonth = await fetchBookings(mStart, mEnd);
     setMonthBookings(updatedMonth);
+  }
+
+  async function handleCancelRefresh() {
+    setSelectedBooking(null);
+    await refreshBookings();
+  }
+
+  // Patients may have booked since the day was loaded — show the current state
+  // before the admin picks a time.
+  function handleAddBooking() {
+    setShowManualBooking(true);
+    void refreshBookings();
   }
 
   const confirmedCount = dayBookings.filter((b) => b.status === "confirmed").length;
@@ -594,7 +605,7 @@ export default function AdminDashboard({
                   isLoading={isDayLoading}
                   onBookingClick={handleBookingClick}
                   onCancelBooking={handleCancelBooking}
-                  onAddBooking={() => setShowManualBooking(true)}
+                  onAddBooking={handleAddBooking}
                 />
               </div>
             </div>
@@ -638,17 +649,7 @@ export default function AdminDashboard({
           onClose={() => setShowManualBooking(false)}
           onCreated={() => {
             setShowManualBooking(false);
-            void (async () => {
-              const updatedDay = await fetchBookings(selectedDate, selectedDate);
-              setDayBookings(updatedDay);
-              const currentDate = new Date(selectedDate);
-              const { startDate: mStart, endDate: mEnd } = getMonthRange(
-                currentDate.getFullYear(),
-                currentDate.getMonth(),
-              );
-              const updatedMonth = await fetchBookings(mStart, mEnd);
-              setMonthBookings(updatedMonth);
-            })();
+            void refreshBookings();
           }}
         />
       )}

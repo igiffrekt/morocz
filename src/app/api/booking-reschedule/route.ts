@@ -4,6 +4,7 @@ import { buildRescheduleEmail } from "@/lib/booking-email";
 import { isEmailConfigured, sendEmail } from "@/lib/email";
 import { createCalendarEvent } from "@/lib/google-calendar";
 import { getWriteClient } from "@/lib/sanity-write-client";
+import { releaseSlotLock } from "@/lib/slot-lock";
 
 export const dynamic = "force-dynamic";
 
@@ -163,15 +164,9 @@ export async function POST(request: Request): Promise<Response> {
     // ── 6. STEP 2 — Release old slot and update booking ────────────────────────
     // Critical ordering: new slot locked BEFORE old slot released.
     // If this step partially fails, the degraded state is acceptable (admin can resolve).
-    const oldSlotLockDocId = `slotLock-${booking.slotDate}-${booking.slotTime.replace(":", "-")}`;
-
     // Release old slot — if this fails, log but don't fail the reschedule
     try {
-      await getWriteClient()
-        .patch(oldSlotLockDocId)
-        .set({ status: "available" })
-        .unset(["bookingRef"])
-        .commit();
+      await releaseSlotLock(booking);
     } catch (err) {
       // Log degraded state but do not fail — new slot is already locked
       console.error(

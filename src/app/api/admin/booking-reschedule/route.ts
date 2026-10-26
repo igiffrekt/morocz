@@ -5,6 +5,7 @@ import { buildRescheduleEmail } from "@/lib/booking-email";
 import { isEmailConfigured, sendEmail } from "@/lib/email";
 import { createCalendarEvent, deleteCalendarEvent } from "@/lib/google-calendar";
 import { getWriteClient } from "@/lib/sanity-write-client";
+import { releaseSlotLock } from "@/lib/slot-lock";
 
 export const dynamic = "force-dynamic";
 
@@ -146,13 +147,8 @@ export async function POST(request: Request): Promise<Response> {
     }
 
     // ── 7. Release the old slot lock (non-fatal if missing) ────────────────────
-    const oldSlotLockDocId = `slotLock-${booking.slotDate}-${booking.slotTime.replace(":", "-")}`;
     try {
-      await getWriteClient()
-        .patch(oldSlotLockDocId)
-        .set({ status: "available" })
-        .unset(["bookingRef"])
-        .commit();
+      await releaseSlotLock(booking);
     } catch (err) {
       console.error(
         "[api/admin/booking-reschedule] Partial reschedule: new slot locked but old slot not released.",

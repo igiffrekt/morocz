@@ -14,6 +14,7 @@ import { createCalendarEvent } from "@/lib/google-calendar";
 import { processRefund, type RefundBooking } from "@/lib/refund/process-refund";
 import { resolveLatestRefundId } from "@/lib/refund/resolve-latest-refund";
 import { getWriteClient } from "@/lib/sanity-write-client";
+import { releaseSlotLock } from "@/lib/slot-lock";
 import { stripe } from "@/lib/stripe";
 import { creditInvoiceExternalId } from "@/lib/szamlazz/build-credit-invoice-xml";
 import { findCreditInvoiceByExternalId, issueCreditInvoice } from "@/lib/szamlazz/client";
@@ -170,13 +171,7 @@ export async function POST(request: Request): Promise<Response> {
           .commit();
 
         if (booking) {
-          const slotLockDocId = `slotLock-${booking.slotDate}-${booking.slotTime.replace(":", "-")}`;
-          await getWriteClient()
-            .patch(slotLockDocId)
-            .set({ status: "available" })
-            .unset(["bookingRef"])
-            .commit()
-            .catch(() => {});
+          await releaseSlotLock({ _id: bookingId, ...booking }).catch(() => {});
         }
       } catch (err) {
         console.error("[stripe-webhook] Failed to clean up expired checkout:", err);

@@ -3,6 +3,7 @@ import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { createCalendarEvent } from "@/lib/google-calendar";
 import { getWriteClient } from "@/lib/sanity-write-client";
+import { slotLockIdFor } from "@/lib/slot-lock";
 
 export const dynamic = "force-dynamic";
 
@@ -32,7 +33,7 @@ export async function POST(request: Request): Promise<Response> {
     const { serviceId, slotDate, slotTime, patientName, patientEmail, patientPhone } = parsed.data;
 
     const slotId = `${slotDate}T${slotTime}:00`;
-    const slotLockDocId = `slotLock-${slotDate}-${slotTime.replace(":", "-")}`;
+    const slotLockDocId = slotLockIdFor(slotDate, slotTime);
 
     const client = getWriteClient();
 
@@ -45,7 +46,57 @@ export async function POST(request: Request): Promise<Response> {
       status: "available",
     });
 
-    await client.patch(slotLockDocId).set({ status: "booked" }).commit();
+    // Never book over a taken slot. Check the confirmed bookings as well as the
+    // lock, since older bookings may have no lock (or a wrongly released one).
+    const slotState = await client.fetch<{
+      lock: { _rev: string; status: string; heldUntil: string | null } | null;
+      existing: { patientName: string | null } | null;
+    } | null>(
+      `{
+        "lock": *[_type == "slotLock" && _id == $slotLockDocId][0]{_rev, status, heldUntil},
+        "existing": *[_type == "booking" && slotDate == $slotDate && slotTime == $slotTime && status == "confirmed"][0]{patientName}
+      }`,
+      { slotLockDocId, slotDate, slotTime },
+    );
+    if (!slotState?.lock) {
+      return Response.json({ error: "Hiba történt. Kérjük, próbálja újra." }, { status: 500 });
+    }
+    if (slotState.existing || slotState.lock.status === "booked") {
+      const who = slotState.existing?.patientName?.trim();
+      return Response.json(
+        {
+          error: `Ez az időpont már foglalt${who ? ` (${who})` : ""}. Kérjük, válasszon másik időpontot.`,
+        },
+        { status: 409 },
+      );
+    }
+    if (
+      slotState.lock.status === "held" &&
+      slotState.lock.heldUntil &&
+      new Date(slotState.lock.heldUntil) > new Date()
+    ) {
+      return Response.json(
+        {
+          error:
+            "Ezt az időpontot egy páciens éppen foglalja. Kérjük, válasszon másikat, vagy próbálja újra néhány perc múlva.",
+        },
+        { status: 409 },
+      );
+    }
+
+    // Optimistic lock — a patient booking in the same instant makes this fail
+    try {
+      await client
+        .patch(slotLockDocId)
+        .ifRevisionId(slotState.lock._rev)
+        .set({ status: "booked" })
+        .commit();
+    } catch {
+      return Response.json(
+        { error: "Ez az időpont közben foglalt lett. Kérjük, válasszon másik időpontot." },
+        { status: 409 },
+      );
+    }
 
     const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
     let code = "";
@@ -99,10 +150,7 @@ export async function POST(request: Request): Promise<Response> {
       }
     })();
 
-    return Response.json(
-      { bookingId: booking._id, reservationNumber },
-      { status: 201 },
-    );
+    return Response.json({ bookingId: booking._id, reservationNumber }, { status: 201 });
   } catch (err) {
     console.error("[admin/booking-create] Error:", err);
     return Response.json({ error: "Hiba történt a foglalás létrehozásakor." }, { status: 500 });

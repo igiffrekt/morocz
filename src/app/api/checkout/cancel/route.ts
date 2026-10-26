@@ -2,6 +2,7 @@ import { headers } from "next/headers";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { getWriteClient } from "@/lib/sanity-write-client";
+import { releaseSlotLock } from "@/lib/slot-lock";
 
 export const dynamic = "force-dynamic";
 
@@ -30,9 +31,12 @@ export async function POST(request: Request): Promise<Response> {
       slotTime: string;
       paymentStatus: string;
       userId: string;
-    } | null>(`*[_type == "booking" && _id == $id][0]{_id, slotDate, slotTime, paymentStatus, userId}`, {
-      id: bookingId,
-    });
+    } | null>(
+      `*[_type == "booking" && _id == $id][0]{_id, slotDate, slotTime, paymentStatus, userId}`,
+      {
+        id: bookingId,
+      },
+    );
 
     if (!booking) {
       return Response.json({ error: "Booking not found" }, { status: 404 });
@@ -51,13 +55,7 @@ export async function POST(request: Request): Promise<Response> {
       .set({ status: "cancelled", paymentStatus: "failed" })
       .commit();
 
-    const slotLockDocId = `slotLock-${booking.slotDate}-${booking.slotTime.replace(":", "-")}`;
-    await getWriteClient()
-      .patch(slotLockDocId)
-      .set({ status: "available" })
-      .unset(["bookingRef"])
-      .commit()
-      .catch(() => {});
+    await releaseSlotLock(booking).catch(() => {});
 
     return Response.json({ success: true });
   } catch (err) {

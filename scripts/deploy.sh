@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-SERVER="drmorocz1@152.53.66.114"
+SERVER="drmorocz1@62.210.142.158"
 REMOTE_DIR="~/public_html"
 LOCAL_ENV=".env.production.local"
 EXPECTED_AUTH_URL="BETTER_AUTH_URL=https://drmoroczangela.hu"

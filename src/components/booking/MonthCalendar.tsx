@@ -87,7 +87,7 @@ export function MonthCalendar({
     <div
       className={cn(
         "flex min-w-0 flex-col bg-field",
-        compact ? "gap-3 rounded-[28px] p-4" : "gap-4 rounded-[32px] p-4 sm:p-5",
+        compact ? "gap-3 rounded-tile p-4" : "gap-4 rounded-panel p-4 sm:p-5",
         className,
       )}
     >

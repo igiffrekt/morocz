@@ -22,7 +22,7 @@ export function HomeHero({ subtitle, doctorImage, serviceIds, schedule }: HomeHe
 
   return (
     <section aria-labelledby="hero-title" className="relative">
-      <div className="relative flex flex-col overflow-hidden rounded-[32px] bg-navy text-white lg:min-h-[720px] lg:flex-row lg:items-stretch lg:rounded-hero">
+      <div className="relative flex flex-col overflow-hidden rounded-panel bg-navy text-white lg:min-h-[720px] lg:flex-row lg:items-stretch lg:rounded-hero">
         <div
           aria-hidden="true"
           className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,.07)_1px,transparent_1px)] bg-[length:26px_26px]"

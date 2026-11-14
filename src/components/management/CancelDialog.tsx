@@ -66,7 +66,7 @@ export function CancelDialog({ booking, onCancelled, onClose }: CancelDialogProp
   }
 
   return (
-    <div className="flex flex-col gap-4 rounded-[32px] bg-coral-soft p-5 sm:p-7">
+    <div className="flex flex-col gap-4 rounded-panel bg-coral-soft p-5 sm:p-7">
       <div className="flex items-start gap-3.5">
         <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-coral text-navy">
           <svg

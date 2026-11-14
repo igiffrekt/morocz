@@ -149,7 +149,7 @@ export function MobileMenu({
           open ? "bg-transparent" : "bg-canvas/86 backdrop-blur-[16px]",
         )}
       >
-        <Link href="/" inert={open} className={cn("mr-auto flex items-center", fade)}>
+        <Link href="/" inert={open} className={cn("mr-auto flex min-h-11 items-center", fade)}>
           <Image
             src="/mm-logo-web.svg"
             alt={logoAlt}

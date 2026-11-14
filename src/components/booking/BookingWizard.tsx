@@ -60,6 +60,14 @@ interface BookingWizardProps {
   initialSelection?: { serviceId: string; date: string | null } | null;
 }
 
+/** Summary card rows (icon | label over value). */
+const SUMMARY_ROW =
+  "grid grid-cols-[2.5rem_minmax(0,1fr)] grid-rows-[auto_auto] items-center gap-x-3.5 gap-y-0.5 py-3";
+const SUMMARY_ICON =
+  "row-span-2 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/8 text-mint-light";
+const SUMMARY_LABEL =
+  "col-start-2 self-end text-xs font-bold tracking-[.06em] text-navy-soft uppercase";
+
 const STEP_LABELS = ["Időpont", "Bejelentkezés", "Megerősítés"];
 const STORAGE_KEY = "morocz-booking-wizard-v2";
 const PRENATAL_NAME = "Várandósgondozás";
@@ -501,7 +509,7 @@ export function BookingWizard({ services, scheduleData, initialSelection }: Book
           >
             <aside
               aria-label="Foglalás összegzése"
-              className="flex flex-col gap-[18px] overflow-hidden rounded-[32px] bg-navy p-6 text-white sm:rounded-[36px] sm:p-7"
+              className="flex flex-col gap-[18px] overflow-hidden rounded-panel bg-navy p-6 text-white sm:rounded-[36px] sm:p-7"
             >
               <div className="flex items-center justify-between gap-3">
                 <span className="text-[13px] font-extrabold tracking-[.12em] text-mint-light uppercase">
@@ -513,38 +521,35 @@ export function BookingWizard({ services, scheduleData, initialSelection }: Book
               </div>
               <dl className="m-0 flex flex-col">
                 {summaryRows.map((row) => (
-                  <div
-                    key={row.k}
-                    className="flex items-center gap-3.5 border-b border-white/10 py-3"
-                  >
-                    <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/8 text-mint-light">
-                      <PathSvg d={row.icon} />
-                    </span>
-                    <div className="flex min-w-0 flex-col gap-0.5">
-                      <dt className="text-xs font-bold tracking-[.06em] text-navy-soft uppercase">
-                        {row.k}
-                      </dt>
-                      <dd
-                        className={cn(
-                          "m-0 text-base leading-snug first-letter:uppercase",
-                          row.v ? "font-extrabold text-white" : "font-semibold text-navy-faint",
-                        )}
-                      >
-                        {row.v || "Még nincs kiválasztva"}
-                      </dd>
-                    </div>
+                  // dt/dd are the row's only children (valid <dl>); the icon lives in the dt
+                  // and a 2-column grid keeps it centred beside label + value.
+                  <div key={row.k} className={cn(SUMMARY_ROW, "border-b border-white/10")}>
+                    <dt className="contents">
+                      <span aria-hidden="true" className={SUMMARY_ICON}>
+                        <PathSvg d={row.icon} />
+                      </span>
+                      <span className={SUMMARY_LABEL}>{row.k}</span>
+                    </dt>
+                    <dd
+                      className={cn(
+                        "col-start-2 m-0 min-w-0 self-start text-base leading-snug first-letter:uppercase",
+                        row.v ? "font-extrabold text-white" : "font-semibold text-navy-faint",
+                      )}
+                    >
+                      {row.v || "Még nincs kiválasztva"}
+                    </dd>
                   </div>
                 ))}
-                <div className="flex items-center gap-3.5 py-3">
-                  <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/8 text-mint-light">
-                    <PathSvg d={ICONS.card} />
-                  </span>
-                  <div className="flex min-w-0 flex-col gap-0.5">
-                    <dt className="text-xs font-bold tracking-[.06em] text-navy-soft uppercase">
-                      Foglalási díj
-                    </dt>
-                    <dd className="m-0 text-xl font-extrabold text-mint-light">{BOOKING_FEE}</dd>
-                  </div>
+                <div className={SUMMARY_ROW}>
+                  <dt className="contents">
+                    <span aria-hidden="true" className={SUMMARY_ICON}>
+                      <PathSvg d={ICONS.card} />
+                    </span>
+                    <span className={SUMMARY_LABEL}>Foglalási díj</span>
+                  </dt>
+                  <dd className="col-start-2 m-0 self-start text-xl font-extrabold text-mint-light">
+                    {BOOKING_FEE}
+                  </dd>
                 </div>
               </dl>
               <p className="m-0 text-[13px] leading-relaxed text-navy-soft">

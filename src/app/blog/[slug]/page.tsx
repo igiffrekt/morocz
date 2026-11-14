@@ -60,7 +60,8 @@ export async function generateMetadata({
     }),
   ]);
 
-  const title = post?.title ?? "Blog | Mórocz Medical";
+  // Same cleaning as the h1 (drops the leading emoji Sanity titles carry).
+  const title = cleanServiceName(post?.title) || "Blog";
   const description = post?.metaDescription ?? post?.excerpt ?? undefined;
 
   // OG image cascade: ogImage > featuredImage > defaultOgImage
@@ -278,7 +279,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         <nav aria-label="Morzsamenü" className="max-w-full">
           <ol className="m-0 inline-flex max-w-full list-none items-center gap-2 rounded-full bg-white px-4 py-2.5 text-[13px] font-semibold text-muted md:px-5">
             <li className="shrink-0">
-              <Link href="/" className="link-grow py-0.5 text-muted hover:text-navy">
+              <Link href="/" className="link-grow tap-area py-0.5 text-muted hover:text-navy">
                 Kezdőlap
               </Link>
             </li>
@@ -329,7 +330,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
       {/* ── Hero image (shown whole) ───────────────────────────────────── */}
       {heroUrl && (
-        <div className="mx-auto mt-6 w-full max-w-[1160px] overflow-hidden rounded-[32px] bg-sage shadow-[0_34px_70px_-44px_rgba(36,42,95,.5)] md:mt-10 md:rounded-hero">
+        <div className="mx-auto mt-6 w-full max-w-[1160px] overflow-hidden rounded-panel bg-sage shadow-[0_34px_70px_-44px_rgba(36,42,95,.5)] md:mt-10 md:rounded-hero">
           <Image
             src={heroUrl}
             alt={title}
@@ -344,10 +345,10 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
       {/* ── Body + rail ────────────────────────────────────────────────── */}
       <div className="mx-auto mt-3 grid w-full max-w-[1160px] items-start gap-3 md:mt-6 md:gap-6 min-[1100px]:grid-cols-[minmax(0,1fr)_320px]">
-        <article className="rounded-[32px] bg-white px-[22px] pt-8 pb-10 md:rounded-hero md:px-[72px] md:pt-16 md:pb-[72px]">
+        <article className="rounded-panel bg-white px-[22px] pt-8 pb-10 md:rounded-hero md:px-[72px] md:pt-16 md:pb-[72px]">
           <ArticleBody body={body} />
 
-          <div className="mx-auto mt-12 flex max-w-[680px] flex-wrap items-center gap-5 border-t border-[#eceef4] pt-9">
+          <div className="mx-auto mt-12 flex max-w-[680px] flex-wrap items-center gap-5 border-t border-line-soft pt-9">
             <Avatar url={avatarLarge} size={88} ring />
             <div className="flex min-w-0 flex-[1_1_220px] flex-col gap-1">
               <span className="text-xs font-bold tracking-[.12em] text-teal-ink uppercase">

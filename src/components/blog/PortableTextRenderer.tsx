@@ -59,37 +59,45 @@ interface PortableTextRendererProps {
 /** Also reused by the blog article layout (image + styledTable renderers). */
 export const components: Partial<PortableTextReactComponents> = {
   block: {
-    h2: ({ children }) => <h2 className="text-2xl font-bold text-primary mt-8 mb-4">{children}</h2>,
+    h2: ({ children }) => (
+      <h2 className="mt-8 mb-4 text-2xl leading-tight font-extrabold tracking-[-0.02em] text-navy">
+        {children}
+      </h2>
+    ),
     h3: ({ children }) => (
-      <h3 className="text-xl font-semibold text-primary mt-6 mb-3">{children}</h3>
+      <h3 className="mt-6 mb-3 text-xl font-extrabold text-navy">{children}</h3>
     ),
     h4: ({ children }) => (
-      <h4 className="text-lg font-semibold text-primary mt-4 mb-2">{children}</h4>
+      <h4 className="mt-4 mb-2 text-lg font-extrabold text-teal-ink">{children}</h4>
     ),
     blockquote: ({ children }) => (
-      <blockquote className="border-l-4 border-primary/30 pl-4 italic text-gray-600 my-4">
+      <blockquote className="my-5 rounded-tile bg-sage px-5 py-4 font-semibold text-navy">
         {children}
       </blockquote>
     ),
     normal: ({ children }) => (
-      <p className="text-base text-gray-700 leading-relaxed mb-4">{children}</p>
+      <p className="mb-4 text-base leading-relaxed text-muted-strong">{children}</p>
     ),
   },
   list: {
     bullet: ({ children }) => (
-      <ul className="list-disc pl-6 mb-4 space-y-1 text-gray-700">{children}</ul>
+      <ul className="mb-4 list-disc space-y-1 pl-6 text-muted-strong marker:text-mint">
+        {children}
+      </ul>
     ),
     number: ({ children }) => (
-      <ol className="list-decimal pl-6 mb-4 space-y-1 text-gray-700">{children}</ol>
+      <ol className="mb-4 list-decimal space-y-1 pl-6 text-muted-strong marker:font-extrabold marker:text-teal-ink">
+        {children}
+      </ol>
     ),
   },
   marks: {
-    strong: ({ children }) => <strong className="font-bold">{children}</strong>,
+    strong: ({ children }) => <strong className="font-extrabold text-navy">{children}</strong>,
     em: ({ children }) => <em>{children}</em>,
     link: ({ children, value }) => (
       <a
         href={value?.href}
-        className="text-primary underline hover:text-primary/80"
+        className="font-bold text-navy underline decoration-mint decoration-2 underline-offset-4 hover:decoration-navy"
         target="_blank"
         rel="noopener noreferrer"
       >
@@ -107,12 +115,10 @@ export const components: Partial<PortableTextReactComponents> = {
             alt={value.alt ?? "Blog kép"}
             width={720}
             height={405}
-            className="w-full rounded-xl object-cover"
+            className="w-full rounded-tile object-cover"
           />
           {value.caption && (
-            <figcaption className="text-center text-sm text-gray-500 mt-2">
-              {value.caption}
-            </figcaption>
+            <figcaption className="mt-2 text-center text-sm text-muted">{value.caption}</figcaption>
           )}
         </figure>
       );
@@ -128,7 +134,7 @@ export const components: Partial<PortableTextReactComponents> = {
             : "text-left";
       return (
         <div className="my-6 overflow-x-auto">
-          <table className="w-full border-collapse text-sm text-gray-700">
+          <table className="w-full border-collapse text-sm text-muted-strong">
             <tbody>
               {rows.map((row, rowIndex) => {
                 const isHeaderRow = value.headerRow && rowIndex === 0;
@@ -141,9 +147,9 @@ export const components: Partial<PortableTextReactComponents> = {
                     key={row._key}
                     className={
                       isHeaderRow
-                        ? "bg-primary/10 font-semibold"
+                        ? "bg-lavender font-extrabold text-navy"
                         : isStriped
-                          ? "bg-gray-50"
+                          ? "bg-field"
                           : undefined
                     }
                   >
@@ -151,7 +157,7 @@ export const components: Partial<PortableTextReactComponents> = {
                       <td
                         // biome-ignore lint/suspicious/noArrayIndexKey: table cells have no stable id
                         key={i}
-                        className={`border border-gray-300 px-3 py-2 align-top ${alignClass}`}
+                        className={`border border-line px-3 py-2 align-top ${alignClass}`}
                       >
                         {cell}
                       </td>

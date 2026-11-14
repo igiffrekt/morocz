@@ -138,11 +138,15 @@ export function InfoAccordion({ items, idBase }: { items: InfoItem[]; idBase: st
 export function ContactAside({ week, className }: { week: WeekHours[]; className?: string }) {
   const contact = useSiteContact();
   return (
-    <aside
+    // A labelled group, not <aside>: it sits inside a section landmark (axe
+    // landmark-complementary-is-top-level).
+    // biome-ignore lint/a11y/useSemanticElements: not a form, so no <fieldset>
+    <div
+      role="group"
       aria-label="Rendelési idő és elérhetőség"
       className={cn("flex flex-[1_1_300px] flex-col gap-3", className)}
     >
-      <div className="flex flex-col gap-2 rounded-[28px] bg-navy px-5 py-[18px] text-white md:gap-3 md:rounded-panel md:p-7">
+      <div className="flex flex-col gap-2 rounded-tile bg-navy px-5 py-[18px] text-white md:gap-3 md:rounded-panel md:p-7">
         <span className="text-xs font-extrabold tracking-[.12em] text-mint-light uppercase md:text-[13px]">
           Rendelési idő
         </span>
@@ -156,7 +160,7 @@ export function ContactAside({ week, className }: { week: WeekHours[]; className
               <span
                 className={cn(
                   "whitespace-nowrap tabular-nums",
-                  day.hours ? "font-extrabold text-mint-light" : "opacity-50",
+                  day.hours ? "font-extrabold text-mint-light" : "text-navy-faint",
                 )}
               >
                 {day.hours ?? "zárva"}
@@ -199,7 +203,7 @@ export function ContactAside({ week, className }: { week: WeekHours[]; className
           {contact.email}
         </a>
       )}
-    </aside>
+    </div>
   );
 }
 

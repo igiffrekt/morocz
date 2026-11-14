@@ -30,7 +30,7 @@ export function BookingHero({
   return (
     <section
       className={cn(
-        "relative overflow-hidden rounded-[32px] bg-navy text-white lg:rounded-hero",
+        "relative overflow-hidden rounded-panel bg-navy text-white lg:rounded-hero",
         className,
       )}
     >

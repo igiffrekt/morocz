@@ -89,7 +89,9 @@ describe("prepareLegalBody", () => {
         text: "Javasolt jelölőnégyzet",
       },
     ]);
-    expect(out.headings.a).toMatchObject({ rank: 3, num: null, text: "Mórocz Medical Kft." });
+    // A sub-heading before the first h2 would skip a level after the page h1: it stays a
+    // plain block (LegalBody renders it as a bold paragraph).
+    expect(out.headings.a).toBeUndefined();
     expect(out.headings.b).toMatchObject({ rank: 2, num: "1", numDot: "." });
     // number prefix moved to the pill: rendered text = num + dot + " " + rest
     const b = out.body[1];

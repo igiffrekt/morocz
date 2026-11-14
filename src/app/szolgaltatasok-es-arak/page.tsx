@@ -17,7 +17,7 @@ import { getOpeningWeek, getPriceListData, getServicesIntro } from "@/sanity/lib
 export const revalidate = 30;
 
 export const metadata: Metadata = {
-  title: "Szolgáltatások és Árak | Mórocz Medical",
+  title: "Szolgáltatások és Árak",
   description:
     "Nőgyógyászati szolgáltatások és árak. Vizsgálatok, várandósgondozás, laborvizsgálatok - teljes árlista 2026.",
 };

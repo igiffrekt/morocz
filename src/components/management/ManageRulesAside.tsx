@@ -28,7 +28,7 @@ export function ManageRulesAside() {
       aria-label="Szabályok röviden"
       className="flex min-w-0 flex-col gap-3 lg:sticky lg:top-[104px]"
     >
-      <div className="flex flex-col gap-4 rounded-[32px] bg-navy p-6 text-white sm:rounded-[36px] sm:p-7">
+      <div className="flex flex-col gap-4 rounded-panel bg-navy p-6 text-white sm:rounded-[36px] sm:p-7">
         <span className="text-[13px] font-extrabold tracking-[.12em] text-mint-light uppercase">
           Jó tudni
         </span>

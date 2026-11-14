@@ -118,7 +118,7 @@ export function YogaCalendar({
                 onClick={() => setFilter(on && f.name ? "" : f.name)}
                 icon={f.color ? <Dot color={f.color} /> : undefined}
                 className={cn(
-                  "h-[42px] gap-2 px-[18px] text-sm",
+                  "h-11 gap-2 px-[18px] text-sm",
                   !on && "border-white",
                   !on && filter && "opacity-75",
                 )}

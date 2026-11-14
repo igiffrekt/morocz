@@ -127,7 +127,7 @@ export function LabBody({ sections }: { sections: LabSection[] }) {
         <section
           key={section.title || i}
           aria-labelledby={section.title ? `labor-${i}` : undefined}
-          className="flex flex-col gap-4 rounded-[32px] bg-white p-5 md:gap-5 md:rounded-hero md:p-[clamp(24px,4vw,48px)]"
+          className="flex flex-col gap-4 rounded-panel bg-white p-5 md:gap-5 md:rounded-hero md:p-[clamp(24px,4vw,48px)]"
         >
           {section.title && (
             <div className="flex items-center gap-3 md:gap-4">

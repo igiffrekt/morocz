@@ -120,8 +120,8 @@ export function Modal({
             className={cn(
               "relative flex max-h-[calc(100dvh-2rem)] w-full flex-col overflow-hidden bg-white text-navy shadow-card outline-none",
               isSheet
-                ? "max-h-[92dvh] rounded-t-[32px] sm:max-h-[calc(100dvh-3rem)] sm:rounded-[32px]"
-                : "rounded-[32px]",
+                ? "max-h-[92dvh] rounded-t-panel sm:max-h-[calc(100dvh-3rem)] sm:rounded-panel"
+                : "rounded-panel",
               WIDTHS[size],
               className,
             )}

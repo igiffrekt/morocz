@@ -1,6 +1,6 @@
 "use client";
 
-import { Children, type ReactNode, useCallback, useRef, useState } from "react";
+import { Children, type ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/cn";
 
 interface SwipeRowProps {
@@ -35,6 +35,19 @@ export function SwipeRow({
   const [active, setActive] = useState(0);
   const rowRef = useRef<HTMLElement>(null);
   const raf = useRef(0);
+  // Keyboard users can scroll the row only if it can take focus; only while it
+  // actually overflows (phones), so the md+ grid adds no empty tab stop.
+  const [scrollable, setScrollable] = useState(false);
+
+  useEffect(() => {
+    const row = rowRef.current;
+    if (!row) return;
+    const measure = () => setScrollable(row.scrollWidth > row.clientWidth + 1);
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(row);
+    return () => ro.disconnect();
+  }, []);
 
   const onScroll = useCallback(() => {
     if (raf.current) return;
@@ -74,9 +87,11 @@ export function SwipeRow({
         ref={rowRef}
         onScroll={onScroll}
         aria-roledescription="carousel"
-        aria-label={label}
+        // Distinct from the enclosing section, which is often named by the same heading.
+        aria-label={`${label} – lapozható kártyák`}
+        tabIndex={scrollable ? 0 : undefined}
         className={cn(
-          "scrollbar-none flex snap-x snap-mandatory gap-2.5 overflow-x-auto pb-1",
+          "scrollbar-none flex snap-x snap-mandatory gap-2.5 overflow-x-auto pb-1 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-teal-focus",
           bleedClassName,
           "md:mx-0 md:grid md:snap-none md:gap-3 md:overflow-visible md:px-0 md:pb-0",
           gridClassName,
@@ -93,8 +108,9 @@ export function SwipeRow({
             className={cn(
               "flex min-w-0 snap-start transition-[transform,opacity] duration-[450ms] ease-bento md:flex-auto",
               slideClassName,
-              index === active ? "scale-100 opacity-100" : "scale-[.96] opacity-[.78]",
-              "md:scale-100 md:opacity-100",
+              // No opacity dim on the peeking slide (canvas .78): it pushed its text below 4.5:1.
+              index === active ? "scale-100" : "scale-[.96]",
+              "md:scale-100",
             )}
           >
             {slide}
@@ -102,7 +118,7 @@ export function SwipeRow({
         ))}
       </section>
       {slides.length > 1 && (
-        <div className="flex justify-center gap-1.5 md:hidden">
+        <div className="-my-[19px] flex justify-center md:hidden">
           {slides.map((_, index) => (
             <button
               // biome-ignore lint/suspicious/noArrayIndexKey: dots are positional
@@ -111,11 +127,15 @@ export function SwipeRow({
               tabIndex={-1}
               aria-hidden="true"
               onClick={() => goTo(index)}
-              className={cn(
-                "h-1.5 rounded-full border-0 p-0 transition-[width,background-color] duration-[400ms] ease-bento",
-                index === active ? "w-[22px] bg-navy" : "w-1.5 bg-[#c5cad9]",
-              )}
-            />
+              className="inline-flex h-11 min-w-6 items-center justify-center border-0 bg-transparent p-0"
+            >
+              <span
+                className={cn(
+                  "block h-1.5 rounded-full transition-[width,background-color] duration-[400ms] ease-bento",
+                  index === active ? "w-[22px] bg-navy" : "w-1.5 bg-[#c5cad9]",
+                )}
+              />
+            </button>
           ))}
         </div>
       )}

@@ -127,7 +127,7 @@ export function QuickBooking({ serviceIds, schedule }: QuickBookingProps) {
   return (
     <div
       id="foglalas"
-      className="relative z-[5] mx-3 -mt-14 scroll-mt-28 rounded-[32px] bg-white p-[18px] shadow-[0_24px_50px_-28px_rgba(36,42,95,.55)] md:mx-8 md:-mt-[136px] md:rounded-[36px] md:p-6 md:shadow-[0_34px_70px_-34px_rgba(36,42,95,.5)]"
+      className="relative z-[5] mx-3 -mt-14 scroll-mt-28 rounded-panel bg-white p-[18px] shadow-[0_24px_50px_-28px_rgba(36,42,95,.55)] md:mx-8 md:-mt-[136px] md:rounded-[36px] md:p-6 md:shadow-[0_34px_70px_-34px_rgba(36,42,95,.5)]"
     >
       <div className="flex flex-col gap-3.5 md:flex-row md:flex-wrap md:items-end md:gap-4">
         {/* Service */}
@@ -190,7 +190,7 @@ export function QuickBooking({ serviceIds, schedule }: QuickBookingProps) {
               ))}
             </div>
           ) : shown.length === 0 ? (
-            <div className="fade-up flex min-h-[76px] items-center justify-center rounded-[28px] border-[1.5px] border-dashed border-line px-5 text-center text-sm font-semibold text-muted md:min-h-[84px] md:rounded-full">
+            <div className="fade-up flex min-h-[76px] items-center justify-center rounded-tile border-[1.5px] border-dashed border-line px-5 text-center text-sm font-semibold text-muted md:min-h-[84px] md:rounded-full">
               A következő {windowDays} napban nincs szabad időpont erre a szolgáltatásra.
             </div>
           ) : (
@@ -263,7 +263,7 @@ export function QuickBooking({ serviceIds, schedule }: QuickBookingProps) {
 /** Text from the booking wizard's PrenatalNoticeModal. */
 function PrenatalNotice() {
   return (
-    <div className="flex items-start gap-4 rounded-[22px] bg-sun-soft px-4 py-3.5 md:mt-5 md:rounded-[28px] md:px-6 md:py-5">
+    <div className="flex items-start gap-4 rounded-[22px] bg-sun-soft px-4 py-3.5 md:mt-5 md:rounded-tile md:px-6 md:py-5">
       <span className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-full bg-sun text-navy md:inline-flex">
         <PathIcon d={ICON_PATHS.alert} size={20} strokeWidth={2} />
       </span>

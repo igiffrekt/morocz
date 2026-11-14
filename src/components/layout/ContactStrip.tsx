@@ -16,7 +16,7 @@ export function ContactStrip() {
   return (
     <section
       aria-label="Elérhetőségek"
-      className="flex flex-wrap items-center justify-between gap-4 rounded-[32px] bg-white px-5 py-6 md:rounded-hero md:px-8 md:py-7"
+      className="flex flex-wrap items-center justify-between gap-4 rounded-panel bg-white px-5 py-6 md:rounded-hero md:px-8 md:py-7"
     >
       <div className="flex min-w-0 flex-[1_1_360px] items-center gap-4">
         <span className="inline-flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full bg-sage text-teal-ink">

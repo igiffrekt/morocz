@@ -191,7 +191,7 @@ export default async function LabTestPage({ params }: { params: Promise<{ slug: 
         ) : (
           test.body &&
           test.body.length > 0 && (
-            <article className="rounded-[32px] bg-white p-5 md:rounded-hero md:p-12">
+            <article className="rounded-panel bg-white p-5 md:rounded-hero md:p-12">
               <PortableTextRenderer body={test.body} />
             </article>
           )

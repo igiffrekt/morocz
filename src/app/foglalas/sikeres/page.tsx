@@ -1,8 +1,15 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import type Stripe from "stripe";
 import { stripe } from "@/lib/stripe";
 import { PaymentSuccessClient } from "./PaymentSuccessClient";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Sikeres foglalás",
+  robots: { index: false },
+};
 
 interface Props {
   searchParams: Promise<{ session_id?: string }>;
@@ -15,7 +22,7 @@ export default async function PaymentSuccessPage({ searchParams }: Props) {
     redirect("/idopontfoglalas");
   }
 
-  let session;
+  let session: Stripe.Checkout.Session;
   try {
     session = await stripe.checkout.sessions.retrieve(session_id);
   } catch {

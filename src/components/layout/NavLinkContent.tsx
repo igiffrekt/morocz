@@ -1,4 +1,4 @@
-export const YOGA_NAV_COLOR = "#0a7d73"; // turquoise, 4.5:1 on the header grey
+export const YOGA_NAV_COLOR = "var(--color-yoga)"; // turquoise token, ≥4.5:1 on the header grey
 
 export function isYogaLink(href?: string) {
   return href === "/joga" || href?.startsWith("/joga/") === true;

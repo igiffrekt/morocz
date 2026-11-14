@@ -279,7 +279,7 @@ export default async function KapcsolatPage() {
       {/* ── HERO ─────────────────────────────────────────────────────────── */}
       <section
         aria-labelledby="kapcsolat-cim"
-        className="relative overflow-hidden rounded-[32px] bg-navy text-white lg:rounded-hero"
+        className="relative overflow-hidden rounded-panel bg-navy text-white lg:rounded-hero"
       >
         <div
           aria-hidden="true"
@@ -295,7 +295,7 @@ export default async function KapcsolatPage() {
               aria-label="Morzsamenü"
               className="fade-up inline-flex items-center gap-2 self-start rounded-full border border-white/14 bg-white/8 px-3.5 py-1.5 text-xs font-semibold whitespace-nowrap text-[#d6d9ec] md:px-4 md:py-2 md:text-[13px]"
             >
-              <Link href="/" className="link-grow text-[#d6d9ec] hover:text-white">
+              <Link href="/" className="link-grow tap-area text-[#d6d9ec] hover:text-white">
                 Kezdőlap
               </Link>
               <span aria-hidden="true" className="opacity-50">
@@ -347,7 +347,7 @@ export default async function KapcsolatPage() {
         <div className="grid grid-cols-2 gap-2">
           <a
             href={telHref(phone)}
-            className="tap-press col-span-2 flex min-h-[84px] items-center gap-3.5 rounded-[28px] bg-mint px-4 py-3.5 text-navy no-underline"
+            className="tap-press col-span-2 flex min-h-[84px] items-center gap-3.5 rounded-tile bg-mint px-4 py-3.5 text-navy no-underline"
           >
             <span className="inline-flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full bg-navy text-white">
               <PathIcon d={ICONS.phone} size={22} strokeWidth={2} />
@@ -363,7 +363,7 @@ export default async function KapcsolatPage() {
           {receptionEmail && (
             <a
               href={`mailto:${receptionEmail}`}
-              className="tap-press flex min-h-[120px] flex-col gap-2.5 rounded-[28px] bg-white p-4 text-navy no-underline"
+              className="tap-press flex min-h-[120px] flex-col gap-2.5 rounded-tile bg-white p-4 text-navy no-underline"
             >
               <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-blush-soft">
                 <PathIcon d={ICON_PATHS.mail} size={20} />
@@ -376,7 +376,7 @@ export default async function KapcsolatPage() {
             href={mapsUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="tap-press flex min-h-[120px] flex-col gap-2.5 rounded-[28px] bg-white p-4 text-navy no-underline"
+            className="tap-press flex min-h-[120px] flex-col gap-2.5 rounded-tile bg-white p-4 text-navy no-underline"
           >
             <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-sun-soft">
               <PathIcon d={ICONS.route} size={20} strokeWidth={2} />
@@ -426,7 +426,7 @@ export default async function KapcsolatPage() {
                 E-mail címeink
               </h2>
             </div>
-            <ul className="m-0 flex list-none flex-col rounded-[28px] bg-white p-1.5">
+            <ul className="m-0 flex list-none flex-col rounded-tile bg-white p-1.5">
               {mails.map((mail) => {
                 const style = MAIL_STYLE[mail.kind];
                 return (
@@ -457,7 +457,7 @@ export default async function KapcsolatPage() {
           </div>
         )}
 
-        <div className="flex flex-col gap-1.5 rounded-[28px] bg-navy px-5 py-[18px] text-white">
+        <div className="flex flex-col gap-1.5 rounded-tile bg-navy px-5 py-[18px] text-white">
           <span className="text-xs font-extrabold tracking-[.12em] text-mint-light uppercase">
             Rendelési idő
           </span>
@@ -467,7 +467,7 @@ export default async function KapcsolatPage() {
               <span
                 className={cn(
                   "whitespace-nowrap tabular-nums",
-                  day.hours ? "font-extrabold text-mint-light" : "opacity-50",
+                  day.hours ? "font-extrabold text-mint-light" : "text-navy-faint",
                 )}
               >
                 {day.hours ?? "zárva"}
@@ -555,7 +555,7 @@ export default async function KapcsolatPage() {
                 key={day.name}
                 className={cn(
                   "flex justify-between py-[9px] text-[15px] text-navy",
-                  index < week.length - 1 && "border-b border-[#eceef4]",
+                  index < week.length - 1 && "border-b border-line-soft",
                 )}
               >
                 <span className="font-bold">{day.name}</span>
@@ -647,14 +647,14 @@ export default async function KapcsolatPage() {
                     href={card.link.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="link-grow mt-auto self-start py-0.5 text-[15px] font-extrabold text-navy"
+                    className="link-grow tap-area mt-auto self-start py-0.5 text-[15px] font-extrabold text-navy"
                   >
                     {card.link.text} →<span className="sr-only"> (új lapon)</span>
                   </a>
                 ) : (
                   <Link
                     href={card.link.href}
-                    className="link-grow mt-auto self-start py-0.5 text-[15px] font-extrabold text-navy"
+                    className="link-grow tap-area mt-auto self-start py-0.5 text-[15px] font-extrabold text-navy"
                   >
                     {card.link.text} →
                   </Link>

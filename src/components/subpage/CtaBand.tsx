@@ -32,7 +32,7 @@ export function CtaBand({
     <section aria-label={eyebrow}>
       <div
         className={cn(
-          "relative flex flex-wrap items-center justify-between gap-7 overflow-hidden rounded-[32px] p-6 sm:p-10 lg:rounded-hero lg:p-14",
+          "relative flex flex-wrap items-center justify-between gap-7 overflow-hidden rounded-panel p-6 sm:p-10 lg:rounded-hero lg:p-14",
           className,
         )}
       >
@@ -45,7 +45,7 @@ export function CtaBand({
           className="absolute right-[200px] -bottom-[170px] hidden h-[260px] w-[260px] rounded-full border-[1.5px] border-white/40 md:block"
         />
         <div className="relative flex max-w-[720px] flex-col gap-3">
-          <span className="text-xs font-extrabold tracking-[.14em] uppercase opacity-85 md:text-[13px]">
+          <span className="text-xs font-extrabold tracking-[.14em] uppercase md:text-[13px]">
             {eyebrow}
           </span>
           <h2 className="m-0 text-[28px] leading-[1.1] font-extrabold tracking-[-0.02em] md:text-[clamp(32px,3.4vw,44px)]">

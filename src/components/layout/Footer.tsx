@@ -48,17 +48,30 @@ function FooterLink({
   href,
   children,
   className,
+  tapTarget = false,
+  underline = false,
 }: {
   href: string | null | undefined;
   children: ReactNode;
   className?: string;
+  /** Phones: a 44px-tall hit area; the growing underline then sits on the label. */
+  tapTarget?: boolean;
+  /** Permanent underline instead of the growing one. */
+  underline?: boolean;
 }) {
-  const classes = cn("link-grow text-navy-soft hover:text-white", className);
+  const classes = cn(
+    !tapTarget && !underline && "link-grow",
+    underline && "underline underline-offset-2",
+    "text-navy-soft hover:text-white",
+    tapTarget && "inline-flex min-h-11 items-center",
+    className,
+  );
+  const label = tapTarget && !underline ? <span className="link-grow">{children}</span> : children;
   const link = classifyHref(href);
   if (link.kind === "internal") {
     return (
       <Link href={link.href} className={classes}>
-        {children}
+        {label}
       </Link>
     );
   }
@@ -68,7 +81,7 @@ function FooterLink({
       className={classes}
       {...(link.kind === "external" ? { target: "_blank", rel: "noopener noreferrer" } : {})}
     >
-      {children}
+      {label}
     </a>
   );
 }
@@ -157,7 +170,7 @@ export default function Footer({
   return (
     <div className="mt-12 px-3 md:mt-16 lg:mt-28 lg:px-4">
       {/* ── Phones: compact footer (MobilFooldal) ─────────────────────── */}
-      <footer className="site-footer flex flex-col gap-5 rounded-t-[32px] bg-navy px-[22px] pt-[26px] pb-7 text-sm text-navy-soft md:hidden">
+      <footer className="site-footer flex flex-col gap-5 rounded-t-panel bg-navy px-[22px] pt-[26px] pb-7 text-sm text-navy-soft md:hidden">
         <h2 className="m-0 text-2xl leading-[1.15] font-extrabold text-white">
           Foglaljon időpontot még ma!
         </h2>
@@ -174,11 +187,12 @@ export default function Footer({
           {email && <FooterLink href={`mailto:${email}`}>{email}</FooterLink>}
         </p>
         {mobileLinks.length > 0 && (
-          <nav aria-label="Lábléc navigáció" className="grid grid-cols-2 gap-x-4 gap-y-2.5">
+          <nav aria-label="Lábléc navigáció" className="-my-2.5 grid grid-cols-2 gap-x-4">
             {mobileLinks.map((link) => (
               <FooterLink
                 key={link._key}
                 href={link.href}
+                tapTarget
                 className="font-bold text-white no-underline"
               >
                 {link.label}
@@ -186,24 +200,26 @@ export default function Footer({
             ))}
           </nav>
         )}
-        <div className="flex flex-wrap gap-x-3.5 gap-y-2 border-t border-white/12 pt-4 text-xs text-navy-faint">
+        <div className="flex flex-wrap items-center gap-x-3.5 border-t border-white/12 pt-1.5 text-xs text-navy-faint">
           {legalLinks.map((link) => (
             <FooterLink
               key={link.label}
               href={link.href}
-              className="text-navy-faint underline hover:text-white"
+              tapTarget
+              underline
+              className="text-navy-faint hover:text-white"
             >
               {link.short}
             </FooterLink>
           ))}
-          <span>
+          <span className="py-3">
             © {year} {displayName}
           </span>
         </div>
       </footer>
 
       {/* ── Tablet / desktop (Footer.dc) ──────────────────────────────── */}
-      <footer className="site-footer mx-auto hidden max-w-site flex-col gap-10 rounded-t-[32px] bg-navy px-10 pt-12 pb-7 text-navy-soft md:flex lg:gap-12 lg:rounded-t-hero lg:px-14 lg:pt-16 lg:pb-8">
+      <footer className="site-footer mx-auto hidden max-w-site flex-col gap-10 rounded-t-panel bg-navy px-10 pt-12 pb-7 text-navy-soft md:flex lg:gap-12 lg:rounded-t-hero lg:px-14 lg:pt-16 lg:pb-8">
         {/* CTA band */}
         <div className="flex flex-wrap items-center justify-between gap-6 border-b border-white/12 pb-10 lg:pb-12">
           <div className="flex max-w-[620px] flex-col gap-3">

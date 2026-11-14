@@ -8,7 +8,7 @@ export async function DraftModeIndicator() {
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-[60] bg-primary text-white py-2 px-4 flex justify-center items-center gap-4">
+    <div className="fixed bottom-0 left-0 right-0 z-[60] bg-navy text-white py-2 px-4 flex justify-center items-center gap-4">
       <span className="text-sm font-bold">Előnézet mód aktív</span>
       <a
         href="/api/disable-draft"

@@ -3,20 +3,20 @@
 import { motion } from "motion/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { PillButton } from "@/components/ui/PillButton";
+import { CheckboxRow } from "@/components/ui/PillCheckbox";
 import { type Consent, readConsent, saveConsent } from "@/lib/consent";
 
 /**
- * z-[60]: a hozzájárulási sáv MINDEN más rétegen felül van.
+ * z-[80]: a hozzájárulási sáv MINDEN más rétegen felül van, a Modal (z-[70]) felett is.
  *
- * z-50-nel a PopupModal teljes képernyős backdropja (szintén z-50, de a DOM-ban
- * később renderelődik, ezért felül fest) letakarta ezt a sávot: amíg a látogató be
- * nem zárta a felugró ablakot, az „Elfogad mind" gombra fizikailag nem lehetett
- * kattintani — a document.elementFromPoint a gomb közepén a backdropot adta vissza.
- *
- * Ez nem csak kényelmetlenség: hozzájárulás nélkül a Google Ads konverziómérés nem
- * fut (gcs=G100), tehát egy letakart cookie-sáv közvetlenül mérési kiesés.
+ * Ha egy felugró ablak backdropja letakarja, az „Elfogad mind" gombra fizikailag nem
+ * lehet kattintani, amíg a látogató be nem zárja az ablakot. Hozzájárulás nélkül a
+ * Google Ads konverziómérés nem fut (gcs=G100), tehát egy letakart cookie-sáv
+ * közvetlenül mérési kiesés.
  */
-const NOTICE_CLASS = "fixed bottom-4 right-4 z-[60] w-full max-w-sm rounded-2xl bg-white p-4 shadow-lg";
+const NOTICE_CLASS =
+  "fixed inset-x-3 bottom-3 z-[80] flex max-h-[calc(100dvh-1.5rem)] flex-col gap-3.5 overflow-y-auto rounded-tile bg-white p-5 text-navy shadow-float ring-1 ring-line-soft sm:inset-x-auto sm:right-5 sm:bottom-5 sm:w-[400px] sm:p-6";
 
 export function CookieNotice() {
   const [visible, setVisible] = useState(false);
@@ -41,95 +41,85 @@ export function CookieNotice() {
   return (
     <motion.div
       role="dialog"
-      aria-label="Cookie beállítások"
+      aria-labelledby="cookie-notice-title"
       className={NOTICE_CLASS}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, ease: "easeOut" }}
+      transition={{ duration: 0.4, ease: [0.2, 0.8, 0.2, 1] }}
     >
-      <p className="mb-1 text-sm font-bold text-primary">Sütik használata</p>
-      <p className="mb-3 text-sm text-gray-700 leading-relaxed">
-        Sütiket használunk a weboldal működéséhez, valamint — hozzájárulásoddal — analitikai és
-        marketing (Google Ads) célból. Részletek az{" "}
-        <Link
-          href="/adatkezelesi-tajekoztato"
-          className="text-accent underline hover:opacity-80 transition-opacity"
-        >
-          adatkezelési tájékoztatóban
-        </Link>
-        .
-      </p>
+      <div className="flex flex-col gap-1.5">
+        <p id="cookie-notice-title" className="m-0 text-base font-extrabold">
+          Sütik használata
+        </p>
+        <p className="m-0 text-sm leading-relaxed text-muted">
+          Sütiket használunk a weboldal működéséhez, valamint — hozzájárulásoddal — analitikai és
+          marketing (Google Ads) célból. Részletek az{" "}
+          <Link
+            href="/adatkezelesi-tajekoztato"
+            className="font-bold text-teal-ink underline underline-offset-2 hover:text-navy"
+          >
+            adatkezelési tájékoztatóban
+          </Link>
+          .
+        </p>
+      </div>
 
       {showSettings && (
-        <div className="mb-3 space-y-2 rounded-xl bg-gray-50 p-3">
-          <label className="flex items-start justify-between gap-3 opacity-60">
-            <span className="text-sm text-gray-700">
-              <span className="font-medium">Szükséges</span>
-              <br />
-              <span className="text-xs">A weboldal működéséhez elengedhetetlen.</span>
-            </span>
-            <input type="checkbox" checked disabled className="mt-1 h-4 w-4 accent-primary" />
-          </label>
-          <label className="flex items-start justify-between gap-3 cursor-pointer">
-            <span className="text-sm text-gray-700">
-              <span className="font-medium">Analitika</span>
-              <br />
-              <span className="text-xs">Névtelen látogatottsági statisztika (GA4).</span>
-            </span>
-            <input
-              type="checkbox"
-              checked={analytics}
-              onChange={(e) => setAnalytics(e.target.checked)}
-              className="mt-1 h-4 w-4 accent-primary"
-            />
-          </label>
-          <label className="flex items-start justify-between gap-3 cursor-pointer">
-            <span className="text-sm text-gray-700">
-              <span className="font-medium">Marketing</span>
-              <br />
-              <span className="text-xs">Google Ads konverziómérés a hirdetések hatékonyságához.</span>
-            </span>
-            <input
-              type="checkbox"
-              checked={marketing}
-              onChange={(e) => setMarketing(e.target.checked)}
-              className="mt-1 h-4 w-4 accent-primary"
-            />
-          </label>
+        <div className="flex flex-col gap-1 rounded-[22px] bg-field p-2">
+          <p className="m-0 px-3.5 py-2 text-sm leading-normal text-muted-strong">
+            <span className="font-extrabold text-navy">Szükséges</span> — a weboldal működéséhez
+            elengedhetetlen, mindig aktív.
+          </p>
+          <CheckboxRow id="cookie-analytics" checked={analytics} onChange={setAnalytics} size="sm">
+            <span className="font-extrabold text-navy">Analitika</span> — névtelen látogatottsági
+            statisztika (GA4).
+          </CheckboxRow>
+          <CheckboxRow id="cookie-marketing" checked={marketing} onChange={setMarketing} size="sm">
+            <span className="font-extrabold text-navy">Marketing</span> — Google Ads konverziómérés
+            a hirdetések hatékonyságához.
+          </CheckboxRow>
         </div>
       )}
 
-      <div className="flex flex-wrap items-center gap-2">
-        <button
-          type="button"
+      <div className="grid grid-cols-2 gap-2">
+        <PillButton
+          size="md"
+          fullWidth
+          className="col-span-2 h-11"
           onClick={() => commit({ analytics: true, marketing: true })}
-          className="rounded-xl bg-primary px-4 py-2 text-sm text-white hover:opacity-90 transition-opacity"
         >
           Elfogad mind
-        </button>
-        <button
-          type="button"
+        </PillButton>
+        <PillButton
+          variant="outline"
+          size="md"
+          fullWidth
+          className="h-11 px-3"
           onClick={() => commit({ analytics: false, marketing: false })}
-          className="rounded-xl border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
         >
           Elutasít
-        </button>
+        </PillButton>
         {showSettings ? (
-          <button
-            type="button"
+          <PillButton
+            variant="outline"
+            size="md"
+            fullWidth
+            className="h-11 px-3"
             onClick={() => commit({ analytics, marketing })}
-            className="rounded-xl border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
           >
             Mentés
-          </button>
+          </PillButton>
         ) : (
-          <button
-            type="button"
+          <PillButton
+            variant="ghost"
+            size="md"
+            fullWidth
+            className="h-11 bg-canvas px-3"
+            aria-expanded={false}
             onClick={() => setShowSettings(true)}
-            className="text-sm text-accent underline hover:opacity-80 transition-opacity"
           >
             Beállítások
-          </button>
+          </PillButton>
         )}
       </div>
     </motion.div>

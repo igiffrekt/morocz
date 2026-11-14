@@ -12,7 +12,7 @@ import type { BlockedDate, WeeklySchedule } from "../../../../sanity.types";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Időpont kezelése — Mórocz Medical",
+  title: "Időpont kezelése",
   robots: { index: false },
 };
 
@@ -124,7 +124,7 @@ export default async function FoglalasTokenPage({
     struck?: boolean;
   }) {
     return (
-      <div className="fade-up flex flex-col items-start gap-[18px] rounded-[32px] bg-white p-6 sm:rounded-[36px] sm:p-[clamp(24px,4vw,48px)]">
+      <div className="fade-up flex flex-col items-start gap-[18px] rounded-panel bg-white p-6 sm:rounded-[36px] sm:p-[clamp(24px,4vw,48px)]">
         <span
           className={`inline-flex h-[76px] w-[76px] items-center justify-center rounded-full ${iconClassName}`}
         >
@@ -148,7 +148,7 @@ export default async function FoglalasTokenPage({
         <p className="m-0 max-w-[560px] text-base leading-relaxed text-muted">{text}</p>
         {appointment && (
           <dl
-            className={`m-0 flex max-w-full flex-wrap gap-x-7 gap-y-2 rounded-[28px] bg-canvas px-[22px] py-3.5 text-[15px] ${struck ? "text-muted line-through" : "text-navy"}`}
+            className={`m-0 flex max-w-full flex-wrap gap-x-7 gap-y-2 rounded-tile bg-canvas px-[22px] py-3.5 text-[15px] ${struck ? "text-muted line-through" : "text-navy"}`}
           >
             <div className="flex gap-1.5">
               <dt className="font-semibold text-muted">Szolgáltatás:</dt>

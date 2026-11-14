@@ -22,7 +22,7 @@ export function HeroBreadcrumb({ crumbs }: { crumbs: readonly Crumb[] }) {
         <li className="flex">
           <Link
             href="/"
-            className="link-grow inline-flex items-center gap-2 rounded-full py-0.5 pr-1.5 pl-0.5 text-[#d6d9ec] hover:text-white"
+            className="link-grow tap-area inline-flex items-center gap-2 rounded-full py-0.5 pr-1.5 pl-0.5 text-[#d6d9ec] hover:text-white"
           >
             <span className="inline-flex h-[26px] w-[26px] items-center justify-center rounded-full bg-mint text-navy">
               <PathIcon d={HOME_ICON} size={14} strokeWidth={2.4} />
@@ -40,7 +40,7 @@ export function HeroBreadcrumb({ crumbs }: { crumbs: readonly Crumb[] }) {
               {crumb.href && middle ? (
                 <Link
                   href={crumb.href}
-                  className="link-grow px-1 py-0.5 text-[#d6d9ec] hover:text-white"
+                  className="link-grow tap-area px-1 py-0.5 text-[#d6d9ec] hover:text-white"
                 >
                   {crumb.label}
                 </Link>
@@ -108,7 +108,7 @@ export function PageHero({
 }: PageHeroProps) {
   return (
     <section aria-labelledby={titleId}>
-      <div className="relative flex flex-wrap items-center gap-12 overflow-hidden rounded-[32px] bg-navy px-5 pt-5 pb-6 text-white sm:px-10 sm:py-12 lg:min-h-[640px] lg:rounded-hero lg:px-[clamp(20px,5vw,64px)] lg:py-[clamp(28px,5vw,72px)]">
+      <div className="relative flex flex-wrap items-center gap-12 overflow-hidden rounded-panel bg-navy px-5 pt-5 pb-6 text-white sm:px-10 sm:py-12 lg:min-h-[640px] lg:rounded-hero lg:px-[clamp(20px,5vw,64px)] lg:py-[clamp(28px,5vw,72px)]">
         <div
           aria-hidden="true"
           className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,.08)_1.2px,transparent_1.6px)] bg-[length:18px_18px] lg:bg-[radial-gradient(rgba(255,255,255,.07)_1px,transparent_1px)] lg:bg-[length:26px_26px]"

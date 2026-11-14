@@ -30,7 +30,7 @@ function PriceRows({ rows, compact }: { rows: PriceMenuItem[]; compact?: boolean
           className={cn(
             "flex flex-col gap-1 py-[11px]",
             i < rows.length - 1 &&
-              (compact ? "border-b border-navy/8" : "border-b border-[#eceef4]"),
+              (compact ? "border-b border-navy/8" : "border-b border-line-soft"),
           )}
         >
           <div className="flex items-end gap-2.5">
@@ -124,7 +124,7 @@ function WeekRows({ week }: { week: WeekdayHours[] }) {
       {week.map((day) => (
         <div
           key={day.name}
-          className="flex items-center justify-between gap-3 border-b border-[#eceef4] py-3 text-[15px] md:text-base"
+          className="flex items-center justify-between gap-3 border-b border-line-soft py-3 text-[15px] md:text-base"
         >
           <span className="font-bold">{day.name}</span>
           <span

@@ -69,7 +69,7 @@ export function YogaInstructors({ instructors, sessions, onOpen }: YogaInstructo
                 type="button"
                 onClick={() => onOpen(person.slug)}
                 aria-haspopup="dialog"
-                className="card-lift zoom-frame flex h-full w-full flex-col overflow-hidden rounded-[28px] border border-[#eceef4] bg-white p-0 text-left text-navy"
+                className="card-lift zoom-frame flex h-full w-full flex-col overflow-hidden rounded-tile border border-line-soft bg-white p-0 text-left text-navy"
               >
                 <span className="relative block aspect-square w-full overflow-hidden bg-[#dfe3ea]">
                   {person.photoUrl ? (

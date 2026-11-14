@@ -108,7 +108,7 @@ export function EmptyWell({
   return (
     <div
       className={cn(
-        "fade-up flex flex-col items-center justify-center gap-3.5 rounded-[28px] border-[1.5px] border-dashed border-line p-6 text-center text-[15px] font-bold text-muted",
+        "fade-up flex flex-col items-center justify-center gap-3.5 rounded-tile border-[1.5px] border-dashed border-line p-6 text-center text-[15px] font-bold text-muted",
         className,
       )}
     >

@@ -6,7 +6,7 @@ export function StepCard({ children, className }: { children: ReactNode; classNa
   return (
     <section
       className={cn(
-        "flex flex-col gap-7 rounded-[32px] bg-white p-4 sm:rounded-[36px] sm:p-[clamp(20px,3vw,36px)]",
+        "flex flex-col gap-7 rounded-panel bg-white p-4 sm:rounded-[36px] sm:p-[clamp(20px,3vw,36px)]",
         className,
       )}
     >

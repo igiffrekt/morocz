@@ -370,7 +370,7 @@ export function Step4Confirm({
             Céges számlát kérek
           </CheckboxPill>
           <Collapse id="confirm-company-panel" open={wantsBusinessInvoice}>
-            <div className="mt-4 flex flex-col gap-3.5 rounded-[28px] bg-field p-4 sm:p-5">
+            <div className="mt-4 flex flex-col gap-3.5 rounded-tile bg-field p-4 sm:p-5">
               <TextField
                 id="tax-number"
                 label="Adószám"

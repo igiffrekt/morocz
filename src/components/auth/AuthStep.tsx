@@ -468,7 +468,7 @@ export default function AuthStep({ onSuccess, defaultTab = "belepes", className 
               hint="Legalább 6 karakter"
               error={errors.password}
             />
-            <fieldset className="m-0 flex flex-col gap-3 rounded-[28px] border-0 bg-field p-4 sm:p-5">
+            <fieldset className="m-0 flex flex-col gap-3 rounded-tile border-0 bg-field p-4 sm:p-5">
               <legend className="float-left mb-1 p-0 text-[13px] font-extrabold tracking-[.08em] text-muted uppercase">
                 Számlázási cím
               </legend>

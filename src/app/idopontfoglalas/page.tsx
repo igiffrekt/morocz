@@ -21,7 +21,7 @@ import type {
 } from "../../../sanity.types";
 
 export const metadata: Metadata = {
-  title: "Időpontfoglalás | Mórocz Medical",
+  title: "Időpontfoglalás",
   description: "Foglaljon időpontot online nőgyógyászati vizsgálatra vagy várandósgondozásra.",
 };
 

@@ -224,8 +224,8 @@ export function PriceMenu({
       <Accordion
         items={items}
         className="grid items-start gap-3.5 md:gap-4 md:[grid-template-columns:repeat(auto-fit,minmax(min(100%,560px),1fr))]"
-        itemClassName="rounded-[28px] md:rounded-panel"
-        triggerClassName="gap-3 rounded-[28px] p-3.5 md:gap-[18px] md:rounded-panel md:px-6 md:py-[22px]"
+        itemClassName="rounded-tile md:rounded-panel"
+        triggerClassName="gap-3 rounded-tile p-3.5 md:gap-[18px] md:rounded-panel md:px-6 md:py-[22px]"
         titleClassName="text-base leading-[1.25] md:text-xl md:leading-tight"
         subtitleClassName="text-xs md:text-sm"
         plusClassName="h-9 w-9 md:h-[42px] md:w-[42px]"

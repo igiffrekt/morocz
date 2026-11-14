@@ -466,7 +466,7 @@ export function LegalHelpCard({ className }: { className?: string }) {
       {email && (
         <a
           href={`mailto:${email}`}
-          className="link-grow relative self-start text-[13px] font-bold break-all text-mint-light hover:text-white"
+          className="link-grow tap-area self-start text-[13px] font-bold break-all text-mint-light hover:text-white"
         >
           {email}
         </a>
@@ -515,7 +515,7 @@ export function LegalNextDoc({ current, className }: { current: LegalDocKey; cla
       </span>
       <Link
         href={next.href}
-        className="tap-press flex min-h-[72px] items-center gap-3 rounded-[28px] bg-navy py-3 pr-3 pl-[18px] text-white no-underline hover:text-white"
+        className="tap-press flex min-h-[72px] items-center gap-3 rounded-tile bg-navy py-3 pr-3 pl-[18px] text-white no-underline hover:text-white"
       >
         <span className="flex min-w-0 flex-1 flex-col gap-0.5">
           <strong className="text-base font-extrabold">{next.label}</strong>

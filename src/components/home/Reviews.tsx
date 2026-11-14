@@ -45,7 +45,7 @@ function prefersReducedMotion() {
  * scroll position either way.
  */
 export function Reviews({ heading, reviews, ctaText, ctaUrl }: ReviewsProps) {
-  const trackRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLElement>(null);
   const [active, setActive] = useState(0);
   const count = reviews.length;
 
@@ -92,7 +92,7 @@ export function Reviews({ heading, reviews, ctaText, ctaUrl }: ReviewsProps) {
         href={ctaUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="link-grow py-0.5 text-[13px] font-bold whitespace-nowrap text-navy md:text-[15px]"
+        className="link-grow tap-area py-0.5 text-[13px] font-bold whitespace-nowrap text-navy md:text-[15px]"
       >
         {ctaText} <span aria-hidden="true">→</span>
       </a>
@@ -142,9 +142,13 @@ export function Reviews({ heading, reviews, ctaText, ctaUrl }: ReviewsProps) {
         )}
       </div>
 
-      <div
+      {/* Focusable so keyboard users can scroll it (axe scrollable-region-focusable). */}
+      <section
         ref={trackRef}
-        className="scrollbar-none -mx-3 flex snap-x snap-mandatory scroll-px-3 gap-2.5 overflow-x-auto overscroll-x-contain px-3 lg:mx-0 lg:scroll-px-0 lg:gap-0 lg:px-0"
+        aria-label="Vélemények – lapozható lista"
+        // biome-ignore lint/a11y/noNoninteractiveTabindex: scroll container must be keyboard-scrollable
+        tabIndex={0}
+        className="scrollbar-none -mx-3 flex snap-x snap-mandatory scroll-px-3 gap-2.5 overflow-x-auto overscroll-x-contain px-3 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-teal-focus lg:mx-0 lg:scroll-px-0 lg:gap-0 lg:px-0"
       >
         {reviews.map((review, index) => (
           <figure
@@ -162,11 +166,11 @@ export function Reviews({ heading, reviews, ctaText, ctaUrl }: ReviewsProps) {
             </figcaption>
           </figure>
         ))}
-      </div>
+      </section>
 
       <div className="flex flex-wrap items-center justify-center gap-3 lg:justify-between">
         {count > 1 && (
-          <div className="flex gap-1.5 lg:gap-2">
+          <div className="-my-[19px] flex lg:-my-[17px]">
             {reviews.map((review, index) => (
               <button
                 key={review.id}
@@ -174,13 +178,19 @@ export function Reviews({ heading, reviews, ctaText, ctaUrl }: ReviewsProps) {
                 aria-label={`${index + 1}. vélemény`}
                 aria-current={index === active ? "true" : undefined}
                 onClick={() => goTo(index)}
-                className={cn(
-                  "relative h-1.5 rounded-full border-0 p-0 before:absolute before:-inset-x-1 before:-inset-y-3 before:content-[''] transition-[width,background-color] duration-[450ms] ease-bento lg:h-2.5",
-                  index === active
-                    ? "w-[22px] bg-navy lg:w-9"
-                    : "w-1.5 bg-[#c5cad9] lg:w-2.5 lg:bg-line",
-                )}
-              />
+                // 44px-tall, ≥24px-wide hit area; the visible dot is the inner span.
+                className="group inline-flex h-11 min-w-6 items-center justify-center border-0 bg-transparent p-0 lg:min-w-7"
+              >
+                <span
+                  aria-hidden="true"
+                  className={cn(
+                    "block h-1.5 rounded-full transition-[width,background-color] duration-[450ms] ease-bento lg:h-2.5",
+                    index === active
+                      ? "w-[22px] bg-navy lg:w-9"
+                      : "w-1.5 bg-[#c5cad9] group-hover:bg-muted lg:w-2.5 lg:bg-line",
+                  )}
+                />
+              </button>
             ))}
           </div>
         )}

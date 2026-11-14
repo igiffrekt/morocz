@@ -292,7 +292,7 @@ export function ServicePage({
             </div>
             <Link
               href={PRICES_PATH}
-              className="link-grow py-1 text-[15px] font-bold whitespace-nowrap text-navy"
+              className="link-grow tap-area py-1 text-[15px] font-bold whitespace-nowrap text-navy"
             >
               Szolgáltatások és Árak →
             </Link>
@@ -305,7 +305,7 @@ export function ServicePage({
                   <Link
                     href={rm.href}
                     className={cn(
-                      "card-lift flex w-full min-h-[150px] flex-col justify-between rounded-[28px] p-5 text-navy no-underline hover:text-navy md:min-h-[230px] md:rounded-[36px] md:p-7",
+                      "card-lift flex w-full min-h-[150px] flex-col justify-between rounded-tile p-5 text-navy no-underline hover:text-navy md:min-h-[230px] md:rounded-[36px] md:p-7",
                       rm.tint,
                     )}
                   >

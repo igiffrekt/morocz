@@ -154,7 +154,7 @@ export function MobileStepProgress({
                 <span
                   className={cn(
                     "flex min-w-0 items-center gap-[5px] text-[11px] font-extrabold whitespace-nowrap",
-                    current ? "text-navy" : "text-[#6b7280]",
+                    current ? "text-navy" : "text-muted",
                   )}
                 >
                   <span

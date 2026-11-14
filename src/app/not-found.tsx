@@ -38,7 +38,7 @@ export default function NotFound() {
     <div className="flex flex-col gap-3 pb-6 md:gap-4 lg:pb-0">
       {/* Page-local keyframes (the global reduced-motion rule switches them off). */}
       <style>{`@keyframes nf-spin{to{transform:rotate(360deg)}}@keyframes nf-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}`}</style>
-      <section className="relative flex flex-wrap items-stretch overflow-hidden rounded-[32px] bg-navy text-white md:min-h-[620px] md:rounded-hero">
+      <section className="relative flex flex-wrap items-stretch overflow-hidden rounded-panel bg-navy text-white md:min-h-[620px] md:rounded-hero">
         <div
           aria-hidden="true"
           className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,.07)_1px,transparent_1px)] bg-[length:26px_26px]"

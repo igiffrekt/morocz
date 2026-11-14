@@ -1,5 +1,6 @@
 "use client";
 
+import { Fragment } from "react";
 import { useNow } from "@/hooks/useNow";
 import {
   budapestClock,
@@ -13,8 +14,8 @@ import type { OpeningDay } from "@/lib/opening-hours";
 const TONES: Record<ClinicState | "idle", { pill: string; dot: string }> = {
   open: { pill: "bg-mint-pale text-[#1f5f5a]", dot: "bg-teal-ink" },
   later: { pill: "bg-sun-soft text-[#5c4307]", dot: "bg-sun" },
-  closed: { pill: "bg-canvas text-muted-strong", dot: "bg-[#9ca1b5]" },
-  idle: { pill: "bg-canvas text-muted-strong", dot: "bg-[#9ca1b5]" },
+  closed: { pill: "bg-canvas text-muted-strong", dot: "bg-disabled-ink" },
+  idle: { pill: "bg-canvas text-muted-strong", dot: "bg-disabled-ink" },
 };
 
 interface ClinicStatusProps {
@@ -105,7 +106,7 @@ export function ClinicStatusCard({ schedule, openDays }: ClinicStatusProps) {
 export function ClinicStatusPill({ schedule }: Pick<ClinicStatusProps, "schedule">) {
   const { status } = useStatus(schedule);
   const dot =
-    status?.state === "open" ? "bg-mint" : status?.state === "later" ? "bg-sun" : "bg-[#9ca1b5]";
+    status?.state === "open" ? "bg-mint" : status?.state === "later" ? "bg-sun" : "bg-disabled-ink";
   return (
     // biome-ignore lint/a11y/useSemanticElements: a live status line, not a form result (<output>)
     <div role="status" className="relative flex min-h-[58px] flex-col items-start gap-2">
@@ -118,7 +119,16 @@ export function ClinicStatusPill({ schedule }: Pick<ClinicStatusProps, "schedule
       </span>
       {status?.nextValue && (
         <span className="text-[13px] leading-snug text-navy-soft">
-          {status.nextLabel}: <strong className="font-bold text-white">{status.nextValue}</strong>
+          {status.nextLabel}:{" "}
+          <strong className="font-bold text-white">
+            {/* Keep "Kedd, november 17." and "13:20 – 16:40" each on one line. */}
+            {status.nextValue.split(" · ").map((part, index) => (
+              <Fragment key={part}>
+                {index > 0 && " · "}
+                <span className="whitespace-nowrap">{part}</span>
+              </Fragment>
+            ))}
+          </strong>
         </span>
       )}
     </div>

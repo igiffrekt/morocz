@@ -219,10 +219,15 @@ export function prepareLegalBody<T extends LegalBlockLike>(
   const headings: Record<string, LegalHeading> = {};
   const toc: LegalTocItem[] = [];
 
+  let seenTop = false;
   const body = source.map((block, index) => {
     if (!isHeading(block)) return block;
     const level = HEADING_LEVEL[block.style ?? ""] ?? 4;
     const rank = Math.min(4, Math.max(2, level - shift)) as HeadingRank;
+    // A sub-heading before the first top-level heading (e.g. the operator's name under
+    // the title) would skip a level after the page h1: it renders as a bold paragraph.
+    if (rank === 2) seenTop = true;
+    else if (!seenTop) return block;
     const plain = blockPlainText(block);
     const key = block._key ?? `h-${index}`;
     const id = uniqueId(slugifyHeading(plain));

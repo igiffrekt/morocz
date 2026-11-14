@@ -55,7 +55,7 @@ export function YogaWeek({ classes }: { classes: YogaClassSlot[] }) {
     <section
       id="joga"
       aria-labelledby="joga-cim"
-      className="flex scroll-mt-28 flex-col gap-3.5 rounded-[32px] bg-sage px-4 py-[22px] md:gap-9 md:rounded-hero md:p-10 lg:p-14"
+      className="flex scroll-mt-28 flex-col gap-3.5 rounded-panel bg-sage px-4 py-[22px] md:gap-9 md:rounded-hero md:p-10 lg:p-14"
     >
       <div className="flex items-end justify-between gap-2.5 px-1 md:flex-wrap md:gap-5 md:px-0">
         <div className="flex flex-col gap-1 md:gap-3">

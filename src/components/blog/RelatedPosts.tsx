@@ -35,7 +35,7 @@ export function RelatedPosts({ posts }: { posts: ArticleCard[] }) {
             <Link
               href={`/blog/${post.slug}`}
               aria-current={post.current ? "page" : undefined}
-              className="card-lift zoom-frame flex h-full flex-col overflow-hidden rounded-[32px] bg-white text-navy no-underline md:rounded-hero"
+              className="card-lift zoom-frame flex h-full flex-col overflow-hidden rounded-panel bg-white text-navy no-underline md:rounded-hero"
             >
               <span className="relative block h-[220px] overflow-hidden bg-sage md:h-[240px]">
                 {post.imageUrl && (
@@ -71,7 +71,7 @@ export function RelatedPosts({ posts }: { posts: ArticleCard[] }) {
           </li>
         ))}
         {onlyCurrent && (
-          <li className="flex min-h-[240px] flex-col items-center justify-center gap-3.5 rounded-[32px] border-2 border-dashed border-line p-8 text-center md:min-h-[380px] md:rounded-hero">
+          <li className="flex min-h-[240px] flex-col items-center justify-center gap-3.5 rounded-panel border-2 border-dashed border-line p-8 text-center md:min-h-[380px] md:rounded-hero">
             <span className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-white text-[#9aa0b4]">
               <svg
                 width="24"

@@ -117,7 +117,7 @@ export function BookingSuccessPanel({
     "link-grow self-start border-0 bg-transparent px-0 py-1 text-sm font-bold text-teal-ink";
 
   return (
-    <div className="fade-up flex flex-wrap items-start gap-10 rounded-[32px] bg-white p-6 sm:rounded-hero sm:p-[clamp(24px,4vw,56px)]">
+    <div className="fade-up flex flex-wrap items-start gap-10 rounded-panel bg-white p-6 sm:rounded-hero sm:p-[clamp(24px,4vw,56px)]">
       <div className="flex min-w-0 flex-[1_1_380px] flex-col gap-[22px]">
         <span className="pop-in-slow inline-flex h-[84px] w-[84px] items-center justify-center rounded-full bg-mint text-navy shadow-[0_0_0_12px_var(--color-mint-pale)]">
           <Icon d="M20 6 9 17l-5-5" size={40} />
@@ -175,7 +175,7 @@ export function BookingSuccessPanel({
       </div>
 
       <div className="flex min-w-0 flex-[1_1_360px] flex-col gap-3">
-        <dl className="m-0 rounded-[32px] bg-canvas px-6 py-2.5">
+        <dl className="m-0 rounded-panel bg-canvas px-6 py-2.5">
           {rows.map((r, i) => (
             <div
               key={r.k}
@@ -190,7 +190,7 @@ export function BookingSuccessPanel({
           ))}
         </dl>
 
-        <div className="flex flex-col gap-2.5 rounded-[28px] bg-mint-pale px-[22px] py-[18px] text-sm leading-relaxed text-muted-strong">
+        <div className="flex flex-col gap-2.5 rounded-tile bg-mint-pale px-[22px] py-[18px] text-sm leading-relaxed text-muted-strong">
           <strong className="text-[15px] text-navy">Tudnivalók a látogatással kapcsolatban</strong>
           <ul className="m-0 flex list-none flex-col gap-1.5 p-0">
             <li className="flex gap-2.5">
@@ -223,7 +223,7 @@ export function BookingSuccessPanel({
           </ul>
         </div>
 
-        <div className="flex flex-col gap-1.5 rounded-[28px] bg-sun-soft px-[22px] py-[18px] text-sm leading-relaxed text-muted-strong">
+        <div className="flex flex-col gap-1.5 rounded-tile bg-sun-soft px-[22px] py-[18px] text-sm leading-relaxed text-muted-strong">
           <strong className="text-[15px] text-navy">Időpontfoglalás lemondása</strong>
           <span>
             A foglalt időpontot bármikor lemondhatja a visszaigazoló e-mailben található linkre

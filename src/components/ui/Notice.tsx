@@ -52,7 +52,7 @@ export function Notice({
       className={cn(
         "fade-up flex items-start gap-3 text-sm",
         shape === "pill"
-          ? "rounded-[28px] py-3 pr-5 pl-3 font-bold"
+          ? "rounded-tile py-3 pr-5 pl-3 font-bold"
           : "rounded-3xl px-5 py-4 leading-relaxed",
         plain && shape === "pill" && "pl-5",
         t.box,

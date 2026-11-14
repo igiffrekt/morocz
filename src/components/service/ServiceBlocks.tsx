@@ -9,7 +9,7 @@ function CheckList({ items, meta }: { items: string[]; meta: ServiceMeta }) {
   return (
     <ul
       className={cn(
-        "m-0 mt-1 flex list-none flex-col gap-0.5 rounded-[28px] bg-white p-1.5",
+        "m-0 mt-1 flex list-none flex-col gap-0.5 rounded-tile bg-white p-1.5",
         "md:gap-3.5 md:p-[clamp(20px,3vw,30px)]",
         meta.listSurfaceMd,
       )}

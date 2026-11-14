@@ -105,7 +105,7 @@ export function Header({
               scrolled ? "shadow-float" : "shadow-bar",
             )}
           >
-            <Link href="/" className="flex shrink-0 items-center">
+            <Link href="/" className="flex min-h-11 shrink-0 items-center">
               <Image
                 src="/mm-logo-web.svg"
                 alt={logoAlt}

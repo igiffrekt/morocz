@@ -56,7 +56,7 @@ export async function AuthShell({ crumb, children }: AuthShellProps) {
 
   return (
     <section className="flex flex-col gap-3 lg:flex-row lg:items-stretch lg:gap-4">
-      <div className="relative flex min-w-0 flex-col overflow-hidden rounded-[32px] bg-navy text-white lg:min-h-[760px] lg:flex-[1_1_520px] lg:rounded-hero">
+      <div className="relative flex min-w-0 flex-col overflow-hidden rounded-panel bg-navy text-white lg:min-h-[760px] lg:flex-[1_1_520px] lg:rounded-hero">
         <div
           aria-hidden="true"
           className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,.07)_1px,transparent_1px)] bg-[length:26px_26px]"
@@ -73,7 +73,7 @@ export async function AuthShell({ crumb, children }: AuthShellProps) {
             {FACTS.map((fact, i) => (
               <li
                 key={fact.t}
-                className="fade-up flex items-start gap-3.5 rounded-[28px] border border-white/10 bg-white/6 py-3.5 pr-[18px] pl-3.5"
+                className="fade-up flex items-start gap-3.5 rounded-tile border border-white/10 bg-white/6 py-3.5 pr-[18px] pl-3.5"
                 style={{ "--i": i * 1.3 } as CSSProperties}
               >
                 <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-mint text-navy">
@@ -116,7 +116,7 @@ export async function AuthShell({ crumb, children }: AuthShellProps) {
         </div>
       </div>
 
-      <div className="flex min-w-0 flex-col gap-[22px] rounded-[32px] bg-white p-5 sm:p-[clamp(24px,4vw,56px)] lg:flex-[1_1_440px] lg:rounded-hero">
+      <div className="flex min-w-0 flex-col gap-[22px] rounded-panel bg-white p-5 sm:p-[clamp(24px,4vw,56px)] lg:flex-[1_1_440px] lg:rounded-hero">
         {children}
       </div>
     </section>

@@ -149,7 +149,7 @@ export default function ForgotPassword({
         </>
       ) : (
         <>
-          <output className="fade-up flex items-start gap-3.5 rounded-[28px] bg-mint-pale px-[22px] py-[18px]">
+          <output className="fade-up flex items-start gap-3.5 rounded-tile bg-mint-pale px-[22px] py-[18px]">
             <span className="pop-in-slow inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-mint text-navy">
               <svg
                 width="20"

@@ -11,7 +11,8 @@ export const revalidate = 30;
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await sanityFetch<YogaPageQueryResult>({ query: yogaPageQuery, tags: ["yogaPage"] });
-  const title = page?.heroHeadline || "Lélekző";
+  // The hero headline is just "Lélekző"; the tab title uses the full name (as the nav does).
+  const title = "Lélekző Jóga";
   const description =
     page?.metaDescription || "Fedezd fel jógaóráinkat és csatlakozz heti foglalkozásainkhoz.";
   return {

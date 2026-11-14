@@ -1,11 +1,23 @@
 import { describe, expect, it } from "vitest";
 import { resolveRefund } from "./policy";
 
+// The policy reads slotDate/slotTime as Budapest wall-clock time, so the helper
+// formats both in Europe/Budapest too (mixing a UTC date with local hours broke the
+// test between 00:00 and 01:00 local time). `now` is pinned so nothing drifts.
+const NOW = new Date();
+const budapestParts = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "Europe/Budapest",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit",
+  hourCycle: "h23",
+});
 const apptIn = (hoursFromNow: number) => {
-  const d = new Date(Date.now() + hoursFromNow * 3600_000);
-  const slotDate = d.toISOString().slice(0, 10);
-  const slotTime = `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
-  return { slotDate, slotTime };
+  const d = new Date(NOW.getTime() + hoursFromNow * 3600_000);
+  const p = Object.fromEntries(budapestParts.formatToParts(d).map((x) => [x.type, x.value]));
+  return { slotDate: `${p.year}-${p.month}-${p.day}`, slotTime: `${p.hour}:${p.minute}`, now: NOW };
 };
 
 describe("resolveRefund", () => {

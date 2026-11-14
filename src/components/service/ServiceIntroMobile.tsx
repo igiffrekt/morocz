@@ -16,7 +16,8 @@ export function ServiceIntroMobile({ intro }: { intro: string[] }) {
       aria-label="Bevezető"
       className="mt-3 flex flex-col gap-3 rounded-tile bg-white px-5 pt-5 pb-4 md:hidden"
     >
-      <p className="fade-up m-0 text-[15px] leading-[1.6] text-muted-strong">{first}</p>
+      {/* No entrance animation: on phones this paragraph is the LCP element. */}
+      <p className="m-0 text-[15px] leading-[1.6] text-muted-strong">{first}</p>
       {rest.length > 0 && (
         <>
           <Collapse id={panelId} open={open}>

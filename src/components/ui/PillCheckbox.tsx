@@ -106,7 +106,7 @@ export function CheckboxRow({
   return (
     <div
       className={cn(
-        "flex items-start gap-3.5 rounded-[28px] py-1.5 pr-3.5 pl-1.5 transition-colors duration-300",
+        "flex items-start gap-3.5 rounded-tile py-1.5 pr-3.5 pl-1.5 transition-colors duration-300",
         invalid ? "bg-coral-soft" : "bg-transparent",
         className,
       )}

@@ -204,7 +204,7 @@ export function ClassModal({
                 <button
                   type="button"
                   onClick={() => onOpenInstructor(instructor.slug)}
-                  className="chip-lift inline-flex items-center gap-3 self-start rounded-full border-[1.5px] border-[#eceef4] bg-white py-1.5 pr-5 pl-1.5 font-extrabold whitespace-nowrap text-navy hover:border-navy"
+                  className="chip-lift inline-flex items-center gap-3 self-start rounded-full border-[1.5px] border-line-soft bg-white py-1.5 pr-5 pl-1.5 font-extrabold whitespace-nowrap text-navy hover:border-navy"
                 >
                   <Avatar url={instructor.avatarUrl} size={40} />
                   {instructor.name}
@@ -316,7 +316,7 @@ export function InstructorModal({
                     key={s.id}
                     type="button"
                     onClick={() => onOpenSession(s.id)}
-                    className="chip-lift inline-flex min-h-10 items-center gap-2 rounded-full border-[1.5px] border-[#eceef4] bg-white px-4 py-1.5 text-left text-[13px] font-bold whitespace-nowrap text-navy hover:border-navy"
+                    className="chip-lift inline-flex min-h-10 items-center gap-2 rounded-full border-[1.5px] border-line-soft bg-white px-4 py-1.5 text-left text-[13px] font-bold whitespace-nowrap text-navy hover:border-navy"
                   >
                     <span
                       aria-hidden="true"
@@ -330,7 +330,7 @@ export function InstructorModal({
             </Field>
           )}
           {(instructor.phone || instructor.email || instructor.links.length > 0) && (
-            <div className="flex flex-col gap-2.5 border-t border-[#eceef4] pt-[18px]">
+            <div className="flex flex-col gap-2.5 border-t border-line-soft pt-[18px]">
               <span className="text-[13px] font-bold text-[#6b7280]">Kapcsolat</span>
               {instructor.phone && (
                 <a

@@ -22,7 +22,7 @@ function PackageCard({ pack, index }: { pack: ScreeningPackage; index: number })
       <article
         aria-labelledby={`csomag-${pack.id}`}
         className={cn(
-          "card-lift flex w-full flex-col gap-[18px] rounded-[32px] p-5 md:gap-[22px] md:rounded-[36px] md:p-[clamp(24px,3vw,36px)]",
+          "card-lift flex w-full flex-col gap-[18px] rounded-panel p-5 md:gap-[22px] md:rounded-[36px] md:p-[clamp(24px,3vw,36px)]",
           hi
             ? "bg-navy text-white shadow-[0_34px_70px_-36px_rgba(36,42,95,.7)]"
             : "bg-white text-navy",
@@ -94,7 +94,7 @@ function PackageCard({ pack, index }: { pack: ScreeningPackage; index: number })
               <span className="min-w-0 flex-1">
                 {row.text}
                 {!row.included && (
-                  <span className="block text-[13px] font-semibold opacity-80">
+                  <span className="block text-[13px] font-semibold text-muted">
                     nem része a csomagnak
                   </span>
                 )}
@@ -125,7 +125,7 @@ export function ScreeningCompare({ packages }: { packages: ScreeningPackage[] })
     <section
       id="szurocsomagok"
       aria-labelledby="szurocsomagok-cim"
-      className="relative flex scroll-mt-28 flex-col gap-5 overflow-hidden rounded-[32px] bg-sun-soft px-[18px] py-6 md:gap-9 md:rounded-hero md:p-[clamp(24px,4.5vw,56px)]"
+      className="relative flex scroll-mt-28 flex-col gap-5 overflow-hidden rounded-panel bg-sun-soft px-[18px] py-6 md:gap-9 md:rounded-hero md:p-[clamp(24px,4.5vw,56px)]"
     >
       <div
         aria-hidden="true"

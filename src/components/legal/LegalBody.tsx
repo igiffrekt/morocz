@@ -67,7 +67,7 @@ function Heading({
         id={heading.id}
         tabIndex={-1}
         className={cn(
-          "group m-0 mt-10 mb-[18px] flex items-start gap-2.5 border-t border-[#eceef4] pt-8 text-[22px] leading-[1.3] font-extrabold tracking-[-0.02em] text-navy outline-none first:mt-0 first:border-t-0 first:pt-0 md:mt-12 md:gap-3.5 md:pt-10 md:text-[27px] md:leading-[1.28]",
+          "group m-0 mt-10 mb-[18px] flex items-start gap-2.5 border-t border-line-soft pt-8 text-[22px] leading-[1.3] font-extrabold tracking-[-0.02em] text-navy outline-none first:mt-0 first:border-t-0 first:pt-0 md:mt-12 md:gap-3.5 md:pt-10 md:text-[27px] md:leading-[1.28]",
           SCROLL_MARGIN,
         )}
       >
@@ -111,7 +111,7 @@ function LegalTable({ value }: { value: StyledTable }) {
   const bodyRows = value.headerRow ? rest : rows;
   const zebra = value.zebraStripes !== false;
   return (
-    <div className="my-2.5 mb-[30px] overflow-hidden rounded-[24px] border border-[#eceef4]">
+    <div className="my-2.5 mb-[30px] overflow-hidden rounded-[24px] border border-line-soft">
       {/* biome-ignore lint/a11y/noNoninteractiveTabindex: keyboard users must be able to scroll the table sideways */}
       <section className="overflow-x-auto" tabIndex={0} aria-label="Táblázat">
         <table className="w-full min-w-[540px] border-collapse text-left">
@@ -136,7 +136,7 @@ function LegalTable({ value }: { value: StyledTable }) {
               <tr
                 key={row._key}
                 className={cn(
-                  (value.headerRow || ri > 0) && "border-t border-[#eceef4]",
+                  (value.headerRow || ri > 0) && "border-t border-line-soft",
                   zebra && ri % 2 === 1 ? "bg-[#FAFBFC]" : "bg-white",
                 )}
               >
@@ -190,7 +190,7 @@ function legalComponents(
     },
     list: {
       bullet: ({ children }) => (
-        <ul className="m-0 mt-1.5 mb-[26px] flex list-none flex-col gap-3 rounded-[24px] bg-canvas px-4 py-4 md:rounded-[28px] md:px-[26px] md:py-[22px]">
+        <ul className="m-0 mt-1.5 mb-[26px] flex list-none flex-col gap-3 rounded-[24px] bg-canvas px-4 py-4 md:rounded-tile md:px-[26px] md:py-[22px]">
           {children}
         </ul>
       ),

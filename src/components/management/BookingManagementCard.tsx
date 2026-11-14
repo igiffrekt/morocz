@@ -90,7 +90,7 @@ function Svg({
 /** White result card with a popping round icon (cancelled / rescheduled). */
 function ResultCard({ children }: { children: React.ReactNode }) {
   return (
-    <div className="fade-up flex flex-col items-start gap-[18px] rounded-[32px] bg-white p-6 sm:rounded-[36px] sm:p-[clamp(24px,4vw,48px)]">
+    <div className="fade-up flex flex-col items-start gap-[18px] rounded-panel bg-white p-6 sm:rounded-[36px] sm:p-[clamp(24px,4vw,48px)]">
       {children}
     </div>
   );
@@ -127,7 +127,7 @@ export function BookingManagementCard({ booking, scheduleData }: BookingManageme
         <p className="m-0 max-w-[560px] text-base leading-relaxed text-muted">
           Megkaptuk a lemondási kérelmét. Hamarosan visszaigazoló e-mailt küldünk.
         </p>
-        <div className="max-w-full rounded-[28px] bg-canvas px-[22px] py-3 text-[15px] text-muted line-through">
+        <div className="max-w-full rounded-tile bg-canvas px-[22px] py-3 text-[15px] text-muted line-through">
           {serviceName} · {when}
         </div>
         <div className="flex w-full flex-wrap gap-3">
@@ -176,13 +176,13 @@ export function BookingManagementCard({ booking, scheduleData }: BookingManageme
           Időpont sikeresen áthelyezve
         </h2>
         <div className="flex max-w-full flex-wrap items-center gap-2.5">
-          <span className="rounded-[28px] bg-canvas px-5 py-3 text-sm text-muted line-through">
+          <span className="rounded-tile bg-canvas px-5 py-3 text-sm text-muted line-through">
             {when}
           </span>
           <span aria-hidden="true" className="text-teal-ink">
             <ArrowIcon />
           </span>
-          <span className="rounded-[28px] bg-navy px-[22px] py-3 text-[15px] font-extrabold text-white">
+          <span className="rounded-tile bg-navy px-[22px] py-3 text-[15px] font-extrabold text-white">
             <span className="font-bold text-mint-light">Új időpont:</span> {newWhen}
           </span>
         </div>
@@ -226,7 +226,7 @@ export function BookingManagementCard({ booking, scheduleData }: BookingManageme
   ];
 
   return (
-    <div className="fade-up flex flex-col gap-6 rounded-[32px] bg-white p-4 sm:rounded-[36px] sm:p-[clamp(20px,3vw,36px)]">
+    <div className="fade-up flex flex-col gap-6 rounded-panel bg-white p-4 sm:rounded-[36px] sm:p-[clamp(20px,3vw,36px)]">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="m-0 text-[26px] font-extrabold tracking-[-0.02em] text-navy sm:text-[28px]">
           Az Ön időpontja
@@ -244,7 +244,7 @@ export function BookingManagementCard({ booking, scheduleData }: BookingManageme
           <div
             key={d.k}
             className={cn(
-              "fade-up flex items-center gap-3.5 rounded-[28px] px-[18px] py-4",
+              "fade-up flex items-center gap-3.5 rounded-tile px-[18px] py-4",
               TILE_TONES[i],
             )}
             style={{ "--i": i } as CSSProperties}
@@ -319,7 +319,7 @@ export function BookingManagementCard({ booking, scheduleData }: BookingManageme
         <div
           id="reschedule-lock"
           role="note"
-          className="flex items-start gap-3.5 rounded-[28px] bg-canvas px-[22px] py-[18px]"
+          className="flex items-start gap-3.5 rounded-tile bg-canvas px-[22px] py-[18px]"
         >
           <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-navy text-white">
             <Svg d={ICON.lock} size={16} />

@@ -20,7 +20,7 @@ function CancelContent() {
   }, [bookingId]);
 
   return (
-    <div className="fade-up flex flex-col items-start gap-[18px] rounded-[32px] bg-white p-6 sm:rounded-[36px] sm:p-[clamp(24px,4vw,56px)]">
+    <div className="fade-up flex flex-col items-start gap-[18px] rounded-panel bg-white p-6 sm:rounded-[36px] sm:p-[clamp(24px,4vw,56px)]">
       <span className="pop-in-slow inline-flex h-[84px] w-[84px] items-center justify-center rounded-full bg-sun text-navy shadow-[0_0_0_12px_var(--color-sun-soft)]">
         <svg
           width="38"

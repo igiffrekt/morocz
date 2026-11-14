@@ -123,7 +123,7 @@ export function LelekzoJoga({ headline, heroImageUrl, timetable }: LelekzoJogaPr
         className,
       )}
     >
-      <Link href="/" className="link-grow text-muted hover:text-navy">
+      <Link href="/" className="link-grow tap-area text-muted hover:text-navy">
         Kezdőlap
       </Link>
       <span aria-hidden="true" className="text-[#9aa0b4]">
@@ -179,7 +179,7 @@ export function LelekzoJoga({ headline, heroImageUrl, timetable }: LelekzoJogaPr
         </div>
 
         {/* Photo card (Sanity yogaPage hero image) — carries the text on phones */}
-        <div className="relative h-[420px] min-w-0 flex-[1.35_1_520px] overflow-hidden rounded-[32px] bg-[#c9d6cf] md:h-auto md:min-h-[520px] md:rounded-hero">
+        <div className="relative h-[420px] min-w-0 flex-[1.35_1_520px] overflow-hidden rounded-panel bg-[#c9d6cf] md:h-auto md:min-h-[520px] md:rounded-hero">
           {heroImageUrl && (
             <Image
               src={heroImageUrl}

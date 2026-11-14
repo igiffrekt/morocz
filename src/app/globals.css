@@ -33,9 +33,9 @@
   --color-coral-soft: #fcebe4;
   --color-blush: #e1bbcd;
   --color-blush-soft: #f8ebf1;
-  --color-teal-ink: #2f7a75; /* eyebrows / accent text */
+  --color-teal-ink: #2c736e; /* eyebrows / accent text (canvas #2f7a75, darkened to reach 4.5:1 on sage / mint-pale tints) */
   --color-teal-focus: #469993; /* focus ring */
-  --color-yoga: #0a7d73; /* Lélekző Jóga label */
+  --color-yoga: #08776d; /* Lélekző Jóga label (canvas #0a7d73, darkened to reach 4.5:1 on sage) */
   --color-ink: #1A1D2D;
   --color-muted: #4b5563;
   --color-muted-strong: #374151;
@@ -206,18 +206,22 @@
     min-height: 0;
   }
 
-  /* Fade-up entrance; stagger with style={{ "--i": n }} */
+  /* Fade-up entrance; stagger with style={{ "--i": n }}.
+     Fill mode is `backwards`, not `both`: only the start frame is held (during the
+     stagger delay). Once it finishes the animation lets go of `transform`, so hover
+     lifts (.card-lift, .chip-lift, .btn-lift, .tap-press, zoom) on the same element
+     keep working. */
   .fade-up {
-    animation: bento-fade-up .55s var(--ease-bento) both;
+    animation: bento-fade-up .55s var(--ease-bento) backwards;
     animation-delay: calc(var(--i, 0) * 70ms);
   }
 
   /* Pop-in (selected calendar day, success ticks) */
   .pop-in {
-    animation: bento-pop .45s var(--ease-bento) both;
+    animation: bento-pop .45s var(--ease-bento) backwards;
   }
   .pop-in-slow {
-    animation: bento-pop .7s var(--ease-bento) both;
+    animation: bento-pop .7s var(--ease-bento) backwards;
   }
 
   /* Slow float (decorative badges) */
@@ -236,6 +240,21 @@
     transform: scale(1.05);
   }
 
+  /* Invisible 44×44 minimum hit area around a visually small control (breadcrumbs,
+     text links, slider dots). Uses ::after, so it combines with .link-grow. */
+  .tap-area {
+    position: relative;
+  }
+  .tap-area::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: max(100%, 44px);
+    height: max(100%, 44px);
+    transform: translate(-50%, -50%);
+  }
+
   /* Desktop nav pill (hover colours are set with hover: utilities) */
   .nav-pill {
     transition:
@@ -251,14 +270,11 @@
   }
 }
 
+/* No `to` frame: it ends on the element's own opacity/transform. */
 @keyframes bento-fade-up {
   from {
     opacity: 0;
     transform: translateY(14px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
   }
 }
 
@@ -270,9 +286,6 @@
   60% {
     transform: scale(1.08);
     opacity: 1;
-  }
-  100% {
-    transform: scale(1);
   }
 }
 

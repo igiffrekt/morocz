@@ -95,8 +95,8 @@ function GroupAccordion({
       open={open}
       onOpenChange={onOpenChange}
       className="gap-2.5"
-      itemClassName="fade-up rounded-[28px] shadow-[inset_0_0_0_1px_#eceef4] has-[[aria-expanded=true]]:shadow-[0_24px_48px_-32px_rgba(36,42,95,.5),inset_0_0_0_2px_var(--color-mint-light)]"
-      triggerClassName="group min-h-16 gap-3 rounded-[28px] px-3.5 py-3 hover:bg-navy/[.04] md:gap-4 md:py-4 md:pr-4 md:pl-5"
+      itemClassName="fade-up rounded-tile shadow-[inset_0_0_0_1px_#eceef4] has-[[aria-expanded=true]]:shadow-[0_24px_48px_-32px_rgba(36,42,95,.5),inset_0_0_0_2px_var(--color-mint-light)]"
+      triggerClassName="group min-h-16 gap-3 rounded-tile px-3.5 py-3 hover:bg-navy/[.04] md:gap-4 md:py-4 md:pr-4 md:pl-5"
       titleClassName="text-[15px] leading-[1.3] md:text-[17px]"
       plusClassName="h-[30px] w-[30px] bg-canvas group-aria-expanded:bg-navy md:h-10 md:w-10"
       contentClassName="pt-0 pr-4 pb-4 pl-16 md:pr-6 md:pb-[22px] md:pl-[76px]"

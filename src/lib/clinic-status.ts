@@ -78,9 +78,9 @@ export type ClinicState = "open" | "later" | "closed";
 
 export interface ClinicStatus {
   state: ClinicState;
-  /** "Most rendelés van" / "Ma rendelés lesz" / "Ma zárva" / "Ma már zárva". */
+  /** "Most rendelünk" / "Ma rendelünk" / "Ma nincs rendelés" / "Ma már nem rendelünk". */
   title: string;
-  /** "Ma rendelés van" / "Ma rendelés" / "Következő rendelési nap" ("" if none found). */
+  /** "Mai rendelési idő" / "Következő rendelési nap" ("" if none found). */
   nextLabel: string;
   /** "13:20 – 16:40" or "Kedd, november 17. · 13:20 – 16:40". */
   nextValue: string;
@@ -100,21 +100,21 @@ export function clinicStatus(
   if (today && now.minutes >= toMinutes(today.start) && now.minutes < toMinutes(today.end)) {
     return {
       state: "open",
-      title: "Most rendelés van",
-      nextLabel: "Ma rendelés van",
+      title: "Most rendelünk",
+      nextLabel: "Mai rendelési idő",
       nextValue: range(today),
     };
   }
   if (today && now.minutes < toMinutes(today.start)) {
     return {
       state: "later",
-      title: "Ma rendelés lesz",
-      nextLabel: "Ma rendelés",
+      title: "Ma rendelünk",
+      nextLabel: "Mai rendelési idő",
       nextValue: range(today),
     };
   }
 
-  const title = today ? "Ma már zárva" : "Ma zárva";
+  const title = today ? "Ma már nem rendelünk" : "Ma nincs rendelés";
   for (let i = 1; i <= horizonDays; i++) {
     const date = addDaysIso(now.date, i);
     const hours = hoursOnDate(schedule, date);

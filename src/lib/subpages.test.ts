@@ -58,8 +58,8 @@ describe("clinicStatus", () => {
   it("is open during today's seasonal hours", () => {
     expect(clinicStatus(schedule, at(17, 13, 30))).toEqual({
       state: "open",
-      title: "Most rendelés van",
-      nextLabel: "Ma rendelés van",
+      title: "Most rendelünk",
+      nextLabel: "Mai rendelési idő",
       nextValue: "13:20 – 16:40",
     });
   });
@@ -67,21 +67,21 @@ describe("clinicStatus", () => {
   it("announces a later session today", () => {
     const status = clinicStatus(schedule, at(17, 9));
     expect(status.state).toBe("later");
-    expect(status.title).toBe("Ma rendelés lesz");
+    expect(status.title).toBe("Ma rendelünk");
   });
 
   it("points to the next consulting day once today is over", () => {
     expect(clinicStatus(schedule, at(17, 17))).toEqual({
       state: "closed",
-      title: "Ma már zárva",
+      title: "Ma már nem rendelünk",
       nextLabel: "Következő rendelési nap",
       nextValue: "Szerda, november 18. · 11:00 – 14:20",
     });
   });
 
-  it("skips blocked dates and says 'Ma zárva' on a day off", () => {
+  it("skips blocked dates and says 'Ma nincs rendelés' on a day off", () => {
     const status = clinicStatus({ ...schedule, blockedDates: ["2026-11-17"] }, at(16, 10));
-    expect(status.title).toBe("Ma zárva");
+    expect(status.title).toBe("Ma nincs rendelés");
     expect(status.nextValue).toBe("Szerda, november 18. · 11:00 – 14:20");
   });
 

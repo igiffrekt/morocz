@@ -31,6 +31,20 @@ function weekOrder(dayOfWeek: number): number {
   return dayOfWeek === 0 ? 7 : dayOfWeek;
 }
 
+export interface WeekdayHours {
+  name: string;
+  /** "13:20 – 16:40", null = closed. */
+  hours: string | null;
+}
+
+/** Monday–Friday rows (closed days included) for the hours cards. */
+export function weekdayHours(hours: OpeningHours): WeekdayHours[] {
+  return [1, 2, 3, 4, 5].map((dow) => ({
+    name: HU_DAY_NAMES[dow] ?? "",
+    hours: hours.days.find((d) => d.dayOfWeek === dow)?.hours ?? null,
+  }));
+}
+
 /**
  * Opening hours that apply on `date` (YYYY-MM-DD, Budapest): the seasonal schedule
  * covering that date overrides the weekly one — same rule as the slot generator

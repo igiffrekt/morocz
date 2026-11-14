@@ -1,10 +1,18 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { ICON_PATHS, PathIcon } from "@/components/home/PathIcon";
+import { PriceMenu } from "@/components/home/PriceMenu";
+import { MobileActionBar } from "@/components/layout/MobileActionBar";
+import { PriceNotes } from "@/components/prices/PriceNotes";
+import { PriceOverviewCard } from "@/components/prices/PriceOverviewCard";
+import { ScreeningCompare } from "@/components/prices/ScreeningCompare";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { SectionHeader } from "@/components/ui/SectionHeader";
-import { sanityFetch } from "@/sanity/lib/fetch";
-import { pricingPageQuery } from "@/sanity/lib/queries";
-import type { PricingPageQueryResult } from "../../../sanity.types";
+import { CtaBand } from "@/components/subpage/CtaBand";
+import { PageHero } from "@/components/subpage/PageHero";
+import { PillLink } from "@/components/ui/PillButton";
+import { bookingHref } from "@/lib/booking-services";
+import { comparePackages, priceMenuOffers } from "@/lib/price-menu";
+import { breadcrumbJsonLd } from "@/lib/service-page";
+import { getOpeningWeek, getPriceListData, getServicesIntro } from "@/sanity/lib/subpage-data";
 
 export const revalidate = 30;
 
@@ -14,806 +22,123 @@ export const metadata: Metadata = {
     "Nőgyógyászati szolgáltatások és árak. Vizsgálatok, várandósgondozás, laborvizsgálatok - teljes árlista 2026.",
 };
 
-// Card gradient styles matching homepage
-const cardStyles = {
-  navy: {
-    bg: "bg-gradient-to-br from-[#2B3674] to-[#1a2550]",
-  },
-  mint: {
-    bg: "bg-gradient-to-br from-[#76c8b6] to-[#5eb8a3]",
-  },
-  pink: {
-    bg: "bg-gradient-to-br from-[#E8D5E0] to-[#d4bfcc]",
-  },
-  blue: {
-    bg: "bg-gradient-to-br from-[#D4E5ED] to-[#b8d1de]",
-  },
-  coral: {
-    bg: "bg-gradient-to-br from-[#f0a88c] to-[#e8927a]",
-  },
-};
-
-const importantInfo = [
-  {
-    title: "E-recept",
-    content:
-      "Rendszeresen szedett fogamzásgátló gyógyszer felírása E-recept formájában ingyenes, amennyiben 1 éven belüli méhnyakszűrés történt rendelőnkben. Recept felírása vizsgálat alkalmával díjtalan.",
-  },
-  {
-    title: "Vizsgálati díjak",
-    content:
-      "A vizsgálati díjak tartalmazzák a mintakezelési, leletkezelési és adminisztrációs költséget is.",
-  },
-  {
-    title: "Eredmények",
-    content:
-      "Eredményeik az EESZT rendszerbe kerülnek feltöltésre, melyet lakossági portáljukon belépve tekinthetnek meg.",
-  },
-  {
-    title: "Magzati genetikai ultrahang",
-    content:
-      "Magzati genetikai ultrahangot nem végzek. Ajánlott intézmény: Czeizel Intézet Budapest.",
-  },
-];
-
-const officeHours = [
-  { day: "Kedd", hours: "12:00-16:00" },
-  { day: "Szerda", hours: "11:00-15:00" },
-  { day: "Csütörtök", hours: "12:00-16:00" },
-];
-
-// Fallback data used until the pricingPage singleton is published in Studio.
-// Mirrors the initialValue in src/sanity/schemaTypes/pricingPageType.ts so
-// the page renders sensibly on first deploy before any editor publish.
-const DEFAULT_DATA: NonNullable<PricingPageQueryResult> = {
-  validityNote: "Érvényes 2026. július 1-től",
-  gynBaseExam: {
-    items: [
-      {
-        _key: "d1",
-        label: "Vizsgálat / tanácsadás",
-        subtitle: "ultrahang nélkül",
-        badge: null,
-        badgeStyle: null,
-        note: null,
-        price: 30000,
-      },
-      {
-        _key: "d2",
-        label: "Vizsgálat ultrahanggal",
-        subtitle: null,
-        badge: "+ UH",
-        badgeStyle: "mint",
-        note: null,
-        price: 43000,
-      },
-      {
-        _key: "d3",
-        label: "Vizsgálat ultrahanggal és méhnyakszűréssel",
-        subtitle: null,
-        badge: "+ UH + LBC",
-        badgeStyle: "pink",
-        note: null,
-        price: 52000,
-      },
-      {
-        _key: "d4",
-        label: "Kontroll vizsgálat",
-        subtitle: null,
-        badge: "-17%",
-        badgeStyle: "white",
-        note: "(3 hónapon belül)",
-        price: 25000,
-      },
-    ],
-  },
-  spiralServices: {
-    items: [
-      {
-        _key: "d5",
-        label: "Spirál felhelyezés / csere",
-        subtitle: "ultrahanggal",
-        badge: null,
-        badgeStyle: null,
-        note: null,
-        price: 45000,
-      },
-      {
-        _key: "d6",
-        label: "Spirál eltávolítás",
-        subtitle: null,
-        badge: null,
-        badgeStyle: null,
-        note: null,
-        price: 30000,
-      },
-    ],
-    footnote: "Az eszköz árát nem tartalmazza",
-  },
-  pregnancyCare: {
-    label: "Várandósgondozás",
-    subtitle: "Tájékozódó ultrahanggal (nem genetikai)",
-    price: 45000,
-  },
-  screeningPackages: {
-    tiers: [
-      {
-        _key: "t1",
-        name: "Komplex",
-        price: 52000,
-        highlighted: false,
-        features: [
-          {
-            _key: "f1",
-            text: "Nőgyógyászati vizsgálat",
-            subtext: null,
-            included: true,
-            emphasized: false,
-          },
-          { _key: "f2", text: "Ultrahang", subtext: null, included: true, emphasized: false },
-          {
-            _key: "f3",
-            text: "LBC méhnyakszűrés",
-            subtext: "(vizsgálat+mintavétel+ultrahang)",
-            included: true,
-            emphasized: false,
-          },
-          {
-            _key: "f4",
-            text: "HPV DNS tipizálás",
-            subtext: null,
-            included: false,
-            emphasized: false,
-          },
-        ],
-      },
-      {
-        _key: "t2",
-        name: "Kiterjesztett komplex",
-        price: 68000,
-        highlighted: true,
-        features: [
-          {
-            _key: "f5",
-            text: "Nőgyógyászati vizsgálat",
-            subtext: null,
-            included: true,
-            emphasized: false,
-          },
-          { _key: "f6", text: "Ultrahang", subtext: null, included: true, emphasized: false },
-          {
-            _key: "f7",
-            text: "LBC méhnyakszűrés",
-            subtext: "(vizsgálat+mintavétel+ultrahang)",
-            included: true,
-            emphasized: false,
-          },
-          {
-            _key: "f8",
-            text: "HPV 14 tipizálás",
-            subtext: null,
-            included: true,
-            emphasized: false,
-          },
-        ],
-      },
-    ],
-  },
-  samplingServices: {
-    items: [
-      { _key: "s1", label: "Folyadékalapú méhnyakszűrés (LBC) mintavétel", price: 9000 },
-      { _key: "s3", label: "Hagyományos citológia mintavétel", price: 6500 },
-      { _key: "s2", label: "Endometrium (méhnyálkahártya) szövettani mintavétel", price: 20000 },
-    ],
-  },
-  microbiologyServices: {
-    items: [
-      {
-        _key: "m1",
-        label: "Hüvelyváladék tenyésztés (aerob baktérium + gomba + kenet)",
-        suffix: null,
-        price: 8500,
-      },
-      { _key: "m2", label: "STD vizsgálat", suffix: "/kórokozó", price: 7500 },
-      { _key: "m3", label: "GBS szűrés", suffix: null, price: 7500 },
-    ],
-  },
-  hpvTests: {
-    intro: null,
-    items: [
-      {
-        _key: "h1",
-        name: "HPV DNS alapú, 14 genotípus meghatározás (HPV14)",
-        description: "HPV jelenlétét vizsgálja",
-        price: 18000,
-      },
-    ],
-  },
-  otherServices: {
-    items: [
-      { _key: "o1", label: "Injekció beadása", price: 6000 },
-      { _key: "o2", label: "Szakorvosi dokumentáció", price: 12000 },
-      { _key: "o3", label: "Sürgősségi fogamzásgátlás", price: 10000 },
-      { _key: "o4", label: "Receptírás", price: 4900 },
-    ],
-    footnote: "Receptírás vizsgálat alkalmával díjtalan.",
-  },
-};
-
-const formatPrice = (price: number | null | undefined) =>
-  typeof price === "number" ? `${price.toLocaleString("hu-HU")} Ft` : "";
-
-type BadgeStyle = "mint" | "pink" | "white" | null | undefined;
-
-const badgeClass = (style: BadgeStyle) => {
-  switch (style) {
-    case "mint":
-      return "bg-[#a8d5ba] text-[#1e2952]";
-    case "pink":
-      return "bg-[#E8D5E0] text-[#1e2952]";
-    default:
-      return "bg-white/20 text-white";
-  }
-};
-
-const priceColorClass = (style: BadgeStyle) => {
-  switch (style) {
-    case "mint":
-      return "text-[#a8d5ba]";
-    case "pink":
-      return "text-[#E8D5E0]";
-    default:
-      return "text-white";
-  }
-};
-
-type PriceRowItem = {
-  _key: string;
-  label: string | null;
-  subtitle: string | null;
-  badge: string | null;
-  badgeStyle: BadgeStyle;
-  note: string | null;
-  price: number | null;
-};
-
-function PriceRow({ item, isLast }: { item: PriceRowItem; isLast: boolean }) {
-  const highlight = item.badgeStyle === "mint";
-  return (
-    <div
-      className={`flex flex-col md:flex-row md:items-center justify-between py-3 ${
-        isLast ? "" : "border-b border-white/10"
-      } ${highlight ? "bg-white/5 -mx-4 px-4 md:-mx-0 md:px-0 md:bg-transparent" : ""}`}
-    >
-      <div className="flex items-center gap-3 flex-wrap">
-        {item.badge ? (
-          <span className={`px-2 py-1 rounded-lg ${badgeClass(item.badgeStyle)} text-xs font-bold`}>
-            {item.badge}
-          </span>
-        ) : null}
-        <span className="text-white font-medium">{item.label}</span>
-        {item.subtitle ? (
-          <span className="px-2 py-0.5 rounded-full bg-white/10 text-white/60 text-xs">
-            {item.subtitle}
-          </span>
-        ) : null}
-        {item.note ? <span className="text-white/50 text-sm">{item.note}</span> : null}
-      </div>
-      <span className={`text-xl font-bold ${priceColorClass(item.badgeStyle)} mt-2 md:mt-0`}>
-        {formatPrice(item.price)}
-      </span>
-    </div>
-  );
-}
-
-// Tier card styling is determined by position (not editor-configurable)
-const TIER_STYLES = [
-  {
-    bg: cardStyles.blue.bg,
-    checkColor: "text-[#76c8b6]",
-    emphColor: "text-[#1e2952]",
-  },
-  {
-    bg: cardStyles.mint.bg,
-    checkColor: "text-[#1e2952]",
-    emphColor: "text-[#1e2952]",
-  },
-];
-
-// ─── Structured data ──────────────────────────────────────────────────────────
-
-const PAGE_URL = "https://drmoroczangela.hu/szolgaltatasok-es-arak";
+const PAGE_PATH = "/szolgaltatasok-es-arak";
+const PAGE_URL = `https://drmoroczangela.hu${PAGE_PATH}`;
 const CLINIC_NAME = "Dr. Mórocz Angéla Nőgyógyászati Rendelő";
-
-type PricedItem = {
-  label?: string | null;
-  name?: string | null;
-  subtitle?: string | null;
-  description?: string | null;
-  suffix?: string | null;
-  price?: number | null;
-};
-
-// Search and answer engines read prices from Offer/priceSpecification, so every priced
-// row is mirrored into the catalog from the same Sanity data the page renders.
-function toOffers(items: PricedItem[], category: string) {
-  return items
-    .filter((item) => typeof item.price === "number" && (item.label ?? item.name))
-    .map((item) => {
-      const name = (item.label ?? item.name) as string;
-      const description = item.subtitle ?? item.description;
-
-      return {
-        "@type": "Offer",
-        name,
-        ...(description ? { description } : {}),
-        category,
-        price: item.price,
-        priceCurrency: "HUF",
-        availability: "https://schema.org/InStock",
-        url: PAGE_URL,
-        priceSpecification: {
-          "@type": "UnitPriceSpecification",
-          price: item.price,
-          priceCurrency: "HUF",
-          // e.g. "/kórokozó" — the price is per unit, not per visit.
-          ...(item.suffix ? { unitText: item.suffix.replace(/^\//, "") } : {}),
-        },
-        itemOffered: {
-          "@type": "MedicalProcedure",
-          name,
-        },
-      };
-    });
-}
+const DEFAULT_LEAD =
+  "Átfogó egészségügyi ellátás modern környezetben. Minden, amire szüksége van, egy helyen.";
 
 export default async function SzolgaltatasokEsArakPage() {
-  const fetched = await sanityFetch<PricingPageQueryResult | null>({
-    query: pricingPageQuery,
-    tags: ["pricingPage"],
-  });
-  const data = fetched ?? DEFAULT_DATA;
-
-  const gynItems = data.gynBaseExam?.items ?? [];
-  const spiralItems = data.spiralServices?.items ?? [];
-  const tiers = data.screeningPackages?.tiers ?? [];
-  const samplingItems = data.samplingServices?.items ?? [];
-  const microItems = data.microbiologyServices?.items ?? [];
-  const hpvItems = data.hpvTests?.items ?? [];
-  const otherItems = data.otherServices?.items ?? [];
-
-  const breadcrumbJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      {
-        "@type": "ListItem",
-        position: 1,
-        name: "Kezdőlap",
-        item: "https://drmoroczangela.hu",
-      },
-      {
-        "@type": "ListItem",
-        position: 2,
-        name: "Szolgáltatások és Árak",
-        item: PAGE_URL,
-      },
-    ],
-  };
-
-  // Screening tiers are packages: the included features describe what the price covers.
-  const tierOffers = tiers
-    .filter((tier) => typeof tier.price === "number" && tier.name)
-    .map((tier) => {
-      const included = (tier.features ?? [])
-        .filter((feature) => feature.included && feature.text)
-        .map((feature) => feature.text)
-        .join(", ");
-
-      return {
-        "@type": "Offer",
-        name: tier.name,
-        ...(included ? { description: `Tartalmazza: ${included}` } : {}),
-        category: "Szűrőcsomagok",
-        price: tier.price,
-        priceCurrency: "HUF",
-        availability: "https://schema.org/InStock",
-        url: PAGE_URL,
-        priceSpecification: {
-          "@type": "UnitPriceSpecification",
-          price: tier.price,
-          priceCurrency: "HUF",
-        },
-        itemOffered: {
-          "@type": "MedicalProcedure",
-          name: tier.name,
-        },
-      };
-    });
-
-  const pregnancyCare = data.pregnancyCare;
+  const [prices, week, intro] = await Promise.all([
+    getPriceListData(),
+    getOpeningWeek(),
+    getServicesIntro(),
+  ]);
+  const { categories, validityNote } = prices;
+  const screening = categories.find((c) => c.theme === "screening");
+  const packages = comparePackages(screening?.items ?? []);
+  const lead = intro?.servicesSubtitle || DEFAULT_LEAD;
 
   const offerCatalogJsonLd = {
     "@context": "https://schema.org",
     "@type": "OfferCatalog",
-    name: "Szolgáltatások és árak — Dr. Mórocz Angéla Nőgyógyászati Rendelő",
+    name: `Szolgáltatások és árak — ${CLINIC_NAME}`,
     url: PAGE_URL,
     inLanguage: "hu",
-    ...(data.validityNote ? { description: data.validityNote } : {}),
-    provider: {
-      "@type": "MedicalClinic",
-      name: CLINIC_NAME,
-      url: "https://drmoroczangela.hu",
-    },
-    itemListElement: [
-      ...toOffers(gynItems, "Nőgyógyászati vizsgálatok"),
-      ...tierOffers,
-      ...toOffers(hpvItems, "HPV vizsgálatok"),
-      ...toOffers(samplingItems, "Mintavételek"),
-      ...toOffers(microItems, "Mikrobiológiai vizsgálatok"),
-      ...toOffers(spiralItems, "Spirál"),
-      ...toOffers(pregnancyCare ? [pregnancyCare] : [], "Várandósgondozás"),
-      ...toOffers(otherItems, "Egyéb szolgáltatások"),
-    ],
+    description: validityNote,
+    provider: { "@type": "MedicalClinic", name: CLINIC_NAME, url: "https://drmoroczangela.hu" },
+    itemListElement: priceMenuOffers(categories, PAGE_URL),
   };
 
   return (
-    <main className="min-h-screen bg-[#FAF8F3] text-primary rounded-[40px] overflow-hidden">
-      <JsonLd data={breadcrumbJsonLd} />
-      <JsonLd data={offerCatalogJsonLd} />
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-[#1e2952] to-[#2B3674] rounded-b-[40px] relative overflow-hidden pt-28 pb-16 -mt-10">
-        <div className="absolute right-0 top-0 w-96 h-96 bg-[#a8d5ba] opacity-5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-        <div className="absolute left-0 bottom-0 w-64 h-64 bg-[#E8D5E0] opacity-5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
-
-        <div className="relative z-10 max-w-6xl mx-auto px-6 md:px-12">
-          {data.validityNote ? (
-            <span className="inline-block px-4 py-1.5 rounded-full bg-[#a8d5ba]/20 text-[#a8d5ba] text-sm font-bold uppercase tracking-wider mb-6">
-              {data.validityNote}
-            </span>
-          ) : null}
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-4">
-            Szolgáltatások és Árak
-          </h1>
-          <p className="text-base text-[#a8d5ba] font-medium mb-4">
+    <div className="flex flex-col gap-12 pb-4 lg:gap-28 lg:pb-0">
+      <PageHero
+        titleId="arak-cim"
+        crumbs={[{ label: "Szolgáltatások és Árak" }]}
+        eyebrow="Árlista"
+        eyebrowIcon={ICON_PATHS.coin}
+        accentClassName="bg-sun"
+        title={
+          <>
+            Szolgáltatások és <span className="text-sun">Árak</span>
+          </>
+        }
+        lead={lead}
+        leadClassName="max-md:hidden"
+        aside={<PriceOverviewCard categories={categories} />}
+        actions={
+          <>
+            <PillLink
+              href={bookingHref("nogyogyaszat")}
+              variant="pink"
+              size="lg"
+              arrow
+              className="max-sm:w-full"
+            >
+              Foglaljon időpontot
+            </PillLink>
+            <PillLink
+              href="#tudnivalok"
+              variant="ghost"
+              size="lg"
+              className="border-[1.5px] border-white/28 font-bold text-white hover:bg-white/10 hover:text-white max-sm:hidden"
+            >
+              Tudnivalók
+            </PillLink>
+          </>
+        }
+      >
+        <div className="fade-up flex flex-wrap gap-1.5 [--i:2] md:gap-2">
+          <span className="inline-flex items-center gap-2 rounded-full bg-mint-light py-[7px] pr-3.5 pl-3 text-xs font-extrabold whitespace-nowrap text-navy md:bg-white md:py-2.5 md:pr-5 md:text-sm">
+            <PathIcon d={ICON_PATHS.cal} size={16} strokeWidth={2} />
+            {validityNote}
+          </span>
+          <span className="inline-flex items-center rounded-full border border-white/20 px-3.5 py-[7px] text-xs font-semibold whitespace-nowrap text-[#d6d9ec] md:px-5 md:py-2.5 md:text-sm">
             Az árváltoztatás jogát fenntartjuk.
-          </p>
-          <p className="text-base text-blue-200/80 max-w-3xl leading-relaxed">
+          </span>
+        </div>
+        <div className="fade-up flex max-w-[620px] items-start gap-3.5 rounded-tile border border-sun/35 bg-sun/12 px-4 py-3.5 [--i:3] md:px-5 md:py-4">
+          <span className="inline-flex h-[30px] shrink-0 items-center rounded-full bg-sun px-3 text-xs font-extrabold whitespace-nowrap text-navy">
+            + Felár
+          </span>
+          <span className="text-[13px] leading-[1.6] text-[#e4e6f2] md:text-[15px]">
             A vizsgálat során szakmailag indokolttá válhatnak további vizsgálatok, mintavételek,
             amelyek többletköltséggel járhatnak. Ezek elvégzése a páciens előzetes tájékoztatásával
             és beleegyezésével történnek.
-          </p>
+          </span>
         </div>
-      </section>
+      </PageHero>
 
-      {/* Main Services Section */}
-      <section className="max-w-7xl mx-auto px-4 md:px-8 py-12">
-        {/* === GYNECOLOGICAL EXAMS === */}
-        <div className="mb-12">
-          <div className="flex items-center gap-3 mb-6">
-            <span className="text-3xl">👩‍⚕️</span>
-            <h2 className="text-2xl md:text-3xl font-bold text-[#1e2952]">
-              Nőgyógyászati vizsgálatok
-            </h2>
-          </div>
+      <PriceMenu
+        id="arlista"
+        anchors
+        heading={intro?.servicesHeadline}
+        lead={lead}
+        validityNote={validityNote}
+        categories={categories}
+        surchargeExample={prices.surchargeExample}
+      />
 
-          <div className={`${cardStyles.navy.bg} rounded-3xl p-6 md:p-8 shadow-xl`}>
-            {/* Base exam group */}
-            <div className="mb-8">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-2 h-2 rounded-full bg-[#a8d5ba]" />
-                <span className="text-sm font-bold text-[#a8d5ba] uppercase tracking-wide">
-                  Alapvizsgálat
-                </span>
-              </div>
+      <ScreeningCompare packages={packages} />
 
-              <div className="relative pl-4 border-l-2 border-[#a8d5ba]/30">
-                {gynItems.map((item, idx) => (
-                  <PriceRow key={item._key} item={item} isLast={idx === gynItems.length - 1} />
-                ))}
-              </div>
-            </div>
+      <PriceNotes week={week} />
 
-            {/* Spiral services group */}
-            <div className="mb-8">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-2 h-2 rounded-full bg-[#E8D5E0]" />
-                <span className="text-sm font-bold text-[#E8D5E0] uppercase tracking-wide">
-                  Spirál szolgáltatások
-                </span>
-              </div>
+      <CtaBand
+        eyebrow="Időpontfoglalás"
+        title="Foglaljon időpontot!"
+        text="Online időpontfoglalás pár kattintással."
+        href={bookingHref("nogyogyaszat")}
+        label="Időpontfoglalás"
+      />
 
-              <div className="relative pl-4 border-l-2 border-[#E8D5E0]/30">
-                {spiralItems.map((item, idx) => (
-                  <PriceRow key={item._key} item={item} isLast={idx === spiralItems.length - 1} />
-                ))}
-                {data.spiralServices?.footnote ? (
-                  <p className="text-white/50 text-sm mt-2">{data.spiralServices.footnote}</p>
-                ) : null}
-              </div>
-            </div>
-
-            {/* Pregnancy care */}
-            {data.pregnancyCare ? (
-              <div className="bg-white/10 backdrop-blur rounded-2xl p-5">
-                <div className="flex flex-col md:flex-row md:items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <span className="text-3xl">🤰</span>
-                    <div>
-                      <span className="text-white font-bold text-lg">
-                        {data.pregnancyCare.label}
-                      </span>
-                      {data.pregnancyCare.subtitle ? (
-                        <p className="text-white/60 text-sm">{data.pregnancyCare.subtitle}</p>
-                      ) : null}
-                    </div>
-                  </div>
-                  <span className="text-2xl font-bold text-[#a8d5ba] mt-3 md:mt-0">
-                    {formatPrice(data.pregnancyCare.price)}
-                  </span>
-                </div>
-              </div>
-            ) : null}
-          </div>
-        </div>
-
-        {/* === SCREENING PACKAGES === */}
-        <div className="mb-12">
-          <div className="flex items-center gap-3 mb-6">
-            <span className="text-3xl">🩺</span>
-            <h2 className="text-2xl md:text-3xl font-bold text-[#1e2952]">Éves Szűrőcsomagok</h2>
-            <span className="px-3 py-1 rounded-full bg-[#a8d5ba]/20 text-[#1e2952] text-sm font-medium">
-              Évente 1x igénybe vehető
-            </span>
-          </div>
-
-          <div className="rounded-3xl shadow-xl overflow-hidden">
-            <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-[#1e2952]/10">
-              {tiers.map((tier, idx) => {
-                const style = TIER_STYLES[idx] ?? TIER_STYLES[0];
-                return (
-                  <div key={tier._key} className={`${style.bg} p-8 md:p-10`}>
-                    <div className="flex items-start justify-between gap-3 mb-6">
-                      <div>
-                        <span className="text-sm font-bold text-[#1e2952]/60 uppercase tracking-wide">
-                          {tier.name}
-                        </span>
-                        <div className="text-4xl font-black text-[#1e2952] mt-2">
-                          {typeof tier.price === "number" ? tier.price.toLocaleString("hu-HU") : ""}{" "}
-                          <span className="text-lg">Ft</span>
-                        </div>
-                      </div>
-                      {tier.highlighted ? (
-                        <span className="px-3 py-1 rounded-full bg-[#1e2952] text-white text-xs font-bold uppercase whitespace-nowrap">
-                          Ajánlott
-                        </span>
-                      ) : null}
-                    </div>
-                    <ul className="space-y-4">
-                      {(tier.features ?? []).map((feature) => {
-                        const included = feature.included !== false;
-                        const iconColor = included
-                          ? feature.emphasized
-                            ? style.emphColor
-                            : style.checkColor
-                          : "";
-                        const textClass = included
-                          ? `text-[#1e2952] ${feature.emphasized ? "font-medium" : ""}`
-                          : "text-[#1e2952]/40";
-                        return (
-                          <li
-                            key={feature._key}
-                            className={`flex ${feature.subtext ? "items-start" : "items-center"} gap-2 ${textClass}`}
-                          >
-                            {included ? (
-                              <svg
-                                className={`w-5 h-5 ${iconColor} ${feature.subtext ? "flex-shrink-0 mt-0.5" : ""}`}
-                                fill="currentColor"
-                                viewBox="0 0 20 20"
-                              >
-                                <path
-                                  fillRule="evenodd"
-                                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                  clipRule="evenodd"
-                                />
-                              </svg>
-                            ) : (
-                              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                <path
-                                  fillRule="evenodd"
-                                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                                  clipRule="evenodd"
-                                />
-                              </svg>
-                            )}
-                            {feature.subtext ? (
-                              <div>
-                                <div>{feature.text}</div>
-                                <p className="text-xs text-[#1e2952]/60">{feature.subtext}</p>
-                              </div>
-                            ) : (
-                              <span>{feature.text}</span>
-                            )}
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-
-        {/* === ADD-ON SERVICES HEADING === */}
-        <div className="mb-6">
-          <div className="flex items-center gap-3">
-            <span className="text-3xl">➕</span>
-            <h2 className="text-2xl md:text-3xl font-bold text-[#1e2952]">
-              Nőgyógyászati vizsgálati díjon felüli árak
-            </h2>
-          </div>
-        </div>
-
-        {/* === SURCHARGE GRID: Sampling, Microbiology, HPV === */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
-          {/* Sampling */}
-          <div className={`${cardStyles.blue.bg} rounded-3xl p-6 shadow-lg`}>
-            <div className="flex items-center gap-3 mb-5">
-              <span className="text-2xl">🧪</span>
-              <h3 className="text-xl font-bold text-[#1e2952]">Mintavételek</h3>
-            </div>
-            <div className="space-y-3">
-              {samplingItems.map((item, idx) => (
-                <div
-                  key={item._key}
-                  className={`flex justify-between items-center py-2 ${
-                    idx === samplingItems.length - 1 ? "" : "border-b border-[#1e2952]/10"
-                  }`}
-                >
-                  <span className="text-[#1e2952]">{item.label}</span>
-                  <span className="font-bold text-[#1e2952] whitespace-nowrap ml-4">
-                    {formatPrice(item.price)}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Microbiology */}
-          <div className={`${cardStyles.mint.bg} rounded-3xl p-6 shadow-lg`}>
-            <div className="flex items-center gap-3 mb-5">
-              <span className="text-2xl">🔬</span>
-              <h3 className="text-xl font-bold text-[#1e2952]">Mikrobiológiai vizsgálatok</h3>
-            </div>
-            <div className="space-y-3">
-              {microItems.map((item, idx) => (
-                <div
-                  key={item._key}
-                  className={`flex justify-between items-center py-2 ${
-                    idx === microItems.length - 1 ? "" : "border-b border-[#1e2952]/10"
-                  }`}
-                >
-                  <div>
-                    <span className="text-[#1e2952]">{item.label}</span>
-                    {item.suffix ? (
-                      <span className="text-[#1e2952]/50 text-sm ml-2">{item.suffix}</span>
-                    ) : null}
-                  </div>
-                  <span className="font-bold text-[#1e2952] whitespace-nowrap ml-4">
-                    {formatPrice(item.price)}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* === OTHER SERVICES (bento, HPV test featured alongside) === */}
-        <div className="mb-6">
-          <div className="flex items-center gap-3">
-            <span className="text-3xl">📋</span>
-            <h2 className="text-2xl md:text-3xl font-bold text-[#1e2952]">Egyéb szolgáltatások</h2>
-          </div>
-        </div>
-
-        <div className="mb-12">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {hpvItems.map((item) => (
-              <div
-                key={item._key}
-                className={`${cardStyles.coral.bg} rounded-3xl p-6 shadow-lg sm:col-span-2 flex flex-col justify-between`}
-              >
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="text-xl">🧬</span>
-                  <span className="font-bold text-white text-lg">{item.name}</span>
-                </div>
-                <div className="flex items-end justify-between gap-4">
-                  {item.description ? (
-                    <p className="text-white/80 text-sm leading-relaxed">{item.description}</p>
-                  ) : null}
-                  <span className="text-2xl font-bold text-white whitespace-nowrap">
-                    {formatPrice(item.price)}
-                  </span>
-                </div>
-              </div>
-            ))}
-            {otherItems.map((item) => (
-              <div
-                key={item._key}
-                className={`${cardStyles.pink.bg} rounded-3xl p-5 shadow-lg flex flex-col justify-between`}
-              >
-                <span className="text-[#1e2952] font-medium">{item.label}</span>
-                <span className="font-bold text-[#1e2952] text-xl mt-3">
-                  {formatPrice(item.price)}
-                </span>
-              </div>
-            ))}
-          </div>
-          {data.otherServices?.footnote ? (
-            <p className="text-[#1e2952]/60 text-sm mt-4">{data.otherServices.footnote}</p>
-          ) : null}
-        </div>
-      </section>
-
-      {/* Important Information */}
-      <section className="bg-white py-16 rounded-[40px]">
-        <div className="max-w-6xl mx-auto px-6 md:px-12">
-          <SectionHeader
-            label="Tudnivalók"
-            title="Fontos információk"
-            subtitle="Kérjük, olvassa el figyelmesen"
-          />
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {importantInfo.map((info) => (
-              <div key={info.title} className="bg-[#FAF8F3] p-5 rounded-2xl">
-                <h3 className="text-base font-bold text-[#1e2952] mb-2">{info.title}</h3>
-                <p className="text-[#1e2952]/60 text-sm leading-relaxed">{info.content}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Office Hours & CTA */}
-      <section className="max-w-6xl mx-auto px-6 md:px-12 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-[#1e2952] text-white p-8 rounded-3xl">
-            <h3 className="text-xl font-bold mb-6">Rendelési idő</h3>
-            <div className="space-y-3">
-              {officeHours.map((hour) => (
-                <div
-                  key={hour.day}
-                  className="flex justify-between py-2 border-b border-white/10 last:border-0"
-                >
-                  <span className="text-blue-200">{hour.day}</span>
-                  <span className="font-bold">{hour.hours}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="bg-gradient-to-br from-[#76c8b6] to-[#5eb8a3] p-8 rounded-3xl flex flex-col justify-center">
-            <h3 className="text-2xl font-bold text-[#1e2952] mb-4">Foglaljon időpontot!</h3>
-            <p className="text-[#1e2952]/70 mb-6">Online időpontfoglalás pár kattintással.</p>
-            <Link
-              href="/idopontfoglalas"
-              className="inline-flex items-center justify-center bg-[#1e2952] text-white px-8 py-4 rounded-xl font-bold hover:bg-[#1e2952]/90 transition-colors"
-            >
-              Időpontfoglalás
-              <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17 8l4 4m0 0l-4 4m4-4H3"
-                />
-              </svg>
-            </Link>
-          </div>
-        </div>
-      </section>
-    </main>
+      <MobileActionBar bookingHref={bookingHref("nogyogyaszat")} />
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: "Kezdőlap", path: "/" },
+          { name: "Szolgáltatások és Árak", path: PAGE_PATH },
+        ])}
+      />
+      <JsonLd data={offerCatalogJsonLd} />
+    </div>
   );
 }

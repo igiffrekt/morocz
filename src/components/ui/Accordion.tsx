@@ -1,6 +1,6 @@
 "use client";
 
-import { type ElementType, type ReactNode, useId, useState } from "react";
+import { type ElementType, type ReactNode, useEffect, useId, useState } from "react";
 import { cn } from "@/lib/cn";
 
 interface CollapseProps {
@@ -77,6 +77,18 @@ export interface AccordionItemData {
   content: ReactNode;
   /** Per-item surface, e.g. "bg-lavender". */
   className?: string;
+  /**
+   * DOM id of the item; a link to `#anchor` scrolls to it and opens it (on load and on
+   * every hashchange — see `requestAccordionOpen` for re-clicking the same link).
+   */
+  anchor?: string;
+}
+
+/** Re-opens the item behind `#anchor` even when the URL already ends with that hash. */
+export function requestAccordionOpen(anchor: string) {
+  if (window.location.hash === `#${anchor}`) {
+    window.dispatchEvent(new HashChangeEvent("hashchange"));
+  }
 }
 
 interface AccordionProps {
@@ -124,6 +136,19 @@ export function Accordion({
   );
   const open = controlledOpen ?? uncontrolledOpen;
 
+  useEffect(() => {
+    if (!items.some((item) => item.anchor)) return;
+    const openFromHash = () => {
+      const hash = decodeURIComponent(window.location.hash.slice(1));
+      const hit = hash ? items.find((item) => item.anchor === hash) : undefined;
+      if (!hit) return;
+      setOpen((prev) => (prev.includes(hit.id) ? prev : multiple ? [...prev, hit.id] : [hit.id]));
+    };
+    openFromHash();
+    window.addEventListener("hashchange", openFromHash);
+    return () => window.removeEventListener("hashchange", openFromHash);
+  }, [items, multiple]);
+
   const toggle = (id: string) => {
     const isOpen = open.includes(id);
     const next = isOpen ? open.filter((x) => x !== id) : multiple ? [...open, id] : [id];
@@ -140,6 +165,7 @@ export function Accordion({
         return (
           <div
             key={item.id}
+            id={item.anchor}
             className={cn(
               "rounded-panel bg-white transition-shadow duration-[400ms] ease-bento",
               isOpen && "shadow-[0_24px_48px_-32px_rgba(36,42,95,.5)]",

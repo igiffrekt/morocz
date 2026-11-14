@@ -37,25 +37,48 @@ function Highlight({ children, className }: { children: string; className?: stri
   );
 }
 
-function InfoCard({ item, index }: { item: InfoItem; index: number }) {
+/** Card surface + round icon colours; the homepage uses white cards with sage icons. */
+export interface InfoCardTone {
+  surface: string;
+  icon: string;
+  highlight?: string;
+}
+
+const DEFAULT_TONE: InfoCardTone = { surface: "bg-white", icon: "bg-sage text-teal-ink" };
+
+export function InfoCard({
+  item,
+  index,
+  tone = DEFAULT_TONE,
+}: {
+  item: InfoItem;
+  index: number;
+  tone?: InfoCardTone;
+}) {
   return (
     <div
-      className="card-lift fade-up flex flex-col gap-3 rounded-tile bg-white p-[26px]"
+      className={cn("card-lift fade-up flex flex-col gap-3 rounded-tile p-[26px]", tone.surface)}
       style={{ "--i": index } as CSSProperties}
     >
       <span className="flex items-center gap-3">
-        <span className="inline-flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-full bg-sage text-teal-ink">
+        <span
+          className={cn(
+            "inline-flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-full",
+            tone.icon,
+          )}
+        >
           <PathIcon d={item.icon} size={20} />
         </span>
         <h3 className="m-0 text-lg font-extrabold text-navy">{item.title}</h3>
       </span>
       <p className="m-0 text-[15px] leading-[1.65] text-muted-strong">{item.body}</p>
-      {item.highlight && <Highlight>{item.highlight}</Highlight>}
+      {item.highlight && <Highlight className={tone.highlight}>{item.highlight}</Highlight>}
     </div>
   );
 }
 
-function InfoAccordion({ items, idBase }: { items: InfoItem[]; idBase: string }) {
+/** Phone layout of the info cards: single-open accordion, everything closed initially. */
+export function InfoAccordion({ items, idBase }: { items: InfoItem[]; idBase: string }) {
   const [open, setOpen] = useState<number | null>(null);
   return (
     <div className="flex flex-col gap-2">
@@ -103,6 +126,78 @@ function InfoAccordion({ items, idBase }: { items: InfoItem[]; idBase: string })
         );
       })}
     </div>
+  );
+}
+
+/**
+ * Rendelési idő card (navy, Mon–Fri from the resolved Sanity schedule) + clinic photo and
+ * reception phone / e-mail pills (desktop). Shared by the homepage and the prices page.
+ */
+export function ContactAside({ week, className }: { week: WeekHours[]; className?: string }) {
+  const contact = useSiteContact();
+  return (
+    <aside
+      aria-label="Rendelési idő és elérhetőség"
+      className={cn("flex flex-[1_1_300px] flex-col gap-3", className)}
+    >
+      <div className="flex flex-col gap-2 rounded-[28px] bg-navy px-5 py-[18px] text-white md:gap-3 md:rounded-panel md:p-7">
+        <span className="text-xs font-extrabold tracking-[.12em] text-mint-light uppercase md:text-[13px]">
+          Rendelési idő
+        </span>
+        <div>
+          {week.map((day) => (
+            <div
+              key={day.name}
+              className="flex justify-between gap-4 py-1 text-sm md:border-b md:border-white/10 md:py-2 md:text-[15px]"
+            >
+              <span className="text-navy-soft md:text-white">{day.name}</span>
+              <span
+                className={cn(
+                  "whitespace-nowrap tabular-nums",
+                  day.hours ? "font-extrabold text-mint-light" : "opacity-50",
+                )}
+              >
+                {day.hours ?? "zárva"}
+              </span>
+            </div>
+          ))}
+        </div>
+        <span className="text-[13px] text-navy-soft">
+          Telefonon csak a rendelési időben vagyunk elérhetőek.
+        </span>
+      </div>
+      <div className="relative hidden h-[220px] overflow-hidden rounded-panel md:block">
+        <Image
+          src="/morocz-medical-kulter.webp"
+          alt="A rendelő épülete"
+          fill
+          sizes="(min-width: 1024px) 340px, 100vw"
+          className="object-cover"
+        />
+      </div>
+      {contact?.phone && (
+        <a
+          href={telHref(contact.phone)}
+          className={pillClassName({
+            variant: "mint",
+            className: "hidden h-[54px] w-full bg-mint hover:bg-mint md:flex",
+          })}
+        >
+          {contact.phone}
+        </a>
+      )}
+      {contact?.email && (
+        <a
+          href={`mailto:${contact.email}`}
+          className={pillClassName({
+            variant: "outline",
+            className: "hidden h-[54px] w-full border-0 font-bold md:flex",
+          })}
+        >
+          {contact.email}
+        </a>
+      )}
+    </aside>
   );
 }
 
@@ -168,68 +263,7 @@ export function ImportantInfo({ week, certificatePrice }: ImportantInfoProps) {
           )}
         </div>
 
-        <aside
-          aria-label="Rendelési idő és elérhetőség"
-          className="flex flex-[1_1_300px] flex-col gap-3"
-        >
-          <div className="flex flex-col gap-2 rounded-[28px] bg-navy px-5 py-[18px] text-white md:gap-3 md:rounded-panel md:p-7">
-            <span className="text-xs font-extrabold tracking-[.12em] text-mint-light uppercase md:text-[13px]">
-              Rendelési idő
-            </span>
-            <div>
-              {week.map((day) => (
-                <div
-                  key={day.name}
-                  className="flex justify-between gap-4 py-1 text-sm md:border-b md:border-white/10 md:py-2 md:text-[15px]"
-                >
-                  <span className="text-navy-soft md:text-white">{day.name}</span>
-                  <span
-                    className={cn(
-                      "whitespace-nowrap tabular-nums",
-                      day.hours ? "font-extrabold text-mint-light" : "opacity-50",
-                    )}
-                  >
-                    {day.hours ?? "zárva"}
-                  </span>
-                </div>
-              ))}
-            </div>
-            <span className="text-[13px] text-navy-soft">
-              Telefonon csak a rendelési időben vagyunk elérhetőek.
-            </span>
-          </div>
-          <div className="relative hidden h-[220px] overflow-hidden rounded-panel md:block">
-            <Image
-              src="/morocz-medical-kulter.webp"
-              alt="A rendelő épülete"
-              fill
-              sizes="(min-width: 1024px) 340px, 100vw"
-              className="object-cover"
-            />
-          </div>
-          {contact?.phone && (
-            <a
-              href={telHref(contact.phone)}
-              className={pillClassName({
-                variant: "mint",
-                className: "hidden h-[54px] w-full bg-mint hover:bg-mint md:flex",
-              })}
-            >
-              {contact.phone}
-            </a>
-          )}
-          {contact?.email && (
-            <a
-              href={`mailto:${contact.email}`}
-              className={pillClassName({
-                variant: "outline",
-                className: "hidden h-[54px] w-full border-0 font-bold md:flex",
-              })}
-            >
-              {contact.email}
-            </a>
-          )}
-        </aside>
+        <ContactAside week={week} />
       </div>
     </section>
   );

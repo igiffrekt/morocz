@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect } from "react";
+import { type ReactNode, useEffect } from "react";
 import { cn } from "@/lib/cn";
 import { telHref } from "@/lib/site-nav";
 import { ArrowRightIcon, PhoneIcon } from "./icons";
@@ -11,6 +11,8 @@ interface MobileActionBarProps {
   /** Booking target (defaults to the booking wizard). */
   bookingHref?: string;
   bookingLabel?: string;
+  /** Replaces the round call button (e.g. a "Árak" sheet trigger on service pages). */
+  leading?: ReactNode;
   className?: string;
 }
 
@@ -23,6 +25,7 @@ interface MobileActionBarProps {
 export function MobileActionBar({
   bookingHref = "/idopontfoglalas",
   bookingLabel = "Időpontfoglalás",
+  leading,
   className,
 }: MobileActionBarProps) {
   const contact = useSiteContact();
@@ -39,7 +42,8 @@ export function MobileActionBar({
         className,
       )}
     >
-      {contact?.phone && (
+      {leading}
+      {!leading && contact?.phone && (
         <a
           href={telHref(contact.phone)}
           aria-label={`Hívás: ${contact.phone}`}

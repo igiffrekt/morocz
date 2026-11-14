@@ -155,6 +155,120 @@ export function surchargeExample(services: readonly PriceMenuSourceService[]): s
   return `vizsgálat ultrahanggal ${formatFt(base)} + LBC mintavétel ${formatFt(extra)} = ${formatFt(base + extra)}`;
 }
 
+/** "Mintavételek (Felárak)" → "Mintavételek" (the + Felár badge says the rest). */
+export function shortCategoryName(name: string): string {
+  return name.replace(/\s*\(felárak\)\s*$/i, "").trim();
+}
+
+/** URL-safe anchor for a price category ("Éves Szűrőcsomagok" → "arlista-eves-szurocsomagok"). */
+export function categoryAnchor(name: string): string {
+  const slug = shortCategoryName(name)
+    .toLocaleLowerCase("hu-HU")
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return `arlista-${slug || "kategoria"}`;
+}
+
+export interface PackageRow {
+  text: string;
+  included: boolean;
+}
+
+export interface ScreeningPackage {
+  id: string;
+  name: string;
+  /** "Cél: …" line from the Sanity description. */
+  goal: string;
+  price: number | null;
+  recommended: boolean;
+  rows: PackageRow[];
+}
+
+/** First two words of a "Tartalma:" line — "Folyadékalapú méhnyakszűrés (LBC)" ≈ "… méhnyakszűrés". */
+function featureKey(text: string): string {
+  return norm(text)
+    .replace(/[^\p{L}\p{N}\s]/gu, " ")
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .join(" ");
+}
+
+/**
+ * Éves Szűrőcsomagok side by side: each package lists its own Sanity "Tartalma:" lines,
+ * plus every line another package has and this one lacks (shown as "nem része a
+ * csomagnak"). The "Kiterjesztett" package — or, failing that, the dearest — is "Ajánlott".
+ */
+export function comparePackages(items: readonly PriceMenuItem[]): ScreeningPackage[] {
+  const named = items.findIndex((i) => /kiterjesztett/i.test(i.name));
+  let recommended = named;
+  if (recommended < 0 && items.length > 1) {
+    const prices = items.map((i) => i.price ?? -1);
+    recommended = prices.indexOf(Math.max(...prices));
+  }
+
+  return items.map((item, index) => {
+    const own = new Set(item.includes.map(featureKey));
+    const missing: PackageRow[] = [];
+    const seen = new Set<string>();
+    for (const other of items) {
+      if (other === item) continue;
+      for (const text of other.includes) {
+        const key = featureKey(text);
+        if (own.has(key) || seen.has(key)) continue;
+        seen.add(key);
+        missing.push({ text, included: false });
+      }
+    }
+    return {
+      id: item.id,
+      name: item.name,
+      goal: item.note,
+      price: item.price,
+      recommended: index === recommended,
+      rows: [...item.includes.map((text) => ({ text, included: true })), ...missing],
+    };
+  });
+}
+
+/**
+ * schema.org Offers for every priced row of the menu (search and answer engines read
+ * prices from Offer/priceSpecification), built from the same Sanity data the page shows.
+ */
+export function priceMenuOffers(categories: readonly PriceMenuCategory[], url: string) {
+  return categories.flatMap((cat) =>
+    cat.items
+      .filter((item) => item.price != null && item.name)
+      .map((item) => {
+        const description =
+          item.includes.length > 0
+            ? `Tartalmazza: ${item.includes.join(", ")}`
+            : item.note || undefined;
+        // "Ár kórokozónként" — the price is per unit, not per visit.
+        const perUnit = /kórokozónként/i.test(item.note) ? { unitText: "kórokozó" } : {};
+        return {
+          "@type": "Offer",
+          name: item.name,
+          ...(description ? { description } : {}),
+          category: shortCategoryName(cat.name),
+          price: item.price,
+          priceCurrency: "HUF",
+          availability: "https://schema.org/InStock",
+          url,
+          priceSpecification: {
+            "@type": "UnitPriceSpecification",
+            price: item.price,
+            priceCurrency: "HUF",
+            ...perUnit,
+          },
+          itemOffered: { "@type": "MedicalProcedure", name: item.name },
+        };
+      }),
+  );
+}
+
 /** Card subtitle, desktop and compact (mobile) wording. */
 export function categorySubtitle(cat: PriceMenuCategory): { long: string; short: string } {
   const count = cat.items.length;

@@ -135,3 +135,19 @@ export function buildInfoGroups({ phone, email, certificatePrice }: InfoContentI
     },
   ];
 }
+
+/** The four notes of the "Szolgáltatások és Árak" page, in its order. */
+export const PRICE_PAGE_INFO_TITLES = [
+  "E-recept",
+  "Vizsgálati díjak",
+  "Eredmények",
+  "Magzati genetikai ultrahang",
+] as const;
+
+/** Info items by title (same copy as the homepage tabs), in the requested order. */
+export function pickInfoItems(groups: InfoGroup[], titles: readonly string[]): InfoItem[] {
+  const all = groups.flatMap((g) => g.items);
+  return titles
+    .map((title) => all.find((item) => item.title === title))
+    .filter((item): item is InfoItem => Boolean(item));
+}

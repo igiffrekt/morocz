@@ -6,6 +6,7 @@ import { bookingHref } from "@/lib/booking-services";
 import { cn } from "@/lib/cn";
 import {
   type CategoryTheme,
+  categoryAnchor,
   categorySubtitle,
   type PriceMenuCategory,
   type PriceMenuItem,
@@ -13,7 +14,8 @@ import {
 import { formatFt } from "@/lib/service-menu";
 import { ICON_PATHS, PathIcon } from "./PathIcon";
 
-const THEMES: Record<CategoryTheme, { tint: string; accent: string; icon: string }> = {
+/** Category surface, round icon colours and icon (also used by the prices page overview). */
+export const PRICE_THEMES: Record<CategoryTheme, { tint: string; accent: string; icon: string }> = {
   gyn: { tint: "bg-lavender", accent: "bg-navy text-white", icon: ICON_PATHS.gyn },
   screening: { tint: "bg-sun-soft", accent: "bg-sun text-navy", icon: ICON_PATHS.shield },
   sampling: { tint: "bg-mint-pale", accent: "bg-mint text-navy", icon: ICON_PATHS.tube },
@@ -30,6 +32,11 @@ interface PriceMenuProps {
   categories: PriceMenuCategory[];
   /** "vizsgálat ultrahanggal 43 000 Ft + LBC mintavétel 9 000 Ft = 52 000 Ft" or null. */
   surchargeExample: string | null;
+  /** Section id (default "szolgaltatasok"); the heading id is derived from it. */
+  id?: string;
+  eyebrow?: string;
+  /** Give every category a `#arlista-…` anchor that scrolls to and opens it. */
+  anchors?: boolean;
 }
 
 function SurchargeBadge({ className }: { className?: string }) {
@@ -122,13 +129,18 @@ export function PriceMenu({
   validityNote,
   categories,
   surchargeExample,
+  id = "szolgaltatasok",
+  eyebrow = "Szolgáltatások és Árak",
+  anchors = false,
 }: PriceMenuProps) {
+  const headingId = `${id}-cim`;
   const items: AccordionItemData[] = categories.map((cat) => {
-    const theme = THEMES[cat.theme];
+    const theme = PRICE_THEMES[cat.theme];
     const sub = categorySubtitle(cat);
     return {
       id: cat.id,
-      className: theme.tint,
+      anchor: anchors ? categoryAnchor(cat.name) : undefined,
+      className: cn(theme.tint, anchors && "scroll-mt-24 lg:scroll-mt-8"),
       icon: (
         <span
           className={cn(
@@ -184,13 +196,13 @@ export function PriceMenu({
 
   return (
     <section
-      id="szolgaltatasok"
-      aria-labelledby="szolgaltatasok-cim"
+      id={id}
+      aria-labelledby={headingId}
       className="flex scroll-mt-28 flex-col gap-3.5 md:gap-8"
     >
       <SectionHeading
-        id="szolgaltatasok-cim"
-        eyebrow="Szolgáltatások és Árak"
+        id={headingId}
+        eyebrow={eyebrow}
         title={heading || "Szolgáltatásaink"}
         lead={lead}
         className="px-1.5 md:px-0"

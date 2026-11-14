@@ -327,13 +327,8 @@ export function MobileMenu({
               className="flex flex-col gap-2.5 rounded-tile border border-white/10 bg-white/6 px-5 py-[18px]"
               style={reveal(entries.length + 1)}
             >
-              <p className="m-0 flex items-center justify-between text-xs font-extrabold uppercase tracking-[.12em] text-mint-light">
-                <span>Rendelési idő</span>
-                {openingHours.seasonName && (
-                  <span className="whitespace-nowrap rounded-full bg-mint-light px-3 py-1 tracking-normal normal-case text-navy">
-                    {openingHours.seasonName}
-                  </span>
-                )}
+              <p className="m-0 text-xs font-extrabold uppercase tracking-[.12em] text-mint-light">
+                Rendelési idő
               </p>
               <dl className="m-0 flex flex-col gap-2.5">
                 {openingHours.days.map((d) => (

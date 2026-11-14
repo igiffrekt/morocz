@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { computeOpeningHours } from "./opening-hours";
 import { buildServiceMenu, formatFt } from "./service-menu";
-import { isActiveHref, mapsHref, normalizeHref, telHref } from "./site-nav";
+import { classifyHref, isActiveHref, mapsHref, normalizeHref, telHref } from "./site-nav";
 
 const day = (dayOfWeek: number, startTime = "", endTime = "", isDayOff = !startTime) => ({
   dayOfWeek,
@@ -43,6 +43,24 @@ describe("normalizeHref / isActiveHref", () => {
   });
 });
 
+describe("classifyHref", () => {
+  it("makes site URLs relative and flags external / plain links", () => {
+    expect(classifyHref("https://drmoroczangela.hu/idopontfoglalas")).toEqual({
+      href: "/idopontfoglalas",
+      kind: "internal",
+    });
+    expect(classifyHref("/#blog")).toEqual({ href: "/#blog", kind: "internal" });
+    expect(classifyHref("https://www.google.com/maps/place/x")).toEqual({
+      href: "https://www.google.com/maps/place/x",
+      kind: "external",
+    });
+    expect(classifyHref("https://facebook.com/moroczmedical").kind).toBe("external");
+    expect(classifyHref("tel:+36706395239")).toEqual({ href: "tel:+36706395239", kind: "plain" });
+    expect(classifyHref("mailto:a@b.hu")).toEqual({ href: "mailto:a@b.hu", kind: "plain" });
+    expect(classifyHref(null)).toEqual({ href: "#", kind: "plain" });
+  });
+});
+
 describe("computeOpeningHours", () => {
   const weekly = {
     days: [day(1, "12:00", "15:20"), day(2, "12:00", "15:20"), day(3), day(4, "13:00", "16:40")],
@@ -60,7 +78,6 @@ describe("computeOpeningHours", () => {
 
   it("uses the weekly schedule outside any season", () => {
     expect(computeOpeningHours("2026-10-15", weekly, seasonals)).toEqual({
-      seasonName: null,
       days: [
         { dayOfWeek: 1, name: "Hétfő", hours: "12:00 – 15:20" },
         { dayOfWeek: 2, name: "Kedd", hours: "12:00 – 15:20" },
@@ -71,7 +88,7 @@ describe("computeOpeningHours", () => {
 
   it("lets the seasonal schedule override, Monday-first, open days only", () => {
     const result = computeOpeningHours("2026-11-14", weekly, seasonals);
-    expect(result.seasonName).toBe("November");
+    expect(result).not.toHaveProperty("seasonName");
     expect(result.days.map((d) => `${d.name} ${d.hours}`)).toEqual([
       "Kedd 13:20 – 16:40",
       "Szerda 11:00 – 14:20",
@@ -80,7 +97,7 @@ describe("computeOpeningHours", () => {
   });
 
   it("copes with missing data", () => {
-    expect(computeOpeningHours("2026-11-14", null, null)).toEqual({ seasonName: null, days: [] });
+    expect(computeOpeningHours("2026-11-14", null, null)).toEqual({ days: [] });
   });
 });
 

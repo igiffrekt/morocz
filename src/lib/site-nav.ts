@@ -61,3 +61,19 @@ export function telHref(phone: string): string {
 export function mapsHref(address: string): string {
   return `https://maps.google.com/?q=${encodeURIComponent(address.replace(/\s*\n\s*/g, " "))}`;
 }
+
+export type LinkKind = "internal" | "external" | "plain";
+
+/**
+ * Classify a CMS link: site URLs become relative client-side routes ("internal"),
+ * other http(s) / protocol-relative URLs open in a new tab ("external"), and
+ * tel:/mailto:/other schemes are rendered as-is ("plain").
+ */
+export function classifyHref(href: string | null | undefined): { href: string; kind: LinkKind } {
+  const normal = normalizeHref(href?.trim());
+  if (normal.startsWith("//") || /^https?:\/\//i.test(normal)) {
+    return { href: normal, kind: "external" };
+  }
+  if (normal.startsWith("/")) return { href: normal, kind: "internal" };
+  return { href: normal, kind: "plain" };
+}

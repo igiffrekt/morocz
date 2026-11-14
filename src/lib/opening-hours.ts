@@ -22,13 +22,9 @@ export interface OpeningDay {
 }
 
 export interface OpeningHours {
-  /** Name of the seasonal schedule in force today, or null for the weekly default. */
-  seasonName: string | null;
   /** Open days only, Monday first. */
   days: OpeningDay[];
 }
-
-export type SeasonalScheduleWithName = SeasonalScheduleSummary & { name?: string | null };
 
 /** Monday-first order (1..6, then Sunday). */
 function weekOrder(dayOfWeek: number): number {
@@ -43,24 +39,14 @@ function weekOrder(dayOfWeek: number): number {
 export function computeOpeningHours(
   date: string,
   weekly: Pick<ResolvedSchedule, "days"> | null | undefined,
-  seasonals: readonly SeasonalScheduleWithName[] | null | undefined,
+  seasonals: readonly SeasonalScheduleSummary[] | null | undefined,
 ): OpeningHours {
   const fallback: ResolvedSchedule = {
     defaultSlotDuration: 0,
     bufferMinutes: 0,
     days: weekly?.days ?? [],
   };
-  const list = [...(seasonals ?? [])];
-  const resolved = resolveScheduleForDate(date, fallback, list);
-  const season =
-    resolved === fallback
-      ? null
-      : (list
-          .filter((s) => s.startDate <= date && date <= s.endDate)
-          .reduce<SeasonalScheduleWithName | null>(
-            (earliest, s) => (!earliest || s.startDate < earliest.startDate ? s : earliest),
-            null,
-          ) ?? null);
+  const resolved = resolveScheduleForDate(date, fallback, [...(seasonals ?? [])]);
 
   const days = (resolved.days ?? [])
     .filter((d) => !d.isDayOff && d.startTime && d.endTime)
@@ -71,5 +57,5 @@ export function computeOpeningHours(
       hours: `${d.startTime} – ${d.endTime}`,
     }));
 
-  return { seasonName: season?.name?.trim() || null, days };
+  return { days };
 }

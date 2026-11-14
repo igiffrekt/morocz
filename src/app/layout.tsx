@@ -10,9 +10,9 @@ import { GoogleAnalytics } from "@/components/ui/GoogleAnalytics";
 import { PopupModal } from "@/components/ui/PopupModal";
 import { StaleDeploymentReloader } from "@/components/ui/StaleDeploymentReloader";
 import { plusJakartaSans } from "@/lib/fonts";
-import { computeOpeningHours, type SeasonalScheduleWithName } from "@/lib/opening-hours";
+import { computeOpeningHours } from "@/lib/opening-hours";
 import { buildServiceMenu } from "@/lib/service-menu";
-import { todayInBudapest } from "@/lib/slots";
+import { type SeasonalScheduleSummary, todayInBudapest } from "@/lib/slots";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import { urlFor } from "@/sanity/lib/image";
 import {
@@ -107,7 +107,7 @@ export default async function RootLayout({
       query: weeklyScheduleQuery,
       tags: ["weeklySchedule"],
     }),
-    sanityFetch<SeasonalScheduleWithName[] | null>({
+    sanityFetch<SeasonalScheduleSummary[] | null>({
       query: seasonalSchedulesForRangeQuery,
       params: { startDate: today, endDate: today },
       tags: ["seasonalSchedule"],
@@ -154,6 +154,7 @@ export default async function RootLayout({
               email={email}
               address={address}
               socialLinks={settings?.socialLinks}
+              footerColumns={settings?.footerColumns}
               privacyPolicyUrl={settings?.privacyPolicyUrl ?? undefined}
               cookiePolicyUrl={settings?.cookiePolicyUrl ?? undefined}
               termsOfServiceUrl={settings?.termsOfServiceUrl ?? undefined}

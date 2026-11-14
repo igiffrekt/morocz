@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<title>Mobil · Kapcsolat</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#dfe3ea}
+a{color:#242a5f;-webkit-tap-highlight-color:transparent}
+button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+a:focus-visible,button:focus-visible{outline:3px solid #469993;outline-offset:3px}
+.scroll::-webkit-scrollbar{display:none}
+.scroll{scrollbar-width:none}
+.tap{transition:transform .25s cubic-bezier(.2,.8,.2,1),background-color .3s,color .3s,box-shadow .3s}
+.tap:active{transform:scale(.96)}
+.acc{display:grid;transition:grid-template-rows .5s cubic-bezier(.2,.8,.2,1),opacity .4s}
+.acc>div{overflow:hidden;min-height:0}
+.ind{transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+.fade{animation:fadeUp .5s cubic-bezier(.2,.8,.2,1) both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.snap{scroll-snap-type:x mandatory;overscroll-behavior-x:contain}
+.snap>*{scroll-snap-align:start}
+.pulse{animation:pulse 2s cubic-bezier(.2,.8,.2,1) infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(163,218,194,.7)}100%{box-shadow:0 0 0 10px rgba(163,218,194,0)}}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+.scroll[style*="inset: 0"]>*:first-child{position:sticky;top:0;z-index:40}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #F2F4F8; font-family: 'Plus Jakarta Sans', sans-serif; color: #242a5f">
+<div class="scroll" style="position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden">
+<dc-import name="MobilFejlec" active="kapcsolat" hint-size="390px,68px"></dc-import>
+
+<!-- HERO -->
+<section style="padding: 4px 12px 0">
+<div style="position: relative; background: #242a5f; background-image: radial-gradient(rgba(255,255,255,.09) 1.2px, transparent 1.6px); background-size: 18px 18px; border-radius: 32px; overflow: hidden; padding: 20px 20px 22px; color: #ffffff; display: flex; flex-direction: column; gap: 12px">
+<div aria-hidden="true" style="position: absolute; right: -60px; top: -60px; width: 190px; height: 190px; border-radius: 999px; background: #e1bbcd; opacity: .2"></div>
+<nav aria-label="Morzsamenü" style="position: relative; align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); border-radius: 999px; padding: 6px 14px; font-size: 12px; font-weight: 600; color: #c9cde3"><a href="MobilFooldal.dc.html" style="color: #ffffff; text-decoration: none">Kezdőlap</a><span aria-hidden="true">/</span><span aria-current="page">Kapcsolat</span></nav>
+<h1 style="position: relative; margin: 0; font-size: 34px; line-height: 1.04; font-weight: 800; letter-spacing: -0.025em">Kapcsolat</h1>
+<p style="position: relative; margin: 0; font-size: 15px; line-height: 1.55; color: #c9cde3">Kérdése van? Keressen minket bizalommal az alábbi elérhetőségek valamelyikén.</p>
+<span role="status" style="position: relative; align-self: flex-start; display: inline-flex; align-items: center; gap: 10px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); border-radius: 999px; padding: 8px 16px 8px 12px; font-size: 13px; font-weight: 700"><span class="{{statusPulse}}" style="{{statusDot}}"></span>{{statusText}}</span>
+</div>
+</section>
+
+<!-- ACTION TILES -->
+<section style="padding: 12px 12px 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+<a href="tel:+36706395239" class="tap" style="grid-column: 1 / -1; display: flex; align-items: center; gap: 14px; min-height: 84px; padding: 14px 16px; border-radius: 28px; background: #76c8b6; color: #242a5f; text-decoration: none"><span style="width: 52px; height: 52px; border-radius: 999px; background: #242a5f; color: #ffffff; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg></span><span style="flex: 1; display: flex; flex-direction: column; gap: 2px"><strong style="font-size: 18px; font-weight: 800">Hívás</strong><span style="font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums">+36 70 639 5239</span><span style="font-size: 12px; font-weight: 600; color: #1f4a47">Rendelési időben</span></span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+<a href="mailto:recepcio@drmoroczangela.hu" class="tap" style="display: flex; flex-direction: column; gap: 10px; min-height: 120px; padding: 16px; border-radius: 28px; background: #ffffff; color: #242a5f; text-decoration: none; box-sizing: border-box"><span style="width: 44px; height: 44px; border-radius: 999px; background: #f8ebf1; color: #242a5f; display: inline-flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM22 6l-10 7L2 6"></path></svg></span><strong style="margin-top: auto; font-size: 16px">E-mail</strong><span style="font-size: 12px; font-weight: 600; color: #4b5563">Recepció</span></a>
+<a href="https://maps.google.com/?q=2500+Esztergom,+Martsa+Alajos+utca+6/c" target="_blank" rel="noopener" class="tap" style="display: flex; flex-direction: column; gap: 10px; min-height: 120px; padding: 16px; border-radius: 28px; background: #ffffff; color: #242a5f; text-decoration: none; box-sizing: border-box"><span style="width: 44px; height: 44px; border-radius: 999px; background: #fdf3dc; color: #242a5f; display: inline-flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11 22 2l-9 19-2-8-8-2z"></path></svg></span><strong style="margin-top: auto; font-size: 16px">Útvonal</strong><span style="font-size: 12px; font-weight: 600; color: #4b5563">Google Maps</span></a>
+</section>
+
+<!-- RENDELŐ -->
+<section style="padding: 12px 12px 0">
+<div style="position: relative; border-radius: 30px; overflow: hidden; background: #242a5f; color: #ffffff">
+<img src="/_blob/dcc8fc725c9ad49a1def8b2e4401d1d9" alt="A Mórocz Medical rendelő épülete" style="display: block; width: 100%; height: 190px; object-fit: cover">
+<div style="padding: 16px 18px 18px; display: flex; align-items: center; gap: 12px">
+<div style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: #a3dac2">Rendelő</span><strong style="font-size: 16px; line-height: 1.35">2500 Esztergom, Martsa Alajos utca 6/c</strong></div>
+<a href="https://maps.google.com/?q=2500+Esztergom,+Martsa+Alajos+utca+6/c" target="_blank" rel="noopener" aria-label="Útvonaltervezés a rendelőhöz" class="tap" style="width: 48px; height: 48px; border-radius: 999px; background: #e1bbcd; color: #242a5f; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"></path></svg></a>
+</div>
+</div>
+</section>
+
+<!-- E-MAIL LIST -->
+<section style="padding: 32px 12px 0; display: flex; flex-direction: column; gap: 10px">
+<div style="padding: 0 6px"><span style="font-size: 12px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #2f7a75">Írjon nekünk</span><h2 style="margin: 4px 0 0; font-size: 26px; font-weight: 800; letter-spacing: -0.02em">E-mail címeink</h2></div>
+<div style="background: #ffffff; border-radius: 28px; padding: 6px">
+<sc-for list="{{mails}}" as="m" hint-placeholder-count="3">
+<a href="{{m.href}}" class="tap" style="{{m.row}}"><span style="{{m.icon}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{m.path}}"></path></svg></span><span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px"><strong style="font-size: 14px">{{m.label}}</strong><span style="font-size: 13px; color: #4b5563; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{m.addr}}</span></span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+</sc-for>
+</div>
+</section>
+
+<!-- RENDELÉSI IDŐ -->
+<section style="padding: 12px 12px 0">
+<div style="background: #242a5f; color: #ffffff; border-radius: 28px; padding: 18px 20px; display: flex; flex-direction: column; gap: 6px">
+<span style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: #a3dac2"><span>Rendelési idő</span><span style="letter-spacing: 0; text-transform: none; color: #242a5f; background: #a3dac2; border-radius: 999px; padding: 4px 12px">{{seasonName}}</span></span>
+<sc-for list="{{week}}" as="w" hint-placeholder-count="5"><span style="{{w.row}}"><span style="{{w.nameStyle}}">{{w.name}}</span><span style="{{w.style}}">{{w.hours}}</span></span></sc-for>
+<span style="margin-top: 6px; font-size: 12px; line-height: 1.5; color: #c9cde3">Telefonon csak a rendelési időben vagyunk elérhetőek.</span>
+</div>
+</section>
+
+<!-- JÓ TUDNI (swipe) -->
+<section style="padding: 36px 0 0; display: flex; flex-direction: column; gap: 12px">
+<div style="padding: 0 18px"><span style="font-size: 12px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #2f7a75">Hasznos</span><h2 style="margin: 4px 0 0; font-size: 26px; font-weight: 800; letter-spacing: -0.02em">Jó tudni érkezés előtt</h2><p style="margin: 6px 0 0; font-size: 14px; color: #4b5563">Segítünk, hogy stresszmentes legyen a vizit</p></div>
+<div class="snap scroll" onScroll="{{onTipScroll}}" aria-roledescription="carousel" aria-label="Jó tudni érkezés előtt" style="display: flex; gap: 10px; overflow-x: auto; padding: 0 12px 4px; scroll-padding: 0 12px">
+<sc-for list="{{tips}}" as="tp" hint-placeholder-count="3">
+<article data-card="1" aria-roledescription="slide" aria-label="{{tp.t}}" style="{{tp.card}}">
+<span style="{{tp.iconStyle}}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{tp.icon}}"></path></svg></span>
+<h3 style="margin: 0; font-size: 20px; font-weight: 800">{{tp.t}}</h3>
+<p style="margin: 0; font-size: 14px; line-height: 1.6; color: #374151">{{tp.b}}</p>
+<sc-if value="{{tp.link}}" hint-placeholder-val="{{false}}"><a href="MobilArak.dc.html" class="tap" style="margin-top: auto; align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 18px; border-radius: 999px; background: #242a5f; color: #ffffff; font-size: 14px; font-weight: 800; text-decoration: none">Árlista<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a></sc-if>
+</article>
+</sc-for>
+</div>
+<div style="display: flex; justify-content: center; gap: 6px"><sc-for list="{{tipDots}}" as="dt" hint-placeholder-count="3"><span aria-hidden="true" style="{{dt.style}}"></span></sc-for></div>
+</section>
+
+<!-- HASZNOS INFORMÁCIÓK -->
+<section style="padding: 36px 12px 0; display: flex; flex-direction: column; gap: 12px">
+<div style="padding: 0 6px"><span style="font-size: 12px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #2f7a75">Tudnivalók</span><h2 style="margin: 4px 0 0; font-size: 26px; font-weight: 800; letter-spacing: -0.02em">Hasznos információk</h2><p style="margin: 6px 0 0; font-size: 14px; color: #4b5563">Válaszok az Ön legfontosabb kérdéseire</p></div>
+<div role="tablist" aria-label="Témák" style="position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); background: #ffffff; border-radius: 999px; padding: 4px">
+<span class="ind" aria-hidden="true" style="position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc((100% - 8px) / 2); border-radius: 999px; background: #242a5f; transform: translateX({{grpX}})"></span>
+<sc-for list="{{groups}}" as="g" hint-placeholder-count="2">
+<button type="button" role="tab" aria-selected="{{g.on}}" onClick="{{g.pick}}" style="{{g.style}}">{{g.label}}</button>
+</sc-for>
+</div>
+<sc-for list="{{groups}}" as="g" hint-placeholder-count="1">
+<sc-if value="{{g.on}}" hint-placeholder-val="{{true}}">
+<div role="tabpanel" aria-label="{{g.label}}" style="display: flex; flex-direction: column; gap: 8px">
+<sc-for list="{{g.items}}" as="f" hint-placeholder-count="5">
+<div class="fade" style="{{f.box}}">
+<h3 style="margin: 0"><button type="button" id="{{f.bid}}" aria-expanded="{{f.open}}" aria-controls="{{f.pid}}" onClick="{{f.toggle}}" class="tap" style="width: 100%; display: flex; align-items: center; gap: 12px; min-height: 60px; padding: 10px 14px; border: 0; background: transparent; text-align: left; color: #242a5f; border-radius: 24px">
+<span style="width: 38px; height: 38px; border-radius: 999px; background: #E6EDE8; color: #2f7a75; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 12px; font-weight: 800; font-variant-numeric: tabular-nums">{{f.num}}</span>
+<span style="flex: 1; font-size: 15px; font-weight: 800">{{f.t}}</span>
+<span style="{{f.chev}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></span>
+</button></h3>
+<div class="acc" id="{{f.pid}}" role="region" aria-labelledby="{{f.bid}}" aria-hidden="{{f.hidden}}" style="grid-template-rows: {{f.rows}}; opacity: {{f.op}}"><div><div style="padding: 0 16px 16px 64px; display: flex; flex-direction: column; gap: 10px">
+<sc-for list="{{f.b}}" as="bp" hint-placeholder-count="1"><p style="margin: 0; font-size: 14px; line-height: 1.6; color: #374151">{{bp}}</p></sc-for>
+<sc-if value="{{f.mail}}" hint-placeholder-val="{{false}}"><a href="{{f.mailHref}}" style="align-self: flex-start; font-size: 13px; font-weight: 800; color: #242a5f; background: #E6EDE8; border-radius: 999px; padding: 10px 16px; text-decoration: none; word-break: break-all">{{f.mail}}</a></sc-if>
+<sc-if value="{{f.hl}}" hint-placeholder-val="{{false}}"><span style="align-self: flex-start; font-size: 13px; font-weight: 800; background: #fdf3dc; border-radius: 999px; padding: 8px 14px; line-height: 1.4">{{f.hl}}</span></sc-if>
+</div></div></div>
+</div>
+</sc-for>
+</div>
+</sc-if>
+</sc-for>
+</section>
+<div style="height: 120px"></div>
+</div>
+
+<!-- STICKY ACTION BAR -->
+<div style="position: absolute; left: 12px; right: 12px; bottom: 14px; z-index: 30; display: flex; gap: 8px; padding: 6px; border-radius: 999px; background: rgba(255,255,255,.82); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: 0 18px 40px -18px rgba(36,42,95,.55)">
+<a href="tel:+36706395239" aria-label="Hívás" class="tap" style="width: 52px; height: 52px; flex-shrink: 0; border-radius: 999px; background: #E6EDE8; color: #242a5f; display: inline-flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg></a>
+<a href="mailto:recepcio@drmoroczangela.hu" aria-label="E-mail" class="tap" style="width: 52px; height: 52px; flex-shrink: 0; border-radius: 999px; background: #f8ebf1; color: #242a5f; display: inline-flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM22 6l-10 7L2 6"></path></svg></a>
+<a href="MobilFoglalas.dc.html" class="tap" style="flex: 1; height: 52px; border-radius: 999px; background: #242a5f; color: #ffffff; display: inline-flex; align-items: center; justify-content: center; gap: 10px; font-size: 16px; font-weight: 800; text-decoration: none">Időpontfoglalás <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { tip: 0, grp: 0, info: -1 };
+  }
+  renderVals() {
+    const s = this.state;
+    const SPRING = 'cubic-bezier(.2,.8,.2,1)';
+    // ===== Sanity snapshot – weeklySchedule / seasonalSchedule / blockedDate (same as Bento Pro) =====
+    const WEEKLY = { days: [
+      { dayOfWeek: 1, isDayOff: false, startTime: '12:00', endTime: '15:20' }, { dayOfWeek: 2, isDayOff: false, startTime: '12:00', endTime: '15:20' },
+      { dayOfWeek: 3, isDayOff: true, startTime: '11:00', endTime: '' }, { dayOfWeek: 4, isDayOff: false, startTime: '13:00', endTime: '16:40' },
+      { dayOfWeek: 5, isDayOff: true }, { dayOfWeek: 6, isDayOff: true }, { dayOfWeek: 0, isDayOff: true } ] };
+    const SEASONAL = [ { name: 'November', startDate: '2026-11-01', endDate: '2026-12-31', days: [
+      { dayOfWeek: 1, isDayOff: true }, { dayOfWeek: 2, isDayOff: false, startTime: '13:20', endTime: '16:40' },
+      { dayOfWeek: 3, isDayOff: false, startTime: '11:00', endTime: '14:20' }, { dayOfWeek: 4, isDayOff: false, startTime: '13:20', endTime: '16:40' },
+      { dayOfWeek: 5, isDayOff: true }, { dayOfWeek: 6, isDayOff: true }, { dayOfWeek: 0, isDayOff: true } ] } ];
+    const BLOCKED = ['2026-12-02','2026-12-09','2026-12-16','2026-12-21','2026-12-22','2026-12-23','2026-12-24','2026-12-25','2026-12-26','2026-12-27','2026-12-28','2026-12-29','2026-12-30','2026-12-31','2027-01-01','2027-01-02','2027-01-03','2027-01-04'];
+    const DAYN = ['Vasárnap','Hétfő','Kedd','Szerda','Csütörtök','Péntek','Szombat'];
+    const p2 = (n) => (n < 10 ? '0' : '') + n;
+    const toMin = (t) => { const a = String(t).split(':'); return Number(a[0]) * 60 + Number(a[1]); };
+    const isoOf = (d) => d.getFullYear() + '-' + p2(d.getMonth() + 1) + '-' + p2(d.getDate());
+    const resolveDays = (iso) => { const m = SEASONAL.filter((x) => x.startDate <= iso && iso <= x.endDate)[0]; return m ? m.days : WEEKLY.days; };
+    const hoursFor = (iso, dow) => { if (BLOCKED.indexOf(iso) !== -1) return null; const d = resolveDays(iso).find((x) => x.dayOfWeek === dow); if (!d || d.isDayOff || !d.startTime || !d.endTime) return null; return { start: d.startTime, end: d.endTime }; };
+    const now = new Date(); const nowMin = now.getHours() * 60 + now.getMinutes();
+    const today = new Date(now); today.setHours(0, 0, 0, 0);
+    const todayIso = isoOf(today);
+    const season = SEASONAL.find((x) => x.startDate <= todayIso && todayIso <= x.endDate);
+    const curDays = resolveDays(todayIso);
+    const th = hoursFor(todayIso, today.getDay());
+    let open = false; let statusText = '';
+    if (th && nowMin >= toMin(th.start) && nowMin < toMin(th.end)) { open = true; statusText = 'Most rendelés van · ' + th.end + '-ig'; }
+    else {
+      for (let i = 0; i <= 21; i++) {
+        const d = new Date(today); d.setDate(today.getDate() + i);
+        const h = hoursFor(isoOf(d), d.getDay());
+        if (!h) continue;
+        if (i === 0 && nowMin >= toMin(h.start)) continue;
+        statusText = 'Zárva · Következő rendelés: ' + (i === 0 ? 'ma' : i === 1 ? 'holnap' : DAYN[d.getDay()]) + ' ' + h.start; break;
+      }
+      if (!statusText) statusText = 'Zárva';
+    }
+    const week = [1, 2, 3, 4, 5].map((dw) => { const o = curDays.find((x) => x.dayOfWeek === dw && !x.isDayOff && x.startTime && x.endTime); const isT = dw === today.getDay();
+      return { name: DAYN[dw] + (isT ? ' · ma' : ''), hours: o ? o.startTime + ' – ' + o.endTime : 'zárva',
+        row: 'display: flex; justify-content: space-between; align-items: center; font-size: 14px; padding: 8px 12px; margin: 0 -12px; border-radius: 999px; ' + (isT ? 'background: rgba(163,218,194,.16)' : ''),
+        nameStyle: 'color: ' + (isT ? '#ffffff; font-weight: 800' : '#c9cde3'),
+        style: o ? 'font-weight: 800; color: #a3dac2; font-variant-numeric: tabular-nums' : 'opacity: .55' }; });
+    const MI = { mail: 'M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM22 6l-10 7L2 6', pill: 'm10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7ZM8.5 8.5l7 7', alert: 'M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z' };
+    const MAILS = [
+      { label: 'Általános/Recepció', addr: 'recepcio@drmoroczangela.hu', path: MI.mail, bg: '#e9ebf6' },
+      { label: 'Gyógyszer igények', addr: 'gyogyszer@drmoroczangela.hu', path: MI.pill, bg: '#e2f4ee' },
+      { label: 'Sürgős eset, leletek', addr: 'drmoroczangela@gmail.com', path: MI.alert, bg: '#fcebe4' }
+    ];
+    const TIPS = [
+      { t: 'Parkolás', b: 'Rendelőnk mellett ingyenes parkolási lehetőség biztosított.', icon: 'M5 17h14M6 17V9l2-4h8l2 4v8M7 21v-4M17 21v-4M6 12h12', bg: '#E6EDE8', ac: '#2f7a75', at: '#ffffff', link: false },
+      { t: 'Érkezés', b: 'Kérjük, 10 perccel a foglalt időpont előtt érkezzen.', icon: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 6v6l4 2', bg: '#fdf3dc', ac: '#efc462', at: '#242a5f', link: false },
+      { t: 'Fizetés', b: 'Készpénz és bankkártya egyaránt elfogadott. A vizsgálat, illetve a szükséges kezelések árát megtalálja a főoldalon.', icon: 'M2 5h20v14H2zM2 10h20M6 15h4', bg: '#f8ebf1', ac: '#e1bbcd', at: '#242a5f', link: true }
+    ];
+    // Live /kapcsolat "Hasznos információk" + "Fontos tudnivalók" (deduplicated; phone/address/hours/e-mail items are shown above;
+    // the igazolás fee follows Sanity: 12 000 Ft)
+    const GROUPS = [
+      { label: 'Hasznos információk', items: [
+        { t: 'Időpontfoglalás', b: ['Rendelésre bejelentkezni vagy időpontot egyeztetni kizárólag online lehetséges, az oldal alján található gombra kattintva.', 'Kérjük vegyék figyelembe, hogy lemondani a foglalt időpontot maximum 1 nappal a rendelés előtt lehetséges, az 1 napon belüli lemondásért ügyeleti díjat számolunk fel, melynek összege 10.000,- Ft / alkalom.'], mail: '', hl: '' },
+        { t: 'Sürgősségi ellátás', b: ['Telefonon csak a rendelési időben vagyunk elérhetőek. Sürgős esetben rendelési időben telefonon, rendelési időn kívül pedig a drmoroczangela@gmail.com email címen vegyék fel velünk a kapcsolatot.'], mail: 'drmoroczangela@gmail.com', hl: '' },
+        { t: 'Gyógyszer igénylés', b: ['Rendszeresen szedett fogamzásgátló gyógyszerek igényét az alábbi email címre jelezzék, figyelembe véve, hogy gyógyszert felírni csak a rendelési napokon tudunk.'], mail: 'gyogyszer@drmoroczangela.hu', hl: '' },
+        { t: 'Leletek beadása', b: ['Leleteket, eredményeket továbbra is a drmoroczangela@gmail.com email címre várjuk.'], mail: 'drmoroczangela@gmail.com', hl: '' },
+        { t: 'Egyéb kérdések', b: ['Időpontfoglalással kapcsolatos, illetve egyéb technikai kérdéseket az alábbi email címre legyenek kedvesek írni.'], mail: 'recepcio@drmoroczangela.hu', hl: '' } ] },
+      { label: 'Fontos tudnivalók', items: [
+        { t: 'Leletek küldése', b: ['Leletek elektronikus úton történő megküldése és kiértékelése kizárólag előzetes kérésem után történhet. Minden egyéb esetben személyes konzultáció szükséges az eredményekkel.'], mail: '', hl: 'Várandósgondozást elektronikus úton nem végzek, személyes megjelenés szükséges.' },
+        { t: 'Diagnózis felállítása', b: ['Elektronikus úton részletezett panaszok és tünetek, fotók alapján diagnózis felállítani nem tudok. Ilyen esetekben vizsgálat szükséges, kérem jelentkezzen be online vagy a megadott elérhetőségeken egyeztessen velünk időpontot.'], mail: '', hl: '' },
+        { t: 'Igazolások kiállítása', b: ['Elektronikus úton igazolást nem tudunk kiállítani. Időpontfoglalás nélkül, rendelési idő alatt személyes megjelenést követően állítjuk ki a kért igazolásokat.'], mail: '', hl: 'Szakorvosi igazolás kiállításának díja 12 000 Ft, melyet a recepción tud rendezni.' },
+        { t: 'Egészségpénztár', b: ['Egészségpénztárakkal nem állok szerződésben, ezért számlát nem tudok kiállítani.'], mail: '', hl: '' },
+        { t: 'Intimtorna tanfolyam', b: ['Csoportos hétvégi tanfolyamok egyéni tornaterv átadásával és 1 hónapig online konzultációs lehetőséggel.'], mail: '', hl: 'Díj: 40.000 Ft' },
+        { t: 'Magzati genetikai ultrahang', b: ['Magzati genetikai ultrahangot nem végzek.'], mail: '', hl: 'Ajánlott: Czeizel Intézet, Budapest' } ] }
+    ];
+    return {
+      statusText: statusText,
+      statusPulse: open ? 'pulse' : '',
+      statusDot: 'width: 10px; height: 10px; border-radius: 999px; flex-shrink: 0; background: ' + (open ? '#a3dac2' : '#eb8966'),
+      mails: MAILS.map((m, i) => ({ ...m, href: 'mailto:' + m.addr,
+        row: 'display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 8px 14px 8px 10px; border-radius: 22px; text-decoration: none; color: #242a5f' + (i ? '; border-top: 1px solid #eceef4' : ''),
+        icon: 'width: 42px; height: 42px; border-radius: 999px; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; background: ' + m.bg })),
+      seasonName: season ? season.name : 'Heti rend',
+      week: week,
+      onTipScroll: (e) => { const el = e.currentTarget || e.target; const first = el && el.querySelector ? el.querySelector('[data-card]') : null; const w = first ? first.offsetWidth + 10 : 280; const i = Math.min(Math.round(el.scrollLeft / Math.max(w, 1)), TIPS.length - 1); if (i !== this.state.tip) this.setState({ tip: i }); },
+      tips: TIPS.map((t, i) => ({ t: t.t, b: t.b, icon: t.icon, link: t.link,
+        card: 'flex: 0 0 calc(100% - 72px); min-height: 230px; box-sizing: border-box; border-radius: 30px; padding: 20px; display: flex; flex-direction: column; gap: 10px; background: ' + t.bg + '; transition: transform .45s ' + SPRING + '; transform: scale(' + (i === s.tip ? '1' : '.96') + ')',
+        iconStyle: 'width: 48px; height: 48px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; background: ' + t.ac + '; color: ' + t.at })),
+      tipDots: TIPS.map((t, i) => ({ style: 'height: 6px; border-radius: 999px; transition: width .4s ' + SPRING + ', background-color .3s; width: ' + (i === s.tip ? '22px; background: #242a5f' : '6px; background: #c5cad9') })),
+      grpX: (s.grp * 100) + '%',
+      groups: GROUPS.map((g, gi) => { const on = gi === s.grp; return { label: g.label, on: on, pick: () => this.setState({ grp: gi, info: -1 }),
+        style: 'position: relative; z-index: 1; height: 46px; border: 0; background: transparent; border-radius: 999px; font-size: 13px; font-weight: 800; white-space: nowrap; transition: color .4s; color: ' + (on ? '#ffffff' : '#4b5563'),
+        items: g.items.map((f, k) => { const o = on && s.info === k; return { ...f, num: p2(k + 1), open: o, hidden: o ? 'false' : 'true', bid: 'mk-q-' + gi + '-' + k, pid: 'mk-a-' + gi + '-' + k,
+          mailHref: f.mail ? 'mailto:' + f.mail : '',
+          toggle: () => this.setState({ info: o ? -1 : k }), rows: o ? '1fr' : '0fr', op: o ? '1' : '0',
+          box: 'background: #ffffff; border-radius: 24px; animation-delay: ' + (k * 50) + 'ms; transition: box-shadow .4s; box-shadow: ' + (o ? '0 16px 32px -22px rgba(36,42,95,.5)' : 'none'),
+          chev: 'width: 30px; height: 30px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; transition: transform .45s ' + SPRING + ', background-color .3s; ' + (o ? 'background: #242a5f; color: #ffffff; transform: rotate(180deg)' : 'background: #F2F4F8; color: #242a5f') }; }) }; })
+    };
+  }
+}
+</script>
+</body>
+</html>

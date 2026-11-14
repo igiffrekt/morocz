@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<title>Lélekző Jóga – órarend és oktatók</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F2F4F8}
+a{color:#242a5f}a:hover{color:#1a1f47}
+button{font:inherit;cursor:pointer}
+a:focus-visible,button:focus-visible{outline:3px solid #469993;outline-offset:3px}
+.btn{transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s cubic-bezier(.2,.8,.2,1),background-color .25s,color .25s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 14px 28px -14px rgba(36,42,95,.55)}
+.btn:active{transform:translateY(0) scale(.97);transition-duration:.12s}
+.btn .arr{transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.btn:hover .arr{transform:translateX(4px)}
+.lnk{text-decoration:none;background-image:linear-gradient(currentColor,currentColor);background-size:0 2px;background-repeat:no-repeat;background-position:0 100%;transition:background-size .4s cubic-bezier(.2,.8,.2,1),color .25s}
+.lnk:hover{background-size:100% 2px}
+.navlink{position:relative;transition:background-color .3s,color .3s}
+.navlink:hover{background:#E6EDE8;color:#242a5f}
+.chip{transition:background-color .3s,color .3s,border-color .3s,opacity .3s,transform .3s cubic-bezier(.2,.8,.2,1)}
+.chip:hover{transform:translateY(-2px)}.chip:active{transform:scale(.96)}
+.blk{transition:opacity .35s,transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .3s,filter .3s}
+.blk:hover{transform:scale(1.02);box-shadow:0 14px 26px -14px rgba(36,42,95,.55);z-index:3}
+.blk:active{transform:scale(.98)}
+.icard{transition:transform .45s cubic-bezier(.2,.8,.2,1),box-shadow .45s cubic-bezier(.2,.8,.2,1)}
+.icard:hover{transform:translateY(-6px);box-shadow:0 28px 52px -30px rgba(36,42,95,.5)}
+.icard:active{transform:translateY(-2px) scale(.985)}
+.icard img{transition:transform .9s cubic-bezier(.2,.8,.2,1)}
+.icard:hover img{transform:scale(1.05)}
+.icard .more{transition:gap .35s cubic-bezier(.2,.8,.2,1)}
+.icard:hover .more{gap:12px}
+.ovl{transition:opacity .35s ease,visibility 0s linear .35s}
+.ovl.on{transition:opacity .35s ease,visibility 0s}
+.sheet{transition:transform .5s cubic-bezier(.34,1.4,.64,1),opacity .3s}
+.fade{animation:fadeUp .55s cubic-bezier(.2,.8,.2,1) both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.clamp2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.mscroll::-webkit-scrollbar{width:6px}.mscroll::-webkit-scrollbar-thumb{background:#d7dbe8;border-radius:999px}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+</style>
+</helmet>
+<div style="font-family: 'Plus Jakarta Sans', sans-serif; color: #1A1D2D; background: #F2F4F8; min-height: 100vh; padding: 16px 16px 0; box-sizing: border-box">
+<dc-import name="Header" active="joga" hint-size="100%,72px"></dc-import>
+
+<!-- HERO: live photo, well placed -->
+<section style="max-width: 1360px; margin: 16px auto 0; display: flex; flex-wrap: wrap; gap: 16px; align-items: stretch">
+<div style="flex: 1 1 440px; background: #E6EDE8; border-radius: 40px; padding: 56px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; gap: 32px; color: #242a5f">
+<div style="display: flex; flex-direction: column; gap: 18px">
+<nav aria-label="Morzsamenü" style="display: flex; align-self: flex-start; gap: 8px; font-size: 13px; font-weight: 600; background: #ffffff; border-radius: 999px; padding: 8px 16px"><a href="A1.dc.html" class="lnk" style="color: #4b5563">Kezdőlap</a><span aria-hidden="true" style="color: #9aa0b4">/</span><span aria-current="page">Lélekző Jóga</span></nav>
+<span style="font-size: 13px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #0a7d73">Jóga órarend</span>
+<h1 style="margin: 0; font-size: 96px; line-height: .95; font-weight: 800; letter-spacing: -0.04em">Lélekző</h1>
+<p style="margin: 0; font-size: 20px; line-height: 1.5; color: #374151">Jógaközpontunk eseményei</p>
+</div>
+<div style="display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<sc-for list="{{stats}}" as="st" hint-placeholder-count="3">
+<span style="display: inline-flex; align-items: baseline; gap: 8px; background: #ffffff; border-radius: 999px; padding: 10px 20px"><strong style="font-size: 20px; font-weight: 800">{{st.n}}</strong><span style="font-size: 14px; font-weight: 600; color: #4b5563">{{st.l}}</span></span>
+</sc-for>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 10px">
+<a href="#orarend" class="btn" style="display: inline-flex; align-items: center; gap: 10px; height: 56px; padding: 0 28px; border-radius: 999px; background: #242a5f; color: #ffffff; font-weight: 800; font-size: 15px; text-decoration: none">Órarend <svg class="arr" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+<a href="#oktatok" class="btn" style="display: inline-flex; align-items: center; height: 56px; padding: 0 26px; border-radius: 999px; background: #ffffff; color: #242a5f; font-weight: 700; font-size: 15px; text-decoration: none">Oktatóink</a>
+</div>
+</div>
+</div>
+<div style="flex: 1.35 1 520px; position: relative; min-height: 520px; border-radius: 40px; overflow: hidden; background: #c9d6cf">
+<img src="/_blob/47d14487ee1b9a374f8106e60700a05a" alt="Jógaszőnyeg hangtállal és párnákkal a Lélekző jógateremben" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 45% 60%">
+<div aria-hidden="true" style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(36,42,95,0) 55%, rgba(36,42,95,.45) 100%)"></div>
+<sc-if value="{{hasNext}}" hint-placeholder-val="{{true}}">
+<button type="button" onClick="{{openNext}}" class="btn" style="position: absolute; left: 24px; bottom: 24px; right: auto; max-width: calc(100% - 48px); display: flex; align-items: center; gap: 14px; background: #ffffff; border: 0; border-radius: 999px; padding: 10px 22px 10px 10px; text-align: left; color: #242a5f; box-shadow: 0 20px 40px -20px rgba(0,0,0,.45)">
+<span style="{{next.dotStyle}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg></span>
+<span style="display: flex; flex-direction: column; min-width: 0"><span style="font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #4b5563">Következő óra · {{next.when}}</span><span style="font-size: 16px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{next.s}} · {{next.c}}</span></span>
+</button>
+</sc-if>
+</div>
+</section>
+
+<!-- ÓRAREND: full week calendar -->
+<section id="orarend" style="max-width: 1360px; margin: 96px auto 0; display: flex; flex-direction: column; gap: 24px">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 10px"><span style="font-size: 13px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #2f7a75">Heti órarend</span><h2 style="margin: 0; font-size: 52px; line-height: 1.05; font-weight: 800; color: #242a5f; letter-spacing: -0.03em">Jóga órarend</h2></div>
+<span style="font-size: 14px; font-weight: 600; color: #4b5563">Kattintson egy órára a részletekért.</span>
+</div>
+<div role="group" aria-label="Óratípus szűrő" style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin-right: 4px"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"></path></svg>
+<sc-for list="{{filters}}" as="f" hint-placeholder-count="7">
+<button type="button" aria-pressed="{{f.on}}" onClick="{{f.pick}}" class="chip" style="{{f.style}}"><span style="{{f.dot}}"></span>{{f.name}}</button>
+</sc-for>
+</div>
+<div style="background: #ffffff; border-radius: 32px; padding: 20px; overflow-x: auto">
+<div style="min-width: 980px">
+<div style="display: grid; grid-template-columns: 64px repeat(7, minmax(0, 1fr)); gap: 0 6px; padding-bottom: 12px">
+<span></span>
+<sc-for list="{{days}}" as="d" hint-placeholder-count="7">
+<span style="{{d.headStyle}}">{{d.name}}</span>
+</sc-for>
+</div>
+<div style="display: grid; grid-template-columns: 64px repeat(7, minmax(0, 1fr)); gap: 0 6px">
+<div style="position: relative; height: {{gridH}}">
+<sc-for list="{{hours}}" as="h" hint-placeholder-count="13">
+<span style="{{h.style}}">{{h.t}}</span>
+</sc-for>
+</div>
+<sc-for list="{{days}}" as="d" hint-placeholder-count="7">
+<div style="{{d.colStyle}}">
+<sc-for list="{{d.blocks}}" as="b" hint-placeholder-count="1">
+<button type="button" onClick="{{b.open}}" class="blk" aria-label="{{b.aria}}" style="{{b.style}}">
+<span style="font-size: 13px; font-weight: 800; line-height: 1.25; color: #242a5f">{{b.c}}</span>
+<span style="font-size: 12px; font-weight: 600; color: #374151; font-variant-numeric: tabular-nums">{{b.s}}–{{b.e}}</span>
+<sc-if value="{{b.showI}}" hint-placeholder-val="{{true}}"><span style="font-size: 12px; color: #374151">{{b.i}}</span></sc-if>
+</button>
+</sc-for>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+</section>
+
+<!-- OKTATÓINK -->
+<section id="oktatok" style="max-width: 1360px; margin: 96px auto 0; background: #E6EDE8; border-radius: 40px; padding: 64px 48px; box-sizing: border-box; display: flex; flex-direction: column; gap: 40px">
+<div style="display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center">
+<span style="display: inline-flex; align-items: center; gap: 12px; font-size: 13px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #2f7a75"><span style="width: 32px; height: 1px; background: rgba(36,42,95,.25)"></span>Oktatóink<span style="width: 32px; height: 1px; background: rgba(36,42,95,.25)"></span></span>
+<h2 style="margin: 0; font-size: 52px; line-height: 1.05; font-weight: 800; color: #242a5f; letter-spacing: -0.03em">Ismerd meg oktatóinkat</h2>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 20px">
+<sc-for list="{{instructors}}" as="it" hint-placeholder-count="5">
+<button type="button" onClick="{{it.open}}" class="icard fade" style="{{it.cardStyle}}">
+<span style="position: relative; display: block; aspect-ratio: 1 / 1; overflow: hidden; background: #dfe3ea"><img src="{{it.photo}}" alt="{{it.name}}" style="width: 100%; height: 100%; object-fit: cover; display: block"><span style="{{it.barStyle}}"></span></span>
+<span style="display: flex; flex-direction: column; gap: 8px; padding: 22px 24px 24px; text-align: left">
+<span style="font-size: 20px; font-weight: 800; color: #242a5f">{{it.name}}</span>
+<span class="clamp2" style="font-size: 14px; line-height: 1.6; color: #4b5563; min-height: 44px">{{it.teaser}}</span>
+<span class="more" style="display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 800; color: #242a5f">Bemutatkozás <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span>
+</span>
+</button>
+</sc-for>
+</div>
+</section>
+
+<dc-import name="Footer" hint-size="100%,560px"></dc-import>
+
+<!-- INSTRUCTOR MODAL -->
+<div class="{{iOvlClass}}" aria-hidden="{{iHidden}}" style="{{iOvlStyle}}">
+<button type="button" aria-label="Bezárás" onClick="{{closeI}}" style="position: absolute; inset: 0; border: 0; background: rgba(26,29,45,.5); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); cursor: default"></button>
+<div role="dialog" aria-modal="true" aria-labelledby="i-title" class="sheet" style="{{iSheetStyle}}">
+<div style="{{ins.headStyle}}">
+<button type="button" onClick="{{closeI}}" aria-label="Bezárás" class="btn" style="position: absolute; top: 16px; right: 16px; width: 44px; height: 44px; border-radius: 999px; border: 0; background: rgba(255,255,255,.55); color: #242a5f; display: inline-flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"></path></svg></button>
+<img src="{{ins.photo}}" alt="" style="width: 84px; height: 84px; border-radius: 999px; object-fit: cover; border: 4px solid rgba(255,255,255,.55); flex-shrink: 0">
+<span style="display: flex; flex-direction: column; gap: 2px; padding-right: 48px"><span id="i-title" style="font-size: 24px; font-weight: 800">{{ins.name}}</span><span style="font-size: 14px; opacity: .8">Jóga oktató</span></span>
+</div>
+<div class="mscroll" style="padding: 24px 28px 28px; display: flex; flex-direction: column; gap: 22px; overflow-y: auto; max-height: min(60vh, 520px)">
+<sc-if value="{{ins.hasBio}}" hint-placeholder-val="{{true}}">
+<div style="display: flex; flex-direction: column; gap: 10px"><span style="font-size: 13px; font-weight: 700; color: #6b7280">Bemutatkozás</span>
+<sc-for list="{{ins.bio}}" as="p" hint-placeholder-count="2"><p style="margin: 0; font-size: 15px; line-height: 1.7; color: #374151">{{p}}</p></sc-for>
+</div>
+</sc-if>
+<div style="display: flex; flex-direction: column; gap: 10px"><span style="font-size: 13px; font-weight: 700; color: #6b7280">Órái</span>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<sc-for list="{{ins.classes}}" as="ic" hint-placeholder-count="2"><button type="button" onClick="{{ic.open}}" class="chip" style="{{ic.style}}"><span style="{{ic.dot}}"></span>{{ic.label}}</button></sc-for>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px; border-top: 1px solid #eceef4; padding-top: 18px"><span style="font-size: 13px; font-weight: 700; color: #6b7280">Kapcsolat</span>
+<sc-if value="{{ins.phone}}" hint-placeholder-val="{{true}}"><a href="{{ins.tel}}" class="lnk" style="align-self: flex-start; display: inline-flex; align-items: center; gap: 12px; font-weight: 700; color: #242a5f"><span style="{{ins.iconStyle}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg></span>{{ins.phone}}</a></sc-if>
+<sc-if value="{{ins.email}}" hint-placeholder-val="{{true}}"><a href="{{ins.mailto}}" class="lnk" style="align-self: flex-start; display: inline-flex; align-items: center; gap: 12px; font-weight: 700; color: #242a5f"><span style="{{ins.iconStyle}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM22 6l-10 7L2 6"></path></svg></span>{{ins.email}}</a></sc-if>
+<sc-if value="{{ins.link}}" hint-placeholder-val="{{false}}"><a href="{{ins.link}}" class="lnk" style="align-self: flex-start; display: inline-flex; align-items: center; gap: 12px; font-weight: 700; color: #242a5f"><span style="{{ins.iconStyle}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg></span>Facebook</a></sc-if>
+</div>
+</div>
+</div>
+</div>
+
+<!-- CLASS MODAL -->
+<div class="{{cOvlClass}}" aria-hidden="{{cHidden}}" style="{{cOvlStyle}}">
+<button type="button" aria-label="Bezárás" onClick="{{closeC}}" style="position: absolute; inset: 0; border: 0; background: rgba(26,29,45,.5); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); cursor: default"></button>
+<div role="dialog" aria-modal="true" aria-labelledby="c-title" class="sheet" style="{{cSheetStyle}}">
+<div style="{{cls.headStyle}}">
+<button type="button" onClick="{{closeC}}" aria-label="Bezárás" class="btn" style="position: absolute; top: 16px; right: 16px; width: 44px; height: 44px; border-radius: 999px; border: 0; background: rgba(255,255,255,.6); color: #242a5f; display: inline-flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"></path></svg></button>
+<span style="font-size: 13px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #374151">{{cls.dayName}}</span>
+<span id="c-title" style="font-size: 26px; font-weight: 800; line-height: 1.2; color: #242a5f; padding-right: 48px">{{cls.c}}</span>
+</div>
+<div class="mscroll" style="padding: 22px 28px 28px; display: flex; flex-direction: column; gap: 18px; overflow-y: auto; max-height: min(60vh, 520px)">
+<div style="display: flex; flex-direction: column; gap: 4px"><span style="font-size: 13px; font-weight: 700; color: #6b7280">Időpont</span><span style="font-size: 18px; font-weight: 800; color: #242a5f; font-variant-numeric: tabular-nums">{{cls.dayName}}, {{cls.s}} – {{cls.e}}</span></div>
+<div style="display: flex; flex-direction: column; gap: 8px"><span style="font-size: 13px; font-weight: 700; color: #6b7280">Oktató</span>
+<button type="button" onClick="{{cls.openI}}" class="chip" style="align-self: flex-start; display: inline-flex; align-items: center; gap: 12px; padding: 6px 20px 6px 6px; border-radius: 999px; border: 1.5px solid #eceef4; background: #ffffff; color: #242a5f; font-weight: 800"><img src="{{cls.iPhoto}}" alt="" style="width: 40px; height: 40px; border-radius: 999px; object-fit: cover">{{cls.i}}<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></button>
+</div>
+<sc-if value="{{cls.hasDesc}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 8px"><span style="font-size: 13px; font-weight: 700; color: #6b7280">Leírás</span>
+<sc-for list="{{cls.desc}}" as="dl" hint-placeholder-count="3"><p style="margin: 0; font-size: 15px; line-height: 1.65; color: #374151">{{dl}}</p></sc-for>
+</div>
+</sc-if>
+</div>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":3700}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { filter: '', iOpen: false, iSel: 0, cOpen: false, cSel: 0, data: null };
+  }
+  componentDidMount() {
+    fetch('/_blob/3d52fd3169966142601f0b9d1d5ad6f0').then((r) => r.json()).then((d) => this.setState({ data: d })).catch(() => {});
+  }
+  renderVals() {
+    const s = this.state;
+    const SPRING = 'cubic-bezier(.34,1.4,.64,1)';
+    // Sanity yogaSchedule (dayOfWeek 1=hétfő … 7=vasárnap). Class colours = live default palette, assigned alphabetically.
+    const YOGA = [
+      { day: 1, s: '19:00', e: '20:00', c: 'Pilates alapú MEDICAL FITNESS edzések', i: 'Bakács Andi' },
+      { day: 2, s: '17:00', e: '18:30', c: 'Hatha Jóga', i: 'Rinyu Bea' },
+      { day: 2, s: '19:00', e: '20:30', c: 'Hatha Jóga', i: 'Rinyu Bea' },
+      { day: 3, s: '08:30', e: '09:40', c: 'Kismama jóga', i: 'Juhász-Hegedűs Patrícia' },
+      { day: 3, s: '19:00', e: '20:00', c: 'Tánc', i: 'Eszenyi-Tóth Cecília' },
+      { day: 5, s: '17:00', e: '18:30', c: 'Hatha Flow Jóga', i: 'Graczár Andrea' },
+      { day: 5, s: '19:00', e: '20:30', c: 'Yin jóga', i: 'Rinyu Bea' }
+    ];
+    const PALETTE = ['#76c8b6', '#e1bbcd', '#c4dfe6', '#f9e4b7', '#d4c4fb', '#ffd6cc', '#fdf8eb', '#e8f3ee'];
+    const classNames = YOGA.map((y) => y.c).filter((v, i, a) => a.indexOf(v) === i).sort((a, b) => a.localeCompare(b, 'hu'));
+    const color = (c) => PALETTE[classNames.indexOf(c) % PALETTE.length];
+    // Sanity yogaInstructor (active) + bios from the live page
+    const INSTR = [
+      { name: 'Bakács Andi', photo: '/_blob/666ed2ec38e50fb67328d21c441fa82e', color: '#FFAC02', phone: '+36708820303', email: 'info@andihealth.co.uk' },
+      { name: 'Eszenyi-Tóth Cecília', photo: '/_blob/f15c6c33b2e9da8330f7bf4772a90be4', color: '#76c8b6', phone: '+36 20 568 8909', email: 'groovewithcili@gmail.com' },
+      { name: 'Graczár Andrea', photo: '/_blob/1d2b6add637def4542f1fb31993844c8', color: '#9E6548', phone: '+36307469222', email: '' },
+      { name: 'Juhász-Hegedűs Patrícia', photo: '/_blob/104b4efc1e89faaaf7c05ba9c2d42f89', color: '#76c8b6', phone: '+36304347452', email: 'hello@patryoga.hu' },
+      { name: 'Rinyu Bea', photo: '/_blob/20618f21721fd787cbfcb8ec21bc5edd', color: '#474466', phone: '+36 20 911 9228', email: '' }
+    ];
+    const isDark = (hex) => { const h = hex.replace('#', ''); const r = parseInt(h.substr(0, 2), 16), g = parseInt(h.substr(2, 2), 16), b = parseInt(h.substr(4, 2), 16); return (0.299 * r + 0.587 * g + 0.114 * b) < 140; };
+    const bios = {}; const links = {};
+    ((s.data && s.data.joga && s.data.joga.instructors) || []).forEach((x) => { bios[x.name] = x.bio || []; links[x.name] = x.link || ''; });
+    const classDesc = {};
+    ((s.data && s.data.joga && s.data.joga.classes) || []).forEach((x) => { classDesc[x.name] = x.d || []; });
+    const DAYN = ['', 'Hétfő', 'Kedd', 'Szerda', 'Csütörtök', 'Péntek', 'Szombat', 'Vasárnap'];
+    const toMin = (t) => { const a = t.split(':'); return Number(a[0]) * 60 + Number(a[1]); };
+    const now = new Date(); const jsDow = now.getDay(); const today = jsDow === 0 ? 7 : jsDow; const nowMin = now.getHours() * 60 + now.getMinutes();
+    // grid range from data
+    const startH = Math.floor(Math.min.apply(null, YOGA.map((y) => toMin(y.s))) / 60);
+    const endH = Math.ceil(Math.max.apply(null, YOGA.map((y) => toMin(y.e))) / 60);
+    const ROW = 56; const rows = endH - startH;
+    const openClass = (idx) => () => this.setState({ cOpen: true, cSel: idx, iOpen: false });
+    const openInstr = (idx) => () => this.setState({ iOpen: true, iSel: idx, cOpen: false });
+    const instrIdx = (name) => Math.max(0, INSTR.findIndex((x) => x.name === name));
+    // next class
+    let nextIdx = -1; let bestDelta = 1e9;
+    YOGA.forEach((y, k) => { let delta = (y.day - today) * 1440 + toMin(y.s) - nowMin; if (delta < 0) delta += 7 * 1440; if (delta < bestDelta) { bestDelta = delta; nextIdx = k; } });
+    const nx = YOGA[nextIdx];
+    const whenLabel = nx ? (nx.day === today && bestDelta < 1440 ? 'ma' : (bestDelta < 2880 && ((nx.day - today + 7) % 7) === 1 ? 'holnap' : DAYN[nx.day].toLowerCase())) : '';
+    const sel = YOGA[s.cSel] || YOGA[0];
+    const insSel = INSTR[s.iSel] || INSTR[0];
+    const insDark = isDark(insSel.color);
+    const ovl = (on) => 'position: fixed; inset: 0; z-index: 80; display: flex; align-items: center; justify-content: center; padding: 24px; box-sizing: border-box; opacity: ' + (on ? '1' : '0') + '; visibility: ' + (on ? 'visible' : 'hidden');
+    const sheet = (on) => 'position: relative; width: 100%; max-width: 480px; background: #ffffff; border-radius: 32px; overflow: hidden; box-shadow: 0 40px 80px -30px rgba(26,29,45,.6); font-family: inherit; transform: ' + (on ? 'none' : 'translateY(24px) scale(.94)') + '; opacity: ' + (on ? '1' : '0');
+    return {
+      stats: [ { n: String(YOGA.length), l: 'óra hetente' }, { n: String(INSTR.length), l: 'oktató' }, { n: String(classNames.length), l: 'óratípus' } ],
+      hasNext: !!nx,
+      next: nx ? { s: nx.s, c: nx.c, when: whenLabel, dotStyle: 'width: 44px; height: 44px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; color: #242a5f; background: ' + color(nx.c) } : {},
+      openNext: openClass(nextIdx),
+      filters: [''].concat(classNames).map((c) => { const on = s.filter === c; return { name: c || 'Összes', on: on,
+        pick: () => this.setState({ filter: s.filter === c ? '' : c }),
+        style: 'display: inline-flex; align-items: center; gap: 8px; height: 42px; padding: 0 18px; border-radius: 999px; font-size: 14px; font-weight: 700; ' + (on ? 'background: #242a5f; color: #ffffff; border: 1.5px solid #242a5f' : 'background: #ffffff; color: #242a5f; border: 1.5px solid #ffffff; opacity: ' + (s.filter && !on ? '.75' : '1')),
+        dot: c ? 'width: 12px; height: 12px; border-radius: 999px; background: ' + color(c) + '; box-shadow: inset 0 0 0 1px rgba(36,42,95,.12)' : 'display: none' }; }),
+      gridH: (rows * ROW) + 'px',
+      hours: Array.from({ length: rows + 1 }, (_, k) => ({ t: (startH + k < 10 ? '0' : '') + (startH + k) + ':00',
+        style: 'position: absolute; right: 10px; top: ' + (k * ROW - 8) + 'px; font-size: 12px; font-weight: 700; color: #6b7280; font-variant-numeric: tabular-nums' })),
+      days: [1, 2, 3, 4, 5, 6, 7].map((dw) => { const isToday = dw === today; return { name: DAYN[dw],
+        headStyle: 'text-align: center; font-size: 14px; font-weight: 800; border-radius: 999px; padding: 10px 6px; ' + (isToday ? 'background: #242a5f; color: #ffffff' : 'background: #F2F4F8; color: #242a5f'),
+        colStyle: 'position: relative; height: ' + (rows * ROW) + 'px; border-radius: 16px; background-color: ' + (isToday ? '#f4f8f6' : '#fbfbfd') + '; background-image: linear-gradient(#e6e9f0 1px, transparent 1px); background-size: 100% ' + ROW + 'px',
+        blocks: YOGA.map((y, k) => ({ y: y, k: k })).filter((o) => o.y.day === dw).map((o) => { const y = o.y; const top = (toMin(y.s) - startH * 60) / 60 * ROW; const h = (toMin(y.e) - toMin(y.s)) / 60 * ROW; const dim = s.filter && s.filter !== y.c;
+          return { c: y.c, s: y.s, e: y.e, i: y.i, showI: h >= 80, open: openClass(o.k), aria: y.c + ', ' + DAYN[dw] + ' ' + y.s + '–' + y.e + ', ' + y.i,
+            style: 'position: absolute; left: 4px; right: 4px; top: ' + (top + 3) + 'px; height: ' + (h - 6) + 'px; border: 0; border-radius: 18px; padding: 8px 12px; box-sizing: border-box; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; text-align: left; overflow: hidden; background: ' + color(y.c) + '; opacity: ' + (dim ? '.25' : '1') + '; filter: ' + (dim ? 'saturate(.4)' : 'none') }; }) }; }),
+      instructors: INSTR.map((x, k) => { const b = bios[x.name] || []; return { name: x.name, photo: x.photo, open: openInstr(k),
+        teaser: b.length ? b.join(' ') : YOGA.filter((y) => y.i === x.name).map((y) => y.c).filter((v, i, a) => a.indexOf(v) === i).join(', '),
+        cardStyle: 'display: flex; flex-direction: column; padding: 0; border: 1px solid #eceef4; background: #ffffff; border-radius: 28px; overflow: hidden; text-align: left; color: #242a5f; animation-delay: ' + (k * 70) + 'ms',
+        barStyle: 'position: absolute; left: 0; right: 0; bottom: 0; height: 5px; background: ' + x.color }; }),
+      // instructor modal
+      iOvlClass: 'ovl' + (s.iOpen ? ' on' : ''), iHidden: s.iOpen ? 'false' : 'true', iOvlStyle: ovl(s.iOpen), iSheetStyle: sheet(s.iOpen),
+      closeI: () => this.setState({ iOpen: false }),
+      ins: { name: insSel.name, photo: insSel.photo, phone: insSel.phone, tel: 'tel:' + insSel.phone.replace(/\s/g, ''), email: insSel.email, mailto: 'mailto:' + insSel.email, link: links[insSel.name] || '',
+        bio: bios[insSel.name] || [], hasBio: (bios[insSel.name] || []).length > 0,
+        headStyle: 'position: relative; display: flex; align-items: center; gap: 16px; padding: 24px; color: ' + (insDark ? '#ffffff' : '#242a5f') + '; background: ' + insSel.color,
+        iconStyle: 'width: 40px; height: 40px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; color: ' + (insDark ? '#ffffff' : '#242a5f') + '; background: ' + insSel.color,
+        classes: YOGA.map((y, k) => ({ y: y, k: k })).filter((o) => o.y.i === insSel.name).map((o) => ({ label: DAYN[o.y.day] + ' ' + o.y.s + ' · ' + o.y.c, open: openClass(o.k),
+          style: 'display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 6px 16px; border-radius: 999px; border: 1.5px solid #eceef4; background: #ffffff; color: #242a5f; font-size: 13px; font-weight: 700; text-align: left',
+          dot: 'width: 10px; height: 10px; border-radius: 999px; flex-shrink: 0; background: ' + color(o.y.c) })) },
+      // class modal
+      cOvlClass: 'ovl' + (s.cOpen ? ' on' : ''), cHidden: s.cOpen ? 'false' : 'true', cOvlStyle: ovl(s.cOpen), cSheetStyle: sheet(s.cOpen),
+      closeC: () => this.setState({ cOpen: false }),
+      cls: { c: sel.c, s: sel.s, e: sel.e, i: sel.i, dayName: DAYN[sel.day], iPhoto: INSTR[instrIdx(sel.i)].photo, openI: openInstr(instrIdx(sel.i)),
+        desc: classDesc[sel.c] || [], hasDesc: (classDesc[sel.c] || []).length > 0,
+        headStyle: 'position: relative; display: flex; flex-direction: column; gap: 6px; padding: 26px 28px 24px; background: ' + color(sel.c) }
+    };
+  }
+}
+</script>
+</body>
+</html>

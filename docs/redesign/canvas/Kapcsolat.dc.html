@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<title>Kapcsolat – elérhetőségek</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F2F4F8}
+a{color:#242a5f}a:hover{color:#1a1f47}
+button{font:inherit;cursor:pointer}
+a:focus-visible,button:focus-visible{outline:3px solid #469993;outline-offset:3px}
+.btn{transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s cubic-bezier(.2,.8,.2,1),background-color .25s,color .25s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 14px 28px -14px rgba(36,42,95,.55)}
+.btn:active{transform:translateY(0) scale(.97);transition-duration:.12s}
+.btn .arr{transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.btn:hover .arr{transform:translateX(4px)}
+.lnk{text-decoration:none;background-image:linear-gradient(currentColor,currentColor);background-size:0 2px;background-repeat:no-repeat;background-position:0 100%;transition:background-size .4s cubic-bezier(.2,.8,.2,1),color .25s}
+.lnk:hover{background-size:100% 2px}
+.card{transition:transform .45s cubic-bezier(.2,.8,.2,1),box-shadow .45s cubic-bezier(.2,.8,.2,1),background-color .3s}
+.card:hover{transform:translateY(-5px);box-shadow:0 26px 50px -28px rgba(36,42,95,.45)}
+.card .go{transition:transform .4s cubic-bezier(.2,.8,.2,1)}
+.card:hover .go{transform:rotate(-45deg)}
+.zoom{overflow:hidden}.zoom img{transition:transform .9s cubic-bezier(.2,.8,.2,1)}.zoom:hover img{transform:scale(1.05)}
+.acc{display:grid;transition:grid-template-rows .5s cubic-bezier(.2,.8,.2,1),opacity .4s ease}
+.acc>div{overflow:hidden;min-height:0}
+.acc[aria-hidden="true"]>div{visibility:hidden;transition:visibility 0s .5s}
+.acc[aria-hidden="false"]>div{visibility:visible}
+.head{transition:background-color .3s}
+.head:hover{background:rgba(36,42,95,.04)}
+.plus{transition:transform .5s cubic-bezier(.2,.8,.2,1),background-color .3s,color .3s}
+.box{transition:box-shadow .4s cubic-bezier(.2,.8,.2,1),background-color .3s}
+.fade{animation:fadeUp .55s cubic-bezier(.2,.8,.2,1) both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes ping{0%{transform:scale(.6);opacity:.8}100%{transform:scale(2.4);opacity:0}}
+.ping{animation:ping 2.2s cubic-bezier(.2,.8,.2,1) infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+.live{animation:blink 1.8s ease-in-out infinite}
+.bento{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:16px}
+.s4{grid-column:span 4}.s8{grid-column:span 8}.r2{grid-row:span 2}
+@media (max-width: 1080px){.s4{grid-column:span 6}.s8{grid-column:span 12}.r2{grid-row:auto}}
+@media (max-width: 680px){.bento{grid-template-columns:minmax(0,1fr)}.s4,.s8{grid-column:auto}}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+</style>
+</helmet>
+<div style="font-family: 'Plus Jakarta Sans', sans-serif; color: #1A1D2D; background: #F2F4F8; min-height: 100vh; padding: 16px 16px 0; box-sizing: border-box">
+<dc-import name="Header" active="kapcsolat" hint-size="100%,72px"></dc-import>
+
+<!-- HERO -->
+<section style="max-width: 1360px; margin: 16px auto 0; background: #242a5f; border-radius: 40px; position: relative; overflow: hidden; color: #ffffff">
+<div style="position: absolute; inset: 0; background-image: radial-gradient(rgba(255,255,255,.07) 1px, transparent 1px); background-size: 26px 26px"></div>
+<div style="position: relative; display: flex; flex-wrap: wrap; gap: 40px; align-items: center; padding: clamp(32px, 5vw, 72px) clamp(20px, 5vw, 64px)">
+<div style="flex: 1 1 520px; min-width: 0; display: flex; flex-direction: column; gap: 24px">
+<nav aria-label="Morzsamenü" style="align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); border-radius: 999px; padding: 8px 16px; font-size: 13px; font-weight: 600; color: #d6d9ec"><a href="A1.dc.html" class="lnk" style="color: #d6d9ec">Kezdőlap</a><span aria-hidden="true" style="opacity: .5">/</span><span aria-current="page" style="color: #ffffff">Kapcsolat</span></nav>
+<span style="font-size: 13px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #a3dac2">Elérhetőségek</span>
+<h1 style="margin: 0; font-size: clamp(48px, 6vw, 64px); line-height: 1; font-weight: 800; letter-spacing: -0.03em">Kapcsolat</h1>
+<p style="margin: 0; font-size: 19px; line-height: 1.55; color: #c9cde3; max-width: 520px">Kérdése van? Keressen minket bizalommal az alábbi elérhetőségek valamelyikén.</p>
+<div style="display: flex; flex-wrap: wrap; gap: 12px">
+<a href="Idopontfoglalas.dc.html" class="btn" style="display: inline-flex; align-items: center; gap: 10px; background: #e1bbcd; color: #242a5f; text-decoration: none; font-weight: 800; font-size: 16px; height: 58px; padding: 0 30px; border-radius: 999px">Foglaljon időpontot <svg class="arr" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+<a href="tel:+36706395239" class="btn" style="display: inline-flex; align-items: center; gap: 10px; color: #ffffff; text-decoration: none; font-weight: 700; font-size: 16px; height: 58px; padding: 0 28px; border-radius: 999px; border: 1.5px solid rgba(255,255,255,.28)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>+36 70 639 5239</a>
+</div>
+</div>
+<!-- status card: computed from the Sanity schedule -->
+<div style="flex: 0 1 420px; min-width: 0; background: #ffffff; color: #242a5f; border-radius: 32px; padding: 26px; box-sizing: border-box; display: flex; flex-direction: column; gap: 16px; box-shadow: 0 30px 60px -30px rgba(0,0,0,.5)">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 10px">
+<span style="{{statusPill}}"><span class="live" style="{{statusDot}}"></span>{{statusText}}</span>
+<sc-if value="{{seasonName}}" hint-placeholder-val="{{true}}"><span style="font-size: 12px; font-weight: 800; color: #242a5f; background: #a3dac2; border-radius: 999px; padding: 6px 14px">{{seasonName}}</span></sc-if>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px"><span style="font-size: 13px; font-weight: 700; color: #4b5563">{{nextLabel}}</span><span style="font-size: 24px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.2">{{nextValue}}</span></div>
+<div style="display: flex; gap: 8px">
+<sc-for list="{{strip}}" as="w" hint-placeholder-count="5">
+<div style="{{w.style}}"><span style="font-size: 12px; font-weight: 800">{{w.short}}</span><span style="font-size: 11px; font-weight: 700; line-height: 1.3; font-variant-numeric: tabular-nums">{{w.a}}</span><span style="font-size: 11px; font-weight: 700; line-height: 1.3; font-variant-numeric: tabular-nums">{{w.b}}</span></div>
+</sc-for>
+</div>
+<span style="font-size: 13px; color: #4b5563">Telefonon csak a rendelési időben vagyunk elérhetőek.</span>
+</div>
+</div>
+</section>
+
+<!-- BENTO -->
+<section aria-label="Elérhetőségeink" class="bento" style="max-width: 1360px; margin: 16px auto 0">
+<a href="tel:+36706395239" class="card s4" style="background: #76c8b6; color: #242a5f; border-radius: 32px; padding: 28px; text-decoration: none; display: flex; flex-direction: column; gap: 14px; min-height: 240px; box-sizing: border-box">
+<span style="display: flex; justify-content: space-between; align-items: center"><span style="width: 52px; height: 52px; border-radius: 999px; background: #242a5f; color: #ffffff; display: inline-flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg></span><span class="go" style="width: 44px; height: 44px; border-radius: 999px; background: rgba(255,255,255,.5); display: inline-flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></span>
+<span style="margin-top: auto; font-size: 13px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase">Telefon · Rendelési időben</span>
+<span style="font-size: clamp(26px, 2.4vw, 32px); font-weight: 800; letter-spacing: -0.02em; white-space: nowrap">+36 70 639 5239</span>
+</a>
+
+<div class="zoom s8 r2" style="position: relative; border-radius: 32px; min-height: 420px; background: #242a5f; color: #ffffff; display: flex; flex-direction: column; justify-content: space-between; padding: 24px; box-sizing: border-box">
+<img src="/_blob/dcc8fc725c9ad49a1def8b2e4401d1d9" alt="A rendelő épülete – 2500 Esztergom, Martsa Alajos utca 6/c" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover">
+<div aria-hidden="true" style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(36,42,95,0) 45%, rgba(36,42,95,.78) 100%)"></div>
+<div style="position: relative; display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap">
+<span style="display: inline-flex; align-items: center; gap: 10px; background: #ffffff; color: #242a5f; border-radius: 999px; padding: 8px 18px 8px 8px; font-size: 14px; font-weight: 800"><span style="width: 32px; height: 32px; border-radius: 999px; background: #E6EDE8; color: #2f7a75; display: inline-flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"></path></svg></span>Rendelő</span>
+<span style="display: inline-flex; align-items: center; gap: 8px; background: rgba(36,42,95,.75); border: 1px solid rgba(255,255,255,.2); border-radius: 999px; padding: 8px 16px; font-size: 13px; font-weight: 700">Ingyenes parkolás a rendelő mellett</span>
+</div>
+<div style="position: relative; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: #a3dac2">Cím</span><address style="font-style: normal; font-size: clamp(22px, 2.2vw, 30px); font-weight: 800; line-height: 1.2; letter-spacing: -0.02em">2500 Esztergom,<br>Martsa Alajos utca 6/c</address></div>
+<a href="{{mapsUrl}}" target="_blank" rel="noopener" class="btn" style="display: inline-flex; align-items: center; gap: 10px; height: 54px; padding: 0 24px; border-radius: 999px; background: #ffffff; color: #242a5f; text-decoration: none; font-size: 15px; font-weight: 800"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l19-9-9 19-2-8-8-2z"></path></svg>Útvonaltervezés<span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)"> (Google Térkép, új lapon)</span></a>
+</div>
+</div>
+
+<div class="s4" style="background: #ffffff; border-radius: 32px; padding: 26px; display: flex; flex-direction: column; gap: 12px; box-sizing: border-box">
+<span style="display: flex; justify-content: space-between; align-items: center; gap: 8px"><span style="font-size: 13px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: #2f7a75">Rendelési idő</span><sc-if value="{{seasonName}}" hint-placeholder-val="{{true}}"><span style="font-size: 12px; font-weight: 800; color: #242a5f; background: #a3dac2; border-radius: 999px; padding: 5px 14px">{{seasonName}} · {{seasonRange}}</span></sc-if></span>
+<sc-for list="{{week}}" as="w" hint-placeholder-count="5">
+<div style="{{w.rowStyle}}"><span style="font-weight: 700">{{w.name}}</span><span style="{{w.style}}">{{w.hours}}</span></div>
+</sc-for>
+</div>
+
+<sc-for list="{{mails}}" as="m" hint-placeholder-count="3">
+<a href="{{m.href}}" class="card s4" style="{{m.style}}">
+<span style="display: flex; justify-content: space-between; align-items: center"><span style="{{m.iconStyle}}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{m.icon}}"></path></svg></span><span class="go" style="width: 40px; height: 40px; border-radius: 999px; background: #ffffff; color: #242a5f; display: inline-flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></span>
+<span style="font-size: 13px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: #242a5f">{{m.t}}</span>
+<span style="font-size: 18px; font-weight: 800; color: #242a5f; word-break: break-word">{{m.mail}}</span>
+<span style="font-size: 14px; line-height: 1.55; color: #374151">{{m.d}}</span>
+</a>
+</sc-for>
+</section>
+
+<!-- JÓ TUDNI ÉRKEZÉS ELŐTT -->
+<section style="max-width: 1360px; margin: 112px auto 0; display: flex; flex-direction: column; gap: 32px">
+<div style="display: flex; flex-direction: column; gap: 12px; max-width: 680px">
+<span style="font-size: 13px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #2f7a75">Hasznos</span>
+<h2 style="margin: 0; font-size: clamp(36px, 4vw, 52px); line-height: 1.05; font-weight: 800; color: #242a5f; letter-spacing: -0.03em">Jó tudni érkezés előtt</h2>
+<p style="margin: 0; font-size: 18px; line-height: 1.6; color: #4b5563">Segítünk, hogy stresszmentes legyen a vizit</p>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 16px">
+<sc-for list="{{arrival}}" as="ar" hint-placeholder-count="3">
+<div class="card" style="{{ar.style}}">
+<span style="{{ar.iconStyle}}"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ar.icon}}"></path></svg></span>
+<h3 style="margin: 0; font-size: 22px; font-weight: 800; color: #242a5f">{{ar.t}}</h3>
+<p style="margin: 0; font-size: 16px; line-height: 1.6; color: #374151">{{ar.b}}</p>
+<sc-if value="{{ar.href}}" hint-placeholder-val="{{false}}"><a href="{{ar.href}}" class="lnk" style="align-self: flex-start; font-size: 15px; font-weight: 800; color: #242a5f; padding: 2px 0">{{ar.lt}} →</a></sc-if>
+</div>
+</sc-for>
+</div>
+</section>
+
+<!-- HASZNOS INFORMÁCIÓK + FONTOS TUDNIVALÓK -->
+<section style="max-width: 1360px; margin: 112px auto 0; display: flex; flex-wrap: wrap; gap: 40px 24px; align-items: flex-start">
+<sc-for list="{{faqGroups}}" as="g" hint-placeholder-count="2">
+<div style="{{g.wrapStyle}}">
+<div style="display: flex; flex-direction: column; gap: 12px">
+<span style="font-size: 13px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #2f7a75">{{g.eyebrow}}</span>
+<h2 style="margin: 0; font-size: clamp(32px, 3.4vw, 44px); line-height: 1.05; font-weight: 800; color: #242a5f; letter-spacing: -0.03em">{{g.title}}</h2>
+<p style="margin: 0; font-size: 17px; line-height: 1.6; color: #4b5563">{{g.lead}}</p>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<sc-for list="{{g.items}}" as="q" hint-placeholder-count="6">
+<div class="box" style="{{q.boxStyle}}">
+<h3 style="margin: 0"><button type="button" id="{{q.btnId}}" aria-expanded="{{q.open}}" aria-controls="{{q.panelId}}" onClick="{{q.toggle}}" class="head" style="width: 100%; display: flex; align-items: center; gap: 16px; padding: 16px 16px 16px 20px; border: 0; background: transparent; text-align: left; color: #242a5f; border-radius: 28px; min-height: 64px">
+<span style="{{q.numStyle}}">{{q.num}}</span>
+<span style="flex: 1; font-size: 17px; font-weight: 800; line-height: 1.3">{{q.t}}</span>
+<span class="plus" style="{{q.plusStyle}}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></span>
+</button></h3>
+<div id="{{q.panelId}}" role="region" aria-labelledby="{{q.btnId}}" class="acc" aria-hidden="{{q.hidden}}" style="grid-template-rows: {{q.rows}}; opacity: {{q.op}}">
+<div>
+<div style="padding: 0 24px 22px 76px; display: flex; flex-direction: column; gap: 10px">
+<sc-for list="{{q.lines}}" as="ln" hint-placeholder-count="2">
+<sc-if value="{{ln.isText}}" hint-placeholder-val="{{true}}"><p style="margin: 0; font-size: 15px; line-height: 1.65; color: #374151">{{ln.x}}</p></sc-if>
+<sc-if value="{{ln.isLink}}" hint-placeholder-val="{{false}}"><a href="{{ln.href}}" class="btn" style="align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 18px; border-radius: 999px; background: #F2F4F8; color: #242a5f; text-decoration: none; font-size: 14px; font-weight: 800; box-sizing: border-box"><span style="font-weight: 600; color: #4b5563">{{ln.k}}</span>{{ln.x}}</a></sc-if>
+<sc-if value="{{ln.isRow}}" hint-placeholder-val="{{false}}"><span style="display: flex; justify-content: space-between; gap: 12px; max-width: 360px; font-size: 15px; padding: 6px 0; border-bottom: 1px dashed #d7dbe8"><span style="font-weight: 700; color: #242a5f">{{ln.k}}</span><span style="{{ln.style}}">{{ln.x}}</span></span></sc-if>
+<sc-if value="{{ln.isHl}}" hint-placeholder-val="{{false}}"><span style="align-self: flex-start; font-size: 14px; font-weight: 800; color: #242a5f; background: #fdf3dc; border-radius: 999px; padding: 10px 20px; line-height: 1.4">{{ln.x}}</span></sc-if>
+</sc-for>
+</div>
+</div>
+</div>
+</div>
+</sc-for>
+</div>
+</div>
+</sc-for>
+</section>
+
+<dc-import name="Footer" hint-size="100%,560px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":3600}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { faq: '' };
+  }
+  renderVals() {
+    const s = this.state;
+
+    // ===== SANITY (source of truth) – snapshot, identical to A1 =====
+    const WEEKLY = { bookingWindowDays: 30, days: [
+      { dayOfWeek: 1, isDayOff: false, startTime: '12:00', endTime: '15:20' },
+      { dayOfWeek: 2, isDayOff: false, startTime: '12:00', endTime: '15:20' },
+      { dayOfWeek: 3, isDayOff: true, startTime: '11:00', endTime: '' },
+      { dayOfWeek: 4, isDayOff: false, startTime: '13:00', endTime: '16:40' },
+      { dayOfWeek: 5, isDayOff: true, startTime: '', endTime: '' },
+      { dayOfWeek: 6, isDayOff: true, startTime: '', endTime: '' },
+      { dayOfWeek: 0, isDayOff: true, startTime: '', endTime: '' } ] };
+    const SEASONAL = [
+      { name: 'November', startDate: '2026-11-01', endDate: '2026-12-31', days: [
+        { dayOfWeek: 1, isDayOff: true, startTime: null, endTime: null },
+        { dayOfWeek: 2, isDayOff: false, startTime: '13:20', endTime: '16:40' },
+        { dayOfWeek: 3, isDayOff: false, startTime: '11:00', endTime: '14:20' },
+        { dayOfWeek: 4, isDayOff: false, startTime: '13:20', endTime: '16:40' },
+        { dayOfWeek: 5, isDayOff: true, startTime: '', endTime: '' },
+        { dayOfWeek: 6, isDayOff: true, startTime: '', endTime: '' },
+        { dayOfWeek: 0, isDayOff: true, startTime: '', endTime: '' } ] } ];
+    const CUSTOM = [];
+    const BLOCKED = ['2026-12-02','2026-12-09','2026-12-16','2026-12-21','2026-12-22','2026-12-23','2026-12-24','2026-12-25','2026-12-26','2026-12-27','2026-12-28','2026-12-29','2026-12-30','2026-12-31','2027-01-01','2027-01-02','2027-01-03','2027-01-04'];
+    // Szakorvosi dokumentáció (igazolás) kiállítása – service price (Sanity)
+    const CERT_PRICE = 12000;
+    // ================================================================
+
+    const DAYN = ['Vasárnap','Hétfő','Kedd','Szerda','Csütörtök','Péntek','Szombat'];
+    const SHORT = ['V','H','K','Sze','Cs','P','Szo'];
+    const MON = ['január','február','március','április','május','június','július','augusztus','szeptember','október','november','december'];
+    const p2 = (n) => (n < 10 ? '0' : '') + n;
+    const toMin = (t) => { const a = String(t).split(':'); return Number(a[0]) * 60 + Number(a[1]); };
+    const isoOf = (d) => d.getFullYear() + '-' + p2(d.getMonth() + 1) + '-' + p2(d.getDate());
+    const fmt = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' Ft';
+    const resolveDays = (iso) => { const m = SEASONAL.filter((x) => x.startDate <= iso && iso <= x.endDate).sort((a, b) => (a.startDate < b.startDate ? -1 : 1))[0]; return m ? m.days : WEEKLY.days; };
+    const hoursFor = (iso, dow) => {
+      const c = CUSTOM.find((x) => x.date === iso);
+      if (c && c.startTime && c.endTime) return { start: c.startTime, end: c.endTime };
+      if (BLOCKED.indexOf(iso) !== -1) return null;
+      const d = resolveDays(iso).find((x) => x.dayOfWeek === dow);
+      if (!d || d.isDayOff || !d.startTime || !d.endTime) return null;
+      return { start: d.startTime, end: d.endTime };
+    };
+    const now = new Date();
+    const nowMin = now.getHours() * 60 + now.getMinutes();
+    const today = new Date(now); today.setHours(0, 0, 0, 0);
+    const todayIso = isoOf(today);
+    const activeSeason = SEASONAL.find((x) => x.startDate <= todayIso && todayIso <= x.endDate);
+    const curDays = resolveDays(todayIso);
+    const week = [1, 2, 3, 4, 5].map((dw) => { const o = curDays.find((x) => x.dayOfWeek === dw && !x.isDayOff && x.startTime && x.endTime); return { dw: dw, name: DAYN[dw], open: !!o, start: o ? o.startTime : '', end: o ? o.endTime : '', hours: o ? o.startTime + ' – ' + o.endTime : 'zárva' }; });
+
+    // today / next opening
+    const th = hoursFor(todayIso, today.getDay());
+    let status = 'closed'; let nextLabel = ''; let nextValue = '';
+    if (th && nowMin >= toMin(th.start) && nowMin < toMin(th.end)) { status = 'open'; nextLabel = 'Ma rendelés van'; nextValue = th.start + ' – ' + th.end; }
+    else if (th && nowMin < toMin(th.start)) { status = 'later'; nextLabel = 'Ma rendelés'; nextValue = th.start + ' – ' + th.end; }
+    else {
+      for (let i = 1; i <= 60; i++) { const d = new Date(today); d.setDate(today.getDate() + i); const h = hoursFor(isoOf(d), d.getDay());
+        if (h) { nextLabel = 'Következő rendelési nap'; nextValue = DAYN[d.getDay()] + ', ' + MON[d.getMonth()] + ' ' + d.getDate() + '. · ' + h.start + ' – ' + h.end; break; } }
+    }
+    const statusText = status === 'open' ? 'Most rendelés van' : (status === 'later' ? 'Ma rendelés lesz' : 'Ma zárva');
+    const sc = status === 'open' ? ['#e2f4ee', '#1f5f5a', '#2f7a75'] : (status === 'later' ? ['#fdf3dc', '#5c4307', '#efc462'] : ['#F2F4F8', '#374151', '#9ca1b5']);
+    const fmtRange = (a, b) => { const x = a.split('-').map(Number); const y = b.split('-').map(Number); return MON[x[1] - 1].slice(0, 3) + '. ' + x[2] + '. – ' + MON[y[1] - 1].slice(0, 3) + '. ' + y[2] + '.'; };
+
+    const IC = { mail: 'M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM22 6l-10 7L2 6', pill: 'm10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7ZM8.5 8.5l7 7', alert: 'M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z',
+      car: 'M5 17h14M6 17v2M18 17v2M3 13l2-6a2 2 0 0 1 1.9-1.4h10.2A2 2 0 0 1 19 7l2 6v4H3zM7 13h.01M17 13h.01', clock: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 6v6l4 2', card: 'M2 5h20v14H2zM2 10h20M6 15h4' };
+    const MAILS = [
+      { t: 'Általános/Recepció', mail: 'recepcio@drmoroczangela.hu', d: 'Időpontfoglalással kapcsolatos, illetve egyéb technikai kérdések.', icon: IC.mail, tint: '#ffffff', acc: '#E6EDE8', ac: '#2f7a75' },
+      { t: 'Gyógyszer igények', mail: 'gyogyszer@drmoroczangela.hu', d: 'Gyógyszert felírni csak a rendelési napokon tudunk.', icon: IC.pill, tint: '#f8ebf1', acc: '#e1bbcd', ac: '#242a5f' },
+      { t: 'Sürgős eset', mail: 'drmoroczangela@gmail.com', d: 'Sürgős esetben rendelési időben telefonon, rendelési időn kívül pedig e-mailben vegyék fel velünk a kapcsolatot.', icon: IC.alert, tint: '#fcebe4', acc: '#eb8966', ac: '#242a5f' }
+    ];
+    const ARRIVAL = [
+      { t: 'Parkolás', b: 'Rendelőnk mellett ingyenes parkolási lehetőség biztosított.', icon: IC.car, tint: '#E6EDE8', acc: '#76c8b6' },
+      { t: 'Érkezés', b: 'Kérjük, 10 perccel a foglalt időpont előtt érkezzen.', icon: IC.clock, tint: '#fdf3dc', acc: '#efc462' },
+      { t: 'Fizetés', b: 'Készpénz és bankkártya egyaránt elfogadott. A vizsgálat, illetve a szükséges kezelések árát megtalálja a főoldalon.', icon: IC.card, tint: '#f8ebf1', acc: '#e1bbcd', href: 'Arak.dc.html', lt: 'Szolgáltatások és Árak' }
+    ];
+    const T = (x) => ({ x: x, isText: true, isLink: false, isRow: false, isHl: false });
+    const L = (k, x, href) => ({ k: k, x: x, href: href, isText: false, isLink: true, isRow: false, isHl: false });
+    const H = (x) => ({ x: x, isText: false, isLink: false, isRow: false, isHl: true });
+    const mapsUrl = 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent('2500 Esztergom, Martsa Alajos utca 6/c');
+    const hoursRows = week.map((w) => ({ k: w.name, x: w.hours, isText: false, isLink: false, isRow: true, isHl: false, style: w.open ? 'font-weight: 800; color: #2f7a75; font-variant-numeric: tabular-nums' : 'color: #6b7280' }));
+    const HASZNOS = [
+      { t: 'Időpontfoglalás', lines: [T('Rendelésre bejelentkezni vagy időpontot egyeztetni kizárólag online lehetséges, az oldal alján található gombra kattintva.'), T('Kérjük vegyék figyelembe, hogy lemondani a foglalt időpontot maximum 1 nappal a rendelés előtt lehetséges, az 1 napon belüli lemondásért ügyeleti díjat számolunk fel, melynek összege 10.000,- Ft / alkalom.'), L('', 'Időpontfoglalás', 'Idopontfoglalas.dc.html')] },
+      { t: 'Sürgősségi ellátás', lines: [T('Telefonon csak a rendelési időben vagyunk elérhetőek. Sürgős esetben rendelési időben telefonon, rendelési időn kívül pedig a drmoroczangela@gmail.com email címen vegyék fel velünk a kapcsolatot.'), L('', 'drmoroczangela@gmail.com', 'mailto:drmoroczangela@gmail.com')] },
+      { t: 'Gyógyszer igénylés', lines: [T('Rendszeresen szedett fogamzásgátló gyógyszerek igényét az alábbi email címre jelezzék, figyelembe véve, hogy gyógyszert felírni csak a rendelési napokon tudunk.'), L('', 'gyogyszer@drmoroczangela.hu', 'mailto:gyogyszer@drmoroczangela.hu')] },
+      { t: 'Leletek beadása', lines: [T('Leleteket, eredményeket továbbra is a drmoroczangela@gmail.com email címre várjuk.'), L('', 'drmoroczangela@gmail.com', 'mailto:drmoroczangela@gmail.com')] },
+      { t: 'Egyéb kérdések', lines: [T('Időpontfoglalással kapcsolatos, illetve egyéb technikai kérdéseket az alábbi email címre legyenek kedvesek írni.'), L('', 'recepcio@drmoroczangela.hu', 'mailto:recepcio@drmoroczangela.hu')] },
+      { t: 'Telefonszámunk', lines: [T('Rendelési időben elérhető telefonszámunk:'), L('', '+36 70 639 5239', 'tel:+36706395239')] },
+      { t: 'Címünk', lines: [T('2500 Esztergom, Martsa Alajos utca 6/c'), L('', 'Útvonaltervezés', mapsUrl)] },
+      { t: 'Rendelési idő', lines: hoursRows.concat(activeSeason ? [H('Szezonális rendelési idő: ' + activeSeason.name + ' (' + fmtRange(activeSeason.startDate, activeSeason.endDate) + ')')] : []) },
+      { t: 'Hasznos email címek', lines: [L('Általános kérdések, recepció:', 'recepcio@drmoroczangela.hu', 'mailto:recepcio@drmoroczangela.hu'), L('Gyógyszer igények:', 'gyogyszer@drmoroczangela.hu', 'mailto:gyogyszer@drmoroczangela.hu'), L('Sürgősségi:', 'drmoroczangela@gmail.com', 'mailto:drmoroczangela@gmail.com')] }
+    ];
+    const FONTOS = [
+      { t: 'Leletek küldése', lines: [T('Leletek elektronikus úton történő megküldése és kiértékelése kizárólag előzetes kérésem után történhet. Minden egyéb esetben személyes konzultáció szükséges az eredményekkel.'), H('Várandósgondozást elektronikus úton nem végzek, személyes megjelenés szükséges.')] },
+      { t: 'Diagnózis felállítása', lines: [T('Elektronikus úton részletezett panaszok és tünetek, fotók alapján diagnózis felállítani nem tudok. Ilyen esetekben vizsgálat szükséges, kérem jelentkezzen be online vagy a megadott elérhetőségeken egyeztessen velünk időpontot.')] },
+      { t: 'Igazolások kiállítása', lines: [T('Elektronikus úton igazolást nem tudunk kiállítani. Időpontfoglalás nélkül, rendelési idő alatt személyes megjelenést követően állítjuk ki a kért igazolásokat.'), H('Szakorvosi igazolás kiállításának díja ' + fmt(CERT_PRICE) + ', melyet a recepción tud rendezni.')] },
+      { t: 'Egészségpénztár', lines: [T('Egészségpénztárakkal nem állok szerződésben, ezért számlát nem tudok kiállítani.')] },
+      { t: 'Intimtorna tanfolyam', lines: [T('Csoportos hétvégi tanfolyamok egyéni tornaterv átadásával és 1 hónapig online konzultációs lehetőséggel.'), H('Díj: 40 000 Ft')] },
+      { t: 'Magzati genetikai ultrahang', lines: [T('Magzati genetikai ultrahangot nem végzek.'), H('Ajánlott: Czeizel Intézet, Budapest')] }
+    ];
+    const mkItems = (list, key) => list.map((q, i) => { const id = key + i; const o = s.faq === id; return { ...q, num: p2(i + 1), open: o ? 'true' : 'false', hidden: o ? 'false' : 'true',
+      btnId: 'q-' + id, panelId: 'a-' + id, rows: o ? '1fr' : '0fr', op: o ? '1' : '0',
+      toggle: () => this.setState({ faq: o ? '' : id }),
+      boxStyle: 'border-radius: 28px; background: ' + (o ? '#ffffff' : '#ffffff') + '; box-shadow: ' + (o ? '0 24px 48px -32px rgba(36,42,95,.5), inset 0 0 0 2px #a3dac2' : 'inset 0 0 0 1px #eceef4'),
+      numStyle: 'width: 40px; height: 40px; flex-shrink: 0; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; font-variant-numeric: tabular-nums; transition: background-color .3s, color .3s; ' + (o ? 'background: #242a5f; color: #ffffff' : 'background: #E6EDE8; color: #2f7a75'),
+      plusStyle: 'width: 40px; height: 40px; border-radius: 999px; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; ' + (o ? 'background: #242a5f; color: #ffffff; transform: rotate(135deg)' : 'background: #F2F4F8; color: #242a5f') }; });
+
+    return {
+      statusText: statusText,
+      statusPill: 'display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 800; border-radius: 999px; padding: 8px 16px; background: ' + sc[0] + '; color: ' + sc[1],
+      statusDot: 'width: 8px; height: 8px; border-radius: 999px; background: ' + sc[2],
+      nextLabel: nextLabel, nextValue: nextValue,
+      seasonName: activeSeason ? activeSeason.name : '',
+      seasonRange: activeSeason ? fmtRange(activeSeason.startDate, activeSeason.endDate) : '',
+      strip: week.filter((w) => w.open).map((w) => { const isToday = w.dw === today.getDay(); return { short: w.name, a: w.start, b: w.end,
+        style: 'flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 12px 6px; border-radius: 999px; text-align: center; background: #E6EDE8; color: #242a5f' + (isToday ? '; box-shadow: inset 0 0 0 2px #242a5f' : '') }; }),
+      week: week.map((w, i) => ({ ...w, style: w.open ? 'font-weight: 800; color: #2f7a75; font-variant-numeric: tabular-nums' : 'color: #6b7280',
+        rowStyle: 'display: flex; justify-content: space-between; font-size: 15px; color: #242a5f; padding: 9px 0; ' + (i < 4 ? 'border-bottom: 1px solid #eceef4' : '') })),
+      mapsUrl: mapsUrl,
+      mails: MAILS.map((m) => ({ ...m, href: 'mailto:' + m.mail,
+        style: 'border-radius: 32px; padding: 26px; text-decoration: none; display: flex; flex-direction: column; gap: 10px; box-sizing: border-box; min-height: 230px; background: ' + m.tint + (m.tint === '#ffffff' ? '' : ''),
+        iconStyle: 'width: 52px; height: 52px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; background: ' + m.acc + '; color: ' + m.ac })),
+      arrival: ARRIVAL.map((a, i) => ({ ...a, href: a.href || '', lt: a.lt || '',
+        style: 'background: ' + a.tint + '; border-radius: 32px; padding: 32px; display: flex; flex-direction: column; gap: 14px; animation-delay: ' + (i * 80) + 'ms',
+        iconStyle: 'width: 60px; height: 60px; border-radius: 999px; background: ' + a.acc + '; color: #242a5f; display: inline-flex; align-items: center; justify-content: center' })),
+      faqGroups: [
+        { eyebrow: 'Tudnivalók', title: 'Hasznos információk', lead: 'Válaszok az Ön legfontosabb kérdéseire', items: mkItems(HASZNOS, 'h'), wrapStyle: 'flex: 3 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 28px' },
+        { eyebrow: 'Fontos', title: 'Fontos tudnivalók', lead: 'Biztonság és komfort az ellátás során', items: mkItems(FONTOS, 'f'), wrapStyle: 'flex: 2 1 420px; min-width: 0; display: flex; flex-direction: column; gap: 28px' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

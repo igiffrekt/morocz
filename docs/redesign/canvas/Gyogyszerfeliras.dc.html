@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<title>Gyógyszerfelírás – Mórocz Medical</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F2F4F8}
+a{color:#242a5f}a:hover{color:#1a1f47}
+button{font:inherit;cursor:pointer}
+a:focus-visible,button:focus-visible{outline:3px solid #469993;outline-offset:3px}
+.btn{transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s cubic-bezier(.2,.8,.2,1),background-color .25s,color .25s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 14px 28px -14px rgba(36,42,95,.55)}
+.btn:active{transform:translateY(0) scale(.97);transition-duration:.12s}
+.btn .arr{transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.btn:hover .arr{transform:translateX(4px)}
+.lnk{text-decoration:none;background-image:linear-gradient(currentColor,currentColor);background-size:0 2px;background-repeat:no-repeat;background-position:0 100%;transition:background-size .4s cubic-bezier(.2,.8,.2,1),color .25s}
+.lnk:hover{background-size:100% 2px}
+.card{transition:transform .45s cubic-bezier(.2,.8,.2,1),box-shadow .45s cubic-bezier(.2,.8,.2,1),background-color .3s,color .3s}
+.card:hover{transform:translateY(-5px);box-shadow:0 26px 50px -28px rgba(36,42,95,.45)}
+.card:active{transform:translateY(-1px) scale(.985)}
+.card .go{transition:transform .4s cubic-bezier(.2,.8,.2,1)}
+.card:hover .go{transform:rotate(-45deg)}
+.zoom{overflow:hidden}.zoom img{transition:transform .9s cubic-bezier(.2,.8,.2,1)}.zoom:hover img{transform:scale(1.05)}
+.chip{transition:background-color .3s,color .3s,border-color .3s,transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s}
+.chip:hover{transform:translateY(-2px)}.chip:active{transform:scale(.96)}
+.seg-ind,.ind{transition:transform .55s cubic-bezier(.2,.8,.2,1)}
+.tabbtn{transition:color .35s}
+.tabbtn:hover{color:#242a5f}
+.acc{display:grid;transition:grid-template-rows .5s cubic-bezier(.2,.8,.2,1),opacity .4s ease}
+.acc>div{overflow:hidden;min-height:0}
+.fade{animation:fadeUp .55s cubic-bezier(.2,.8,.2,1) both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.track{transition:transform .7s cubic-bezier(.2,.8,.2,1)}
+.navlink{position:relative;text-decoration:none;color:#4b5563;font-size:14px;font-weight:600;height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;transition:background-color .3s,color .3s}
+.navlink:hover{background:#E6EDE8;color:#242a5f}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+.head{transition:background-color .3s}
+.head:hover{background:rgba(255,255,255,.35)}
+.plus{transition:transform .5s cubic-bezier(.2,.8,.2,1),background-color .3s,color .3s}
+.mrow{transition:background-color .25s}
+.mrow:hover{background:rgba(255,255,255,.6)}
+.box{transition:box-shadow .4s cubic-bezier(.2,.8,.2,1)}
+html{scroll-behavior:smooth}
+.toc:hover{background:#E6EDE8}
+.toc[aria-current="true"]:hover{background:#242a5f}
+.skel,.skel-d{background-size:200% 100%;background-repeat:no-repeat;animation:shimmer 1.4s ease-in-out infinite}
+.skel{background-image:linear-gradient(90deg,rgba(255,255,255,0) 0,rgba(255,255,255,.7) 50%,rgba(255,255,255,0) 100%)}
+.skel-d{background-image:linear-gradient(90deg,rgba(255,255,255,0) 0,rgba(255,255,255,.14) 50%,rgba(255,255,255,0) 100%)}
+@keyframes shimmer{from{background-position:160% 0}to{background-position:-160% 0}}
+@media (max-width: 960px){.svc-aside{position:static!important;flex:1 1 100%!important}}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+</style>
+</helmet>
+<div style="font-family: 'Plus Jakarta Sans', sans-serif; color: #1A1D2D; background: #F2F4F8; min-height: 100vh; padding: 16px 16px 0; box-sizing: border-box">
+<dc-import name="Header" active="szolgaltatasok" hint-size="100%,72px"></dc-import>
+<dc-import name="Szolgaltatas" slug="gyogyszerfeliras" hint-size="100%,5930px"></dc-import>
+<dc-import name="Footer" hint-size="100%,560px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":6710}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

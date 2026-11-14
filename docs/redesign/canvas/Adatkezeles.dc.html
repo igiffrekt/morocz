@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<title>Adatkezelési tájékoztató – Mórocz Medical</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F2F4F8}
+a{color:#242a5f}a:hover{color:#1a1f47}
+button{font:inherit;cursor:pointer}
+a:focus-visible,button:focus-visible{outline:3px solid #469993;outline-offset:3px}
+.btn{transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s cubic-bezier(.2,.8,.2,1),background-color .25s,color .25s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 14px 28px -14px rgba(36,42,95,.55)}
+.btn:active{transform:translateY(0) scale(.97);transition-duration:.12s}
+.btn .arr{transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.btn:hover .arr{transform:translateX(4px)}
+.lnk{text-decoration:none;background-image:linear-gradient(currentColor,currentColor);background-size:0 2px;background-repeat:no-repeat;background-position:0 100%;transition:background-size .4s cubic-bezier(.2,.8,.2,1),color .25s}
+.lnk:hover{background-size:100% 2px}
+.card{transition:transform .45s cubic-bezier(.2,.8,.2,1),box-shadow .45s cubic-bezier(.2,.8,.2,1),background-color .3s,color .3s}
+.card:hover{transform:translateY(-5px);box-shadow:0 26px 50px -28px rgba(36,42,95,.45)}
+.card:active{transform:translateY(-1px) scale(.985)}
+.card .go{transition:transform .4s cubic-bezier(.2,.8,.2,1)}
+.card:hover .go{transform:rotate(-45deg)}
+.zoom{overflow:hidden}.zoom img{transition:transform .9s cubic-bezier(.2,.8,.2,1)}.zoom:hover img{transform:scale(1.05)}
+.chip{transition:background-color .3s,color .3s,border-color .3s,transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s}
+.chip:hover{transform:translateY(-2px)}.chip:active{transform:scale(.96)}
+.seg-ind,.ind{transition:transform .55s cubic-bezier(.2,.8,.2,1)}
+.tabbtn{transition:color .35s}
+.tabbtn:hover{color:#242a5f}
+.acc{display:grid;transition:grid-template-rows .5s cubic-bezier(.2,.8,.2,1),opacity .4s ease}
+.acc>div{overflow:hidden;min-height:0}
+.fade{animation:fadeUp .55s cubic-bezier(.2,.8,.2,1) both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.track{transition:transform .7s cubic-bezier(.2,.8,.2,1)}
+.navlink{position:relative;text-decoration:none;color:#4b5563;font-size:14px;font-weight:600;height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;transition:background-color .3s,color .3s}
+.navlink:hover{background:#E6EDE8;color:#242a5f}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+.head{transition:background-color .3s}
+.head:hover{background:rgba(255,255,255,.35)}
+.plus{transition:transform .5s cubic-bezier(.2,.8,.2,1),background-color .3s,color .3s}
+.mrow{transition:background-color .25s}
+.mrow:hover{background:rgba(255,255,255,.6)}
+.box{transition:box-shadow .4s cubic-bezier(.2,.8,.2,1)}
+html{scroll-behavior:smooth}
+.sk{animation:skp 1.4s ease-in-out infinite both}
+@keyframes skp{0%,100%{opacity:1}50%{opacity:.45}}
+.lg-pill{transition:background-color .3s,color .3s,box-shadow .3s,transform .3s cubic-bezier(.2,.8,.2,1)}
+.lg-pill:hover{background-color:#F2F4F8}
+.lg-pill[aria-current="page"]:hover{background-color:#1a1f47}
+.lg-pill:active{transform:scale(.98)}
+.lg-toc-a{transition:background-color .3s,color .3s}
+.lg-toc-a:hover{background-color:#F2F4F8;color:#242a5f}
+.lg-toc-a[aria-current="true"]:hover{background-color:#E6EDE8}
+.lg-sw{scrollbar-width:none}
+.lg-sw::-webkit-scrollbar{display:none}
+@media (max-width:1280px){
+.lg-grid{grid-template-columns:minmax(0,1fr)!important;gap:16px!important}
+.lg-left,.lg-right{position:static!important}
+.lg-sw-wrap{padding:6px!important;border-radius:999px!important}
+.lg-sw-label{display:none!important}
+.lg-sw{flex-direction:row!important;overflow-x:auto;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch}
+.lg-sw a{flex:0 0 auto;white-space:nowrap;scroll-snap-align:start}
+.lg-toc-side{display:none!important}
+.lg-toc-mob{display:block!important}
+.lg-right{flex-direction:row!important;flex-wrap:wrap;align-items:flex-start}
+.lg-help{flex:1 1 300px}
+.lg-top-btn{flex:0 0 auto}
+}
+@media (max-width:720px){
+.lg-hero{padding:28px 22px 32px!important;border-radius:32px!important}
+.lg-hero-art{display:none!important}
+.lg-card{padding:32px 22px 40px!important;border-radius:32px!important}
+.lg-h2{font-size:22px!important;gap:10px!important}
+}
+</style>
+</helmet>
+<div style="font-family: 'Plus Jakarta Sans', sans-serif; color: #1A1D2D; background: #F2F4F8; min-height: 100vh; padding: 16px 16px 0; box-sizing: border-box">
+<dc-import name="Header" active="" hint-size="100%,72px"></dc-import>
+<main>
+<dc-import name="Jogi" doc="adatkezelesi-tajekoztato" hint-size="100%,3600px"></dc-import>
+</main>
+<dc-import name="Footer" hint-size="100%,560px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":8500}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

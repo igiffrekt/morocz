@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<title>Lábléc (komponens)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<footer style="font-family: 'Plus Jakarta Sans', sans-serif; max-width: 1360px; margin: 112px auto 0; background: #242a5f; color: #c9cde3; border-radius: 40px 40px 0 0; padding: 64px 56px 32px; box-sizing: border-box; display: flex; flex-direction: column; gap: 48px">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 24px; align-items: center; padding-bottom: 48px; border-bottom: 1px solid rgba(255,255,255,.12)">
+<div style="display: flex; flex-direction: column; gap: 12px; max-width: 620px"><h2 style="margin: 0; font-size: 44px; font-weight: 800; color: #ffffff; line-height: 1.1">Foglaljon időpontot még ma!</h2><p style="margin: 0; font-size: 17px; line-height: 1.6">Ne várjon - egészsége a legfontosabb. Vegye fel velünk a kapcsolatot és foglaljon időpontot percek alatt.</p></div>
+<a href="Idopontfoglalas.dc.html" class="btn" style="display: inline-flex; align-items: center; gap: 10px; background: #e1bbcd; color: #242a5f; text-decoration: none; font-weight: 800; height: 58px; padding: 0 30px; border-radius: 999px">Időpontfoglalás <svg class="arr" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 32px; font-size: 15px">
+<div style="display: flex; flex-direction: column; gap: 10px; align-items: flex-start"><span style="color: #ffffff; font-weight: 800">Szolgáltatások</span><a href="Nogyogyaszat.dc.html" class="lnk" style="color: #c9cde3">Nőgyógyászat</a><a href="Szuleszet.dc.html" class="lnk" style="color: #c9cde3">Szülészet</a><a href="Varandosgondozas.dc.html" class="lnk" style="color: #c9cde3">Várandósgondozás</a><a href="Gyogyszerfeliras.dc.html" class="lnk" style="color: #c9cde3">Gyógyszerfelírás</a><a href="Arak.dc.html" class="lnk" style="color: #c9cde3">Szolgáltatások és Árak</a></div>
+<div style="display: flex; flex-direction: column; gap: 10px; align-items: flex-start"><span style="color: #ffffff; font-weight: 800">Információk</span><a href="Idopontfoglalas.dc.html" class="lnk" style="color: #c9cde3">Időpontfoglalás</a><a href="Joga.dc.html" class="lnk" style="color: #c9cde3">Lélekző Jóga</a><a href="BlogCikk.dc.html" class="lnk" style="color: #c9cde3">Blog</a><a href="Kapcsolat.dc.html" class="lnk" style="color: #c9cde3">Kapcsolat</a></div>
+<div style="display: flex; flex-direction: column; gap: 10px; align-items: flex-start"><span style="color: #ffffff; font-weight: 800">Kapcsolat</span><span>2500 Esztergom Martsa Alajos utca 6/c</span><a href="tel:+36706395239" class="lnk" style="color: #c9cde3">+36 70 639 5239</a><a href="mailto:recepcio@drmoroczangela.hu" class="lnk" style="color: #c9cde3">recepcio@drmoroczangela.hu</a></div>
+</div>
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; font-size: 13px; color: #9aa0c4"><span>© 2026 Mórocz Medical. Minden jog fenntartva.</span><span style="display: flex; flex-wrap: wrap; gap: 18px"><a href="Adatkezeles.dc.html" class="lnk" style="color: #9aa0c4">Adatkezelési tájékoztató</a><a href="Cookie.dc.html" class="lnk" style="color: #9aa0c4">Cookie Szabályzat</a><a href="Felhasznalasi.dc.html" class="lnk" style="color: #9aa0c4">Felhasználási Feltételek</a><a href="Lemondasi.dc.html" class="lnk" style="color: #9aa0c4">Foglalási és Lemondási Szabályzat</a><a href="Betegtajekoztato.dc.html" class="lnk" style="color: #9aa0c4">Általános Betegtájékoztató</a></span></div>
+</footer>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":560}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

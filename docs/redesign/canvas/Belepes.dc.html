@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<title>Belépés – páciens fiók</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F2F4F8}
+a{color:#242a5f}a:hover{color:#1a1f47}
+button{font:inherit;cursor:pointer}
+a:focus-visible,button:focus-visible{outline:3px solid #469993;outline-offset:3px}
+.btn{transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s cubic-bezier(.2,.8,.2,1),background-color .25s,color .25s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 14px 28px -14px rgba(36,42,95,.55)}
+.btn:active{transform:translateY(0) scale(.97);transition-duration:.12s}
+.btn .arr{transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.btn:hover .arr{transform:translateX(4px)}
+.btn .arl{transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.btn:hover .arl{transform:translateX(-4px)}
+.lnk{text-decoration:none;background-image:linear-gradient(currentColor,currentColor);background-size:0 2px;background-repeat:no-repeat;background-position:0 100%;transition:background-size .4s cubic-bezier(.2,.8,.2,1),color .25s}
+.lnk:hover{background-size:100% 2px}
+.ind{transition:transform .55s cubic-bezier(.2,.8,.2,1)}
+.tabbtn{transition:color .35s}
+.chip{transition:background-color .3s,color .3s,border-color .3s,transform .3s cubic-bezier(.2,.8,.2,1)}
+.chip:hover{transform:translateY(-2px)}
+.acc{display:grid;transition:grid-template-rows .5s cubic-bezier(.2,.8,.2,1),opacity .4s ease}
+.acc>div{overflow:hidden;min-height:0}
+.acc[aria-hidden="true"]>div{visibility:hidden;transition:visibility 0s .5s}
+.acc[aria-hidden="false"]>div{visibility:visible}
+.fade{animation:fadeUp .55s cubic-bezier(.2,.8,.2,1) both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes pop{0%{transform:scale(.6);opacity:0}60%{transform:scale(1.08);opacity:1}100%{transform:scale(1)}}
+.pop{animation:pop .7s cubic-bezier(.2,.8,.2,1) both}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.floaty{animation:floaty 6s ease-in-out infinite}
+.inp{width:100%;box-sizing:border-box;height:54px;border-radius:999px;border:1.5px solid #d7dbe8;background:#F7F8FB;padding:0 22px;font:inherit;font-size:15px;font-weight:600;color:#242a5f;transition:border-color .25s,box-shadow .25s,background-color .25s}
+.inp::placeholder{color:#6b7280;font-weight:500}
+.inp:hover{border-color:#b9bfd3}
+.inp:focus{outline:none;border-color:#242a5f;background:#ffffff;box-shadow:0 0 0 4px rgba(118,200,182,.35)}
+.eye{transition:background-color .25s}
+.eye:hover{background:#E6EDE8}
+.tick{transition:background-color .3s,border-color .3s,color .3s,transform .3s cubic-bezier(.2,.8,.2,1)}
+.tick:active{transform:scale(.92)}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+</style>
+</helmet>
+<div style="font-family: 'Plus Jakarta Sans', sans-serif; color: #1A1D2D; background: #F2F4F8; min-height: 100vh; padding: 16px 16px 0; box-sizing: border-box">
+<dc-import name="Header" active="" hint-size="100%,72px"></dc-import>
+
+<section style="max-width: 1360px; margin: 16px auto 0; display: flex; flex-wrap: wrap; gap: 16px; align-items: stretch">
+
+<!-- BRAND PANEL -->
+<div style="flex: 1 1 520px; min-width: 0; background: #242a5f; color: #ffffff; border-radius: 40px; position: relative; overflow: hidden; display: flex; flex-direction: column; min-height: 760px">
+<div style="position: absolute; inset: 0; background-image: radial-gradient(rgba(255,255,255,.07) 1px, transparent 1px); background-size: 26px 26px"></div>
+<div style="position: relative; padding: clamp(28px, 4vw, 56px) clamp(24px, 4vw, 56px) 0; display: flex; flex-direction: column; gap: 22px">
+<nav aria-label="Morzsamenü" style="align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); border-radius: 999px; padding: 8px 16px; font-size: 13px; font-weight: 600; color: #d6d9ec"><a href="A1.dc.html" class="lnk" style="color: #d6d9ec">Kezdőlap</a><span aria-hidden="true" style="opacity: .5">/</span><span aria-current="page" style="color: #ffffff">Belépés</span></nav>
+<span style="font-size: 13px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #a3dac2">Páciens fiók</span>
+<p style="margin: 0; font-size: clamp(34px, 3.6vw, 48px); line-height: 1.06; font-weight: 800; letter-spacing: -0.03em; max-width: 520px">Foglaljon időpontot <span style="color: #a3dac2">percek alatt!</span></p>
+<ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; max-width: 460px; position: relative; z-index: 2">
+<sc-for list="{{facts}}" as="f" hint-placeholder-count="3">
+<li class="fade" style="{{f.style}}">
+<span style="width: 40px; height: 40px; border-radius: 999px; background: #76c8b6; color: #242a5f; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{f.icon}}"></path></svg></span>
+<span style="display: flex; flex-direction: column; gap: 3px"><strong style="font-size: 15px; font-weight: 800">{{f.t}}</strong><span style="font-size: 14px; line-height: 1.55; color: #c9cde3">{{f.b}}</span></span>
+</li>
+</sc-for>
+</ul>
+</div>
+<div aria-hidden="true" style="position: relative; flex: 1; min-height: 300px; display: flex; justify-content: flex-end; align-items: flex-end; margin-top: -40px">
+<div style="position: absolute; width: 440px; height: 440px; border-radius: 999px; background: #76c8b6; right: -60px; bottom: -150px"></div>
+<div style="position: absolute; width: 560px; height: 560px; border-radius: 999px; border: 1.5px solid rgba(163,218,194,.35); right: -120px; bottom: -210px"></div>
+<img src="/_blob/5df4eea13bb8a171c72baa71a332eca9" alt="" style="position: relative; height: 380px; width: auto; display: block; margin: 0 10px -4px 0">
+</div>
+<div class="floaty" style="position: absolute; left: clamp(24px, 4vw, 56px); bottom: 36px; background: #ffffff; color: #242a5f; border-radius: 999px; padding: 10px 20px 10px 10px; display: inline-flex; align-items: center; gap: 12px; box-shadow: 0 20px 40px -20px rgba(0,0,0,.5); z-index: 2">
+<span style="width: 40px; height: 40px; border-radius: 999px; background: #E6EDE8; color: #2f7a75; display: inline-flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></span>
+<span style="display: flex; flex-direction: column"><strong style="font-size: 14px">Dr. Mórocz Angéla</strong><span style="font-size: 12px; font-weight: 600; color: #4b5563">nőgyógyász szakorvos</span></span>
+</div>
+</div>
+
+<!-- FORM CARD -->
+<div style="flex: 1 1 440px; min-width: 0; background: #ffffff; border-radius: 40px; padding: clamp(24px, 4vw, 56px); box-sizing: border-box; display: flex; flex-direction: column; gap: 22px">
+
+<sc-if value="{{isAuth}}" hint-placeholder-val="{{true}}">
+<div class="fade" style="display: flex; flex-direction: column; gap: 20px">
+<div role="tablist" aria-label="Fiók" style="position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); background: #F2F4F8; border-radius: 999px; padding: 5px">
+<span class="ind" aria-hidden="true" style="position: absolute; top: 5px; bottom: 5px; left: 5px; width: calc(50% - 5px); border-radius: 999px; background: #242a5f; box-shadow: 0 8px 20px -10px rgba(36,42,95,.5); transform: translateX({{tabX}})"></span>
+<sc-for list="{{tabs}}" as="t" hint-placeholder-count="2">
+<button type="button" role="tab" id="{{t.id}}" aria-selected="{{t.on}}" aria-controls="auth-panel" onClick="{{t.pick}}" class="tabbtn" style="{{t.style}}">{{t.name}}</button>
+</sc-for>
+</div>
+<div id="auth-panel" role="tabpanel" aria-labelledby="{{tabId}}" style="display: flex; flex-direction: column; gap: 18px">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<h1 style="margin: 0; font-size: 34px; font-weight: 800; color: #242a5f; letter-spacing: -0.03em">{{title}}</h1>
+<p style="margin: 0; font-size: 15px; line-height: 1.6; color: #4b5563">Az időpontfoglalás véglegesítéséhez kérjük, jelentkezzen be vagy hozzon létre egy fiókot.</p>
+</div>
+<sc-if value="{{savedNote}}" hint-placeholder-val="{{false}}">
+<div role="status" class="fade" style="display: flex; align-items: center; gap: 10px; background: #e2f4ee; color: #1f5f5a; border-radius: 999px; padding: 12px 20px; font-size: 14px; font-weight: 700"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>Új jelszava elmentve. Most már beléphet.</div>
+</sc-if>
+<button type="button" class="btn" style="display: inline-flex; align-items: center; justify-content: center; gap: 12px; height: 54px; border-radius: 999px; border: 1.5px solid #d7dbe8; background: #ffffff; color: #242a5f; font-size: 15px; font-weight: 700"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z"></path><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"></path><path fill="#FBBC05" d="M5.84 14.09A6.6 6.6 0 0 1 5.49 12c0-.73.13-1.43.35-2.09V7.07H2.18A11 11 0 0 0 1 12c0 1.77.43 3.45 1.18 4.93l3.66-2.84z"></path><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"></path></svg>Folytatás Google-fiókkal</button>
+<div aria-hidden="true" style="display: flex; align-items: center; gap: 14px; font-size: 13px; font-weight: 600; color: #6b7280"><span style="flex: 1; height: 1px; background: #eceef4"></span>vagy<span style="flex: 1; height: 1px; background: #eceef4"></span></div>
+<div class="acc" aria-hidden="{{regHidden}}" style="grid-template-rows: {{regRows}}; opacity: {{regOp}}">
+<div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 16px; padding-bottom: 2px">
+<label style="display: flex; flex-direction: column; gap: 8px; font-size: 14px; font-weight: 700; color: #242a5f">Teljes név<input class="inp" type="text" autocomplete="name" placeholder="Kovács János" onChange="{{on.name}}"></label>
+<label style="display: flex; flex-direction: column; gap: 8px; font-size: 14px; font-weight: 700; color: #242a5f">Telefonszám<input class="inp" type="tel" autocomplete="tel" placeholder="+36 70 000 0000" onChange="{{on.phone}}"></label>
+</div>
+</div>
+</div>
+<label style="display: flex; flex-direction: column; gap: 8px; font-size: 14px; font-weight: 700; color: #242a5f">E-mail cím<input class="inp" type="email" autocomplete="email" placeholder="pelda@email.hu" onChange="{{on.email}}"></label>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px"><label for="pw-a" style="font-size: 14px; font-weight: 700; color: #242a5f">Jelszó</label><sc-if value="{{isLogin}}" hint-placeholder-val="{{true}}"><button type="button" onClick="{{toForgot}}" class="lnk" style="border: 0; background: none; padding: 2px 0; font-size: 13px; font-weight: 700; color: #2f7a75">Elfelejtett jelszó?</button></sc-if></div>
+<div style="position: relative">
+<input id="pw-a" class="inp" type="{{pw1Type}}" autocomplete="{{pwAuto}}" placeholder="Legalább 6 karakter" aria-describedby="pw-a-hint" onChange="{{on.pw}}" style="padding-right: 64px">
+<button type="button" class="eye" onClick="{{togglePw1}}" aria-label="{{pw1Label}}" aria-pressed="{{pw1On}}" style="position: absolute; right: 5px; top: 5px; width: 44px; height: 44px; border-radius: 999px; border: 0; background: transparent; color: #242a5f; display: inline-flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{pw1Icon}}"></path></svg></button>
+</div>
+<span id="pw-a-hint" style="font-size: 13px; color: #4b5563; padding-left: 22px">Legalább 6 karakter</span>
+</div>
+<sc-if value="{{isReg}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; align-items: flex-start; gap: 12px">
+<button type="button" role="checkbox" aria-checked="{{consent}}" aria-labelledby="reg-cons" onClick="{{toggleConsent}}" class="tick" style="{{consentBox}}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg></button>
+<span id="reg-cons" style="font-size: 14px; line-height: 1.5; color: #374151; padding-top: 12px">Elfogadom az adatkezelési tájékoztatót — <a href="Adatkezeles.dc.html" class="lnk" style="font-weight: 700; color: #242a5f">részletek</a></span>
+</div>
+</sc-if>
+<sc-if value="{{err}}" hint-placeholder-val="{{false}}">
+<div role="alert" class="fade" style="display: flex; align-items: center; gap: 12px; background: #fcebe4; color: #8a2c0d; border-radius: 999px; padding: 12px 20px 12px 12px; font-size: 14px; font-weight: 700"><span style="width: 30px; height: 30px; border-radius: 999px; background: #eb8966; color: #242a5f; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 8v5M12 16h.01"></path></svg></span>{{errText}}</div>
+</sc-if>
+<button type="button" onClick="{{submitAuth}}" class="btn" style="display: inline-flex; align-items: center; justify-content: center; gap: 10px; height: 58px; border-radius: 999px; border: 0; background: #242a5f; color: #ffffff; font-size: 16px; font-weight: 800">{{title}} <svg class="arr" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></button>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{isForgot}}" hint-placeholder-val="{{false}}">
+<div class="fade" style="display: flex; flex-direction: column; gap: 20px">
+<button type="button" onClick="{{toLogin}}" class="btn" style="align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 18px 0 12px; border-radius: 999px; border: 1.5px solid #d7dbe8; background: #ffffff; color: #242a5f; font-size: 14px; font-weight: 700"><svg class="arl" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6"></path></svg>Vissza a bejelentkezéshez</button>
+<span style="width: 64px; height: 64px; border-radius: 999px; background: #fdf3dc; color: #242a5f; display: inline-flex; align-items: center; justify-content: center"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.78 7.78 5.5 5.5 0 0 1 7.78-7.78zm0 0L15.5 7.5m0 0 3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg></span>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<h1 style="margin: 0; font-size: 34px; font-weight: 800; color: #242a5f; letter-spacing: -0.03em">Elfelejtett jelszó</h1>
+<p style="margin: 0; font-size: 15px; line-height: 1.6; color: #4b5563">Adja meg az e-mail címét, és küldünk egy jelszó-visszaállító linket.</p>
+</div>
+<sc-if value="{{notSent}}" hint-placeholder-val="{{true}}">
+<label style="display: flex; flex-direction: column; gap: 8px; font-size: 14px; font-weight: 700; color: #242a5f">E-mail cím<input class="inp" type="email" autocomplete="email" placeholder="pelda@email.hu" onChange="{{on.email}}"></label>
+<sc-if value="{{err}}" hint-placeholder-val="{{false}}"><span role="alert" style="font-size: 14px; font-weight: 700; color: #8a2c0d; padding-left: 22px">{{errText}}</span></sc-if>
+<button type="button" onClick="{{sendReset}}" class="btn" style="display: inline-flex; align-items: center; justify-content: center; gap: 10px; height: 58px; border-radius: 999px; border: 0; background: #242a5f; color: #ffffff; font-size: 16px; font-weight: 800">Visszaállító link küldése <svg class="arr" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></button>
+</sc-if>
+<sc-if value="{{sent}}" hint-placeholder-val="{{false}}">
+<div role="status" class="fade" style="display: flex; gap: 14px; align-items: flex-start; background: #e2f4ee; border-radius: 28px; padding: 18px 22px">
+<span class="pop" style="width: 40px; height: 40px; border-radius: 999px; background: #76c8b6; color: #242a5f; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg></span>
+<span style="font-size: 15px; line-height: 1.6; color: #1f4f4b; font-weight: 600">Ellenőrizze a postaládáját! Ha regisztrált ezzel az e-mail címmel, hamarosan kap egy visszaállító linket.</span>
+</div>
+<button type="button" onClick="{{toLogin}}" class="btn" style="display: inline-flex; align-items: center; justify-content: center; height: 58px; border-radius: 999px; border: 0; background: #242a5f; color: #ffffff; font-size: 16px; font-weight: 800">Vissza a bejelentkezéshez</button>
+</sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{isReset}}" hint-placeholder-val="{{false}}">
+<div class="fade" style="display: flex; flex-direction: column; gap: 20px">
+<span style="width: 64px; height: 64px; border-radius: 999px; background: #E6EDE8; color: #2f7a75; display: inline-flex; align-items: center; justify-content: center"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 11h14v10H5zM8 11V7a4 4 0 0 1 8 0v4M12 15v2"></path></svg></span>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<h1 style="margin: 0; font-size: 34px; font-weight: 800; color: #242a5f; letter-spacing: -0.03em">Új jelszó beállítása</h1>
+<p style="margin: 0; font-size: 15px; line-height: 1.6; color: #4b5563">Adja meg az új jelszavát.</p>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<label for="pw-n" style="font-size: 14px; font-weight: 700; color: #242a5f">Új jelszó</label>
+<div style="position: relative">
+<input id="pw-n" class="inp" type="{{pw1Type}}" autocomplete="new-password" placeholder="Legalább 6 karakter" onChange="{{on.np1}}" style="padding-right: 64px">
+<button type="button" class="eye" onClick="{{togglePw1}}" aria-label="{{pw1Label}}" aria-pressed="{{pw1On}}" style="position: absolute; right: 5px; top: 5px; width: 44px; height: 44px; border-radius: 999px; border: 0; background: transparent; color: #242a5f; display: inline-flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{pw1Icon}}"></path></svg></button>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<label for="pw-c" style="font-size: 14px; font-weight: 700; color: #242a5f">Jelszó megerősítése</label>
+<div style="position: relative">
+<input id="pw-c" class="inp" type="{{pw2Type}}" autocomplete="new-password" placeholder="Legalább 6 karakter" onChange="{{on.np2}}" style="padding-right: 64px">
+<button type="button" class="eye" onClick="{{togglePw2}}" aria-label="{{pw2Label}}" aria-pressed="{{pw2On}}" style="position: absolute; right: 5px; top: 5px; width: 44px; height: 44px; border-radius: 999px; border: 0; background: transparent; color: #242a5f; display: inline-flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{pw2Icon}}"></path></svg></button>
+</div>
+</div>
+<sc-if value="{{err}}" hint-placeholder-val="{{false}}">
+<div role="alert" class="fade" style="display: flex; align-items: center; gap: 12px; background: #fcebe4; color: #8a2c0d; border-radius: 999px; padding: 12px 20px 12px 12px; font-size: 14px; font-weight: 700"><span style="width: 30px; height: 30px; border-radius: 999px; background: #eb8966; color: #242a5f; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 8v5M12 16h.01"></path></svg></span>{{errText}}</div>
+</sc-if>
+<button type="button" onClick="{{saveReset}}" class="btn" style="display: inline-flex; align-items: center; justify-content: center; gap: 10px; height: 58px; border-radius: 999px; border: 0; background: #242a5f; color: #ffffff; font-size: 16px; font-weight: 800">Jelszó mentése</button>
+</div>
+</sc-if>
+
+<div style="margin-top: auto; padding-top: 18px; border-top: 1px solid #eceef4; display: flex; flex-wrap: wrap; align-items: center; gap: 8px">
+<span style="font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #4b5563; margin-right: 4px">Nézet (demo)</span>
+<sc-for list="{{demoViews}}" as="dv" hint-placeholder-count="3">
+<button type="button" aria-pressed="{{dv.on}}" onClick="{{dv.pick}}" class="chip" style="{{dv.style}}">{{dv.name}}</button>
+</sc-for>
+</div>
+</div>
+</section>
+
+<dc-import name="Footer" hint-size="100%,560px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1620}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { view: 'auth', tab: 0, pw1: false, pw2: false, err: '', sent: false, consent: false, saved: false };
+    this.f = { name: '', phone: '', email: '', pw: '', np1: '', np2: '' };
+  }
+  renderVals() {
+    const s = this.state;
+    const isLogin = s.tab === 0;
+    const EYE = 'M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8zM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z';
+    const EYE_OFF = 'M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19M14.12 14.12a3 3 0 1 1-4.24-4.24M1 1l22 22';
+    const setView = (v) => () => this.setState({ view: v, err: '', sent: false, saved: false });
+    const FACTS = [
+      { t: 'Online időpontfoglalás', b: 'Rendelésre bejelentkezni vagy időpontot egyeztetni kizárólag online lehetséges.', icon: 'M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z' },
+      { t: 'Leletek az EESZT-ben', b: 'Eredményeik az EESZT rendszerbe kerülnek feltöltésre, melyet lakossági portáljukon belépve tekinthetnek meg.', icon: 'M22 11.08V12a10 10 0 1 1-5.93-9.14M22 4 12 14.01l-3-3' },
+      { t: 'Átlátható árak', b: 'A vizsgálati díjak tartalmazzák a mintakezelési, leletkezelési és adminisztrációs költséget is.', icon: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8M12 18V6' }
+    ];
+    const demoKey = s.view === 'auth' ? 0 : (s.view === 'forgot' ? 1 : 2);
+    return {
+      facts: FACTS.map((f, i) => ({ ...f, style: 'display: flex; gap: 14px; align-items: flex-start; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); border-radius: 28px; padding: 14px 18px 14px 14px; animation-delay: ' + (i * 90) + 'ms' })),
+      isAuth: s.view === 'auth', isForgot: s.view === 'forgot', isReset: s.view === 'reset',
+      isLogin: isLogin, isReg: !isLogin,
+      title: isLogin ? 'Belépés' : 'Regisztráció',
+      tabX: isLogin ? '0%' : '100%', tabId: isLogin ? 'tab-login' : 'tab-reg',
+      tabs: ['Belépés', 'Regisztráció'].map((n, i) => ({ name: n, id: i === 0 ? 'tab-login' : 'tab-reg', on: i === s.tab ? 'true' : 'false', pick: () => this.setState({ tab: i, err: '', saved: false }),
+        style: 'position: relative; z-index: 1; height: 50px; border: 0; background: transparent; border-radius: 999px; font-size: 15px; font-weight: 800; padding: 0 12px; color: ' + (i === s.tab ? '#ffffff' : '#4b5563') })),
+      regRows: isLogin ? '0fr' : '1fr', regOp: isLogin ? '0' : '1', regHidden: isLogin ? 'true' : 'false',
+      on: {
+        name: (e) => { this.f.name = e.target.value; }, phone: (e) => { this.f.phone = e.target.value; },
+        email: (e) => { this.f.email = e.target.value; }, pw: (e) => { this.f.pw = e.target.value; },
+        np1: (e) => { this.f.np1 = e.target.value; }, np2: (e) => { this.f.np2 = e.target.value; }
+      },
+      pwAuto: isLogin ? 'current-password' : 'new-password',
+      pw1Type: s.pw1 ? 'text' : 'password', pw1On: s.pw1 ? 'true' : 'false', pw1Label: s.pw1 ? 'Jelszó elrejtése' : 'Jelszó megjelenítése', pw1Icon: s.pw1 ? EYE_OFF : EYE,
+      pw2Type: s.pw2 ? 'text' : 'password', pw2On: s.pw2 ? 'true' : 'false', pw2Label: s.pw2 ? 'Jelszó elrejtése' : 'Jelszó megjelenítése', pw2Icon: s.pw2 ? EYE_OFF : EYE,
+      togglePw1: () => this.setState({ pw1: !s.pw1 }), togglePw2: () => this.setState({ pw2: !s.pw2 }),
+      consent: s.consent ? 'true' : 'false', toggleConsent: () => this.setState({ consent: !s.consent }),
+      consentBox: 'width: 44px; height: 44px; flex-shrink: 0; border-radius: 999px; padding: 0; display: inline-flex; align-items: center; justify-content: center; ' + (s.consent ? 'background: #242a5f; color: #ffffff; border: 1.5px solid #242a5f' : 'background: #ffffff; color: transparent; border: 1.5px solid #b9bfd3'),
+      err: !!s.err, errText: s.err, savedNote: s.saved && isLogin,
+      submitAuth: () => {
+        const okMail = this.f.email.indexOf('@') > 0; const okPw = this.f.pw.length >= 6;
+        if (isLogin) { this.setState({ err: okMail && okPw ? '' : 'Hibás e-mail cím vagy jelszó' }); return; }
+        if (!this.f.name.trim()) { this.setState({ err: 'A név megadása kötelező' }); return; }
+        if (!okMail) { this.setState({ err: 'Érvénytelen e-mail cím' }); return; }
+        if (!okPw) { this.setState({ err: 'A jelszó túl gyenge' }); return; }
+        if (!s.consent) { this.setState({ err: 'Az adatkezelési hozzájárulás elfogadása kötelező.' }); return; }
+        this.setState({ err: '' });
+      },
+      toForgot: setView('forgot'), toLogin: () => this.setState({ view: 'auth', tab: 0, err: '', sent: false }),
+      notSent: !s.sent, sent: s.sent,
+      sendReset: () => { if (this.f.email.indexOf('@') > 0) this.setState({ sent: true, err: '' }); else this.setState({ err: 'Érvénytelen e-mail cím' }); },
+      saveReset: () => {
+        if (this.f.np1.length < 6) { this.setState({ err: 'A jelszó túl gyenge' }); return; }
+        if (this.f.np1 !== this.f.np2) { this.setState({ err: 'A két jelszó nem egyezik' }); return; }
+        this.setState({ view: 'auth', tab: 0, err: '', saved: true });
+      },
+      demoViews: ['Belépés', 'Elfelejtett jelszó', 'Új jelszó'].map((n, i) => { const on = i === demoKey; return { name: n, on: on ? 'true' : 'false',
+        pick: setView(['auth', 'forgot', 'reset'][i]),
+        style: 'height: 44px; padding: 0 16px; border-radius: 999px; font-size: 13px; font-weight: 700; ' + (on ? 'background: #E6EDE8; color: #242a5f; border: 1.5px solid #76c8b6' : 'background: #ffffff; color: #4b5563; border: 1.5px solid #eceef4') }; })
+    };
+  }
+}
+</script>
+</body>
+</html>

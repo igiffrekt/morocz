@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<title>Mobil · Nőgyógyászat</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#dfe3ea}
+a{color:#242a5f;-webkit-tap-highlight-color:transparent}
+button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+a:focus-visible,button:focus-visible{outline:3px solid #469993;outline-offset:3px}
+.scroll::-webkit-scrollbar{display:none}
+.scroll{scrollbar-width:none}
+.tap{transition:transform .25s cubic-bezier(.2,.8,.2,1),background-color .3s,color .3s,box-shadow .3s}
+.tap:active{transform:scale(.96)}
+.acc{display:grid;transition:grid-template-rows .5s cubic-bezier(.2,.8,.2,1),opacity .4s}
+.acc>div{overflow:hidden;min-height:0}
+.fade{animation:fadeUp .5s cubic-bezier(.2,.8,.2,1) both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.snap{scroll-snap-type:x mandatory;overscroll-behavior-x:contain}
+.snap>*{scroll-snap-align:start}
+.sk{background:linear-gradient(90deg,#e3e7ef 25%,#eef1f6 50%,#e3e7ef 75%);background-size:200% 100%;animation:sk 1.3s linear infinite;border-radius:999px}
+.skd{background:linear-gradient(90deg,rgba(255,255,255,.1) 25%,rgba(255,255,255,.2) 50%,rgba(255,255,255,.1) 75%);background-size:200% 100%;animation:sk 1.3s linear infinite;border-radius:999px}
+@keyframes sk{from{background-position:200% 0}to{background-position:-200% 0}}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+.scroll[style*="inset: 0"]>*:first-child{position:sticky;top:0;z-index:40}
+</style>
+</helmet>
+<div data-phone="1" style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #F2F4F8; font-family: 'Plus Jakarta Sans', sans-serif; color: #242a5f">
+<div class="scroll" data-main="1" onScroll="{{onScroll}}" style="position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden">
+<dc-import name="MobilFejlec" active="szolgaltatasok" hint-size="390px,68px"></dc-import>
+
+<!-- HERO -->
+<section style="padding: 4px 12px 0">
+<div style="position: relative; background: #242a5f; background-image: radial-gradient(rgba(255,255,255,.09) 1.2px, transparent 1.6px); background-size: 18px 18px; border-radius: 32px; overflow: hidden; padding: 20px 20px 22px; color: #ffffff; display: flex; flex-direction: column; gap: 14px">
+<div aria-hidden="true" style="position: absolute; right: -70px; top: -70px; width: 200px; height: 200px; border-radius: 999px; background: #76c8b6; opacity: .22"></div>
+<nav aria-label="Morzsamenü" style="position: relative; align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); border-radius: 999px; padding: 6px 14px; font-size: 12px; font-weight: 600; color: #c9cde3"><a href="MobilFooldal.dc.html" style="color: #ffffff; text-decoration: none">Kezdőlap</a><span aria-hidden="true">/</span><span aria-current="page">Nőgyógyászat</span></nav>
+<span style="position: relative; font-size: 12px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #a3dac2">Szolgáltatás</span>
+<sc-if value="{{loading}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 10px"><span class="skd" style="height: 30px; width: 92%"></span><span class="skd" style="height: 30px; width: 70%"></span><span class="skd" style="height: 30px; width: 50%"></span></div>
+</sc-if>
+<sc-if value="{{ready}}" hint-placeholder-val="{{true}}">
+<h1 class="fade" style="position: relative; margin: 0; font-size: 31px; line-height: 1.08; font-weight: 800; letter-spacing: -0.025em">{{title}}</h1>
+</sc-if>
+<div style="position: relative; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-top: 4px">
+<sc-for list="{{facts}}" as="f" hint-placeholder-count="3">
+<div style="background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12); border-radius: 22px; padding: 12px 10px; display: flex; flex-direction: column; gap: 4px"><strong style="font-size: 14px; line-height: 1.2; font-weight: 800; color: #ffffff">{{f.v}}</strong><span style="font-size: 11px; line-height: 1.3; font-weight: 600; color: #c9cde3">{{f.k}}</span></div>
+</sc-for>
+</div>
+</div>
+</section>
+
+<!-- INTRO (expandable) -->
+<section style="padding: 12px 12px 0">
+<div style="background: #ffffff; border-radius: 28px; padding: 20px 20px 16px; display: flex; flex-direction: column; gap: 12px">
+<sc-if value="{{loading}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 9px"><span class="sk" style="height: 13px; width: 100%"></span><span class="sk" style="height: 13px; width: 96%"></span><span class="sk" style="height: 13px; width: 90%"></span><span class="sk" style="height: 13px; width: 60%"></span></div>
+</sc-if>
+<sc-if value="{{ready}}" hint-placeholder-val="{{true}}">
+<p class="fade" style="margin: 0; font-size: 15px; line-height: 1.6; color: #374151">{{intro0}}</p>
+<div class="acc" id="msz-intro-more" aria-hidden="{{introHidden}}" style="grid-template-rows: {{introRows}}; opacity: {{introOp}}"><div><sc-for list="{{introRest}}" as="ip" hint-placeholder-count="1"><p style="margin: 0 0 0; padding-top: 4px; font-size: 15px; line-height: 1.6; color: #374151">{{ip}}</p></sc-for></div></div>
+<button type="button" class="tap" onClick="{{toggleIntro}}" aria-expanded="{{introOpen}}" aria-controls="msz-intro-more" style="align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 18px; border-radius: 999px; border: 1.5px solid #d7dbe8; background: #ffffff; color: #242a5f; font-size: 14px; font-weight: 800">{{introLabel}}<span style="{{introChev}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></span></button>
+</sc-if>
+</div>
+</section>
+
+<!-- STICKY CHAPTER BAR -->
+<div style="position: sticky; top: 68px; z-index: 20; margin-top: 14px; background: rgba(242,244,248,.9); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px)">
+<nav aria-label="Fejezetek" data-chipbar="1" class="scroll" style="position: relative; display: flex; gap: 6px; overflow-x: auto; padding: 8px 12px 10px; scroll-padding: 0 12px">
+<sc-for list="{{chapters}}" as="ch" hint-placeholder-count="6">
+<a href="{{ch.href}}" data-pill="1" onClick="{{ch.go}}" aria-current="{{ch.current}}" class="tap" style="{{ch.style}}"><span style="{{ch.numStyle}}">{{ch.num}}</span>{{ch.label}}</a>
+</sc-for>
+</nav>
+<div aria-hidden="true" style="height: 3px; background: #e3e7ef"><div style="height: 3px; border-radius: 0 999px 999px 0; background: #76c8b6; width: {{progress}}; transition: width .25s linear"></div></div>
+</div>
+
+<!-- SKELETON SECTIONS -->
+<sc-if value="{{loading}}" hint-placeholder-val="{{false}}">
+<div style="padding: 24px 18px 0; display: flex; flex-direction: column; gap: 12px">
+<span class="sk" style="height: 12px; width: 30%"></span><span class="sk" style="height: 26px; width: 85%"></span><span class="sk" style="height: 13px; width: 100%"></span><span class="sk" style="height: 13px; width: 94%"></span><span class="sk" style="height: 13px; width: 70%"></span>
+<div style="display: flex; gap: 10px; margin-top: 8px"><span class="sk" style="height: 180px; flex: 0 0 290px; border-radius: 28px"></span><span class="sk" style="height: 180px; flex: 0 0 60px; border-radius: 28px"></span></div>
+</div>
+</sc-if>
+
+<!-- CONTENT SECTIONS -->
+<sc-for list="{{sections}}" as="sec" hint-placeholder-count="5">
+<section id="{{sec.id}}" data-chap="1" aria-labelledby="{{sec.hid}}" style="padding: 34px 18px 0; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="align-self: flex-start; font-size: 12px; font-weight: 800; letter-spacing: .14em; color: #2f7a75; background: #E6EDE8; border-radius: 999px; padding: 5px 12px">{{sec.num}}</span>
+<h2 id="{{sec.hid}}" style="margin: 0; font-size: 26px; line-height: 1.15; font-weight: 800; letter-spacing: -0.02em">{{sec.h}}</h2>
+</div>
+<sc-for list="{{sec.blocks}}" as="b" hint-placeholder-count="2">
+<div style="display: contents">
+<sc-if value="{{b.isP}}" hint-placeholder-val="{{true}}"><p style="margin: 0; font-size: 15px; line-height: 1.65; color: #374151">{{b.x}}</p></sc-if>
+<sc-if value="{{b.isH3}}" hint-placeholder-val="{{false}}"><h3 style="margin: 6px 0 0; font-size: 18px; font-weight: 800">{{b.x}}</h3></sc-if>
+<sc-if value="{{b.isStep}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; gap: 14px"><div style="display: flex; flex-direction: column; align-items: center; flex-shrink: 0"><span style="width: 36px; height: 36px; border-radius: 999px; background: #242a5f; color: #ffffff; font-size: 14px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center">{{b.stepNo}}</span><span style="{{b.lineStyle}}"></span></div><div style="background: #ffffff; border-radius: 24px; padding: 14px 16px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 4px"><strong style="font-size: 14px; font-weight: 800">{{b.stepTitle}}</strong><p style="margin: 0; font-size: 14px; line-height: 1.6; color: #374151">{{b.x}}</p></div></div>
+</sc-if>
+<sc-if value="{{b.isList}}" hint-placeholder-val="{{false}}">
+<ul style="margin: 0; padding: 6px; list-style: none; display: flex; flex-direction: column; gap: 2px; background: #ffffff; border-radius: 28px">
+<sc-for list="{{b.items}}" as="it" hint-placeholder-count="4">
+<li style="display: flex; gap: 12px; align-items: flex-start; padding: 10px 12px; font-size: 14px; line-height: 1.5; color: #242a5f; font-weight: 600"><span style="width: 24px; height: 24px; border-radius: 999px; background: #a3dac2; color: #242a5f; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg></span><span>{{it}}</span></li>
+</sc-for>
+</ul>
+</sc-if>
+<sc-if value="{{b.isCards}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; justify-content: space-between; align-items: center"><span style="font-size: 12px; font-weight: 700; color: #4b5563">Lapozzon oldalra</span><span style="font-size: 12px; font-weight: 800; font-variant-numeric: tabular-nums; background: #ffffff; border-radius: 999px; padding: 5px 12px">{{b.counter}}</span></div>
+<div class="snap scroll" onScroll="{{b.onScroll}}" aria-roledescription="carousel" aria-label="{{b.label}}" style="display: flex; gap: 10px; overflow-x: auto; margin: 0 -18px; padding: 0 18px 4px; scroll-padding: 0 18px">
+<sc-for list="{{b.cards}}" as="cd" hint-placeholder-count="3">
+<article data-card="1" aria-roledescription="slide" aria-label="{{cd.pos}}" style="{{cd.style}}">
+<span style="{{cd.badge}}">{{cd.no}}</span>
+<h3 style="margin: 0; font-size: 18px; line-height: 1.25; font-weight: 800">{{cd.h}}</h3>
+<p style="margin: 0; font-size: 14px; line-height: 1.6; color: #374151">{{cd.p}}</p>
+</article>
+</sc-for>
+</div>
+<div style="display: flex; justify-content: center; gap: 6px"><sc-for list="{{b.dots}}" as="dt" hint-placeholder-count="4"><span aria-hidden="true" style="{{dt.style}}"></span></sc-for></div>
+</div>
+</sc-if>
+</div>
+</sc-for>
+</section>
+</sc-for>
+
+<!-- FAQ -->
+<sc-if value="{{ready}}" hint-placeholder-val="{{true}}">
+<section id="msz-sec-faq" data-chap="1" aria-labelledby="msz-faq-h" style="padding: 40px 12px 0; display: flex; flex-direction: column; gap: 12px">
+<div style="padding: 0 6px; display: flex; flex-direction: column; gap: 8px"><span style="font-size: 12px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #2f7a75">GYIK</span><h2 id="msz-faq-h" style="margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.02em">Gyakori kérdések</h2></div>
+<sc-for list="{{faq}}" as="q" hint-placeholder-count="4">
+<div style="{{q.box}}">
+<h3 style="margin: 0"><button type="button" id="{{q.bid}}" aria-expanded="{{q.open}}" aria-controls="{{q.pid}}" onClick="{{q.toggle}}" class="tap" style="width: 100%; display: flex; align-items: center; gap: 12px; min-height: 60px; padding: 12px 14px 12px 18px; border: 0; background: transparent; text-align: left; color: #242a5f; border-radius: 24px"><span style="flex: 1; font-size: 15px; line-height: 1.35; font-weight: 800">{{q.q}}</span><span style="{{q.icon}}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></span></button></h3>
+<div class="acc" id="{{q.pid}}" role="region" aria-labelledby="{{q.bid}}" aria-hidden="{{q.hidden}}" style="grid-template-rows: {{q.rows}}; opacity: {{q.op}}"><div><p style="margin: 0; padding: 0 18px 18px; font-size: 14px; line-height: 1.65; color: #374151">{{q.a}}</p></div></div>
+</div>
+</sc-for>
+</section>
+
+<!-- CTA + RELATED -->
+<section style="padding: 40px 12px 0; display: flex; flex-direction: column; gap: 12px">
+<div style="background: #242a5f; background-image: radial-gradient(rgba(255,255,255,.08) 1.2px, transparent 1.6px); background-size: 18px 18px; border-radius: 32px; padding: 24px 20px; color: #ffffff; display: flex; flex-direction: column; gap: 14px">
+<strong style="font-size: 24px; line-height: 1.15; font-weight: 800; letter-spacing: -0.02em">Foglaljon időpontot még ma!</strong>
+<p style="margin: 0; font-size: 14px; line-height: 1.6; color: #c9cde3">{{cta}}</p>
+<a href="MobilFoglalas.dc.html" class="tap" style="display: flex; align-items: center; justify-content: center; gap: 10px; height: 54px; border-radius: 999px; background: #e1bbcd; color: #242a5f; font-size: 16px; font-weight: 800; text-decoration: none">Foglaljon időpontot <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+</div>
+<div style="padding: 14px 6px 0"><span style="font-size: 12px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #2f7a75">Kapcsolódó szolgáltatások</span></div>
+<div style="background: #ffffff; border-radius: 28px; padding: 6px">
+<sc-for list="{{related}}" as="r" hint-placeholder-count="3">
+<a href="{{r.href}}" class="tap" style="display: flex; align-items: center; gap: 14px; min-height: 64px; padding: 8px 10px 8px 14px; border-radius: 22px; text-decoration: none; color: #242a5f"><span style="{{r.dot}}"></span><span style="flex: 1; display: flex; flex-direction: column; gap: 2px"><strong style="font-size: 15px">{{r.h}}</strong><span style="font-size: 12px; color: #4b5563">{{r.s}}</span></span><span style="width: 36px; height: 36px; border-radius: 999px; background: #F2F4F8; display: inline-flex; align-items: center; justify-content: center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a>
+</sc-for>
+</div>
+</section>
+</sc-if>
+<div style="height: 120px"></div>
+</div>
+
+<!-- STICKY ACTION BAR -->
+<div style="position: absolute; left: 12px; right: 12px; bottom: 14px; z-index: 30; display: flex; gap: 8px; padding: 6px; border-radius: 999px; background: rgba(255,255,255,.82); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: 0 18px 40px -18px rgba(36,42,95,.55)">
+<button type="button" onClick="{{openSheet}}" aria-haspopup="dialog" aria-expanded="{{sheetOpen}}" class="tap" style="height: 52px; padding: 0 20px; flex-shrink: 0; border: 0; border-radius: 999px; background: #E6EDE8; color: #242a5f; display: inline-flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 800"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.59 13.41 13.42 20.58a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82zM7 7h.01"></path></svg>Árak</button>
+<a href="MobilFoglalas.dc.html" class="tap" style="flex: 1; height: 52px; border-radius: 999px; background: #242a5f; color: #ffffff; display: inline-flex; align-items: center; justify-content: center; gap: 10px; font-size: 16px; font-weight: 800; text-decoration: none">Időpontfoglalás <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+</div>
+
+<!-- PRICE BOTTOM SHEET -->
+<div aria-hidden="true" onClick="{{closeSheet}}" style="{{backdropStyle}}"></div>
+<div role="dialog" aria-modal="true" aria-labelledby="msz-sheet-h" aria-hidden="{{sheetHidden}}" style="{{sheetStyle}}">
+<div style="display: flex; justify-content: center; padding: 10px 0 4px"><span aria-hidden="true" style="width: 44px; height: 5px; border-radius: 999px; background: #d7dbe8"></span></div>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 6px 20px 12px"><div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: #2f7a75">Árak</span><h2 id="msz-sheet-h" style="margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -0.02em">Nőgyógyászati vizsgálatok</h2></div><button type="button" onClick="{{closeSheet}}" class="tap" style="height: 44px; padding: 0 16px; border: 0; border-radius: 999px; background: #F2F4F8; color: #242a5f; font-size: 14px; font-weight: 800; display: inline-flex; align-items: center; gap: 6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"></path></svg>Bezárás</button></div>
+<div class="scroll" style="overflow-y: auto; padding: 0 14px 22px; display: flex; flex-direction: column; gap: 10px">
+<div style="background: #e9ebf6; border-radius: 26px; padding: 4px 6px">
+<sc-for list="{{priceRows}}" as="pr" hint-placeholder-count="6">
+<div style="{{pr.style}}"><div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px"><span style="font-size: 14px; font-weight: 700; line-height: 1.35">{{pr.n}}</span><strong style="font-size: 14px; font-weight: 800; white-space: nowrap">{{pr.p}}</strong></div><sc-if value="{{pr.d}}" hint-placeholder-val="{{false}}"><span style="font-size: 12px; line-height: 1.5; color: #4b5563">{{pr.d}}</span></sc-if></div>
+</sc-for>
+</div>
+<div style="background: #fdf3dc; border-radius: 26px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px">
+<span style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 800"><span style="height: 26px; padding: 0 10px; border-radius: 999px; background: #efc462; display: inline-flex; align-items: center">+ Felár</span>a vizsgálat díján felül</span>
+<sc-for list="{{felarRows}}" as="fr" hint-placeholder-count="2">
+<div style="display: flex; justify-content: space-between; gap: 12px; font-size: 14px"><span style="font-weight: 700; line-height: 1.35">{{fr.n}}</span><strong style="white-space: nowrap; background: #ffffff; border-radius: 999px; padding: 3px 10px; font-size: 13px">{{fr.p}}</strong></div>
+</sc-for>
+</div>
+<div style="display: flex; gap: 8px">
+<a href="MobilArak.dc.html" class="tap" style="flex: 1; display: inline-flex; align-items: center; justify-content: center; height: 52px; border-radius: 999px; border: 1.5px solid #d7dbe8; color: #242a5f; font-size: 15px; font-weight: 800; text-decoration: none">Teljes árlista</a>
+<a href="MobilFoglalas.dc.html" class="tap" style="flex: 1.3; display: inline-flex; align-items: center; justify-content: center; height: 52px; border-radius: 999px; background: #242a5f; color: #ffffff; font-size: 15px; font-weight: 800; text-decoration: none">Időpontfoglalás</a>
+</div>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { data: null, intro: false, chap: -1, prog: 0, faq: -1, car: {}, sheet: false };
+  }
+  componentDidMount() {
+    fetch('/_blob/3d52fd3169966142601f0b9d1d5ad6f0').then((r) => r.json()).then((data) => this.setState({ data: data })).catch(() => {});
+  }
+  renderVals() {
+    const s = this.state;
+    const SPRING = 'cubic-bezier(.2,.8,.2,1)';
+    const EASE = 'cubic-bezier(.77,0,.18,1)';
+    const p2 = (n) => (n < 10 ? '0' : '') + n;
+    const svc = s.data && s.data.service ? s.data.service.nogyogyaszat : null;
+    const ready = !!svc;
+    // Sanity snapshot – Nőgyógyászati vizsgálatok (same as MobilFooldal CATS[0]) + common felárak
+    const PRICES = [
+      { n: 'Nőgyógyászati vizsgálat / tanácsadás (ultrahang nélkül)', d: '', p: 30000 }, { n: 'Nőgyógyászati vizsgálat ultrahanggal', d: '', p: 43000 },
+      { n: 'Nőgyógyászati vizsgálat ultrahanggal és méhnyakszűréssel', d: '', p: 52000 }, { n: 'Kontroll vizsgálat (3 hónapon belül, rövidített)', d: '', p: 25000 },
+      { n: 'Spirál felhelyezés vagy csere ultrahanggal', d: 'Az eszköz árát nem tartalmazza.', p: 45000 }, { n: 'Spirál eltávolítás (ultrahang nélkül)', d: '', p: 30000 } ];
+    const FELAR = [ { n: 'Folyadékalapú méhnyakszűrés (LBC) mintavétel', p: 9000 }, { n: 'HPV DNS alapú, 14 genotípus meghatározás (HPV14)', p: 18000 } ];
+    const fmt = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' Ft';
+    const SHORT = { 'Mikor keresse fel nőgyógyászát?': 'Mikor?', 'Milyen vizsgálatokat végzünk?': 'Vizsgálatok', 'A nőgyógyászati vizsgálat menete': 'A vizsgálat menete', 'Gyakori nőgyógyászati panaszok és kezelésük': 'Panaszok', 'Megelőzés és rendszeres kontroll': 'Megelőzés' };
+    const STEP_TITLES = ['Beszélgetés', 'Fizikális vizsgálat', 'Eredmények megbeszélése'];
+    const TINTS = [ ['#E6EDE8', '#2f7a75', '#ffffff'], ['#fdf3dc', '#efc462', '#242a5f'], ['#f8ebf1', '#e1bbcd', '#242a5f'], ['#fcebe4', '#eb8966', '#242a5f'], ['#e9ebf6', '#242a5f', '#ffffff'], ['#e2f4ee', '#76c8b6', '#242a5f'] ];
+    const scrollToId = (e, id) => {
+      if (e && e.preventDefault) e.preventDefault();
+      const sc = e && e.currentTarget && e.currentTarget.closest ? e.currentTarget.closest('[data-main]') : null;
+      if (!sc) return;
+      const t = sc.querySelector('#' + id);
+      if (!t) return;
+      sc.scrollTo({ top: t.getBoundingClientRect().top - sc.getBoundingClientRect().top + sc.scrollTop - 126, behavior: 'smooth' });
+    };
+    const secs = ready ? svc.sections : [];
+    const chapList = secs.map((x, i) => ({ id: 'msz-sec-' + i, label: SHORT[x.h] || x.h, num: p2(i + 1) })).concat(ready ? [{ id: 'msz-sec-faq', label: 'GYIK', num: '?' }] : []);
+    const sheetOpen = s.sheet;
+    return {
+      loading: !ready, ready: ready,
+      title: ready ? svc.title : '',
+      facts: [ { v: '30 000 Ft-tól', k: 'vizsgálati díj' }, { v: '15–20 perc', k: 'a vizsgálat időtartama' }, { v: '0–24', k: 'online foglalás' } ],
+      intro0: ready ? svc.intro[0] : '',
+      introRest: ready ? svc.intro.slice(1) : [],
+      introOpen: s.intro, introHidden: s.intro ? 'false' : 'true',
+      introRows: s.intro ? '1fr' : '0fr', introOp: s.intro ? '1' : '0',
+      introLabel: s.intro ? 'Kevesebb' : 'Tovább olvasom',
+      introChev: 'display: inline-flex; transition: transform .45s ' + SPRING + '; transform: rotate(' + (s.intro ? '180deg' : '0deg') + ')',
+      toggleIntro: () => this.setState({ intro: !s.intro }),
+      progress: s.prog + '%',
+      onScroll: (e) => {
+        const sc = e.currentTarget || e.target;
+        if (!sc || !sc.querySelectorAll) return;
+        const max = Math.max(sc.scrollHeight - sc.clientHeight, 1);
+        const prog = Math.round(sc.scrollTop / max * 100);
+        const limit = sc.getBoundingClientRect().top + 150;
+        let cur = -1;
+        sc.querySelectorAll('[data-chap]').forEach((el, i) => { if (el.getBoundingClientRect().top <= limit) cur = i; });
+        const st = this.state;
+        if (cur !== st.chap || Math.abs(prog - st.prog) >= 1) {
+          if (cur !== st.chap && cur >= 0) {
+            const bar = sc.querySelector('[data-chipbar]');
+            const pill = bar ? bar.querySelectorAll('[data-pill]')[cur] : null;
+            if (bar && pill) bar.scrollTo({ left: Math.max(pill.offsetLeft - 12, 0), behavior: 'smooth' });
+          }
+          this.setState({ chap: cur, prog: prog });
+        }
+      },
+      chapters: chapList.map((c, i) => { const on = i === s.chap; return { ...c, href: '#' + c.id, current: on ? 'true' : 'false',
+        go: (e) => scrollToId(e, c.id),
+        style: 'flex: 0 0 auto; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px 0 6px; border-radius: 999px; font-size: 14px; font-weight: 800; white-space: nowrap; text-decoration: none; transition: background-color .4s ' + SPRING + ', color .4s, border-color .4s; ' + (on ? 'background: #242a5f; color: #ffffff; border: 1.5px solid #242a5f' : 'background: #ffffff; color: #242a5f; border: 1.5px solid #e3e7ef'),
+        numStyle: 'width: 32px; height: 32px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; transition: background-color .4s, color .4s; ' + (on ? 'background: #a3dac2; color: #242a5f' : 'background: #F2F4F8; color: #2f7a75') }; }),
+      sections: secs.map((sec, si) => {
+        const isSteps = /menete/i.test(sec.h);
+        let stepNo = 0;
+        const pCount = sec.blocks.filter((b) => b.t === 'p').length;
+        return { id: 'msz-sec-' + si, hid: 'msz-h-' + si, num: p2(si + 1), h: sec.h,
+          blocks: sec.blocks.map((b, bi) => {
+            const out = { isP: b.t === 'p' && !isSteps, isH3: b.t === 'h3', isStep: b.t === 'p' && isSteps, isList: b.t === 'ul' || b.t === 'ol', isCards: b.t === 'cards', x: b.x || '', items: b.items && b.t !== 'cards' ? b.items : [] };
+            if (out.isStep) { stepNo += 1; out.stepNo = stepNo; out.stepTitle = STEP_TITLES[stepNo - 1] || ''; out.lineStyle = 'flex: 1; width: 2px; margin: 4px 0; border-radius: 999px; background: ' + (stepNo < pCount ? '#c5cad9' : 'transparent'); }
+            if (out.isCards) {
+              const key = si + '-' + bi; const ci = s.car[key] || 0;
+              out.label = sec.h; out.counter = (ci + 1) + ' / ' + b.items.length;
+              out.cards = b.items.map((cd, k) => { const t = TINTS[k % TINTS.length]; return { h: cd.h, p: cd.p, no: p2(k + 1), pos: (k + 1) + ' / ' + b.items.length,
+                style: 'flex: 0 0 calc(100% - 56px); box-sizing: border-box; border-radius: 28px; padding: 20px; display: flex; flex-direction: column; gap: 10px; background: ' + t[0] + '; transition: transform .45s ' + SPRING + ', opacity .45s; transform: scale(' + (k === ci ? '1' : '.96') + '); opacity: ' + (k === ci ? '1' : '.78'),
+                badge: 'align-self: flex-start; min-width: 40px; height: 40px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; background: ' + t[1] + '; color: ' + t[2] }; });
+              out.dots = b.items.map((x, k) => ({ style: 'height: 6px; border-radius: 999px; transition: width .4s ' + SPRING + ', background-color .3s; width: ' + (k === ci ? '22px; background: #242a5f' : '6px; background: #c5cad9') }));
+              out.onScroll = (e) => { const el = e.currentTarget || e.target; const first = el && el.querySelector ? el.querySelector('[data-card]') : null; const w = first ? first.offsetWidth + 10 : 300; const i = Math.min(Math.round(el.scrollLeft / Math.max(w, 1)), b.items.length - 1); if (i !== (this.state.car[key] || 0)) { const car = Object.assign({}, this.state.car); car[key] = i; this.setState({ car: car }); } };
+            } else { out.cards = []; out.dots = []; out.counter = ''; out.label = ''; out.onScroll = null; }
+            return out;
+          }) };
+      }),
+      faq: ready ? svc.faq.map((f, i) => { const o = s.faq === i; return { q: f.q, a: f.a, open: o, hidden: o ? 'false' : 'true', bid: 'msz-q-' + i, pid: 'msz-a-' + i,
+        toggle: () => this.setState({ faq: o ? -1 : i }), rows: o ? '1fr' : '0fr', op: o ? '1' : '0',
+        box: 'background: #ffffff; border-radius: 24px; transition: box-shadow .4s; box-shadow: ' + (o ? '0 16px 32px -22px rgba(36,42,95,.5)' : 'none'),
+        icon: 'width: 34px; height: 34px; border-radius: 999px; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; transition: transform .5s ' + SPRING + ', background-color .3s, color .3s; ' + (o ? 'background: #242a5f; color: #ffffff; transform: rotate(135deg)' : 'background: #F2F4F8; color: #242a5f') }; }) : [],
+      cta: ready ? svc.cta : '',
+      related: ready ? svc.related.map((r, i) => ({ h: r.h, s: r.s, href: { 'Szülészet': 'Szuleszet.dc.html', 'Várandósgondozás': 'Varandosgondozas.dc.html', 'Gyógyszerfelírás': 'Gyogyszerfeliras.dc.html' }[r.h] || 'MobilArak.dc.html',
+        dot: 'width: 12px; height: 12px; border-radius: 999px; flex-shrink: 0; background: ' + ['#e1bbcd', '#efc462', '#76c8b6'][i % 3] })) : [],
+      sheetOpen: sheetOpen, sheetHidden: sheetOpen ? 'false' : 'true',
+      openSheet: () => this.setState({ sheet: true }),
+      closeSheet: () => this.setState({ sheet: false }),
+      backdropStyle: 'position: absolute; inset: 0; z-index: 60; background: rgba(20,24,56,.48); transition: opacity .45s ' + SPRING + '; opacity: ' + (sheetOpen ? '1' : '0') + '; pointer-events: ' + (sheetOpen ? 'auto' : 'none'),
+      sheetStyle: 'position: absolute; left: 0; right: 0; bottom: 0; z-index: 70; max-height: 80%; display: flex; flex-direction: column; background: #ffffff; border-radius: 32px 32px 0 0; box-shadow: 0 -20px 50px -20px rgba(20,24,56,.45); transform: translateY(' + (sheetOpen ? '0' : '104%') + '); transition: transform ' + (sheetOpen ? '.6s ' + SPRING : '.45s ' + EASE) + ', visibility 0s linear ' + (sheetOpen ? '0s' : '.45s') + '; visibility: ' + (sheetOpen ? 'visible' : 'hidden'),
+      priceRows: PRICES.map((x, i) => ({ n: x.n, d: x.d, p: fmt(x.p), style: 'padding: 12px 10px; display: flex; flex-direction: column; gap: 4px' + (i ? '; border-top: 1px solid rgba(36,42,95,.08)' : '') })),
+      felarRows: FELAR.map((x) => ({ n: x.n, p: '+ ' + fmt(x.p) }))
+    };
+  }
+}
+</script>
+</body>
+</html>

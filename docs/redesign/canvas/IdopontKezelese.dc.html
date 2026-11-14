@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<title>Időpont kezelése – foglalás módosítása, lemondása</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F2F4F8}
+a{color:#242a5f}a:hover{color:#1a1f47}
+button{font:inherit;cursor:pointer}
+a:focus-visible,button:focus-visible{outline:3px solid #469993;outline-offset:3px}
+.btn{transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s cubic-bezier(.2,.8,.2,1),background-color .25s,color .25s,opacity .25s,border-color .25s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 14px 28px -14px rgba(36,42,95,.55)}
+.btn:active{transform:translateY(0) scale(.97);transition-duration:.12s}
+.btn .arr{transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.btn:hover .arr{transform:translateX(4px)}
+.btn .arl{transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.btn:hover .arl{transform:translateX(-4px)}
+.btn[aria-disabled="true"]{opacity:.42;cursor:not-allowed}
+.btn[aria-disabled="true"]:hover{transform:none;box-shadow:none}
+.lnk{text-decoration:none;background-image:linear-gradient(currentColor,currentColor);background-size:0 2px;background-repeat:no-repeat;background-position:0 100%;transition:background-size .4s cubic-bezier(.2,.8,.2,1),color .25s}
+.lnk:hover{background-size:100% 2px}
+.acc{display:grid;transition:grid-template-rows .55s cubic-bezier(.2,.8,.2,1),opacity .4s ease}
+.acc>div{overflow:hidden;min-height:0}
+.acc[aria-hidden="true"]>div{visibility:hidden;transition:visibility 0s .55s}
+.acc[aria-hidden="false"]>div{visibility:visible}
+.fade{animation:fadeUp .55s cubic-bezier(.2,.8,.2,1) both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes pop{0%{transform:scale(.6);opacity:0}60%{transform:scale(1.08);opacity:1}100%{transform:scale(1)}}
+.pop{animation:pop .7s cubic-bezier(.2,.8,.2,1) both}
+.day{transition:background-color .25s,color .25s,transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s}
+.day.ok:hover{background:#E6EDE8!important;transform:translateY(-2px)}
+.day.sel{animation:pop .45s cubic-bezier(.2,.8,.2,1) both}
+.day.off{cursor:not-allowed}
+.slot{transition:background-color .25s,color .25s,border-color .25s,transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s}
+.slot.ok:hover{border-color:#242a5f!important;transform:translateY(-2px)}
+.slot.off{cursor:not-allowed}
+.sw{transition:background-color .35s}
+.sw .knob{transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+.tile{transition:background-color .3s}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+</style>
+</helmet>
+<div style="font-family: 'Plus Jakarta Sans', sans-serif; color: #1A1D2D; background: #F2F4F8; min-height: 100vh; padding: 16px 16px 0; box-sizing: border-box">
+<dc-import name="Header" active="" hint-size="100%,72px"></dc-import>
+
+<!-- HERO -->
+<section style="max-width: 1360px; margin: 16px auto 0; background: #242a5f; border-radius: 40px; position: relative; overflow: hidden; color: #ffffff">
+<div style="position: absolute; inset: 0; background-image: radial-gradient(rgba(255,255,255,.07) 1px, transparent 1px); background-size: 26px 26px"></div>
+<div style="position: absolute; width: 420px; height: 420px; border-radius: 999px; background: #76c8b6; opacity: .14; left: -140px; bottom: -260px"></div>
+<div style="position: relative; padding: 40px clamp(20px, 4vw, 56px); display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-end; justify-content: space-between">
+<div style="display: flex; flex-direction: column; gap: 16px; flex: 1 1 520px; min-width: 0">
+<nav aria-label="Morzsamenü" style="align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); border-radius: 999px; padding: 8px 16px; font-size: 13px; font-weight: 600; color: #d6d9ec"><a href="A1.dc.html" class="lnk" style="color: #d6d9ec">Kezdőlap</a><span aria-hidden="true" style="opacity: .5">/</span><span aria-current="page" style="color: #ffffff">Foglalás kezelése</span></nav>
+<span style="font-size: 13px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #a3dac2">Foglalás kezelése</span>
+<h1 style="margin: 0; font-size: clamp(40px, 5vw, 58px); line-height: 1.04; font-weight: 800; letter-spacing: -0.03em">Időpont módosítása vagy lemondása</h1>
+<p style="margin: 0; font-size: 17px; line-height: 1.6; color: #c9cde3; max-width: 640px">A lefoglalt időpont díjmentesen áthelyezhető egy másik szabad időpontra, legkésőbb a foglalt időpontot megelőző 24 óráig.</p>
+</div>
+<button type="button" role="switch" aria-checked="{{demo24}}" onClick="{{toggleDemo}}" class="sw" style="{{demoStyle}}"><span style="font-size: 12px; font-weight: 700; letter-spacing: .04em">Demo: 24 órán belül</span><span aria-hidden="true" style="{{demoTrack}}"><span class="knob" style="{{demoKnob}}"></span></span></button>
+</div>
+</section>
+
+<div style="max-width: 1360px; margin: 16px auto 0; display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start">
+<main style="flex: 3 1 640px; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+
+<!-- IDLE: BOOKING CARD -->
+<sc-if value="{{isIdle}}" hint-placeholder-val="{{true}}">
+<div class="fade" style="background: #ffffff; border-radius: 36px; padding: clamp(20px, 3vw, 36px); display: flex; flex-direction: column; gap: 24px">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px">
+<h2 style="margin: 0; font-size: 28px; font-weight: 800; color: #242a5f; letter-spacing: -0.02em">Az Ön időpontja</h2>
+<span style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 800; color: #242a5f; background: #e2f4ee; border-radius: 999px; padding: 8px 16px"><span style="width: 8px; height: 8px; border-radius: 999px; background: #2f7a75"></span>Visszaigazolt foglalás</span>
+</div>
+<dl style="margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 12px">
+<sc-for list="{{details}}" as="dt" hint-placeholder-count="4">
+<div class="tile" style="{{dt.style}}">
+<span style="width: 44px; height: 44px; border-radius: 999px; background: #ffffff; color: #2f7a75; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{dt.icon}}"></path></svg></span>
+<div style="display: flex; flex-direction: column; gap: 4px; min-width: 0"><dt style="font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #4b5563">{{dt.k}}</dt><dd style="margin: 0; font-size: 17px; font-weight: 800; line-height: 1.35; color: #242a5f">{{dt.v}}</dd></div>
+</div>
+</sc-for>
+</dl>
+
+<div style="display: flex; flex-wrap: wrap; gap: 12px">
+<button type="button" onClick="{{toggleRes}}" aria-expanded="{{resOpen}}" aria-controls="res-panel" aria-disabled="{{demo24}}" class="btn" style="{{resBtnStyle}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM10 15l2 2 4-4"></path></svg>Időpont módosítása</button>
+<button type="button" onClick="{{toggleCancel}}" aria-expanded="{{canOpen}}" aria-controls="cancel-panel" class="btn" style="{{canBtnStyle}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"></path></svg>Lemondás</button>
+</div>
+<div class="acc" aria-hidden="{{lockHidden}}" style="grid-template-rows: {{lockRows}}; opacity: {{lockOp}}">
+<div>
+<div role="note" style="display: flex; gap: 14px; align-items: flex-start; background: #F2F4F8; border-radius: 28px; padding: 18px 22px">
+<span style="width: 36px; height: 36px; border-radius: 999px; background: #242a5f; color: #ffffff; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 11h14v10H5zM8 11V7a4 4 0 0 1 8 0v4"></path></svg></span>
+<span style="font-size: 15px; line-height: 1.6; color: #374151"><strong style="color: #242a5f">Az időpont már nem módosítható (kevesebb mint 24 óra van hátra).</strong> Kérdés esetén hívjon minket: <a href="tel:+36706395239" class="lnk" style="font-weight: 800; color: #242a5f">+36 70 639 5239</a></span>
+</div>
+</div>
+</div>
+
+<!-- RESCHEDULE PANEL -->
+<div id="res-panel" class="acc" aria-hidden="{{resHidden}}" style="grid-template-rows: {{resRows}}; opacity: {{resOp}}">
+<div>
+<div style="border-top: 1px solid #eceef4; padding-top: 24px; display: flex; flex-direction: column; gap: 18px">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap">
+<h3 style="margin: 0; font-size: 20px; font-weight: 800; color: #242a5f">Új időpont kiválasztása</h3>
+<span style="font-size: 13px; font-weight: 700; color: #2f7a75; background: #E6EDE8; border-radius: 999px; padding: 8px 16px">A foglalási díj átvezetésre kerül</span>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+<div style="flex: 1 1 340px; min-width: 0; background: #F7F8FB; border-radius: 28px; padding: 16px; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
+<button type="button" onClick="{{prevMonth}}" aria-disabled="{{prevDis}}" aria-label="Előző hónap" class="btn" style="width: 44px; height: 44px; border-radius: 999px; border: 1.5px solid #d7dbe8; background: #ffffff; color: #242a5f; display: inline-flex; align-items: center; justify-content: center"><svg class="arl" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg></button>
+<span id="rcal-title" aria-live="polite" style="font-size: 16px; font-weight: 800; color: #242a5f">{{monthTitle}}</span>
+<button type="button" onClick="{{nextMonth}}" aria-disabled="{{nextDis}}" aria-label="Következő hónap" class="btn" style="width: 44px; height: 44px; border-radius: 999px; border: 0; background: #242a5f; color: #ffffff; display: inline-flex; align-items: center; justify-content: center"><svg class="arr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"></path></svg></button>
+</div>
+<div aria-hidden="true" style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 3px">
+<sc-for list="{{wdays}}" as="wd" hint-placeholder-count="7"><span style="text-align: center; font-size: 11px; font-weight: 800; color: #4b5563; padding: 2px 0">{{wd}}</span></sc-for>
+</div>
+<div role="group" aria-labelledby="rcal-title" style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 3px">
+<sc-for list="{{cells}}" as="d" hint-placeholder-count="35">
+<sc-if value="{{d.blank}}" hint-placeholder-val="{{false}}"><span aria-hidden="true"></span></sc-if>
+<sc-if value="{{d.real}}" hint-placeholder-val="{{true}}"><button type="button" class="{{d.cls}}" aria-label="{{d.label}}" aria-pressed="{{d.on}}" aria-disabled="{{d.dis}}" onClick="{{d.pick}}" style="{{d.style}}">{{d.n}}</button></sc-if>
+</sc-for>
+</div>
+</div>
+<div style="flex: 1 1 260px; min-width: 0; display: flex; flex-direction: column; gap: 12px">
+<sc-if value="{{noDay}}" hint-placeholder-val="{{true}}">
+<div style="min-height: 200px; border-radius: 28px; border: 1.5px dashed #d7dbe8; display: flex; align-items: center; justify-content: center; padding: 20px; text-align: center; font-size: 14px; font-weight: 700; color: #4b5563">Válasszon egy napot a naptárból</div>
+</sc-if>
+<sc-if value="{{hasDay}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 2px"><h4 id="rslot-l" style="margin: 0; font-size: 15px; font-weight: 800; color: #242a5f">Elérhető időpontok</h4><span style="font-size: 13px; font-weight: 600; color: #4b5563">{{selDayLabel}}</span></div>
+<sc-if value="{{hasSlots}}" hint-placeholder-val="{{true}}">
+<div role="radiogroup" aria-labelledby="rslot-l" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 6px">
+<sc-for list="{{slots}}" as="sl" hint-placeholder-count="10">
+<button type="button" role="radio" class="{{sl.cls}}" aria-checked="{{sl.on}}" aria-disabled="{{sl.dis}}" aria-label="{{sl.label}}" onClick="{{sl.pick}}" style="{{sl.style}}">{{sl.t}}</button>
+</sc-for>
+</div>
+</sc-if>
+<sc-if value="{{noSlots}}" hint-placeholder-val="{{false}}">
+<div style="min-height: 100px; border-radius: 24px; border: 1.5px dashed #d7dbe8; display: flex; align-items: center; justify-content: center; padding: 16px; text-align: center; font-size: 14px; font-weight: 600; color: #4b5563">Ezen a napon nincs szabad időpont.</div>
+</sc-if>
+</sc-if>
+</div>
+</div>
+<div style="display: flex; flex-wrap: wrap-reverse; gap: 12px; justify-content: flex-end">
+<button type="button" onClick="{{closePanels}}" class="btn" style="height: 52px; padding: 0 24px; border-radius: 999px; border: 1.5px solid #d7dbe8; background: #ffffff; color: #242a5f; font-size: 15px; font-weight: 700">Mégsem</button>
+<button type="button" onClick="{{confirmRes}}" aria-disabled="{{resConfirmDis}}" class="btn" style="display: inline-flex; align-items: center; gap: 10px; height: 52px; padding: 0 28px; border-radius: 999px; border: 0; background: #242a5f; color: #ffffff; font-size: 15px; font-weight: 800">Megerősítés<sc-if value="{{newSlotTxt}}" hint-placeholder-val="{{false}}"><span style="font-weight: 600; color: #a3dac2">· {{newSlotTxt}}</span></sc-if><svg class="arr" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></button>
+</div>
+</div>
+</div>
+</div>
+
+<!-- CANCEL PANEL -->
+<div id="cancel-panel" class="acc" aria-hidden="{{canHidden}}" style="grid-template-rows: {{canRows}}; opacity: {{canOp}}">
+<div>
+<div style="background: #fcebe4; border-radius: 32px; padding: clamp(20px, 3vw, 28px); display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; gap: 14px; align-items: flex-start">
+<span style="width: 44px; height: 44px; border-radius: 999px; background: #eb8966; color: #242a5f; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"></path></svg></span>
+<div style="display: flex; flex-direction: column; gap: 6px"><h3 style="margin: 0; font-size: 20px; font-weight: 800; color: #242a5f">Biztosan lemondja az alábbi időpontot?</h3><p style="margin: 0; font-size: 15px; line-height: 1.6; color: #374151">Ez a művelet nem visszavonható. A lemondott időpont más páciensek számára elérhetővé válik.</p></div>
+</div>
+<div style="background: #ffffff; border-radius: 24px; padding: 14px 20px; display: flex; flex-wrap: wrap; gap: 8px 28px; font-size: 15px"><span><span style="color: #4b5563; font-weight: 600">Szolgáltatás:</span> <strong style="color: #242a5f">{{bkSvc}}</strong></span><span><span style="color: #4b5563; font-weight: 600">Időpont:</span> <strong style="color: #242a5f">{{bkWhen}}</strong></span></div>
+<div style="background: rgba(255,255,255,.6); border-radius: 24px; padding: 16px 20px; display: flex; flex-direction: column; gap: 8px; font-size: 14px; line-height: 1.6; color: #374151">
+<strong style="color: #242a5f; font-size: 13px; letter-spacing: .08em; text-transform: uppercase">Foglalási és Lemondási Szabályzat · 5. pont</strong>
+<span>Ha a lemondás a foglalt időpontot megelőzően <strong style="color: #242a5f">legalább 48 órával</strong> megtörténik, a Szolgáltató a teljes 10.000 Ft foglalási díjat visszatéríti.</span>
+<span>Ha a lemondás a foglalt időpontot megelőző <strong style="color: #242a5f">48 órán belül</strong> történik, a foglalási díj nem kerül visszatérítésre.</span>
+<a href="Lemondasi.dc.html" class="lnk" style="align-self: flex-start; font-weight: 700; color: #242a5f; padding: 2px 0">A teljes szabályzat</a>
+</div>
+<sc-if value="{{willRefund}}" hint-placeholder-val="{{true}}">
+<div role="status" style="display: flex; align-items: center; gap: 10px; background: #e2f4ee; color: #1f5f5a; border-radius: 999px; padding: 12px 20px; font-size: 14px; font-weight: 700"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>A 10.000 Ft foglalási díj a lemondás után visszatérítésre kerül.</div>
+</sc-if>
+<sc-if value="{{noRefund}}" hint-placeholder-val="{{false}}">
+<div role="alert" style="background: #fdf3dc; border: 1.5px solid #efc462; color: #5c4307; border-radius: 24px; padding: 14px 20px; font-size: 14px; line-height: 1.6; font-weight: 600">Kedves Páciensünk! 48 órán belüli lemondás esetén a 10.000 Ft-os foglalási díj NEM kerül visszatérítésre. Amennyiben ennek tudatában is le kívánja mondani az időpontot, kérjük kattintson a gombra.</div>
+</sc-if>
+<div style="display: flex; flex-wrap: wrap; gap: 12px">
+<button type="button" onClick="{{confirmCancel}}" class="btn" style="display: inline-flex; align-items: center; gap: 10px; height: 52px; padding: 0 26px; border-radius: 999px; border: 0; background: #b42318; color: #ffffff; font-size: 15px; font-weight: 800"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path></svg>Igen, lemondás</button>
+<button type="button" onClick="{{closePanels}}" class="btn" style="height: 52px; padding: 0 26px; border-radius: 999px; border: 1.5px solid #242a5f; background: #ffffff; color: #242a5f; font-size: 15px; font-weight: 800">Mégsem</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</sc-if>
+
+<!-- CANCELLED -->
+<sc-if value="{{isCancelled}}" hint-placeholder-val="{{false}}">
+<div class="fade" style="background: #ffffff; border-radius: 36px; padding: clamp(24px, 4vw, 48px); display: flex; flex-direction: column; align-items: flex-start; gap: 18px">
+<span class="pop" style="width: 76px; height: 76px; border-radius: 999px; background: #E6EDE8; color: #2f7a75; display: inline-flex; align-items: center; justify-content: center"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg></span>
+<h2 role="status" style="margin: 0; font-size: 34px; font-weight: 800; color: #242a5f; letter-spacing: -0.02em">Időpont sikeresen lemondva</h2>
+<p style="margin: 0; font-size: 16px; line-height: 1.6; color: #4b5563; max-width: 560px">Megkaptuk a lemondási kérelmét. Hamarosan visszaigazoló e-mailt küldünk.</p>
+<div style="background: #F2F4F8; border-radius: 999px; padding: 12px 22px; font-size: 15px; color: #4b5563; text-decoration: line-through">{{bkSvc}} · {{bkWhen}}</div>
+<div style="display: flex; flex-wrap: wrap; gap: 12px">
+<a href="Idopontfoglalas.dc.html" class="btn" style="display: inline-flex; align-items: center; gap: 10px; height: 54px; padding: 0 26px; border-radius: 999px; background: #76c8b6; color: #242a5f; text-decoration: none; font-size: 15px; font-weight: 800">Új időpont foglalása <svg class="arr" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+<a href="A1.dc.html" class="btn" style="display: inline-flex; align-items: center; height: 54px; padding: 0 24px; border-radius: 999px; border: 1.5px solid #d7dbe8; background: #ffffff; color: #242a5f; text-decoration: none; font-size: 15px; font-weight: 700">Vissza a főoldalra</a>
+</div>
+<button type="button" onClick="{{resetDemo}}" class="lnk" style="border: 0; background: none; padding: 4px 0; font-size: 13px; font-weight: 700; color: #2f7a75">Demo visszaállítása</button>
+</div>
+</sc-if>
+
+<!-- RESCHEDULED -->
+<sc-if value="{{isMoved}}" hint-placeholder-val="{{false}}">
+<div class="fade" style="background: #ffffff; border-radius: 36px; padding: clamp(24px, 4vw, 48px); display: flex; flex-direction: column; align-items: flex-start; gap: 18px">
+<span class="pop" style="width: 76px; height: 76px; border-radius: 999px; background: #76c8b6; color: #242a5f; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 0 0 10px #e2f4ee"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg></span>
+<h2 role="status" style="margin: 0; font-size: 34px; font-weight: 800; color: #242a5f; letter-spacing: -0.02em">Időpont sikeresen áthelyezve</h2>
+<div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center">
+<span style="background: #F2F4F8; border-radius: 999px; padding: 12px 20px; font-size: 14px; color: #4b5563; text-decoration: line-through">{{oldWhen}}</span>
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2f7a75" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+<span style="background: #242a5f; color: #ffffff; border-radius: 999px; padding: 12px 22px; font-size: 15px; font-weight: 800"><span style="color: #a3dac2; font-weight: 700">Új időpont:</span> {{bkWhen}}</span>
+</div>
+<p style="margin: 0; font-size: 16px; line-height: 1.6; color: #4b5563">Visszaigazoló e-mailt küldtünk az új időpontról.</p>
+<div style="display: flex; flex-wrap: wrap; gap: 12px">
+<button type="button" onClick="{{backIdle}}" class="btn" style="display: inline-flex; align-items: center; gap: 10px; height: 54px; padding: 0 26px; border-radius: 999px; border: 0; background: #242a5f; color: #ffffff; font-size: 15px; font-weight: 800">Foglalás megtekintése <svg class="arr" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></button>
+<a href="#" class="btn" style="display: inline-flex; align-items: center; gap: 10px; height: 54px; padding: 0 24px; border-radius: 999px; border: 1.5px solid #242a5f; background: #ffffff; color: #242a5f; text-decoration: none; font-size: 15px; font-weight: 800"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM12 14v4M10 16h4"></path></svg>Mentés Google Naptárba</a>
+</div>
+</div>
+</sc-if>
+</main>
+
+<!-- RULES ASIDE -->
+<aside aria-label="Szabályok röviden" style="flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 12px">
+<div style="background: #242a5f; color: #ffffff; border-radius: 36px; padding: 28px; display: flex; flex-direction: column; gap: 16px">
+<span style="font-size: 13px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: #a3dac2">Jó tudni</span>
+<sc-for list="{{rules}}" as="r" hint-placeholder-count="3">
+<div style="display: flex; gap: 14px; align-items: flex-start; padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,.1)">
+<span style="width: 40px; height: 40px; border-radius: 999px; background: rgba(255,255,255,.08); color: #a3dac2; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{r.icon}}"></path></svg></span>
+<div style="display: flex; flex-direction: column; gap: 4px"><strong style="font-size: 15px; font-weight: 800">{{r.t}}</strong><span style="font-size: 14px; line-height: 1.55; color: #c9cde3">{{r.b}}</span></div>
+</div>
+</sc-for>
+<a href="Lemondasi.dc.html" class="btn" style="display: inline-flex; align-items: center; justify-content: center; gap: 10px; height: 52px; border-radius: 999px; background: #ffffff; color: #242a5f; text-decoration: none; font-size: 14px; font-weight: 800">Foglalási és Lemondási Szabályzat <svg class="arr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+</div>
+<a href="tel:+36706395239" class="btn" style="display: flex; align-items: center; justify-content: center; gap: 10px; height: 54px; border-radius: 999px; background: #76c8b6; color: #242a5f; font-weight: 800; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>+36 70 639 5239</a>
+<span style="font-size: 13px; color: #4b5563; text-align: center">Telefonon csak a rendelési időben vagyunk elérhetőek.</span>
+</aside>
+</div>
+
+<dc-import name="Footer" hint-size="100%,560px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1700}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { view: 'idle', panel: '', demo24: false, mOff: 0, sel: '', slot: '', bk: null, oldWhen: '' };
+  }
+  renderVals() {
+    const s = this.state;
+
+    // ===== SANITY (source of truth) – snapshot, identical to A1 =====
+    const WEEKLY = { bookingWindowDays: 30, defaultSlotDuration: 20, days: [
+      { dayOfWeek: 1, isDayOff: false, startTime: '12:00', endTime: '15:20' },
+      { dayOfWeek: 2, isDayOff: false, startTime: '12:00', endTime: '15:20' },
+      { dayOfWeek: 3, isDayOff: true, startTime: '11:00', endTime: '' },
+      { dayOfWeek: 4, isDayOff: false, startTime: '13:00', endTime: '16:40' },
+      { dayOfWeek: 5, isDayOff: true, startTime: '', endTime: '' },
+      { dayOfWeek: 6, isDayOff: true, startTime: '', endTime: '' },
+      { dayOfWeek: 0, isDayOff: true, startTime: '', endTime: '' } ] };
+    const SEASONAL = [
+      { name: 'November', startDate: '2026-11-01', endDate: '2026-12-31', days: [
+        { dayOfWeek: 1, isDayOff: true, startTime: null, endTime: null },
+        { dayOfWeek: 2, isDayOff: false, startTime: '13:20', endTime: '16:40' },
+        { dayOfWeek: 3, isDayOff: false, startTime: '11:00', endTime: '14:20' },
+        { dayOfWeek: 4, isDayOff: false, startTime: '13:20', endTime: '16:40' },
+        { dayOfWeek: 5, isDayOff: true, startTime: '', endTime: '' },
+        { dayOfWeek: 6, isDayOff: true, startTime: '', endTime: '' },
+        { dayOfWeek: 0, isDayOff: true, startTime: '', endTime: '' } ] } ];
+    const CUSTOM = [];
+    const BLOCKED = ['2026-12-02','2026-12-09','2026-12-16','2026-12-21','2026-12-22','2026-12-23','2026-12-24','2026-12-25','2026-12-26','2026-12-27','2026-12-28','2026-12-29','2026-12-30','2026-12-31','2027-01-01','2027-01-02','2027-01-03','2027-01-04'];
+    const FULLY_BOOKED = { 'Nőgyógyászat': [], 'Várandósgondozás': [] };
+    const DAY_LOCK_MINUTES_BEFORE_START = 60;
+    const isTaken = (iso, t) => { let h = 7; const k = iso + t; for (let i = 0; i < k.length; i++) h = (h * 31 + k.charCodeAt(i)) % 1009; return h % 4 === 0; };
+    // ================================================================
+
+    const DAYN = ['Vasárnap','Hétfő','Kedd','Szerda','Csütörtök','Péntek','Szombat'];
+    const MON = ['január','február','március','április','május','június','július','augusztus','szeptember','október','november','december'];
+    const p2 = (n) => (n < 10 ? '0' : '') + n;
+    const toMin = (t) => { const a = String(t).split(':'); return Number(a[0]) * 60 + Number(a[1]); };
+    const fromMin = (m) => p2(Math.floor(m / 60)) + ':' + p2(m % 60);
+    const isoOf = (d) => d.getFullYear() + '-' + p2(d.getMonth() + 1) + '-' + p2(d.getDate());
+    const dateOf = (iso) => { const a = iso.split('-').map(Number); return new Date(a[0], a[1] - 1, a[2]); };
+    const longDate = (d) => d.getFullYear() + '. ' + MON[d.getMonth()] + ' ' + d.getDate() + '., ' + DAYN[d.getDay()].toLowerCase();
+    const resolveDays = (iso) => { const m = SEASONAL.filter((x) => x.startDate <= iso && iso <= x.endDate).sort((a, b) => (a.startDate < b.startDate ? -1 : 1))[0]; return m ? m.days : WEEKLY.days; };
+    const svcName = 'Nőgyógyászat';
+    const hoursFor = (iso, dow) => {
+      const c = CUSTOM.find((x) => x.date === iso && (!x.services || !x.services.length || x.services.indexOf(svcName) !== -1));
+      if (c && c.startTime && c.endTime) return { start: c.startTime, end: c.endTime };
+      if (BLOCKED.indexOf(iso) !== -1) return null;
+      const d = resolveDays(iso).find((x) => x.dayOfWeek === dow);
+      if (!d || d.isDayOff || !d.startTime || !d.endTime) return null;
+      return { start: d.startTime, end: d.endTime };
+    };
+    const now = new Date();
+    const nowMin = now.getHours() * 60 + now.getMinutes();
+    const today = new Date(now); today.setHours(0, 0, 0, 0);
+    const lastDay = new Date(today); lastDay.setDate(today.getDate() + WEEKLY.bookingWindowDays);
+    const dayDiff = (d) => Math.round((d.getTime() - today.getTime()) / 86400000);
+    const dayHours = (d) => {
+      const diff = dayDiff(d);
+      if (diff < 0 || diff > WEEKLY.bookingWindowDays) return null;
+      const iso = isoOf(d); const h = hoursFor(iso, d.getDay());
+      if (!h) return null;
+      if (diff === 0 && nowMin >= toMin(h.start) - DAY_LOCK_MINUTES_BEFORE_START) return null;
+      if ((FULLY_BOOKED[svcName] || []).indexOf(iso) !== -1) return null;
+      return h;
+    };
+    const slotsFor = (d, h) => {
+      const out = []; const iso = isoOf(d); const step = WEEKLY.defaultSlotDuration; const endM = toMin(h.end);
+      for (let m = toMin(h.start); m + step <= endM; m += step) {
+        if (dayDiff(d) === 0 && m < nowMin + DAY_LOCK_MINUTES_BEFORE_START) continue;
+        const t = fromMin(m); out.push({ t: t, end: fromMin(m + step), taken: isTaken(iso, t) });
+      }
+      return out;
+    };
+
+    // the existing booking (in production: loaded by /foglalas/[token]); default = first free slot ≥ 3 days ahead
+    let bk = s.bk;
+    if (!bk) {
+      for (let i = 3; i <= WEEKLY.bookingWindowDays && !bk; i++) {
+        const d = new Date(today); d.setDate(today.getDate() + i); const h = dayHours(d);
+        if (!h) continue; const free = slotsFor(d, h).filter((x) => !x.taken);
+        if (free.length) bk = { iso: isoOf(d), t: free[Math.min(2, free.length - 1)].t };
+      }
+      if (!bk) bk = { iso: isoOf(today), t: '13:20' };
+    }
+    const bkDate = dateOf(bk.iso);
+    const bkWhen = longDate(bkDate) + ', ' + bk.t;
+
+    // compact calendar
+    const maxOff = (lastDay.getFullYear() - today.getFullYear()) * 12 + lastDay.getMonth() - today.getMonth();
+    const mOff = Math.min(Math.max(s.mOff, 0), maxOff);
+    const first = new Date(today.getFullYear(), today.getMonth() + mOff, 1);
+    const lead = (first.getDay() + 6) % 7;
+    const dim = new Date(first.getFullYear(), first.getMonth() + 1, 0).getDate();
+    const cells = [];
+    for (let i = 0; i < lead; i++) cells.push({ blank: true, real: false });
+    for (let n = 1; n <= dim; n++) {
+      const d = new Date(first.getFullYear(), first.getMonth(), n);
+      const iso = isoOf(d); const ok = !!dayHours(d); const on = ok && iso === s.sel; const cur = iso === bk.iso;
+      cells.push({ blank: false, real: true, n: n, on: on ? 'true' : 'false', dis: ok ? 'false' : 'true',
+        cls: 'day ' + (on ? 'sel' : (ok ? 'ok' : 'off')),
+        label: longDate(d) + (cur ? ' – jelenlegi időpont' : '') + (ok ? (on ? ' – kiválasztva' : ' – foglalható') : ' – nem foglalható'),
+        pick: () => { if (ok) this.setState({ sel: iso, slot: '' }); },
+        style: 'width: 100%; aspect-ratio: 1 / 1; max-height: 46px; min-height: 40px; border-radius: 999px; font-size: 14px; font-variant-numeric: tabular-nums; display: inline-flex; align-items: center; justify-content: center; padding: 0; ' +
+          (on ? 'background: #242a5f; color: #ffffff; border: 1.5px solid #242a5f; font-weight: 800'
+            : ok ? 'background: #ffffff; color: #242a5f; border: 1.5px solid #76c8b6; font-weight: 800'
+            : 'background: transparent; color: #9ca1b5; border: 1.5px solid transparent; font-weight: 500') +
+          (cur && !on ? '; box-shadow: inset 0 0 0 2px #efc462' : '') });
+    }
+    const selDate = s.sel ? dateOf(s.sel) : null;
+    const selH = selDate ? dayHours(selDate) : null;
+    const slots = selH ? slotsFor(selDate, selH).map((x) => ({ ...x, taken: x.taken || (s.sel === bk.iso && x.t === bk.t) })) : [];
+    const free = slots.filter((x) => !x.taken);
+    const slotObj = slots.find((x) => x.t === s.slot && !x.taken);
+
+    const I = { svc: 'M22 12h-4l-3 9L9 3l-3 9H2', cal: 'M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z', user: 'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z', hash: 'M4 9h16M4 15h16M10 3 8 21M16 3l-2 18', move: 'M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM10 15l2 2 4-4', x: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM15 9l-6 6M9 9l6 6', coin: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8M12 18V6' };
+    const TILE = ['#E6EDE8', '#e9ebf6', '#fdf3dc', '#f8ebf1'];
+    const resOpen = s.panel === 'res' && !s.demo24;
+    const canOpen = s.panel === 'cancel';
+    const pill = (filled, active) => 'display: inline-flex; align-items: center; gap: 10px; height: 54px; padding: 0 26px; border-radius: 999px; font-size: 15px; font-weight: 800; ' + filled;
+
+    return {
+      demo24: s.demo24 ? 'true' : 'false',
+      toggleDemo: () => this.setState({ demo24: !s.demo24, panel: s.panel === 'res' ? '' : s.panel }),
+      demoStyle: 'align-self: flex-start; display: inline-flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 8px 0 16px; border-radius: 999px; border: 1px solid rgba(255,255,255,.18); color: #d6d9ec; background: ' + (s.demo24 ? 'rgba(239,196,98,.18)' : 'rgba(255,255,255,.06)'),
+      demoTrack: 'position: relative; width: 44px; height: 26px; border-radius: 999px; transition: background-color .35s; background: ' + (s.demo24 ? '#efc462' : 'rgba(255,255,255,.2)'),
+      demoKnob: 'position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 999px; background: #ffffff; transform: translateX(' + (s.demo24 ? '18px' : '0') + ')',
+
+      isIdle: s.view === 'idle', isCancelled: s.view === 'cancelled', isMoved: s.view === 'moved',
+      details: [
+        { k: 'Foglalt szolgáltatás', v: svcName, icon: I.svc },
+        { k: 'Időpont', v: bkWhen, icon: I.cal },
+        { k: 'Páciens', v: '[páciens neve]', icon: I.user },
+        { k: 'Foglalási szám', v: '[foglalási szám]', icon: I.hash }
+      ].map((d, i) => ({ ...d, style: 'display: flex; align-items: center; gap: 14px; border-radius: 28px; padding: 16px 18px; background: ' + TILE[i] })),
+      bkSvc: svcName, bkWhen: bkWhen, oldWhen: s.oldWhen,
+
+      resOpen: resOpen ? 'true' : 'false', canOpen: canOpen ? 'true' : 'false',
+      toggleRes: () => { if (s.demo24) return; this.setState({ panel: resOpen ? '' : 'res' }); },
+      toggleCancel: () => this.setState({ panel: canOpen ? '' : 'cancel' }),
+      closePanels: () => this.setState({ panel: '' }),
+      resBtnStyle: pill(resOpen ? 'border: 1.5px solid #242a5f; background: #242a5f; color: #ffffff' : 'border: 1.5px solid #242a5f; background: #ffffff; color: #242a5f'),
+      canBtnStyle: pill(canOpen ? 'border: 1.5px solid #b42318; background: #b42318; color: #ffffff' : 'border: 1.5px solid #e3b4ae; background: #ffffff; color: #b42318'),
+      lockRows: s.demo24 ? '1fr' : '0fr', lockOp: s.demo24 ? '1' : '0', lockHidden: s.demo24 ? 'false' : 'true',
+      resRows: resOpen ? '1fr' : '0fr', resOp: resOpen ? '1' : '0', resHidden: resOpen ? 'false' : 'true',
+      canRows: canOpen ? '1fr' : '0fr', canOp: canOpen ? '1' : '0', canHidden: canOpen ? 'false' : 'true',
+
+      wdays: ['H', 'K', 'Sze', 'Cs', 'P', 'Szo', 'V'],
+      monthTitle: first.getFullYear() + '. ' + MON[first.getMonth()],
+      prevDis: mOff <= 0 ? 'true' : 'false', nextDis: mOff >= maxOff ? 'true' : 'false',
+      prevMonth: () => { if (mOff > 0) this.setState({ mOff: mOff - 1 }); },
+      nextMonth: () => { if (mOff < maxOff) this.setState({ mOff: mOff + 1 }); },
+      cells: cells,
+      noDay: !selH, hasDay: !!selH, selDayLabel: selDate ? longDate(selDate) + ' · ' + (selH ? selH.start + ' – ' + selH.end : '') : '',
+      hasSlots: free.length > 0, noSlots: !!selH && free.length === 0,
+      slots: slots.map((x, i) => { const on = x.t === s.slot && !x.taken; return { t: x.t, on: on ? 'true' : 'false', dis: x.taken ? 'true' : 'false',
+        cls: 'slot fade ' + (x.taken ? 'off' : 'ok'), label: x.t + (x.taken ? ' – foglalt' : ''),
+        pick: () => { if (!x.taken) this.setState({ slot: x.t }); },
+        style: 'height: 44px; border-radius: 999px; font-size: 14px; font-weight: 800; font-variant-numeric: tabular-nums; animation-delay: ' + (i * 25) + 'ms; ' +
+          (on ? 'background: #242a5f; color: #ffffff; border: 1.5px solid #242a5f'
+            : x.taken ? 'background: #F2F4F8; color: #9ca1b5; border: 1.5px solid #F2F4F8; text-decoration: line-through; font-weight: 600'
+            : 'background: #ffffff; color: #242a5f; border: 1.5px solid #d7dbe8') }; }),
+      newSlotTxt: slotObj && selDate ? MON[selDate.getMonth()] + ' ' + selDate.getDate() + '. ' + slotObj.t : '',
+      resConfirmDis: slotObj ? 'false' : 'true',
+      confirmRes: () => { if (!slotObj) return; this.setState({ view: 'moved', panel: '', oldWhen: bkWhen, bk: { iso: s.sel, t: slotObj.t }, sel: '', slot: '' }); },
+
+      willRefund: !s.demo24, noRefund: s.demo24,
+      confirmCancel: () => this.setState({ view: 'cancelled', panel: '' }),
+      backIdle: () => this.setState({ view: 'idle' }),
+      resetDemo: () => this.setState({ view: 'idle', panel: '', bk: null, sel: '', slot: '', oldWhen: '' }),
+
+      rules: [
+        { t: 'Áthelyezés', b: 'Díjmentesen, legkésőbb a foglalt időpontot megelőző 24 óráig. A foglalási díj automatikusan átvezetésre kerül az új időpontra.', icon: I.move },
+        { t: 'Lemondás', b: 'Bármikor, határidő nélkül lemondható. Legalább 48 órával előtte a teljes 10.000 Ft foglalási díjat visszatérítjük.', icon: I.x },
+        { t: '48 órán belül', b: 'A foglalási díj nem kerül visszatérítésre. 24 órán belül online áthelyezés már nem lehetséges – kérjük, hívja a rendelőt.', icon: I.coin }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

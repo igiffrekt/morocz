@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<title>Mobil · Szolgáltatások és Árak</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#dfe3ea}
+a{color:#242a5f;-webkit-tap-highlight-color:transparent}
+button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+a:focus-visible,button:focus-visible{outline:3px solid #469993;outline-offset:3px}
+.scroll::-webkit-scrollbar{display:none}
+.scroll{scrollbar-width:none}
+.tap{transition:transform .25s cubic-bezier(.2,.8,.2,1),background-color .3s,color .3s,box-shadow .3s}
+.tap:active{transform:scale(.96)}
+.acc{display:grid;transition:grid-template-rows .5s cubic-bezier(.2,.8,.2,1),opacity .4s}
+.acc>div{overflow:hidden;min-height:0}
+.fade{animation:fadeUp .5s cubic-bezier(.2,.8,.2,1) both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.inR{animation:inR .55s cubic-bezier(.2,.8,.2,1) both}
+.inL{animation:inL .55s cubic-bezier(.2,.8,.2,1) both}
+@keyframes inR{from{opacity:0;transform:translateX(36px)}to{opacity:1;transform:none}}
+@keyframes inL{from{opacity:0;transform:translateX(-36px)}to{opacity:1;transform:none}}
+.row{animation:fadeUp .45s cubic-bezier(.2,.8,.2,1) both}
+.snap{scroll-snap-type:x mandatory;overscroll-behavior-x:contain}
+.snap>*{scroll-snap-align:start}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+.scroll[style*="inset: 0"]>*:first-child{position:sticky;top:0;z-index:40}
+</style>
+</helmet>
+<div data-phone="1" style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #F2F4F8; font-family: 'Plus Jakarta Sans', sans-serif; color: #242a5f">
+<div class="scroll" data-main="1" style="position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden">
+<dc-import name="MobilFejlec" active="szolgaltatasok" hint-size="390px,68px"></dc-import>
+
+<!-- HERO -->
+<section style="padding: 4px 12px 0">
+<div style="position: relative; background: #242a5f; background-image: radial-gradient(rgba(255,255,255,.09) 1.2px, transparent 1.6px); background-size: 18px 18px; border-radius: 32px; overflow: hidden; padding: 20px 20px 22px; color: #ffffff; display: flex; flex-direction: column; gap: 12px">
+<div aria-hidden="true" style="position: absolute; right: -60px; bottom: -80px; width: 210px; height: 210px; border-radius: 999px; background: #efc462; opacity: .2"></div>
+<nav aria-label="Morzsamenü" style="position: relative; align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); border-radius: 999px; padding: 6px 14px; font-size: 12px; font-weight: 600; color: #c9cde3"><a href="MobilFooldal.dc.html" style="color: #ffffff; text-decoration: none">Kezdőlap</a><span aria-hidden="true">/</span><span aria-current="page">Árak</span></nav>
+<span style="position: relative; font-size: 12px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #a3dac2">Árlista</span>
+<h1 style="position: relative; margin: 0; font-size: 32px; line-height: 1.06; font-weight: 800; letter-spacing: -0.025em">Szolgáltatások és Árak</h1>
+<div style="position: relative; display: flex; flex-wrap: wrap; gap: 6px">
+<span style="display: inline-flex; align-items: center; gap: 6px; background: #a3dac2; color: #242a5f; border-radius: 999px; padding: 7px 14px; font-size: 12px; font-weight: 800"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"></path></svg>Érvényes 2026. július 1-től.</span>
+<span style="display: inline-flex; align-items: center; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); border-radius: 999px; padding: 7px 14px; font-size: 12px; font-weight: 600; color: #d6d9ec">Az árváltoztatás jogát fenntartjuk.</span>
+</div>
+<p style="position: relative; margin: 0; font-size: 13px; line-height: 1.6; color: #c9cde3">A vizsgálat során szakmailag indokolttá válhatnak további vizsgálatok, mintavételek, amelyek többletköltséggel járhatnak. Ezek elvégzése a páciens előzetes tájékoztatásával és beleegyezésével történnek.</p>
+</div>
+</section>
+
+<!-- SZŰRŐCSOMAGOK (swipe) -->
+<section style="padding: 30px 0 0; display: flex; flex-direction: column; gap: 12px">
+<div style="padding: 0 18px; display: flex; justify-content: space-between; align-items: flex-end; gap: 10px"><div><span style="font-size: 12px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #2f7a75">Évente 1x igénybe vehető</span><h2 style="margin: 4px 0 0; font-size: 26px; font-weight: 800; letter-spacing: -0.02em">Éves Szűrőcsomagok</h2></div><span style="font-size: 12px; font-weight: 800; background: #ffffff; border-radius: 999px; padding: 6px 12px; font-variant-numeric: tabular-nums">{{pkgCounter}}</span></div>
+<div class="snap scroll" onScroll="{{onPkgScroll}}" aria-roledescription="carousel" aria-label="Éves Szűrőcsomagok" style="display: flex; gap: 10px; overflow-x: auto; padding: 4px 12px 8px; scroll-padding: 0 12px">
+<sc-for list="{{pkgs}}" as="pk" hint-placeholder-count="2">
+<article data-card="1" aria-roledescription="slide" aria-label="{{pk.name}}" style="{{pk.style}}">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px"><span style="{{pk.iconStyle}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></span><sc-if value="{{pk.rec}}" hint-placeholder-val="{{false}}"><span style="background: #efc462; color: #242a5f; border-radius: 999px; padding: 6px 14px; font-size: 12px; font-weight: 800">Ajánlott</span></sc-if></div>
+<div style="display: flex; flex-direction: column; gap: 2px"><h3 style="margin: 0; font-size: 20px; font-weight: 800">{{pk.name}}</h3><span style="{{pk.subStyle}}">{{pk.full}}</span></div>
+<div style="display: flex; align-items: baseline; gap: 6px"><strong style="font-size: 40px; line-height: 1; font-weight: 800; letter-spacing: -0.03em; font-variant-numeric: tabular-nums">{{pk.price}}</strong><span style="font-size: 16px; font-weight: 800">Ft</span></div>
+<ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px">
+<sc-for list="{{pk.inc}}" as="ic" hint-placeholder-count="4">
+<li aria-label="{{ic.aria}}" style="{{ic.style}}"><span style="{{ic.dot}}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ic.icon}}"></path></svg></span><span style="{{ic.txt}}">{{ic.t}}</span></li>
+</sc-for>
+</ul>
+<a href="MobilFoglalas.dc.html" class="tap" style="{{pk.btn}}">Foglaljon időpontot</a>
+</article>
+</sc-for>
+</div>
+<div style="display: flex; justify-content: center; gap: 6px"><sc-for list="{{pkgDots}}" as="dt" hint-placeholder-count="2"><span aria-hidden="true" style="{{dt.style}}"></span></sc-for></div>
+</section>
+
+<!-- ÁRLISTA -->
+<section style="padding: 30px 0 0">
+<div style="padding: 0 18px 12px; display: flex; flex-direction: column; gap: 8px"><span style="font-size: 12px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #2f7a75">Árlista</span><h2 style="margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.02em">Kategóriák szerint</h2>
+<button type="button" onClick="{{toggleFelar}}" aria-expanded="{{felarOpen}}" aria-controls="ma-felar" class="tap" style="align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-size: 13px; font-weight: 700; background: #fdf3dc; color: #242a5f; border: 0; border-radius: 999px; padding: 6px 14px 6px 6px"><span style="height: 30px; padding: 0 12px; border-radius: 999px; background: #efc462; font-weight: 800; display: inline-flex; align-items: center">+ Felár</span>Mit jelent?<span style="{{felarChev}}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></span></button>
+<div class="acc" id="ma-felar" aria-hidden="{{felarHidden}}" style="grid-template-rows: {{felarRows}}; opacity: {{felarOp}}"><div><div style="margin-top: 4px; background: #ffffff; border: 2px solid #efc462; border-radius: 24px; padding: 14px 16px; font-size: 13px; line-height: 1.55; color: #374151; display: flex; flex-direction: column; gap: 10px"><strong style="color: #242a5f; font-size: 14px">A nőgyógyászati vizsgálat díján felül fizetendő tétel.</strong><span style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-weight: 800; color: #242a5f"><span style="background: #e9ebf6; border-radius: 999px; padding: 6px 12px">43 000 Ft</span>+<span style="background: #fdf3dc; border-radius: 999px; padding: 6px 12px">9 000 Ft</span>=<span style="background: #242a5f; color: #ffffff; border-radius: 999px; padding: 6px 12px">52 000 Ft</span></span><span style="font-size: 12px; color: #4b5563">Pl. vizsgálat ultrahanggal + LBC mintavétel</span></div></div></div>
+</div>
+
+<!-- sticky category chips -->
+<div style="position: sticky; top: 68px; z-index: 20; background: rgba(242,244,248,.9); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px)">
+<div role="tablist" aria-label="Kategóriák" data-chipbar="1" class="scroll" style="position: relative; display: flex; gap: 6px; overflow-x: auto; padding: 8px 12px 10px; scroll-padding: 0 12px">
+<sc-for list="{{cats}}" as="c" hint-placeholder-count="5">
+<button type="button" role="tab" data-pill="1" id="{{c.tid}}" aria-selected="{{c.on}}" aria-controls="ma-panel" onClick="{{c.pick}}" class="tap" style="{{c.chip}}"><span style="{{c.dot}}"></span>{{c.short}}<sc-if value="{{c.felar}}" hint-placeholder-val="{{false}}"><span aria-label="felár" style="{{c.plus}}">+</span></sc-if></button>
+</sc-for>
+</div>
+</div>
+
+<div id="ma-panel" role="tabpanel" aria-labelledby="{{panelLabel}}" style="padding: 6px 12px 0">
+<sc-for list="{{cats}}" as="c" hint-placeholder-count="1">
+<sc-if value="{{c.on}}" hint-placeholder-val="{{true}}">
+<div class="{{c.anim}}" style="{{c.box}}">
+<div style="display: flex; align-items: center; gap: 12px; padding: 4px 4px 10px">
+<span style="{{c.iconStyle}}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{c.icon}}"></path></svg></span>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px"><h3 style="margin: 0; font-size: 18px; line-height: 1.25; font-weight: 800">{{c.name}}</h3><span style="font-size: 12px; font-weight: 600; color: #4b5563">{{c.sub}}</span></div>
+</div>
+<sc-if value="{{c.felar}}" hint-placeholder-val="{{false}}"><div style="margin: 0 2px 8px; background: #ffffff; border: 2px solid #efc462; border-radius: 20px; padding: 10px 14px; font-size: 13px; line-height: 1.5; color: #374151; display: flex; gap: 10px; align-items: center"><span style="height: 26px; padding: 0 10px; border-radius: 999px; background: #efc462; color: #242a5f; font-weight: 800; display: inline-flex; align-items: center; flex-shrink: 0">+ Felár</span><span>A nőgyógyászati vizsgálat díján felül fizetendő.</span></div></sc-if>
+<div style="background: #ffffff; border-radius: 24px; padding: 4px 14px">
+<sc-for list="{{c.items}}" as="it" hint-placeholder-count="4">
+<div class="row" style="{{it.rowStyle}}">
+<div style="display: flex; align-items: flex-end; gap: 8px"><span style="font-size: 14px; font-weight: 700; line-height: 1.35; max-width: 68%">{{it.n}}</span><span aria-hidden="true" style="flex: 1; min-width: 12px; margin-bottom: 5px; border-bottom: 2px dotted #c5cad9"></span><strong style="{{it.priceStyle}}">{{it.p}}</strong></div>
+<sc-if value="{{it.d}}" hint-placeholder-val="{{false}}"><span style="font-size: 12px; line-height: 1.5; color: #4b5563">{{it.d}}</span></sc-if>
+</div>
+</sc-for>
+</div>
+<div style="display: flex; gap: 8px; padding-top: 10px">
+<button type="button" onClick="{{c.prev}}" aria-label="{{c.prevLabel}}" class="tap" style="height: 48px; padding: 0 16px; border: 0; border-radius: 999px; background: #ffffff; color: #242a5f; font-size: 13px; font-weight: 800; display: inline-flex; align-items: center; gap: 6px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6"></path></svg>{{c.prevShort}}</button>
+<button type="button" onClick="{{c.next}}" aria-label="{{c.nextLabel}}" class="tap" style="flex: 1; height: 48px; padding: 0 16px; border: 0; border-radius: 999px; background: #242a5f; color: #ffffff; font-size: 13px; font-weight: 800; display: inline-flex; align-items: center; justify-content: flex-end; gap: 6px">{{c.nextShort}}<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></button>
+</div>
+</div>
+</sc-if>
+</sc-for>
+</div>
+</section>
+
+<!-- TUDNIVALÓK -->
+<section style="padding: 36px 12px 0; display: flex; flex-direction: column; gap: 10px">
+<div style="padding: 0 6px 4px; display: flex; flex-direction: column; gap: 8px"><span style="font-size: 12px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #2f7a75">Tudnivalók</span><h2 style="margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.02em">Fontos információk</h2><p style="margin: 0; font-size: 14px; color: #4b5563">Kérjük, olvassa el figyelmesen</p></div>
+<sc-for list="{{infos}}" as="f" hint-placeholder-count="4">
+<div style="{{f.box}}">
+<h3 style="margin: 0"><button type="button" id="{{f.bid}}" aria-expanded="{{f.open}}" aria-controls="{{f.pid}}" onClick="{{f.toggle}}" class="tap" style="width: 100%; display: flex; align-items: center; gap: 12px; min-height: 60px; padding: 10px 14px; border: 0; background: transparent; text-align: left; color: #242a5f; border-radius: 24px">
+<span style="width: 38px; height: 38px; border-radius: 999px; background: #E6EDE8; color: #2f7a75; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{f.icon}}"></path></svg></span>
+<span style="flex: 1; font-size: 15px; font-weight: 800">{{f.t}}</span>
+<span style="{{f.chev}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></span>
+</button></h3>
+<div class="acc" id="{{f.pid}}" role="region" aria-labelledby="{{f.bid}}" aria-hidden="{{f.hidden}}" style="grid-template-rows: {{f.rows}}; opacity: {{f.op}}"><div><p style="margin: 0; padding: 0 16px 16px 64px; font-size: 14px; line-height: 1.6; color: #374151">{{f.b}}</p></div></div>
+</div>
+</sc-for>
+<a href="MobilKapcsolat.dc.html" class="tap" style="margin-top: 6px; display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 24px; background: #E6EDE8; color: #242a5f; text-decoration: none"><span style="flex: 1; display: flex; flex-direction: column; gap: 2px"><strong style="font-size: 15px">Kérdése van?</strong><span style="font-size: 13px; color: #374151">Elérhetőségek és rendelési idő</span></span><span style="width: 40px; height: 40px; border-radius: 999px; background: #242a5f; color: #ffffff; display: inline-flex; align-items: center; justify-content: center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a>
+</section>
+<div style="height: 120px"></div>
+</div>
+
+<!-- STICKY ACTION BAR -->
+<div style="position: absolute; left: 12px; right: 12px; bottom: 14px; z-index: 30; display: flex; gap: 8px; padding: 6px; border-radius: 999px; background: rgba(255,255,255,.82); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: 0 18px 40px -18px rgba(36,42,95,.55)">
+<a href="tel:+36706395239" aria-label="Hívás" class="tap" style="width: 52px; height: 52px; flex-shrink: 0; border-radius: 999px; background: #E6EDE8; color: #242a5f; display: inline-flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg></a>
+<a href="MobilFoglalas.dc.html" class="tap" style="flex: 1; height: 52px; border-radius: 999px; background: #242a5f; color: #ffffff; display: inline-flex; align-items: center; justify-content: center; gap: 10px; font-size: 16px; font-weight: 800; text-decoration: none">Időpontfoglalás <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { cat: 0, dir: 1, pkg: 0, felar: false, info: -1 };
+  }
+  renderVals() {
+    const s = this.state;
+    const SPRING = 'cubic-bezier(.2,.8,.2,1)';
+    const fmt = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' Ft';
+    const IC = { nogy: 'M22 12h-4l-3 9L9 3l-3 9H2', tube: 'M9 2v6l-5 9a3 3 0 0 0 2.6 4.5h10.8A3 3 0 0 0 20 17l-5-9V2M8 2h8M7 15h10', micro: 'M6 18h8M3 22h18M14 22a7 7 0 1 0 0-14h-1M9 14h2M9 12a2 2 0 0 1-2-2V6h6v4a2 2 0 0 1-2 2Z', dna: 'M2 15c6.667-6 13.333 0 20-6M9 22c1.798-1.998 2.518-3.995 2.807-5.993M15 2c-1.798 1.998-2.518 3.995-2.807 5.993M17 6l-2.5-2.5M14 8l-1-1M7 18l2.5 2.5M10 16l1 1', doc: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M9 15h6' };
+    // ===== Sanity snapshot – services & prices (same as Bento Pro CATS; Éves Szűrőcsomagok shown as the package carousel) =====
+    const CATS = [
+      { name: 'Nőgyógyászati vizsgálatok', short: 'Vizsgálatok', icon: IC.nogy, tint: '#e9ebf6', accent: '#242a5f', at: '#ffffff', felar: false, items: [
+        { n: 'Nőgyógyászati vizsgálat / tanácsadás (ultrahang nélkül)', d: '', p: 30000 }, { n: 'Nőgyógyászati vizsgálat ultrahanggal', d: '', p: 43000 },
+        { n: 'Nőgyógyászati vizsgálat ultrahanggal és méhnyakszűréssel', d: '', p: 52000 }, { n: 'Kontroll vizsgálat (3 hónapon belül, rövidített)', d: '', p: 25000 },
+        { n: 'Spirál felhelyezés vagy csere ultrahanggal', d: 'Az eszköz árát nem tartalmazza. Az aktuálisan elérhető eszközökről rendelőnk elérhetőségein érdeklődhet.', p: 45000 },
+        { n: 'Spirál eltávolítás (ultrahang nélkül)', d: '', p: 30000 },
+        { n: 'Várandósgondozás', d: 'Várandósgondozás során tájékozódó ultrahangot végzek, mely nem minősül genetikai ultrahangnak!', p: 45000 } ] },
+      { name: 'Mintavételek (Felárak)', short: 'Mintavételek', icon: IC.tube, tint: '#e2f4ee', accent: '#76c8b6', at: '#242a5f', felar: true, items: [
+        { n: 'Folyadékalapú méhnyakszűrés (LBC) mintavétel', d: 'A folyadékalapú citológia egy korszerűbb méhnyakszűrési módszer.', p: 9000 }, { n: 'Hagyományos citológia mintavétel', d: '', p: 6500 },
+        { n: 'Endometrium (méhnyálkahártya) szövettani mintavétel', d: '', p: 20000 }, { n: 'Injekció beadása', d: '', p: 6000 } ] },
+      { name: 'Mikrobiológiai vizsgálatok (Felárak)', short: 'Mikrobiológia', icon: IC.micro, tint: '#e1efee', accent: '#2f7a75', at: '#ffffff', felar: true, items: [
+        { n: 'Hüvelyváladék tenyésztés', d: 'aerob baktérium + gomba + kenet', p: 8500 }, { n: 'STD vizsgálat', d: 'Ár kórokozónként', p: 7500 }, { n: 'GBS szűrés', d: '', p: 7500 } ] },
+      { name: 'HPV vizsgálatok (Felárak)', short: 'HPV', icon: IC.dna, tint: '#f8ebf1', accent: '#e1bbcd', at: '#242a5f', felar: true, items: [
+        { n: 'HPV DNS alapú, 14 genotípus meghatározás (HPV14)', d: 'HPV jelenlétét vizsgálja', p: 18000 } ] },
+      { name: 'Egyéb szolgáltatások', short: 'Egyéb', icon: IC.doc, tint: '#fcebe4', accent: '#eb8966', at: '#242a5f', felar: false, items: [
+        { n: 'Szakorvosi dokumentáció (igazolás) kiállítása', d: '(vizsgálaton kívül)', p: 12000 }, { n: 'Sürgősségi fogamzásgátlás', d: '', p: 10000 },
+        { n: 'Receptírás rendelőnk páciensei részére', d: 'Receptírás a vizsgálat alkalmával díjtalan.', p: 4900 } ] }
+    ];
+    const PKGS = [
+      { name: 'Komplex', full: 'Komplex Szűrővizsgálat', p: 52000, rec: false, inc: [['Nőgyógyászati vizsgálat', true], ['Ultrahang', true], ['LBC méhnyakszűrés (vizsgálat+mintavétel+ultrahang)', true], ['HPV DNS tipizálás', false]] },
+      { name: 'Kiterjesztett komplex', full: 'Kiterjesztett Komplex Szűrés', p: 68000, rec: true, inc: [['Nőgyógyászati vizsgálat', true], ['Ultrahang', true], ['LBC méhnyakszűrés (vizsgálat+mintavétel+ultrahang)', true], ['HPV 14 tipizálás', true]] }
+    ];
+    const I = { rx: 'M3 3h7a4 4 0 0 1 0 8H3V3zM3 11v10M8 11l9 10M21 13l-6 6', coin: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8M12 18V6', check: 'M22 11.08V12a10 10 0 1 1-5.93-9.14M22 4 12 14.01l-3-3', baby: 'M9 12h.01M15 12h.01M10 16c.5.3 1.2.5 2 .5s1.5-.2 2-.5M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z' };
+    // Copy verbatim from the live Árak page (Tudnivalók)
+    const INFOS = [
+      { t: 'E-recept', b: 'Rendszeresen szedett fogamzásgátló gyógyszer felírása E-recept formájában ingyenes, amennyiben 1 éven belüli méhnyakszűrés történt rendelőnkben. Recept felírása vizsgálat alkalmával díjtalan.', icon: I.rx },
+      { t: 'Vizsgálati díjak', b: 'A vizsgálati díjak tartalmazzák a mintakezelési, leletkezelési és adminisztrációs költséget is.', icon: I.coin },
+      { t: 'Eredmények', b: 'Eredményeik az EESZT rendszerbe kerülnek feltöltésre, melyet lakossági portáljukon belépve tekinthetnek meg.', icon: I.check },
+      { t: 'Magzati genetikai ultrahang', b: 'Magzati genetikai ultrahangot nem végzek. Ajánlott intézmény: Czeizel Intézet Budapest.', icon: I.baby }
+    ];
+    const n = CATS.length;
+    const pick = (i, e) => {
+      if (i === s.cat) return;
+      this.setState({ cat: i, dir: i > s.cat ? 1 : -1 });
+      const src = e && e.currentTarget && e.currentTarget.closest ? e.currentTarget : null;
+      const scroller = src ? src.closest('[data-main]') : null;
+      if (!scroller) return;
+      const bar = scroller.querySelector('[data-chipbar]');
+      const pills = bar ? bar.querySelectorAll('[data-pill]') : [];
+      if (bar && pills[i]) bar.scrollTo({ left: Math.max(pills[i].offsetLeft - 12, 0), behavior: 'smooth' });
+      // keep the panel start under the sticky chip row when switching from further down
+      const panel = scroller.querySelector('#ma-panel');
+      if (panel) { const d = panel.getBoundingClientRect().top - scroller.getBoundingClientRect().top; if (d < 120) scroller.scrollTo({ top: scroller.scrollTop + d - 130, behavior: 'smooth' }); }
+    };
+    return {
+      pkgCounter: (s.pkg + 1) + ' / ' + PKGS.length,
+      onPkgScroll: (e) => { const el = e.currentTarget || e.target; const first = el && el.querySelector ? el.querySelector('[data-card]') : null; const w = first ? first.offsetWidth + 10 : 300; const i = Math.min(Math.round(el.scrollLeft / Math.max(w, 1)), PKGS.length - 1); if (i !== this.state.pkg) this.setState({ pkg: i }); },
+      pkgs: PKGS.map((p, i) => { const dark = p.rec; const on = i === s.pkg; return { name: p.name, full: p.full, rec: p.rec, price: fmt(p.p).replace(' Ft', ''),
+        style: 'flex: 0 0 calc(100% - 44px); box-sizing: border-box; border-radius: 32px; padding: 20px; display: flex; flex-direction: column; gap: 14px; transition: transform .45s ' + SPRING + ', box-shadow .45s; transform: scale(' + (on ? '1' : '.965') + '); ' + (dark ? 'background: #242a5f; color: #ffffff; box-shadow: 0 24px 44px -26px rgba(36,42,95,.8)' : 'background: #fdf3dc; color: #242a5f; box-shadow: none'),
+        iconStyle: 'width: 44px; height: 44px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; background: ' + (dark ? '#a3dac2' : '#efc462') + '; color: #242a5f',
+        subStyle: 'font-size: 12px; font-weight: 600; color: ' + (dark ? '#c9cde3' : '#4b5563'),
+        btn: 'margin-top: auto; display: flex; align-items: center; justify-content: center; height: 50px; border-radius: 999px; font-size: 15px; font-weight: 800; text-decoration: none; ' + (dark ? 'background: #e1bbcd; color: #242a5f' : 'background: #242a5f; color: #ffffff'),
+        inc: p.inc.map((x) => ({ t: x[0], aria: x[1] ? x[0] : x[0] + ' – nem tartalmazza', icon: x[1] ? 'M20 6 9 17l-5-5' : 'M18 6 6 18M6 6l12 12',
+          style: 'display: flex; align-items: flex-start; gap: 10px; font-size: 14px; line-height: 1.4; font-weight: 600',
+          dot: 'width: 22px; height: 22px; border-radius: 999px; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; ' + (x[1] ? (dark ? 'background: #a3dac2; color: #242a5f' : 'background: #ffffff; color: #2f7a75') : (dark ? 'background: rgba(255,255,255,.1); color: #9aa0c4' : 'background: rgba(36,42,95,.08); color: #6b7280')),
+          txt: x[1] ? '' : 'text-decoration: line-through; opacity: .6' })) }; }),
+      pkgDots: PKGS.map((p, i) => ({ style: 'height: 6px; border-radius: 999px; transition: width .4s ' + SPRING + ', background-color .3s; width: ' + (i === s.pkg ? '22px; background: #242a5f' : '6px; background: #c5cad9') })),
+      felarOpen: s.felar, felarHidden: s.felar ? 'false' : 'true', felarRows: s.felar ? '1fr' : '0fr', felarOp: s.felar ? '1' : '0',
+      felarChev: 'display: inline-flex; transition: transform .45s ' + SPRING + '; transform: rotate(' + (s.felar ? '180deg' : '0deg') + ')',
+      toggleFelar: () => this.setState({ felar: !s.felar }),
+      panelLabel: 'ma-tab-' + s.cat,
+      cats: CATS.map((c, i) => { const on = i === s.cat; const min = Math.min.apply(null, c.items.map((x) => x.p)); const pre = c.felar ? '+ ' : ''; const pv = CATS[(i + n - 1) % n]; const nx = CATS[(i + 1) % n];
+        return { name: c.name, short: c.short, icon: c.icon, felar: c.felar, on: on, tid: 'ma-tab-' + i,
+          anim: s.dir > 0 ? 'inR' : 'inL',
+          pick: (e) => pick(i, e),
+          prev: (e) => pick((i + n - 1) % n, e), next: (e) => pick((i + 1) % n, e),
+          prevShort: pv.short, nextShort: nx.short, prevLabel: 'Előző kategória: ' + pv.name, nextLabel: 'Következő kategória: ' + nx.name,
+          sub: (c.felar ? 'Felár · ' : '') + c.items.length + ' tétel · ' + pre + fmt(min) + '-tól',
+          chip: 'flex: 0 0 auto; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px 0 14px; border-radius: 999px; font-size: 14px; font-weight: 800; white-space: nowrap; transition: background-color .4s ' + SPRING + ', color .4s, border-color .4s, box-shadow .4s; ' + (on ? 'background: #242a5f; color: #ffffff; border: 1.5px solid #242a5f; box-shadow: 0 10px 20px -12px rgba(36,42,95,.7)' : 'background: #ffffff; color: #242a5f; border: 1.5px solid #e3e7ef; box-shadow: none'),
+          dot: 'width: 10px; height: 10px; border-radius: 999px; flex-shrink: 0; background: ' + c.accent + '; box-shadow: 0 0 0 2px ' + (on ? 'rgba(255,255,255,.9)' : 'transparent'),
+          plus: 'min-width: 18px; height: 18px; border-radius: 999px; background: #efc462; color: #242a5f; font-size: 12px; line-height: 18px; text-align: center',
+          box: 'background: ' + c.tint + '; border-radius: 30px; padding: 14px 10px 10px',
+          iconStyle: 'width: 48px; height: 48px; border-radius: 999px; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; background: ' + c.accent + '; color: ' + c.at,
+          items: c.items.map((it, k) => ({ n: it.n, d: it.d, p: pre + fmt(it.p),
+            rowStyle: 'padding: 12px 0; display: flex; flex-direction: column; gap: 4px; animation-delay: ' + (80 + k * 45) + 'ms' + (k ? '; border-top: 1px solid rgba(36,42,95,.07)' : ''),
+            priceStyle: 'font-size: 14px; font-weight: 800; white-space: nowrap; flex-shrink: 0' + (c.felar ? '; background: #fdf3dc; border-radius: 999px; padding: 4px 10px' : '') })) }; }),
+      infos: INFOS.map((f, k) => { const o = s.info === k; return { ...f, open: o, hidden: o ? 'false' : 'true', bid: 'ma-q-' + k, pid: 'ma-a-' + k,
+        toggle: () => this.setState({ info: o ? -1 : k }), rows: o ? '1fr' : '0fr', op: o ? '1' : '0',
+        box: 'background: #ffffff; border-radius: 24px; transition: box-shadow .4s; box-shadow: ' + (o ? '0 16px 32px -22px rgba(36,42,95,.5)' : 'none'),
+        chev: 'width: 30px; height: 30px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; transition: transform .45s ' + SPRING + ', background-color .3s; ' + (o ? 'background: #242a5f; color: #ffffff; transform: rotate(180deg)' : 'background: #F2F4F8; color: #242a5f') }; })
+    };
+  }
+}
+</script>
+</body>
+</html>

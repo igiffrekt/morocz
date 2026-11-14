@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<title>Mobil · Menü (nyitva)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#dfe3ea}
+a{color:#242a5f;-webkit-tap-highlight-color:transparent}
+button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+a:focus-visible,button:focus-visible{outline:3px solid #469993;outline-offset:3px}
+.scroll::-webkit-scrollbar{display:none}
+.scroll{scrollbar-width:none}
+.tap{transition:transform .25s cubic-bezier(.2,.8,.2,1),background-color .3s,color .3s,box-shadow .3s}
+.tap:active{transform:scale(.96)}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+.scroll[style*="inset: 0"]>*:first-child{position:sticky;top:0;z-index:40}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #F2F4F8; font-family: 'Plus Jakarta Sans', sans-serif; color: #242a5f">
+<div class="scroll" style="position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden">
+<dc-import name="MobilFejlec" active="fooldal" start-open="{{yes}}" hint-size="390px,68px"></dc-import>
+
+<!-- Homepage top (short version of MobilFooldal) – sits under the open menu -->
+<section style="padding: 4px 12px 0">
+<div style="position: relative; background: #242a5f; border-radius: 32px; overflow: hidden; padding: 26px 22px 0; color: #ffffff; display: flex; flex-direction: column; gap: 16px">
+<span style="display: inline-flex; align-self: flex-start; align-items: center; gap: 8px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); border-radius: 999px; padding: 6px 14px 6px 6px; font-size: 12px; font-weight: 600; color: #d6d9ec"><span style="width: 20px; height: 20px; border-radius: 999px; background: #76c8b6; display: inline-flex; align-items: center; justify-content: center; color: #242a5f"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg></span>Dr. Mórocz Angéla · nőgyógyász szakorvos</span>
+<h1 style="margin: 0; font-size: 34px; line-height: 1.06; font-weight: 800; letter-spacing: -0.02em">Nőgyógyászat és várandósgondozás <span style="color: #a3dac2">Esztergomban</span></h1>
+<p style="margin: 0; font-size: 15px; line-height: 1.55; color: #c9cde3">Modern nőgyógyászati ellátás Esztergomban. Foglaljon időpontot percek alatt!</p>
+<div style="position: relative; height: 330px; margin: 0 -22px; display: flex; justify-content: center; align-items: flex-end">
+<div style="position: absolute; width: 330px; height: 330px; border-radius: 999px; background: #76c8b6; bottom: -110px; left: 50%; transform: translateX(-50%)"></div>
+<img src="/_blob/5df4eea13bb8a171c72baa71a332eca9" alt="Dr. Mórocz Angéla" style="position: relative; height: 330px; width: auto; display: block">
+</div>
+</div>
+</section>
+<section style="position: relative; margin: -56px 12px 0; z-index: 2; padding-bottom: 120px">
+<div style="background: #ffffff; border-radius: 32px; padding: 18px; box-shadow: 0 24px 50px -28px rgba(36,42,95,.55); display: flex; flex-direction: column; gap: 14px">
+<span style="font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: #4b5563">Szabad rendelési nap</span>
+<a href="MobilFoglalas.dc.html" class="tap" style="display: flex; align-items: center; justify-content: center; gap: 10px; height: 56px; border-radius: 999px; background: #76c8b6; color: #242a5f; font-size: 16px; font-weight: 800; text-decoration: none">Szabad időpontok <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+</div>
+</section>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { yes: true };
+  }
+}
+</script>
+</body>
+</html>

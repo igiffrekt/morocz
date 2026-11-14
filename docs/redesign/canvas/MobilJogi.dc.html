@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<title>Mobil · Jogi dokumentumok</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#dfe3ea}
+a{color:#242a5f;-webkit-tap-highlight-color:transparent}
+button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+a:focus-visible,button:focus-visible{outline:3px solid #469993;outline-offset:3px}
+.scroll::-webkit-scrollbar{display:none}
+.scroll{scrollbar-width:none}
+.tap{transition:transform .25s cubic-bezier(.2,.8,.2,1),background-color .3s,color .3s,box-shadow .3s,border-color .3s}
+.tap:active{transform:scale(.96)}
+.fade{animation:fadeUp .5s cubic-bezier(.2,.8,.2,1) both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.sk{background:linear-gradient(90deg,#e3e7ef 25%,#eef1f6 50%,#e3e7ef 75%);background-size:200% 100%;animation:sk 1.3s linear infinite;border-radius:999px}
+@keyframes sk{from{background-position:200% 0}to{background-position:-200% 0}}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+.scroll[style*="inset: 0"]>*:first-child{position:sticky;top:0;z-index:40}
+</style>
+</helmet>
+<div data-phone="1" style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #F2F4F8; font-family: 'Plus Jakarta Sans', sans-serif; color: #242a5f">
+<div class="scroll" data-main="1" onScroll="{{onScroll}}" style="position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden">
+<dc-import name="MobilFejlec" active="" hint-size="390px,68px"></dc-import>
+
+<!-- DOCUMENT SWITCHER (sticky) -->
+<div style="position: sticky; top: 68px; z-index: 20; background: rgba(242,244,248,.9); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px)">
+<div role="tablist" aria-label="Jogi dokumentumok" data-chipbar="1" class="scroll" style="position: relative; display: flex; gap: 6px; overflow-x: auto; padding: 6px 12px 10px; scroll-padding: 0 12px">
+<sc-for list="{{docs}}" as="d" hint-placeholder-count="5">
+<button type="button" role="tab" data-pill="1" aria-selected="{{d.on}}" aria-controls="mjg-doc" onClick="{{d.pick}}" class="tap" style="{{d.chip}}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{d.icon}}"></path></svg>{{d.short}}</button>
+</sc-for>
+</div>
+<div aria-hidden="true" style="height: 3px; background: #e3e7ef"><div style="height: 3px; border-radius: 0 999px 999px 0; background: #76c8b6; width: {{progress}}; transition: width .2s linear"></div></div>
+</div>
+
+<!-- SKELETON -->
+<sc-if value="{{loading}}" hint-placeholder-val="{{false}}">
+<div style="padding: 16px 12px 0; display: flex; flex-direction: column; gap: 12px">
+<div style="background: #ffffff; border-radius: 30px; padding: 20px; display: flex; flex-direction: column; gap: 12px"><span class="sk" style="height: 12px; width: 35%"></span><span class="sk" style="height: 28px; width: 90%"></span><span class="sk" style="height: 28px; width: 60%"></span><span class="sk" style="height: 30px; width: 50%"></span></div>
+<div style="padding: 8px 8px; display: flex; flex-direction: column; gap: 10px"><span class="sk" style="height: 34px; width: 75%"></span><span class="sk" style="height: 13px; width: 100%"></span><span class="sk" style="height: 13px; width: 96%"></span><span class="sk" style="height: 13px; width: 88%"></span><span class="sk" style="height: 13px; width: 64%"></span></div>
+</div>
+</sc-if>
+
+<!-- DOCUMENT -->
+<div id="mjg-doc" role="tabpanel">
+<sc-for list="{{docs}}" as="d" hint-placeholder-count="1">
+<sc-if value="{{d.show}}" hint-placeholder-val="{{true}}">
+<article class="fade" aria-labelledby="mjg-title">
+<header style="margin: 12px 12px 0; background: #ffffff; border-radius: 30px; padding: 20px; display: flex; flex-direction: column; gap: 12px">
+<span style="display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #2f7a75"><span style="width: 28px; height: 28px; border-radius: 999px; background: #E6EDE8; display: inline-flex; align-items: center; justify-content: center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{d.icon}}"></path></svg></span>Jogi dokumentum</span>
+<h1 id="mjg-title" style="margin: 0; font-size: 28px; line-height: 1.1; font-weight: 800; letter-spacing: -0.025em">{{d.title}}</h1>
+<div style="display: flex; flex-wrap: wrap; gap: 6px">
+<span style="display: inline-flex; align-items: center; gap: 6px; background: #a3dac2; color: #242a5f; border-radius: 999px; padding: 7px 14px; font-size: 12px; font-weight: 800"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"></path></svg>{{d.meta}}</span>
+<span style="display: inline-flex; align-items: center; gap: 6px; background: #F2F4F8; border-radius: 999px; padding: 7px 14px; font-size: 12px; font-weight: 700; color: #374151">{{d.read}}</span>
+<span style="display: inline-flex; align-items: center; gap: 6px; background: #F2F4F8; border-radius: 999px; padding: 7px 14px; font-size: 12px; font-weight: 700; color: #374151">{{d.secCount}}</span>
+</div>
+</header>
+<div style="padding: 8px 20px 0; display: flex; flex-direction: column">
+<sc-for list="{{d.blocks}}" as="b" hint-placeholder-count="6">
+<div style="display: contents">
+<sc-if value="{{b.isH2}}" hint-placeholder-val="{{false}}"><h2 id="{{b.id}}" data-toc="1" style="margin: 30px 0 12px; display: flex; align-items: flex-start; gap: 12px; font-size: 20px; line-height: 1.3; font-weight: 800; letter-spacing: -0.01em"><span style="flex-shrink: 0; min-width: 40px; height: 32px; padding: 0 10px; box-sizing: border-box; border-radius: 999px; background: #242a5f; color: #ffffff; font-size: 13px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; font-variant-numeric: tabular-nums">{{b.num}}</span><span style="padding-top: 3px">{{b.x}}</span></h2></sc-if>
+<sc-if value="{{b.isH3}}" hint-placeholder-val="{{false}}"><h3 id="{{b.id}}" data-toc="{{b.tocAttr}}" style="{{b.h3Style}}"><sc-if value="{{b.num}}" hint-placeholder-val="{{false}}"><span style="flex-shrink: 0; min-width: 36px; height: 30px; padding: 0 10px; box-sizing: border-box; border-radius: 999px; background: #E6EDE8; color: #2f7a75; font-size: 12px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center">{{b.num}}</span></sc-if><span style="padding-top: 3px">{{b.x}}</span></h3></sc-if>
+<sc-if value="{{b.isH4}}" hint-placeholder-val="{{false}}"><h4 style="margin: 16px 0 6px; font-size: 15px; font-weight: 800; color: #2f7a75">{{b.x}}</h4></sc-if>
+<sc-if value="{{b.isP}}" hint-placeholder-val="{{true}}"><p style="margin: 0 0 12px; font-size: 15px; line-height: 1.7; color: #374151">{{b.x}}</p></sc-if>
+<sc-if value="{{b.isUl}}" hint-placeholder-val="{{false}}"><ul style="margin: 0 0 14px; padding: 6px 14px; list-style: none; background: #ffffff; border-radius: 24px; display: flex; flex-direction: column"><sc-for list="{{b.items}}" as="it" hint-placeholder-count="3"><li style="{{it.style}}"><span aria-hidden="true" style="width: 8px; height: 8px; border-radius: 999px; background: #76c8b6; flex-shrink: 0; margin-top: 8px"></span><span>{{it.x}}</span></li></sc-for></ul></sc-if>
+<sc-if value="{{b.isOl}}" hint-placeholder-val="{{false}}"><ol style="margin: 0 0 14px; padding: 6px 14px; list-style: none; background: #ffffff; border-radius: 24px; display: flex; flex-direction: column"><sc-for list="{{b.items}}" as="it" hint-placeholder-count="3"><li style="{{it.style}}"><span aria-hidden="true" style="width: 26px; height: 26px; border-radius: 999px; background: #E6EDE8; color: #2f7a75; font-size: 12px; font-weight: 800; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center">{{it.n}}</span><span>{{it.x}}</span></li></sc-for></ol></sc-if>
+<sc-if value="{{b.isTable}}" hint-placeholder-val="{{false}}">
+<div role="table" aria-label="{{b.caption}}" style="margin: 0 0 14px; display: flex; flex-direction: column; gap: 8px">
+<sc-for list="{{b.rows}}" as="r" hint-placeholder-count="3">
+<div role="row" style="background: #ffffff; border-radius: 24px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px">
+<strong role="rowheader" style="font-size: 14px; font-weight: 800; color: #242a5f">{{r.head}}</strong>
+<sc-for list="{{r.cells}}" as="c" hint-placeholder-count="2"><div role="cell" style="display: flex; flex-direction: column; gap: 3px; border-left: 3px solid #a3dac2; padding-left: 12px"><span style="font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: #2f7a75">{{c.k}}</span><span style="font-size: 14px; line-height: 1.55; color: #374151">{{c.v}}</span></div></sc-for>
+</div>
+</sc-for>
+</div>
+</sc-if>
+</div>
+</sc-for>
+</div>
+<div style="margin: 24px 12px 0; display: flex; flex-direction: column; gap: 8px">
+<span style="padding: 0 8px; font-size: 12px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #2f7a75">Következő dokumentum</span>
+<button type="button" onClick="{{d.next}}" class="tap" style="display: flex; align-items: center; gap: 12px; width: 100%; min-height: 72px; padding: 12px 12px 12px 18px; border: 0; border-radius: 28px; background: #242a5f; color: #ffffff; text-align: left"><span style="flex: 1; display: flex; flex-direction: column; gap: 2px"><strong style="font-size: 16px">{{d.nextTitle}}</strong><span style="font-size: 12px; color: #c9cde3">Jogi dokumentum</span></span><span style="width: 44px; height: 44px; border-radius: 999px; background: #e1bbcd; color: #242a5f; display: inline-flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></button>
+<a href="MobilKapcsolat.dc.html" class="tap" style="display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 10px 12px 10px 18px; border-radius: 28px; background: #ffffff; color: #242a5f; text-decoration: none"><span style="flex: 1; display: flex; flex-direction: column; gap: 2px"><strong style="font-size: 15px">Kérdése van?</strong><span style="font-size: 12px; color: #4b5563">recepcio@drmoroczangela.hu</span></span><span style="width: 40px; height: 40px; border-radius: 999px; background: #F2F4F8; display: inline-flex; align-items: center; justify-content: center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a>
+</div>
+</article>
+</sc-if>
+</sc-for>
+</div>
+<div style="height: 120px"></div>
+</div>
+
+<!-- FLOATING PILLS -->
+<div style="position: absolute; left: 0; right: 0; bottom: 16px; z-index: 30; display: flex; justify-content: center; gap: 8px; pointer-events: none">
+<button type="button" onClick="{{openToc}}" aria-haspopup="dialog" aria-expanded="{{tocOpen}}" disabled="{{noToc}}" class="tap" style="{{tocBtn}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"></path></svg>Tartalom<span style="{{tocBadge}}">{{tocCur}}</span></button>
+<button type="button" onClick="{{toTop}}" aria-hidden="{{topHidden}}" tabindex="{{topTab}}" class="tap" style="{{topBtn}}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"></path></svg>Vissza a tetejére</button>
+</div>
+
+<!-- TOC BOTTOM SHEET -->
+<div aria-hidden="true" onClick="{{closeToc}}" style="{{backdropStyle}}"></div>
+<div role="dialog" aria-modal="true" aria-labelledby="mjg-toc-h" aria-hidden="{{tocHidden}}" style="{{sheetStyle}}">
+<div style="display: flex; justify-content: center; padding: 10px 0 4px"><span aria-hidden="true" style="width: 44px; height: 5px; border-radius: 999px; background: #d7dbe8"></span></div>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 6px 20px 12px"><div style="display: flex; flex-direction: column; gap: 2px; min-width: 0"><span style="font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: #2f7a75">Tartalom</span><h2 id="mjg-toc-h" style="margin: 0; font-size: 20px; line-height: 1.2; font-weight: 800">{{curTitle}}</h2></div><button type="button" onClick="{{closeToc}}" class="tap" style="height: 44px; padding: 0 16px; border: 0; border-radius: 999px; background: #F2F4F8; color: #242a5f; font-size: 14px; font-weight: 800; display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"></path></svg>Bezárás</button></div>
+<nav aria-label="Tartalomjegyzék" class="scroll" style="overflow-y: auto; padding: 0 12px 22px; display: flex; flex-direction: column; gap: 4px">
+<sc-for list="{{toc}}" as="t" hint-placeholder-count="8">
+<button type="button" onClick="{{t.go}}" aria-current="{{t.current}}" class="tap" style="{{t.style}}"><span style="{{t.numStyle}}">{{t.num}}</span><span style="flex: 1; font-size: 14px; line-height: 1.4; font-weight: 700">{{t.x}}</span></button>
+</sc-for>
+</nav>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { data: null, doc: 'foglalasi-es-lemondasi-szabalyzat', toc: false, cur: -1, prog: 0, top: false };
+  }
+  componentDidMount() {
+    fetch('/_blob/3d52fd3169966142601f0b9d1d5ad6f0').then((r) => r.json()).then((data) => this.setState({ data: data })).catch(() => {});
+  }
+  renderVals() {
+    const s = this.state;
+    const SPRING = 'cubic-bezier(.2,.8,.2,1)';
+    const EASE = 'cubic-bezier(.77,0,.18,1)';
+    const DOCS = [
+      { key: 'foglalasi-es-lemondasi-szabalyzat', short: 'Foglalás és lemondás', icon: 'M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z' },
+      { key: 'felhasznalasi-feltetelek', short: 'Felhasználási feltételek', icon: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M9 13h6M9 17h6' },
+      { key: 'adatkezelesi-tajekoztato', short: 'Adatkezelés', icon: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z' },
+      { key: 'altalanos-betegtajekoztato', short: 'Betegtájékoztató', icon: 'M22 12h-4l-3 9L9 3l-3 9H2' },
+      { key: 'cookie-szabalyzat', short: 'Cookie', icon: 'M12 22a10 10 0 1 1 9.8-12 3 3 0 0 1-3.8 3.8A10 10 0 0 1 12 22zM8.5 8.5h.01M16 15.5h.01M11 16h.01M7 13h.01' }
+    ];
+    const legal = s.data && s.data.legal ? s.data.legal : null;
+    const doc = legal ? legal[s.doc] : null;
+    const mainOf = (e) => { const ph = e && e.currentTarget && e.currentTarget.closest ? e.currentTarget.closest('[data-phone]') : null; return ph ? ph.querySelector('[data-main]') : null; };
+    // headings that form the table of contents: h2, or h3 when the document has no h2
+    let tocLevel = 'h2';
+    if (doc && !doc.blocks.some((b) => b.t === 'h2')) tocLevel = 'h3';
+    const tocItems = [];
+    const numRe = /^(\d+(?:\.\d+)*)\.?\s+(.*)$/;
+    const anyNumbered = doc ? doc.blocks.some((b) => b.t === tocLevel && numRe.test(b.x || '')) : false;
+    let words = 0;
+    const blocks = doc ? doc.blocks.map((b, i) => {
+      const txt = b.x || (b.items ? b.items.join(' ') : '') || (b.rows ? b.rows.map((r) => r.join(' ')).join(' ') : '');
+      words += String(txt).split(/\s+/).length;
+      const isToc = b.t === tocLevel;
+      const m = numRe.exec(b.x || '');
+      const out = { isH2: b.t === 'h2', isH3: b.t === 'h3', isH4: b.t === 'h4', isP: b.t === 'p', isUl: b.t === 'ul', isOl: b.t === 'ol', isTable: b.t === 'table',
+        x: (b.t === 'h2' || b.t === 'h3') && m ? m[2] : (b.x || ''), id: 'mjg-' + s.doc.slice(0, 6) + '-' + i, tocAttr: isToc ? '1' : '', items: [], rows: [], caption: '', num: '' };
+      if (isToc) { out.num = m ? m[1] : (anyNumbered ? '§' : String(tocItems.length + 1)); tocItems.push({ id: out.id, num: out.num, x: out.x }); }
+      else if (b.t === 'h3' && m) out.num = m[1];
+      if (b.t === 'h2' && !out.num) out.num = String(tocItems.length);
+      out.h3Style = 'margin: ' + (isToc ? '28px 0 10px' : '20px 0 8px') + '; display: flex; align-items: flex-start; gap: 10px; font-size: ' + (isToc ? '19px' : '17px') + '; line-height: 1.35; font-weight: 800';
+      if (b.items) out.items = b.items.map((x, k) => ({ x: x, n: String(k + 1), style: 'display: flex; gap: 12px; align-items: flex-start; padding: 9px 0; font-size: 14px; line-height: 1.6; color: #374151' + (k ? '; border-top: 1px solid #eceef4' : '') }));
+      if (b.t === 'table' && b.rows && b.rows.length) { const head = b.rows[0]; out.caption = head.join(' · '); out.rows = b.rows.slice(1).map((r) => ({ head: r[0], cells: r.slice(1).map((v, k) => ({ k: head[k + 1] || '', v: v })) })); }
+      return out;
+    }) : [];
+    const di = DOCS.findIndex((d) => d.key === s.doc);
+    const nextDoc = DOCS[(di + 1) % DOCS.length];
+    const pickDoc = (key, e) => {
+      const sc = mainOf(e);
+      this.setState({ doc: key, toc: false, cur: -1, prog: 0, top: false });
+      if (sc) {
+        sc.scrollTo({ top: 0, behavior: 'smooth' });
+        const bar = sc.querySelector('[data-chipbar]'); const pills = bar ? bar.querySelectorAll('[data-pill]') : []; const k = DOCS.findIndex((d) => d.key === key);
+        if (bar && pills[k]) bar.scrollTo({ left: Math.max(pills[k].offsetLeft - 12, 0), behavior: 'smooth' });
+      }
+    };
+    const tocOpen = s.toc;
+    const curIdx = s.cur;
+    return {
+      loading: !doc,
+      progress: s.prog + '%',
+      onScroll: (e) => {
+        const sc = e.currentTarget || e.target; if (!sc || !sc.querySelectorAll) return;
+        const max = Math.max(sc.scrollHeight - sc.clientHeight, 1);
+        const prog = Math.round(sc.scrollTop / max * 100);
+        const lim = sc.getBoundingClientRect().top + 160;
+        let cur = -1; sc.querySelectorAll('[data-toc="1"]').forEach((el, i) => { if (el.getBoundingClientRect().top <= lim) cur = i; });
+        const top = sc.scrollTop > 600;
+        const st = this.state;
+        if (prog !== st.prog || cur !== st.cur || top !== st.top) this.setState({ prog: prog, cur: cur, top: top });
+      },
+      docs: DOCS.map((d, i) => { const on = d.key === s.doc; return { short: d.short, icon: d.icon, on: on, show: on && !!doc,
+        pick: (e) => pickDoc(d.key, e),
+        chip: 'flex: 0 0 auto; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px 0 14px; border-radius: 999px; font-size: 13px; font-weight: 800; white-space: nowrap; transition: background-color .4s ' + SPRING + ', color .4s, border-color .4s; ' + (on ? 'background: #242a5f; color: #ffffff; border: 1.5px solid #242a5f' : 'background: #ffffff; color: #242a5f; border: 1.5px solid #e3e7ef'),
+        title: on && doc ? doc.title : '', meta: on && doc ? (doc.meta || '[Hatályos: dátum]') : '',
+        read: '~' + Math.max(1, Math.round(words / 200)) + ' perc olvasás', secCount: tocItems.length + ' fejezet',
+        blocks: on ? blocks : [],
+        next: (e) => pickDoc(nextDoc.key, e), nextTitle: legal && legal[nextDoc.key] ? legal[nextDoc.key].title : nextDoc.short }; }),
+      curTitle: doc ? doc.title : '',
+      tocOpen: tocOpen, tocHidden: tocOpen ? 'false' : 'true', noToc: !doc || tocItems.length === 0,
+      tocCur: curIdx >= 0 && tocItems[curIdx] ? tocItems[curIdx].num : String(tocItems.length),
+      tocBadge: 'min-width: 26px; height: 26px; padding: 0 8px; box-sizing: border-box; border-radius: 999px; background: #a3dac2; color: #242a5f; font-size: 12px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; font-variant-numeric: tabular-nums',
+      openToc: () => this.setState({ toc: true }),
+      closeToc: () => this.setState({ toc: false }),
+      tocBtn: 'pointer-events: auto; height: 52px; padding: 0 10px 0 20px; border: 0; border-radius: 999px; background: #242a5f; color: #ffffff; display: inline-flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 800; box-shadow: 0 18px 36px -16px rgba(36,42,95,.7)',
+      topHidden: s.top ? 'false' : 'true', topTab: s.top ? '0' : '-1',
+      toTop: (e) => { const sc = mainOf(e); if (sc) sc.scrollTo({ top: 0, behavior: 'smooth' }); },
+      topBtn: 'pointer-events: ' + (s.top ? 'auto' : 'none') + '; height: 52px; padding: 0 18px; border: 0; border-radius: 999px; background: rgba(255,255,255,.9); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); color: #242a5f; display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 800; white-space: nowrap; box-shadow: 0 18px 36px -18px rgba(36,42,95,.55); transition: opacity .4s ' + SPRING + ', transform .5s ' + SPRING + ', max-width .5s ' + SPRING + ', padding .5s ' + SPRING + '; overflow: hidden; opacity: ' + (s.top ? '1' : '0') + '; transform: translateY(' + (s.top ? '0' : '16px') + ') scale(' + (s.top ? '1' : '.9') + '); max-width: ' + (s.top ? '200px' : '0px') + (s.top ? '' : '; padding: 0'),
+      toc: tocItems.map((t, i) => { const on = i === curIdx; return { num: t.num, x: t.x, current: on ? 'true' : 'false',
+        go: (e) => { const sc = mainOf(e); this.setState({ toc: false }); if (!sc) return; const el = sc.querySelector('#' + t.id); if (el) sc.scrollTo({ top: el.getBoundingClientRect().top - sc.getBoundingClientRect().top + sc.scrollTop - 136, behavior: 'smooth' }); },
+        style: 'display: flex; align-items: center; gap: 12px; width: 100%; min-height: 54px; padding: 8px 14px 8px 8px; border: 0; border-radius: 999px; text-align: left; color: #242a5f; transition: background-color .3s; background: ' + (on ? '#E6EDE8' : 'transparent'),
+        numStyle: 'flex-shrink: 0; min-width: 38px; height: 38px; padding: 0 8px; box-sizing: border-box; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; ' + (on ? 'background: #242a5f; color: #ffffff' : 'background: #F2F4F8; color: #2f7a75') }; }),
+      backdropStyle: 'position: absolute; inset: 0; z-index: 60; background: rgba(20,24,56,.48); transition: opacity .45s ' + SPRING + '; opacity: ' + (tocOpen ? '1' : '0') + '; pointer-events: ' + (tocOpen ? 'auto' : 'none'),
+      sheetStyle: 'position: absolute; left: 0; right: 0; bottom: 0; z-index: 70; max-height: 78%; display: flex; flex-direction: column; background: #ffffff; border-radius: 32px 32px 0 0; box-shadow: 0 -20px 50px -20px rgba(20,24,56,.45); transform: translateY(' + (tocOpen ? '0' : '104%') + '); transition: transform ' + (tocOpen ? '.6s ' + SPRING : '.45s ' + EASE) + ', visibility 0s linear ' + (tocOpen ? '0s' : '.45s') + '; visibility: ' + (tocOpen ? 'visible' : 'hidden')
+    };
+  }
+}
+</script>
+</body>
+</html>

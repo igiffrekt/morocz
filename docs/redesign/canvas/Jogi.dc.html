@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<title>Jogi dokumentum sablon (komponens)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div id="lg-top" style="font-family: 'Plus Jakarta Sans', sans-serif; color: #1A1D2D; max-width: 1360px; margin: 16px auto 0; box-sizing: border-box">
+
+<!-- HERO -->
+<section class="lg-hero" style="position: relative; background: #242a5f; border-radius: 40px; overflow: hidden; padding: 44px 56px 48px; box-sizing: border-box; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 32px; color: #ffffff">
+<div aria-hidden="true" style="position: absolute; inset: 0; background-image: radial-gradient(rgba(255,255,255,.07) 1px, transparent 1px); background-size: 26px 26px"></div>
+<div style="position: relative; flex: 1 1 560px; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 20px">
+<nav aria-label="Morzsamenü">
+<ol style="list-style: none; margin: 0; display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); border-radius: 999px; padding: 9px 18px; font-size: 13px; font-weight: 600; color: #d6d9ec">
+<li><a href="A1.dc.html" class="lnk" style="color: #d6d9ec; padding: 2px 0">Kezdőlap</a></li>
+<li aria-hidden="true" style="opacity: .5">/</li>
+<li>Jogi információk</li>
+<li aria-hidden="true" style="opacity: .5">/</li>
+<li aria-current="page" style="color: #ffffff; font-weight: 700">{{title}}</li>
+</ol>
+</nav>
+<span style="font-size: 13px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #a3dac2">Jogi információk</span>
+<h1 style="margin: 0; font-size: clamp(34px, 5vw, 56px); line-height: 1.05; font-weight: 800; letter-spacing: -0.03em; max-width: 820px">{{title}}</h1>
+<div style="display: flex; flex-wrap: wrap; gap: 10px; min-height: 40px">
+<sc-if value="{{loading}}" hint-placeholder-val="{{false}}">
+<span class="sk" aria-hidden="true" style="width: 210px; height: 40px; border-radius: 999px; background: rgba(255,255,255,.12)"></span>
+<span class="sk" aria-hidden="true" style="width: 150px; height: 40px; border-radius: 999px; background: rgba(255,255,255,.12)"></span>
+</sc-if>
+<sc-if value="{{hasMeta}}" hint-placeholder-val="{{true}}">
+<span class="fade" style="display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 18px 0 14px; border-radius: 999px; background: #a3dac2; color: #242a5f; font-size: 14px; font-weight: 800"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"></path></svg>{{meta}}</span>
+</sc-if>
+<sc-if value="{{ready}}" hint-placeholder-val="{{true}}">
+<span class="fade" style="display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 18px 0 14px; border-radius: 999px; border: 1.5px solid rgba(255,255,255,.28); color: #ffffff; font-size: 14px; font-weight: 700; box-sizing: border-box; animation-delay: 80ms"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 6v6l4 2"></path></svg>{{readTime}}</span>
+<span class="fade" style="display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 18px 0 14px; border-radius: 999px; border: 1.5px solid rgba(255,255,255,.28); color: #ffffff; font-size: 14px; font-weight: 700; box-sizing: border-box; animation-delay: 160ms"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"></path></svg>{{sectionCount}}</span>
+</sc-if>
+</div>
+</div>
+<div class="lg-hero-art" aria-hidden="true" style="position: relative; flex: 0 0 260px; height: 220px; display: flex; align-items: center; justify-content: center">
+<div style="position: absolute; width: 250px; height: 250px; border-radius: 999px; border: 1.5px solid rgba(163,218,194,.35)"></div>
+<div style="position: absolute; width: 190px; height: 190px; border-radius: 999px; background: #76c8b6"></div>
+<div style="position: relative; width: 104px; height: 128px; border-radius: 24px; background: #ffffff; box-shadow: 0 24px 40px -20px rgba(16,20,60,.6); display: flex; flex-direction: column; gap: 9px; padding: 22px 18px; box-sizing: border-box; transform: rotate(-6deg)">
+<span style="width: 44%; height: 8px; border-radius: 999px; background: #242a5f"></span>
+<span style="width: 100%; height: 6px; border-radius: 999px; background: #d7dbe8"></span>
+<span style="width: 86%; height: 6px; border-radius: 999px; background: #d7dbe8"></span>
+<span style="width: 94%; height: 6px; border-radius: 999px; background: #d7dbe8"></span>
+<span style="width: 62%; height: 6px; border-radius: 999px; background: #d7dbe8"></span>
+</div>
+<span style="position: absolute; right: 26px; bottom: 26px; width: 52px; height: 52px; border-radius: 999px; background: #e1bbcd; color: #242a5f; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 14px 26px -14px rgba(16,20,60,.7)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m9 12 2 2 4-4"></path></svg></span>
+</div>
+</section>
+
+<!-- BODY -->
+<div class="lg-grid" style="display: grid; grid-template-columns: 360px minmax(0, 1fr) 260px; gap: 24px; align-items: start; margin-top: 24px">
+
+<!-- LEFT: document switcher -->
+<aside class="lg-left" style="position: sticky; top: 16px; min-width: 0">
+<nav aria-label="Jogi dokumentumok" class="lg-sw-wrap" style="background: #ffffff; border-radius: 32px; padding: 20px 12px 12px; box-sizing: border-box">
+<span class="lg-sw-label" style="display: block; padding: 0 12px 10px; font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #4b5563">Dokumentumok</span>
+<div class="lg-sw" style="display: flex; flex-direction: column; gap: 4px">
+<sc-for list="{{docs}}" as="d" hint-placeholder-count="5">
+<a href="{{d.file}}" aria-current="{{d.current}}" class="lg-pill" style="{{d.style}}"><span style="{{d.iconStyle}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{d.icon}}"></path></svg></span><span>{{d.label}}</span></a>
+</sc-for>
+</div>
+</nav>
+</aside>
+
+<!-- CENTER: document -->
+<div class="lg-main" style="min-width: 0; display: flex; flex-direction: column; gap: 16px">
+
+<div class="lg-toc-mob" style="display: none; background: #ffffff; border-radius: 32px">
+<button type="button" onClick="{{tocToggle}}" aria-expanded="{{tocExp}}" aria-controls="lg-toc-panel" class="head" style="width: 100%; min-height: 64px; display: flex; align-items: center; gap: 14px; padding: 10px 12px 10px 22px; border: 0; background: transparent; border-radius: 32px; text-align: left; color: #242a5f">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"></path></svg>
+<span style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 16px; font-weight: 800">Ezen az oldalon</span><span style="font-size: 13px; font-weight: 600; color: #4b5563">{{sectionCount}}</span></span>
+<span class="plus" style="{{chevStyle}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></span>
+</button>
+<div id="lg-toc-panel" class="acc" aria-hidden="{{tocHidden}}" style="grid-template-rows: {{tocRows}}; opacity: {{tocOp}}">
+<div>
+<div style="padding: 0 12px 14px; display: flex; flex-direction: column; gap: 2px">
+<sc-for list="{{toc}}" as="t" hint-placeholder-count="6">
+<a href="{{t.href}}" onClick="{{t.go}}" aria-current="{{t.current}}" class="lg-toc-a" style="{{t.style}}"><span style="{{t.numStyle}}">{{t.num}}</span><span title="{{t.text}}" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden">{{t.text}}</span></a>
+</sc-for>
+</div>
+</div>
+</div>
+</div>
+
+<article class="lg-card" aria-busy="{{busy}}" style="background: #ffffff; border-radius: 40px; padding: 56px 64px 64px; box-sizing: border-box">
+<div style="max-width: 760px; margin: 0 auto; font-size: 17px; line-height: 1.75; color: #374151">
+
+<sc-if value="{{loading}}" hint-placeholder-val="{{false}}">
+<div aria-hidden="true" style="display: flex; flex-direction: column; gap: 14px">
+<sc-for list="{{skel}}" as="k" hint-placeholder-count="12">
+<span class="sk" style="{{k.style}}"></span>
+</sc-for>
+</div>
+<span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Betöltés…</span>
+</sc-if>
+
+<sc-if value="{{err}}" hint-placeholder-val="{{false}}">
+<div role="alert" style="display: flex; flex-direction: column; align-items: flex-start; gap: 16px; background: #fcebe4; border-radius: 28px; padding: 28px">
+<strong style="font-size: 18px; color: #242a5f">A dokumentum betöltése nem sikerült.</strong>
+<button type="button" onClick="{{retry}}" class="btn" style="height: 48px; padding: 0 24px; border-radius: 999px; border: 0; background: #242a5f; color: #ffffff; font-size: 14px; font-weight: 800">Újrapróbálás</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ready}}" hint-placeholder-val="{{true}}">
+<div class="fade">
+<sc-for list="{{blocks}}" as="b" hint-placeholder-count="14">
+
+<sc-if value="{{b.isTop}}" hint-placeholder-val="{{false}}">
+<h2 id="{{b.id}}" class="lg-h2" style="{{b.style}}"><span style="{{b.numStyle}}"><sc-if value="{{b.num}}" hint-placeholder-val="{{true}}">{{b.num}}</sc-if><sc-if value="{{b.noNum}}" hint-placeholder-val="{{false}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg></sc-if></span><span>{{b.text}}</span></h2>
+</sc-if>
+
+<sc-if value="{{b.isSub}}" hint-placeholder-val="{{false}}">
+<h3 style="margin: 36px 0 12px; font-size: 21px; line-height: 1.35; font-weight: 800; color: #242a5f; letter-spacing: -0.01em">{{b.x}}</h3>
+</sc-if>
+
+<sc-if value="{{b.isSub2}}" hint-placeholder-val="{{false}}">
+<h4 style="margin: 28px 0 10px; font-size: 17px; line-height: 1.4; font-weight: 800; color: #2f7a75">{{b.x}}</h4>
+</sc-if>
+
+<sc-if value="{{b.isP}}" hint-placeholder-val="{{true}}">
+<p style="margin: 0 0 18px">{{b.x}}</p>
+</sc-if>
+
+<sc-if value="{{b.isUl}}" hint-placeholder-val="{{false}}">
+<ul style="list-style: none; margin: 6px 0 26px; padding: 22px 26px; background: #F2F4F8; border-radius: 28px; display: flex; flex-direction: column; gap: 12px">
+<sc-for list="{{b.items}}" as="x" hint-placeholder-count="3">
+<li style="display: flex; gap: 14px; line-height: 1.7"><span aria-hidden="true" style="flex-shrink: 0; width: 8px; height: 8px; border-radius: 999px; background: #76c8b6; margin-top: 11px; box-shadow: 0 0 0 4px rgba(118,200,182,.22)"></span><span style="min-width: 0">{{x}}</span></li>
+</sc-for>
+</ul>
+</sc-if>
+
+<sc-if value="{{b.isOl}}" hint-placeholder-val="{{false}}">
+<ol style="list-style: none; margin: 6px 0 26px; padding: 0; display: flex; flex-direction: column; gap: 14px">
+<sc-for list="{{b.oitems}}" as="o" hint-placeholder-count="3">
+<li style="display: flex; gap: 14px; font-size: 16px; line-height: 1.65"><span aria-hidden="true" style="flex-shrink: 0; width: 32px; height: 32px; border-radius: 999px; background: #e9ebf6; color: #242a5f; font-size: 13px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; font-variant-numeric: tabular-nums">{{o.n}}</span><span style="min-width: 0; padding-top: 3px">{{o.x}}</span></li>
+</sc-for>
+</ol>
+</sc-if>
+
+<sc-if value="{{b.isTable}}" hint-placeholder-val="{{false}}">
+<div role="table" aria-label="{{b.caption}}" style="margin: 10px 0 30px; border: 1px solid #eceef4; border-radius: 24px; overflow: hidden">
+<div style="overflow-x: auto">
+<div style="min-width: 640px">
+<sc-for list="{{b.rows}}" as="r" hint-placeholder-count="4">
+<div role="row" style="{{r.style}}">
+<sc-for list="{{r.cells}}" as="c" hint-placeholder-count="3">
+<div role="{{c.role}}" style="{{c.style}}">{{c.x}}</div>
+</sc-for>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+</sc-if>
+
+</sc-for>
+</div>
+</sc-if>
+
+</div>
+</article>
+</div>
+
+<!-- RIGHT: TOC + help -->
+<aside class="lg-right" style="position: sticky; top: 16px; min-width: 0; display: flex; flex-direction: column; gap: 12px">
+<nav class="lg-toc-side" aria-label="Ezen az oldalon" style="background: #ffffff; border-radius: 32px; padding: 22px 12px 12px; box-sizing: border-box; max-height: calc(100vh - 300px); min-height: 160px; overflow-y: auto">
+<span style="display: block; padding: 0 12px 10px; font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #4b5563">Ezen az oldalon</span>
+<sc-if value="{{loading}}" hint-placeholder-val="{{false}}">
+<div aria-hidden="true" style="display: flex; flex-direction: column; gap: 10px; padding: 4px 12px 8px">
+<span class="sk" style="width: 90%; height: 14px; border-radius: 999px; background: #eceef4"></span>
+<span class="sk" style="width: 70%; height: 14px; border-radius: 999px; background: #eceef4"></span>
+<span class="sk" style="width: 82%; height: 14px; border-radius: 999px; background: #eceef4"></span>
+<span class="sk" style="width: 60%; height: 14px; border-radius: 999px; background: #eceef4"></span>
+</div>
+</sc-if>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<sc-for list="{{toc}}" as="t" hint-placeholder-count="6">
+<a href="{{t.href}}" onClick="{{t.go}}" aria-current="{{t.current}}" class="lg-toc-a" style="{{t.style}}"><span style="{{t.numStyle}}">{{t.num}}</span><span title="{{t.text}}" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden">{{t.text}}</span></a>
+</sc-for>
+</div>
+</nav>
+<a href="#lg-top" onClick="{{toTop}}" class="btn lg-top-btn" style="display: inline-flex; align-items: center; justify-content: center; gap: 10px; height: 52px; padding: 0 24px; border-radius: 999px; background: #ffffff; color: #242a5f; text-decoration: none; font-size: 14px; font-weight: 800"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"></path></svg>Vissza a tetejére</a>
+<div class="lg-help" style="background: #242a5f; color: #ffffff; border-radius: 32px; padding: 24px; display: flex; flex-direction: column; gap: 12px; position: relative; overflow: hidden">
+<div aria-hidden="true" style="position: absolute; width: 150px; height: 150px; border-radius: 999px; background: #76c8b6; opacity: .18; right: -50px; top: -60px"></div>
+<span style="position: relative; width: 44px; height: 44px; border-radius: 999px; background: #76c8b6; color: #242a5f; display: inline-flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01"></path></svg></span>
+<strong style="position: relative; font-size: 20px; font-weight: 800">Kérdése van?</strong>
+<span style="position: relative; font-size: 14px; line-height: 1.55; color: #c9cde3">Telefonon csak a rendelési időben vagyunk elérhetőek.</span>
+<a href="mailto:recepcio@drmoroczangela.hu" class="btn" style="position: relative; display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 14px; border-radius: 999px; background: #76c8b6; color: #242a5f; text-decoration: none; font-size: 13px; font-weight: 800; word-break: break-all; text-align: center">recepcio@drmoroczangela.hu</a>
+<a href="tel:+36706395239" class="btn" style="position: relative; display: flex; align-items: center; justify-content: center; gap: 8px; height: 48px; padding: 0 14px; border-radius: 999px; border: 1.5px solid rgba(255,255,255,.28); color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 700; box-sizing: border-box"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>+36 70 639 5239</a>
+</div>
+</aside>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"doc":{"editor":"enum","options":["adatkezelesi-tajekoztato","altalanos-betegtajekoztato","cookie-szabalyzat","felhasznalasi-feltetelek","foglalasi-es-lemondasi-szabalyzat"],"default":"foglalasi-es-lemondasi-szabalyzat"},"$preview":{"width":1440,"height":6800}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { data: null, err: false, active: 0, tocOpen: false };
+  }
+  componentDidMount() { this.load(); }
+  load() {
+    fetch('/_blob/3d52fd3169966142601f0b9d1d5ad6f0')
+      .then((r) => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then((d) => this.setState({ data: d, err: false }))
+      .catch(() => this.setState({ err: true }));
+  }
+  renderVals() {
+    const s = this.state;
+    const IC = {
+      shield: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',
+      cookie: 'M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5M8.5 8.5v.01M16 15.5v.01M12 12v.01M11 17v.01M7 14v.01',
+      doc: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M9 13h6M9 17h6',
+      cal: 'M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM9 16l2 2 4-4',
+      heart: 'M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z'
+    };
+    const DOCS = [
+      { key: 'adatkezelesi-tajekoztato', label: 'Adatkezelési tájékoztató', file: 'Adatkezeles.dc.html', icon: IC.shield },
+      { key: 'cookie-szabalyzat', label: 'Cookie Szabályzat', file: 'Cookie.dc.html', icon: IC.cookie },
+      { key: 'felhasznalasi-feltetelek', label: 'Felhasználási Feltételek', file: 'Felhasznalasi.dc.html', icon: IC.doc },
+      { key: 'foglalasi-es-lemondasi-szabalyzat', label: 'Foglalási és Lemondási Szabályzat', file: 'Lemondasi.dc.html', icon: IC.cal },
+      { key: 'altalanos-betegtajekoztato', label: 'Általános Betegtájékoztató', file: 'Betegtajekoztato.dc.html', icon: IC.heart }
+    ];
+    const key = DOCS.some((d) => d.key === this.props.doc) ? this.props.doc : 'foglalasi-es-lemondasi-szabalyzat';
+    const cur = DOCS.find((d) => d.key === key);
+    const doc = s.data && s.data.legal ? s.data.legal[key] : null;
+    const ready = !!doc;
+    const loading = !doc && !s.err;
+    const raw = doc && Array.isArray(doc.blocks) ? doc.blocks : [];
+
+    // Heading levels: top level = h2, or h3 when the document has no h2
+    const topTag = raw.some((b) => b.t === 'h2') ? 'h2' : 'h3';
+    const LV = { h2: 2, h3: 3, h4: 4 };
+    const shift = topTag === 'h2' ? 0 : 1;
+    const NUM = /^(\d+(?:\.\d+)*)\.?\s+(.+)$/;
+    const anyNum = raw.some((b) => b.t === topTag && NUM.test(b.x || ''));
+
+    // Reading time from word count
+    let words = 0;
+    const cnt = (t) => { const m = String(t || '').trim().match(/\S+/g); words += m ? m.length : 0; };
+    raw.forEach((b) => { cnt(b.x); (b.items || []).forEach(cnt); (b.rows || []).forEach((r) => r.forEach(cnt)); });
+    const mins = Math.max(1, Math.round(words / 200));
+
+    const jump = (e, id) => {
+      let el = null;
+      try {
+        const t = e && e.currentTarget;
+        const root = t && t.getRootNode ? t.getRootNode() : document;
+        el = root && root.getElementById ? root.getElementById(id) : document.getElementById(id);
+      } catch (x) { el = null; }
+      if (el && el.scrollIntoView) {
+        if (e && e.preventDefault) e.preventDefault();
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    };
+
+    const tocRaw = [];
+    let ti = -1;
+    let lastTable = '';
+    const blocks = raw.map((b, k) => {
+      const o = { isTop: false, isSub: false, isSub2: false, isP: false, isUl: false, isOl: false, isTable: false, x: b.x || '' };
+      const lv = LV[b.t] ? LV[b.t] - shift : 0;
+      if (lv === 2) {
+        ti += 1;
+        const m = (b.x || '').match(NUM);
+        const num = m ? m[1] : (anyNum ? '' : String(ti + 1));
+        const text = m ? m[2] : b.x;
+        const id = 'lg-' + key + '-' + ti;
+        tocRaw.push({ id: id, num: num, text: text, i: ti });
+        o.isTop = true; o.id = id; o.num = num; o.noNum = !num; o.text = text;
+        o.style = 'display: flex; align-items: flex-start; gap: 14px; font-size: 27px; line-height: 1.28; font-weight: 800; color: #242a5f; letter-spacing: -0.02em; scroll-margin-top: 24px; ' +
+          (k === 0 ? 'margin: 0 0 18px' : 'margin: 48px 0 18px; padding-top: 40px; border-top: 1px solid #eceef4');
+        o.numStyle = 'flex-shrink: 0; min-width: 44px; height: 34px; padding: 0 12px; box-sizing: border-box; border-radius: 999px; background: ' + (s.active === ti ? '#242a5f; color: #ffffff' : '#E6EDE8; color: #2f7a75') + '; font-size: 15px; font-weight: 800; letter-spacing: 0; display: inline-flex; align-items: center; justify-content: center; font-variant-numeric: tabular-nums; transition: background-color .3s, color .3s';
+      } else if (lv === 3) { o.isSub = true; lastTable = b.x;
+      } else if (lv === 4) { o.isSub2 = true; lastTable = b.x;
+      } else if (b.t === 'p') { o.isP = true;
+      } else if (b.t === 'ul') { o.isUl = true; o.items = b.items || [];
+      } else if (b.t === 'ol') { o.isOl = true; o.oitems = (b.items || []).map((x, i) => ({ n: i + 1, x: x }));
+      } else if (b.t === 'table') {
+        const rows = b.rows || [];
+        const n = rows.length ? rows[0].length : 1;
+        const cols = 'grid-template-columns: minmax(150px, .75fr) repeat(' + Math.max(n - 1, 1) + ', minmax(200px, 1fr))';
+        o.isTable = true; o.caption = lastTable || 'Táblázat';
+        o.rows = rows.map((r, ri) => ({
+          style: 'display: grid; ' + cols + '; ' + (ri === 0 ? 'background: #E6EDE8' : 'border-top: 1px solid #eceef4; background: ' + (ri % 2 === 0 ? '#FAFBFC' : '#ffffff')),
+          cells: r.map((c, ci) => ({ x: c, role: ri === 0 ? 'columnheader' : (ci === 0 ? 'rowheader' : 'cell'),
+            style: 'padding: ' + (ri === 0 ? '16px 20px' : '18px 20px') + '; font-size: ' + (ri === 0 ? '14px; font-weight: 800; color: #242a5f; letter-spacing: .01em' : '15px; line-height: 1.6; ' + (ci === 0 ? 'font-weight: 800; color: #242a5f' : 'color: #374151')) }))
+        }));
+      } else { o.isP = true; }
+      return o;
+    });
+
+    const toc = tocRaw.map((t) => { const on = s.active === t.i; return { ...t, href: '#' + t.id, current: on ? 'true' : 'false',
+      go: (e) => { jump(e, t.id); this.setState({ active: t.i, tocOpen: false }); },
+      style: 'display: flex; align-items: flex-start; gap: 10px; padding: 9px 12px; border-radius: 16px; text-decoration: none; font-size: 14px; line-height: 1.4; ' + (on ? 'background: #E6EDE8; color: #242a5f; font-weight: 800' : 'color: #4b5563; font-weight: 600'),
+      numStyle: 'flex-shrink: 0; min-width: 28px; height: 22px; padding: 0 7px; box-sizing: border-box; border-radius: 999px; font-size: 11px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; font-variant-numeric: tabular-nums; transition: background-color .3s, color .3s; ' +
+        (on ? 'background: #242a5f; color: #ffffff' : 'background: #F2F4F8; color: #2f7a75') + (t.num ? '' : '; min-width: 10px; width: 10px; height: 10px; padding: 0; margin: 6px 9px 0') }; });
+
+    const SK = ['42%', '100%', '96%', '88%', '0', '100%', '92%', '97%', '64%', '0', '36%', '100%', '94%', '78%'];
+    const skel = SK.map((w, i) => ({ style: w === '0' ? 'height: 10px' : 'display: block; width: ' + w + '; height: ' + (i === 0 || i === 10 ? '30px' : '15px') + '; border-radius: 999px; background: ' + (i === 0 || i === 10 ? '#E6EDE8' : '#eceef4') + '; animation-delay: ' + (i * 60) + 'ms' }));
+
+    const open = s.tocOpen;
+    return {
+      title: doc && doc.title ? doc.title : cur.label,
+      meta: doc && doc.meta ? doc.meta : '',
+      hasMeta: !!(doc && doc.meta),
+      ready: ready,
+      loading: loading,
+      err: !!s.err && !doc,
+      busy: loading ? 'true' : 'false',
+      retry: () => { this.setState({ err: false }); this.load(); },
+      readTime: '≈ ' + mins + ' perc olvasás',
+      sectionCount: ready ? tocRaw.length + ' fejezet' : 'Fejezetek',
+      blocks: blocks,
+      toc: toc,
+      skel: skel,
+      toTop: (e) => jump(e, 'lg-top'),
+      tocToggle: () => this.setState({ tocOpen: !open }),
+      tocExp: open ? 'true' : 'false',
+      tocHidden: open ? 'false' : 'true',
+      tocRows: open ? '1fr' : '0fr',
+      tocOp: open ? '1' : '0',
+      chevStyle: 'width: 42px; height: 42px; border-radius: 999px; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; ' + (open ? 'background: #242a5f; color: #ffffff; transform: rotate(180deg)' : 'background: #F2F4F8; color: #242a5f'),
+      docs: DOCS.map((d) => { const on = d.key === key; return { ...d, current: on ? 'page' : 'false',
+        style: 'display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 6px 20px 6px 6px; border-radius: 999px; text-decoration: none; font-size: 14px; font-weight: ' + (on ? '800' : '700') + '; line-height: 1.3; white-space: nowrap; box-sizing: border-box; ' + (on ? 'background: #242a5f; color: #ffffff; box-shadow: 0 12px 24px -14px rgba(36,42,95,.7)' : 'color: #242a5f'),
+        iconStyle: 'width: 40px; height: 40px; border-radius: 999px; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; ' + (on ? 'background: #76c8b6; color: #242a5f' : 'background: #E6EDE8; color: #2f7a75') }; })
+    };
+  }
+}
+</script>
+</body>
+</html>

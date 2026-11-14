@@ -17,96 +17,104 @@ const thousands = (n: number) =>
 function PackageCard({ pack, index }: { pack: ScreeningPackage; index: number }) {
   const hi = pack.recommended;
   return (
-    <article
-      aria-labelledby={`csomag-${pack.id}`}
-      className={cn(
-        "card-lift fade-up flex w-full flex-col gap-[18px] rounded-[32px] p-5 md:gap-[22px] md:rounded-[36px] md:p-[clamp(24px,3vw,36px)]",
-        hi
-          ? "bg-navy text-white shadow-[0_34px_70px_-36px_rgba(36,42,95,.7)]"
-          : "bg-white text-navy",
-      )}
-      style={{ "--i": index } as CSSProperties}
-    >
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="flex min-w-0 flex-col gap-1.5">
-          <h3
-            id={`csomag-${pack.id}`}
-            className="m-0 text-xl leading-[1.2] font-extrabold tracking-[-0.01em] md:text-[26px]"
-          >
-            {pack.name}
-          </h3>
-          {pack.goal && (
-            <span
-              className={cn(
-                "text-[13px] leading-normal font-semibold md:text-[15px]",
-                hi ? "text-navy-soft" : "text-muted",
-              )}
+    // fade-up sits on a wrapper: its animation would otherwise cancel the hover lift.
+    <div className="fade-up flex w-full" style={{ "--i": index } as CSSProperties}>
+      <article
+        aria-labelledby={`csomag-${pack.id}`}
+        className={cn(
+          "card-lift flex w-full flex-col gap-[18px] rounded-[32px] p-5 md:gap-[22px] md:rounded-[36px] md:p-[clamp(24px,3vw,36px)]",
+          hi
+            ? "bg-navy text-white shadow-[0_34px_70px_-36px_rgba(36,42,95,.7)]"
+            : "bg-white text-navy",
+        )}
+      >
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="flex min-w-0 flex-col gap-1.5">
+            <h3
+              id={`csomag-${pack.id}`}
+              className="m-0 text-xl leading-[1.2] font-extrabold tracking-[-0.01em] md:text-[26px]"
             >
-              {pack.goal}
+              {pack.name}
+            </h3>
+            {pack.goal && (
+              <span
+                className={cn(
+                  "text-[13px] leading-normal font-semibold md:text-[15px]",
+                  hi ? "text-navy-soft" : "text-muted",
+                )}
+              >
+                {pack.goal}
+              </span>
+            )}
+          </div>
+          {hi && (
+            <span className="inline-flex h-[34px] shrink-0 items-center gap-1.5 rounded-full bg-sun px-3.5 text-[13px] font-extrabold whitespace-nowrap text-navy">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path d={STAR} />
+              </svg>
+              Ajánlott
             </span>
           )}
         </div>
-        {hi && (
-          <span className="inline-flex h-[34px] shrink-0 items-center gap-1.5 rounded-full bg-sun px-3.5 text-[13px] font-extrabold whitespace-nowrap text-navy">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <path d={STAR} />
-            </svg>
-            Ajánlott
-          </span>
+        {pack.price != null && (
+          <div className="flex items-baseline gap-2">
+            <span className="text-[40px] leading-none font-extrabold tracking-[-0.03em] tabular-nums md:text-[clamp(44px,4.4vw,60px)]">
+              {thousands(pack.price)}
+            </span>
+            <span className="text-base font-extrabold md:text-xl">Ft</span>
+          </div>
         )}
-      </div>
-      {pack.price != null && (
-        <div className="flex items-baseline gap-2">
-          <span className="text-[40px] leading-none font-extrabold tracking-[-0.03em] tabular-nums md:text-[clamp(44px,4.4vw,60px)]">
-            {thousands(pack.price)}
-          </span>
-          <span className="text-base font-extrabold md:text-xl">Ft</span>
-        </div>
-      )}
-      <ul className="m-0 flex flex-1 list-none flex-col gap-2.5 p-0">
-        {pack.rows.map((row) => (
-          <li
-            key={row.text}
-            className={cn(
-              "flex items-start gap-3 rounded-[22px] px-4 py-3 text-sm leading-normal font-bold md:text-base",
-              hi ? "bg-white/8" : row.included ? "bg-sun-soft" : "bg-canvas text-muted",
-            )}
-          >
-            <span
+        <ul className="m-0 flex flex-1 list-none flex-col gap-2.5 p-0">
+          {pack.rows.map((row) => (
+            <li
+              key={row.text}
               className={cn(
-                "-mt-px inline-flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-full",
-                !row.included
-                  ? "bg-line text-muted"
-                  : hi
-                    ? "bg-sun text-navy"
-                    : "bg-navy text-white",
+                "flex items-start gap-3 rounded-[22px] px-4 py-3 text-sm leading-normal font-bold md:text-base",
+                hi ? "bg-white/8" : row.included ? "bg-sun-soft" : "bg-canvas text-muted",
               )}
             >
-              <PathIcon d={row.included ? ICON_PATHS.tick : CROSS} size={14} strokeWidth={3} />
-            </span>
-            <span className="min-w-0 flex-1">
-              {row.text}
-              {!row.included && (
-                <span className="block text-[13px] font-semibold opacity-80">
-                  nem része a csomagnak
-                </span>
-              )}
-            </span>
-          </li>
-        ))}
-      </ul>
-      <PillLink
-        href={bookingHref("nogyogyaszat")}
-        variant={hi ? "mint" : "navy"}
-        arrow
-        className={cn(
-          "h-[50px] w-full md:h-[54px] md:w-auto md:self-start md:px-[26px] md:text-[15px]",
-          hi && "bg-sun text-navy hover:bg-sun",
-        )}
-      >
-        Foglaljon időpontot
-      </PillLink>
-    </article>
+              <span
+                className={cn(
+                  "-mt-px inline-flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-full",
+                  !row.included
+                    ? "bg-line text-muted"
+                    : hi
+                      ? "bg-sun text-navy"
+                      : "bg-navy text-white",
+                )}
+              >
+                <PathIcon d={row.included ? ICON_PATHS.tick : CROSS} size={14} strokeWidth={3} />
+              </span>
+              <span className="min-w-0 flex-1">
+                {row.text}
+                {!row.included && (
+                  <span className="block text-[13px] font-semibold opacity-80">
+                    nem része a csomagnak
+                  </span>
+                )}
+              </span>
+            </li>
+          ))}
+        </ul>
+        <PillLink
+          href={bookingHref("nogyogyaszat")}
+          variant={hi ? "mint" : "navy"}
+          arrow
+          className={cn(
+            "h-[50px] w-full md:h-[54px] md:w-auto md:self-start md:px-[26px] md:text-[15px]",
+            hi && "bg-sun text-navy hover:bg-sun",
+          )}
+        >
+          Foglaljon időpontot
+        </PillLink>
+      </article>
+    </div>
   );
 }
 

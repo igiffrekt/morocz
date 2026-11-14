@@ -56,23 +56,25 @@ export function InfoCard({
   tone?: InfoCardTone;
 }) {
   return (
-    <div
-      className={cn("card-lift fade-up flex flex-col gap-3 rounded-tile p-[26px]", tone.surface)}
-      style={{ "--i": index } as CSSProperties}
-    >
-      <span className="flex items-center gap-3">
-        <span
-          className={cn(
-            "inline-flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-full",
-            tone.icon,
-          )}
-        >
-          <PathIcon d={item.icon} size={20} />
+    // fade-up sits on a wrapper: its animation would otherwise cancel the hover lift.
+    <div className="fade-up flex" style={{ "--i": index } as CSSProperties}>
+      <div
+        className={cn("card-lift flex w-full flex-col gap-3 rounded-tile p-[26px]", tone.surface)}
+      >
+        <span className="flex items-center gap-3">
+          <span
+            className={cn(
+              "inline-flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-full",
+              tone.icon,
+            )}
+          >
+            <PathIcon d={item.icon} size={20} />
+          </span>
+          <h3 className="m-0 text-lg font-extrabold text-navy">{item.title}</h3>
         </span>
-        <h3 className="m-0 text-lg font-extrabold text-navy">{item.title}</h3>
-      </span>
-      <p className="m-0 text-[15px] leading-[1.65] text-muted-strong">{item.body}</p>
-      {item.highlight && <Highlight className={tone.highlight}>{item.highlight}</Highlight>}
+        <p className="m-0 text-[15px] leading-[1.65] text-muted-strong">{item.body}</p>
+        {item.highlight && <Highlight className={tone.highlight}>{item.highlight}</Highlight>}
+      </div>
     </div>
   );
 }

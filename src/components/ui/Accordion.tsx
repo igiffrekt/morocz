@@ -1,6 +1,6 @@
 "use client";
 
-import { type ElementType, type ReactNode, useEffect, useId, useState } from "react";
+import { type ElementType, type ReactNode, useEffect, useId, useRef, useState } from "react";
 import { cn } from "@/lib/cn";
 
 interface CollapseProps {
@@ -135,14 +135,20 @@ export function Accordion({
     multiple ? [...defaultOpen] : defaultOpen.slice(0, 1),
   );
   const open = controlledOpen ?? uncontrolledOpen;
+  // Latest state for the hash listener (works in controlled and uncontrolled mode).
+  const latest = useRef({ open, onOpenChange });
+  latest.current = { open, onOpenChange };
 
   useEffect(() => {
     if (!items.some((item) => item.anchor)) return;
     const openFromHash = () => {
       const hash = decodeURIComponent(window.location.hash.slice(1));
       const hit = hash ? items.find((item) => item.anchor === hash) : undefined;
-      if (!hit) return;
-      setOpen((prev) => (prev.includes(hit.id) ? prev : multiple ? [...prev, hit.id] : [hit.id]));
+      const { open: current, onOpenChange: notify } = latest.current;
+      if (!hit || current.includes(hit.id)) return;
+      const next = multiple ? [...current, hit.id] : [hit.id];
+      setOpen(next);
+      notify?.(next);
     };
     openFromHash();
     window.addEventListener("hashchange", openFromHash);

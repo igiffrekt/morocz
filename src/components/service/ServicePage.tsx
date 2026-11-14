@@ -301,37 +301,37 @@ export function ServicePage({
             {content.related.map((rel, i) => {
               const rm = SERVICE_META[rel.slug];
               return (
-                <Link
-                  key={rel.slug}
-                  href={rm.href}
-                  className={cn(
-                    "card-lift fade-up flex min-h-[150px] flex-col justify-between rounded-[28px] p-5 text-navy no-underline hover:text-navy md:min-h-[230px] md:rounded-[36px] md:p-7",
-                    rm.tint,
-                  )}
-                  style={{ "--i": i } as CSSProperties}
-                >
-                  <span className="flex items-start justify-between gap-3">
-                    <span
-                      className={cn(
-                        "inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full md:h-[60px] md:w-[60px]",
-                        rm.accent,
-                      )}
-                    >
-                      <PathIcon d={rm.icon} size={24} />
+                <div key={rel.slug} className="fade-up flex" style={{ "--i": i } as CSSProperties}>
+                  <Link
+                    href={rm.href}
+                    className={cn(
+                      "card-lift flex w-full min-h-[150px] flex-col justify-between rounded-[28px] p-5 text-navy no-underline hover:text-navy md:min-h-[230px] md:rounded-[36px] md:p-7",
+                      rm.tint,
+                    )}
+                  >
+                    <span className="flex items-start justify-between gap-3">
+                      <span
+                        className={cn(
+                          "inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full md:h-[60px] md:w-[60px]",
+                          rm.accent,
+                        )}
+                      >
+                        <PathIcon d={rm.icon} size={24} />
+                      </span>
+                      <span className="card-go inline-flex h-12 w-12 items-center justify-center rounded-full bg-white text-navy">
+                        <PathIcon d="M5 12h14M13 6l6 6-6 6" size={20} strokeWidth={2.2} />
+                      </span>
                     </span>
-                    <span className="card-go inline-flex h-12 w-12 items-center justify-center rounded-full bg-white text-navy">
-                      <PathIcon d="M5 12h14M13 6l6 6-6 6" size={20} strokeWidth={2.2} />
+                    <span className="mt-6 flex flex-col gap-1.5 md:mt-9">
+                      <span className="text-[22px] font-extrabold tracking-[-0.01em] md:text-[26px]">
+                        {rel.h}
+                      </span>
+                      <span className="text-sm font-semibold text-muted-strong md:text-base">
+                        {rel.s}
+                      </span>
                     </span>
-                  </span>
-                  <span className="mt-6 flex flex-col gap-1.5 md:mt-9">
-                    <span className="text-[22px] font-extrabold tracking-[-0.01em] md:text-[26px]">
-                      {rel.h}
-                    </span>
-                    <span className="text-sm font-semibold text-muted-strong md:text-base">
-                      {rel.s}
-                    </span>
-                  </span>
-                </Link>
+                  </Link>
+                </div>
               );
             })}
           </div>

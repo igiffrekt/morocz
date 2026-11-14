@@ -1,4 +1,3 @@
-import type { CSSProperties } from "react";
 import { ICON_PATHS, PathIcon } from "@/components/home/PathIcon";
 import { SwipeRow } from "@/components/subpage/SwipeRow";
 import type { ServiceBlock, ServiceCard } from "@/content/services/types";
@@ -100,10 +99,9 @@ function Cards({ items, meta, label }: { items: ServiceCard[]; meta: ServiceMeta
           <article
             key={card.h}
             className={cn(
-              "card-lift fade-up flex w-full flex-col gap-2.5 rounded-tile p-5 md:gap-3 md:p-[26px]",
+              "card-lift flex w-full flex-col gap-2.5 rounded-tile p-5 md:gap-3 md:p-[26px]",
               tone?.surface,
             )}
-            style={{ "--i": k } as CSSProperties}
           >
             <span
               className={cn(

@@ -1,32 +1,47 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
-import { BlogSection } from "@/components/sections/BlogSection";
-import { HeroSection } from "@/components/sections/HeroSection";
-import { HeroServiceCards } from "@/components/sections/HeroServiceCards";
-import { ServicesSectionBento } from "@/components/sections/ServicesSectionBento";
-// import { ServicesSectionScrollStack } from "@/components/sections/ServicesSectionScrollStack"; // Scroll stack version
-// import { ServicesSectionAccordion } from "@/components/sections/ServicesSectionAccordion"; // 2-col accordion version
-// import { ServicesSection } from "@/components/sections/ServicesSection"; // Original stacked version
-import { YogaScheduleSection } from "@/components/sections/YogaScheduleSection";
-import { TestimonialCarousel, type Testimonial } from "@/components/ui/testimonial";
-import { ImportantInfoSection } from "@/components/sections/ImportantInfoSection";
+import { BlogTeaser } from "@/components/home/BlogTeaser";
+import { HomeHero } from "@/components/home/HomeHero";
+import { ImportantInfo, type WeekHours } from "@/components/home/ImportantInfo";
+import { PriceMenu } from "@/components/home/PriceMenu";
+import { Reviews } from "@/components/home/Reviews";
+import { type YogaClassSlot, YogaWeek } from "@/components/home/YogaWeek";
+import { MobileActionBar } from "@/components/layout/MobileActionBar";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { pickBookingServices } from "@/lib/booking-services";
+import { computeOpeningHours, HU_DAY_NAMES } from "@/lib/opening-hours";
+import { buildPriceMenu, findServicePrice, surchargeExample } from "@/lib/price-menu";
+import { addDaysIso, type QuickBookingSchedule } from "@/lib/quick-booking";
+import { formatFt } from "@/lib/service-menu";
+import {
+  type ResolvedSchedule,
+  resolveScheduleForDate,
+  type SeasonalScheduleSummary,
+  todayInBudapest,
+} from "@/lib/slots";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import { urlFor } from "@/sanity/lib/image";
 import {
   allServiceCategoriesQuery,
   allServicesQuery,
+  blockedDatesQuery,
+  customAvailabilityForRangeQuery,
   homepageQuery,
   latestBlogPostsQuery,
+  pricingPageQuery,
+  seasonalSchedulesForRangeQuery,
+  servicesForBookingQuery,
   siteSettingsQuery,
   weeklyScheduleQuery,
   yogaScheduleQuery,
 } from "@/sanity/lib/queries";
 import type {
-  LatestBlogPostsQueryResult,
-  HomepageQueryResult,
   AllServiceCategoriesQueryResult,
   AllServicesQueryResult,
+  BlockedDatesQueryResult,
+  HomepageQueryResult,
+  LatestBlogPostsQueryResult,
+  PricingPageQueryResult,
+  ServicesForBookingQueryResult,
   SiteSettings,
   WeeklyScheduleQueryResult,
   YogaScheduleQueryResult,
@@ -79,7 +94,36 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-// ─── Structured data helpers ──────────────────────────────────────────────────
+// ─── Schedule helpers ─────────────────────────────────────────────────────────
+
+type WeeklyDay = NonNullable<NonNullable<WeeklyScheduleQueryResult>["days"]>[number];
+
+/** Sanity returns nullable fields; the schedule resolver expects plain values. */
+function normalizeDay(d: Partial<Omit<WeeklyDay, "_key">>) {
+  return {
+    dayOfWeek: d.dayOfWeek ?? -1,
+    isDayOff: d.isDayOff ?? false,
+    startTime: d.startTime ?? "",
+    endTime: d.endTime ?? "",
+    breakStart: d.breakStart ?? null,
+    breakEnd: d.breakEnd ?? null,
+  };
+}
+
+interface SeasonalDoc {
+  startDate: string | null;
+  endDate: string | null;
+  defaultSlotDuration: number | null;
+  bufferMinutes: number | null;
+  days: Partial<Omit<WeeklyDay, "_key">>[] | null;
+}
+
+interface CustomAvailabilityDoc {
+  date: string | null;
+  startTime: string | null;
+  endTime: string | null;
+  services: Array<{ _id: string } | null> | null;
+}
 
 const SCHEMA_DAYS = [
   "Sunday",
@@ -91,122 +135,216 @@ const SCHEMA_DAYS = [
   "Saturday",
 ] as const;
 
-// Opening hours come from the same weeklySchedule doc that drives the booking system,
-// so what Google and the answer engines quote can never drift from the bookable reality.
-function toOpeningHours(schedule: WeeklyScheduleQueryResult) {
-  return (schedule?.days ?? [])
-    .filter((day) => !day.isDayOff && day.dayOfWeek != null && day.startTime && day.endTime)
-    .sort((a, b) => (a.dayOfWeek ?? 0) - (b.dayOfWeek ?? 0))
+// Opening hours come from the same schedule documents that drive the booking system
+// (weekly, overridden by the seasonal schedule in force today), so what Google and
+// the answer engines quote can never drift from the bookable reality.
+function toOpeningHours(days: ResolvedSchedule["days"]) {
+  return days
+    .filter((day) => !day.isDayOff && day.dayOfWeek >= 0 && day.startTime && day.endTime)
+    .sort((a, b) => a.dayOfWeek - b.dayOfWeek)
     .flatMap((day) => {
-      const dayOfWeek = SCHEMA_DAYS[day.dayOfWeek as number];
+      const dayOfWeek = SCHEMA_DAYS[day.dayOfWeek];
       // A break splits the day into two published windows so opening hours
       // never claim the clinic is open during the lunch break.
       if (day.breakStart && day.breakEnd) {
         return [
-          { "@type": "OpeningHoursSpecification", dayOfWeek, opens: day.startTime, closes: day.breakStart },
-          { "@type": "OpeningHoursSpecification", dayOfWeek, opens: day.breakEnd, closes: day.endTime },
+          {
+            "@type": "OpeningHoursSpecification",
+            dayOfWeek,
+            opens: day.startTime,
+            closes: day.breakStart,
+          },
+          {
+            "@type": "OpeningHoursSpecification",
+            dayOfWeek,
+            opens: day.breakEnd,
+            closes: day.endTime,
+          },
         ];
       }
-      return [{ "@type": "OpeningHoursSpecification", dayOfWeek, opens: day.startTime, closes: day.endTime }];
+      return [
+        {
+          "@type": "OpeningHoursSpecification",
+          dayOfWeek,
+          opens: day.startTime,
+          closes: day.endTime,
+        },
+      ];
     });
+}
+
+const YOGA_DAYS: Record<string, number> = {
+  sunday: 0,
+  monday: 1,
+  tuesday: 2,
+  wednesday: 3,
+  thursday: 4,
+  friday: 5,
+  saturday: 6,
+};
+
+/** Class colours from the A1 palette, assigned in timetable order (Sanity colour wins). */
+const YOGA_PALETTE = ["#469993", "#76c8b6", "#e1bbcd", "#eb8966", "#efc462", "#242a5f"];
+
+function toYogaSlots(schedule: YogaScheduleQueryResult | null): YogaClassSlot[] {
+  const slots = (schedule ?? [])
+    .map((s) => ({ ...s, dow: YOGA_DAYS[s.dayOfWeek ?? ""] ?? -1 }))
+    .filter((s) => s.dow >= 0 && s.startTime && s.endTime && s.yogaClass?.name)
+    .sort(
+      (a, b) =>
+        ((a.dow + 6) % 7) - ((b.dow + 6) % 7) ||
+        (a.startTime ?? "").localeCompare(b.startTime ?? ""),
+    );
+  const colorOf = new Map<string, string>();
+  for (const s of slots) {
+    const name = s.yogaClass?.name ?? "";
+    if (!colorOf.has(name)) {
+      colorOf.set(
+        name,
+        s.yogaClass?.color || YOGA_PALETTE[colorOf.size % YOGA_PALETTE.length] || "#469993",
+      );
+    }
+  }
+  return slots.map((s) => ({
+    id: s._id,
+    dayOfWeek: s.dow,
+    start: s.startTime ?? "",
+    end: s.endTime ?? "",
+    name: s.yogaClass?.name ?? "",
+    instructor: s.instructor?.name ?? "",
+    color: colorOf.get(s.yogaClass?.name ?? "") ?? "#469993",
+    recurrence:
+      s.recurrence === "biweekly-even"
+        ? "páros hét"
+        : s.recurrence === "biweekly-odd"
+          ? "páratlan hét"
+          : null,
+  }));
 }
 
 // ─── Homepage Page ────────────────────────────────────────────────────────────
 
 export default async function Home() {
-  const [homepage, settings, categories, services, yogaSchedule, latestPosts, weeklySchedule] =
-    await Promise.all([
-      sanityFetch<HomepageQueryResult | null>({ query: homepageQuery, tags: ["homepage"] }),
-      sanityFetch<SiteSettings | null>({ query: siteSettingsQuery, tags: ["siteSettings"] }),
-      sanityFetch<AllServiceCategoriesQueryResult>({
-        query: allServiceCategoriesQuery,
-        tags: ["serviceCategory"],
-      }),
-      sanityFetch<AllServicesQueryResult>({ query: allServicesQuery, tags: ["service"] }),
-      sanityFetch<YogaScheduleQueryResult>({ query: yogaScheduleQuery, tags: ["yogaSchedule"] }),
-      sanityFetch<LatestBlogPostsQueryResult>({ query: latestBlogPostsQuery, tags: ["blogPost"] }),
-      sanityFetch<WeeklyScheduleQueryResult>({
-        query: weeklyScheduleQuery,
-        tags: ["weeklySchedule"],
-      }),
-    ]);
+  const today = todayInBudapest();
 
-  // Transform homepage: convert null to undefined for type compatibility
-  const transformedHomepage = homepage ? {
-    ...homepage,
-    heroHeadline: homepage.heroHeadline ?? undefined,
-    heroSubtitle: homepage.heroSubtitle ?? undefined,
-    heroBadges: (homepage.heroBadges ?? []).map(badge => ({
-      _key: badge._key,
-      emoji: badge.emoji ?? undefined,
-      text: badge.text ?? undefined,
-    })),
-    heroCards: (homepage.heroCards ?? []).map(card => ({
-      _key: card._key,
-      title: card.title ?? undefined,
-      subtitle: card.subtitle ?? undefined,
-      icon: card.icon ?? undefined,
-    })),
-    servicesHeadline: homepage.servicesHeadline ?? undefined,
-    servicesSubtitle: homepage.servicesSubtitle ?? undefined,
-    labTestsHeadline: homepage.labTestsHeadline ?? undefined,
-    labTestsSubtitle: homepage.labTestsSubtitle ?? undefined,
-    testimonialsHeadline: homepage.testimonialsHeadline ?? undefined,
-    testimonialsCtaText: homepage.testimonialsCtaText ?? undefined,
-    testimonialsCtaUrl: homepage.testimonialsCtaUrl ?? undefined,
-    blogHeadline: homepage.blogHeadline ?? undefined,
-    ctaHeadline: homepage.ctaHeadline ?? undefined,
-    ctaDescription: homepage.ctaDescription ?? undefined,
-    metaDescription: homepage.metaDescription ?? undefined,
-    heroDoctorImage: homepage.heroDoctorImage ?? undefined,
-    ogImage: homepage.ogImage ?? undefined,
-  } : null;
+  const [homepage, settings, weeklySchedule, blockedDoc] = await Promise.all([
+    sanityFetch<HomepageQueryResult | null>({ query: homepageQuery, tags: ["homepage"] }),
+    sanityFetch<SiteSettings | null>({ query: siteSettingsQuery, tags: ["siteSettings"] }),
+    sanityFetch<WeeklyScheduleQueryResult | null>({
+      query: weeklyScheduleQuery,
+      tags: ["weeklySchedule"],
+    }),
+    sanityFetch<BlockedDatesQueryResult | null>({
+      query: blockedDatesQuery,
+      tags: ["blockedDate"],
+    }),
+  ]);
 
-  // Transform categories: convert null to undefined for type compatibility
-  const transformedCategories = (categories ?? []).map((cat) => ({
-    _id: cat._id,
-    name: cat.name ?? undefined,
-    emoji: cat.emoji ?? undefined,
-    order: cat.order ?? undefined,
+  const windowDays = weeklySchedule?.bookingWindowDays ?? 30;
+  // A couple of spare days: the client may already be on "tomorrow" when the cached page is served.
+  const rangeEnd = addDaysIso(today, windowDays + 2);
+
+  const [
+    categories,
+    services,
+    bookingServices,
+    seasonalDocs,
+    customDocs,
+    pricing,
+    yoga,
+    latestPosts,
+  ] = await Promise.all([
+    sanityFetch<AllServiceCategoriesQueryResult>({
+      query: allServiceCategoriesQuery,
+      tags: ["serviceCategory"],
+    }),
+    sanityFetch<AllServicesQueryResult>({ query: allServicesQuery, tags: ["service"] }),
+    sanityFetch<ServicesForBookingQueryResult>({
+      query: servicesForBookingQuery,
+      tags: ["service"],
+    }),
+    sanityFetch<SeasonalDoc[] | null>({
+      query: seasonalSchedulesForRangeQuery,
+      params: { startDate: today, endDate: rangeEnd },
+      tags: ["seasonalSchedule"],
+    }),
+    sanityFetch<CustomAvailabilityDoc[] | null>({
+      query: customAvailabilityForRangeQuery,
+      params: { startDate: today, endDate: rangeEnd },
+      tags: ["customAvailability"],
+    }),
+    sanityFetch<PricingPageQueryResult | null>({ query: pricingPageQuery, tags: ["pricingPage"] }),
+    sanityFetch<YogaScheduleQueryResult | null>({
+      query: yogaScheduleQuery,
+      tags: ["yogaSchedule"],
+    }),
+    sanityFetch<LatestBlogPostsQueryResult | null>({
+      query: latestBlogPostsQuery,
+      tags: ["blogPost"],
+    }),
+  ]);
+
+  // ── Schedule (weekly → seasonal → customAvailability → blockedDate) ─────────
+  const weeklyDays = (weeklySchedule?.days ?? []).map(normalizeDay);
+  const seasonals: SeasonalScheduleSummary[] = (seasonalDocs ?? [])
+    .filter((s): s is SeasonalDoc & { startDate: string; endDate: string } =>
+      Boolean(s.startDate && s.endDate),
+    )
+    .map((s) => ({
+      startDate: s.startDate,
+      endDate: s.endDate,
+      defaultSlotDuration: s.defaultSlotDuration ?? 20,
+      bufferMinutes: s.bufferMinutes ?? 0,
+      days: (s.days ?? []).map(normalizeDay),
+    }));
+
+  const schedule: QuickBookingSchedule = {
+    weeklyDays,
+    bookingWindowDays: windowDays,
+    seasonals,
+    blockedDates: (blockedDoc?.dates ?? []).map((d) => d.date ?? "").filter(Boolean),
+    customAvailability: (customDocs ?? [])
+      .filter((c): c is CustomAvailabilityDoc & { date: string } => Boolean(c.date))
+      .map((c) => ({
+        date: c.date,
+        startTime: c.startTime,
+        endTime: c.endTime,
+        serviceIds:
+          c.services?.map((s) => s?._id).filter((id): id is string => Boolean(id)) ?? null,
+      })),
+  };
+
+  const { gyne, prenatal } = pickBookingServices(
+    (bookingServices ?? []).filter((s) => s.name != null),
+  );
+  const serviceIds = { nogyogyaszat: gyne?._id ?? null, varandosgondozas: prenatal?._id ?? null };
+
+  // Hours shown in "Fontos tudnivalók" and published as structured data: today's schedule.
+  const resolvedToday = resolveScheduleForDate(
+    today,
+    { defaultSlotDuration: 0, bufferMinutes: 0, days: weeklyDays },
+    seasonals,
+  );
+  const openDays = computeOpeningHours(today, { days: weeklyDays }, seasonals).days;
+  const week: WeekHours[] = [1, 2, 3, 4, 5].map((dow) => ({
+    name: HU_DAY_NAMES[dow] ?? "",
+    hours: openDays.find((d) => d.dayOfWeek === dow)?.hours ?? null,
   }));
 
-  // Transform services: convert null to undefined for type compatibility
-  // Also deduplicate by name (keep first occurrence)
-  const seenNames = new Set<string>();
-  const transformedServices = (services ?? [])
-    .map((svc) => ({
-      _id: svc._id,
-      name: svc.name ?? undefined,
-      description: svc.description ?? undefined,
-      price: svc.price ?? undefined,
-      icon: svc.icon,
-      category: svc.category ? {
-        _id: svc.category._id,
-        name: svc.category.name ?? undefined,
-        emoji: svc.category.emoji ?? undefined,
-      } : undefined,
-      order: svc.order ?? undefined,
-    }))
-    .filter((svc) => {
-      if (!svc.name || seenNames.has(svc.name)) return false;
-      seenNames.add(svc.name);
-      return true;
-    });
+  // ── Prices ──────────────────────────────────────────────────────────────────
+  const priceMenu = buildPriceMenu(categories ?? [], services ?? []);
+  const certificate = findServicePrice(
+    services ?? [],
+    "Szakorvosi dokumentáció (igazolás) kiállítása",
+  );
+  const validityNote = (pricing?.validityNote || "Érvényes 2026. július 1-től.").trim();
 
-  // Transform latestPosts: convert null to undefined for type compatibility
-  const transformedLatestPosts = (latestPosts ?? []).map((post) => ({
-    _id: post._id,
-    title: post.title ?? undefined,
-    slug: post.slug ?? undefined,
-    category: post.category ? {
-      _id: post.category._id,
-      name: post.category.name ?? undefined,
-    } : undefined,
-    featuredImage: post.featuredImage,
-    excerpt: post.excerpt ?? undefined,
-    content: post.content,
-  }));
+  // ── Reviews ─────────────────────────────────────────────────────────────────
+  const reviews = (homepage?.testimonials ?? [])
+    .filter((t) => t?.text)
+    .map((t) => ({ id: t._id, name: t.patientName ?? "Páciens", text: t.text ?? "" }));
 
+  // ── Structured data ─────────────────────────────────────────────────────────
   const clinicPhone = settings?.phone ?? "+36 70 639 5239";
   const clinicAddress = {
     "@type": "PostalAddress",
@@ -219,7 +357,7 @@ export default async function Home() {
   const clinicImage = settings?.defaultOgImage?.asset
     ? urlFor(settings.defaultOgImage).width(1200).height(630).url()
     : undefined;
-  const openingHours = toOpeningHours(weeklySchedule);
+  const openingHours = toOpeningHours(resolvedToday.days);
 
   const clinicJsonLd = {
     "@context": "https://schema.org",
@@ -228,8 +366,7 @@ export default async function Home() {
         "@type": ["MedicalClinic", "LocalBusiness"],
         "@id": "https://drmoroczangela.hu/#clinic",
         name: "Dr. Mórocz Angéla Nőgyógyászati Rendelő",
-        description:
-          "Szülészet, nőgyógyászati vizsgálatok és várandósgondozás Esztergomban.",
+        description: "Szülészet, nőgyógyászati vizsgálatok és várandósgondozás Esztergomban.",
         url: "https://drmoroczangela.hu",
         telephone: clinicPhone,
         email: settings?.email ?? "",
@@ -266,91 +403,36 @@ export default async function Home() {
   };
 
   return (
-    <>
-      <HeroSection
-        headline={transformedHomepage?.heroHeadline}
-        subtitle={transformedHomepage?.heroSubtitle}
-        badges={transformedHomepage?.heroBadges}
-        doctorImage={transformedHomepage?.heroDoctorImage}
-        phone={settings?.phone}
+    <div className="flex flex-col gap-12 pb-0 lg:gap-28">
+      <HomeHero
+        subtitle={homepage?.heroSubtitle}
+        doctorImage={homepage?.heroDoctorImage}
+        serviceIds={serviceIds}
+        schedule={schedule}
       />
-      <HeroServiceCards cards={transformedHomepage?.heroCards} />
-      <ServicesSectionBento
-        heading={transformedHomepage?.servicesHeadline}
-        categories={transformedCategories}
-        services={transformedServices}
+      <PriceMenu
+        heading={homepage?.servicesHeadline}
+        lead={homepage?.servicesSubtitle}
+        validityNote={validityNote}
+        categories={priceMenu}
+        surchargeExample={surchargeExample(services ?? [])}
       />
-      <Suspense fallback={<div className="min-h-[400px]" />}>
-        <YogaScheduleSection schedule={yogaSchedule ?? []} showCta inlineModal />
-      </Suspense>
-
-      {/* ImportantInfo + Testimonials 70-30 layout */}
-      <div className="px-4 py-8 md:py-12">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[70%_30%] gap-6 md:gap-8">
-          {/* 70% - ImportantInfoSection */}
-          <div>
-            <ImportantInfoSection />
-          </div>
-          
-          {/* 30% - Testimonials */}
-          {transformedHomepage?.testimonialsHeadline && transformedHomepage?.testimonials && (transformedHomepage.testimonials).length > 0 && (
-            <div className="relative overflow-hidden rounded-3xl bg-secondary">
-              {/* Decorative blobs (matching ImportantInfoSection style) */}
-              <div
-                className="hidden md:block absolute -top-40 -right-40 w-[400px] h-[400px] rounded-full blur-[120px] opacity-40"
-                style={{ background: "radial-gradient(circle, #76c8b6 0%, transparent 70%)" }}
-              />
-              <div
-                className="hidden md:block absolute -bottom-32 right-0 w-[350px] h-[350px] rounded-full blur-[100px] opacity-30"
-                style={{ background: "radial-gradient(circle, #b8cfc0 0%, transparent 70%)" }}
-              />
-              
-              {/* Content */}
-              <div className="relative z-10 p-6 md:p-10 lg:p-14">
-                {/* Overline - matching ImportantInfoSection style */}
-                <span className="inline-flex items-center gap-3 text-xs font-semibold tracking-[0.2em] uppercase text-primary/40 mb-4">
-                  <span className="w-8 h-px bg-primary/20" />
-                  Rólunk mondták
-                </span>
-                
-                {/* Heading - matching ImportantInfoSection style */}
-                <div className="mb-8 md:mb-10">
-                  <h2 className="text-3xl md:text-4xl font-extrabold text-primary leading-tight">
-                    {transformedHomepage.testimonialsHeadline}
-                  </h2>
-                  
-                  {/* Subtitle - matching ImportantInfoSection style */}
-                  {transformedHomepage?.testimonialsCtaText && transformedHomepage?.testimonialsCtaUrl && (
-                    <a
-                      href={transformedHomepage.testimonialsCtaUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-3 inline-flex items-center gap-1 text-base text-primary/45 hover:text-primary/60 transition-colors"
-                    >
-                      {transformedHomepage.testimonialsCtaText}
-                      <span aria-hidden="true">→</span>
-                    </a>
-                  )}
-                </div>
-                
-                <TestimonialCarousel
-                  testimonials={(transformedHomepage.testimonials).map((t) => ({
-                    id: t._id,
-                    name: t.patientName ?? "Páciens",
-                    avatar: t.photo?.asset ? urlFor(t.photo).width(128).height(128).url() : "https://via.placeholder.com/64",
-                    description: t.text ?? "",
-                  }))}
-                  className="max-w-none"
-                  showArrows={true}
-                  showDots={true}
-                />
-              </div>
-            </div>
-          )}
-        </div>
+      <ImportantInfo
+        week={week}
+        certificatePrice={certificate != null ? formatFt(certificate) : null}
+      />
+      <YogaWeek classes={toYogaSlots(yoga)} />
+      <div className="flex flex-col gap-12 lg:flex-row lg:flex-wrap lg:gap-4">
+        <Reviews
+          heading={homepage?.testimonialsHeadline || "Vélemények"}
+          reviews={reviews}
+          ctaText={homepage?.testimonialsCtaText}
+          ctaUrl={homepage?.testimonialsCtaUrl}
+        />
+        <BlogTeaser heading={homepage?.blogHeadline} post={latestPosts?.[0]} />
       </div>
-      <BlogSection heading={transformedHomepage?.blogHeadline} posts={latestPosts ?? []} />
+      <MobileActionBar />
       <JsonLd data={clinicJsonLd} />
-    </>
+    </div>
   );
 }

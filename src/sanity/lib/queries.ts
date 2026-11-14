@@ -338,6 +338,17 @@ export const customAvailabilityForDateQuery =
   services[]->{_id}
 }`);
 
+// Custom availability days in [$startDate, $endDate] (homepage quick booking —
+// same fields /api/slots/availability reads).
+export const customAvailabilityForRangeQuery =
+  defineQuery(`*[_type == "customAvailability" && date >= $startDate && date <= $endDate]{
+  _id,
+  date,
+  startTime,
+  endTime,
+  services[]->{_id}
+}`);
+
 export const slotLocksForDateQuery = defineQuery(`*[_type == "slotLock" && slotDate == $date]{
   _id, slotDate, slotTime, status, heldUntil
 }`);

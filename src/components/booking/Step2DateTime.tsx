@@ -70,8 +70,13 @@ export function Step2DateTime({
   onBack,
 }: Step2DateTimeProps) {
   const today = new Date();
-  const [viewYear, setViewYear] = useState(today.getFullYear());
-  const [viewMonth, setViewMonth] = useState(today.getMonth());
+  // Open the calendar on the month of a preselected date (homepage quick booking).
+  const initialView = (() => {
+    const [y, m] = (selectedDate ?? "").split("-").map(Number);
+    return y && m ? { year: y, month: m - 1 } : { year: today.getFullYear(), month: today.getMonth() };
+  })();
+  const [viewYear, setViewYear] = useState(initialView.year);
+  const [viewMonth, setViewMonth] = useState(initialView.month);
 
   const [slots, setSlots] = useState<string[]>([]);
   const [slotsLoading, setSlotsLoading] = useState(false);

@@ -44,6 +44,12 @@ interface ScheduleData {
 interface BookingWizardProps {
   services: ServiceItem[];
   scheduleData: ScheduleData;
+  /**
+   * Preselection from the URL (?szolgaltatas=…&datum=…, homepage quick booking).
+   * Takes precedence over the sessionStorage restore; the prenatal notice still has
+   * to be acknowledged before Várandósgondozás is applied.
+   */
+  initialSelection?: { serviceId: string; date: string | null } | null;
 }
 
 const STEP_LABELS = ["Időpont", "Bejelentkezés", "Megerősítés"];
@@ -66,7 +72,7 @@ function formatDateHungarian(dateStr: string): string {
   });
 }
 
-export function BookingWizard({ services, scheduleData }: BookingWizardProps) {
+export function BookingWizard({ services, scheduleData, initialSelection }: BookingWizardProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const direction = useRef<number>(0);
 
@@ -82,6 +88,8 @@ export function BookingWizard({ services, scheduleData }: BookingWizardProps) {
 
   // Prenatal care requires acknowledging a notice before it is selected
   const [pendingService, setPendingService] = useState<ServiceItem | null>(null);
+  // Date that comes with a preselected (still pending) prenatal service
+  const [pendingDate, setPendingDate] = useState<string | null>(null);
 
   const [bookingResult, setBookingResult] = useState<BookingResult | null>(null);
 
@@ -92,8 +100,25 @@ export function BookingWizard({ services, scheduleData }: BookingWizardProps) {
   // Hold expiration check
   const [holdExpired, setHoldExpired] = useState(false);
 
-  // ── Restore wizard state from sessionStorage on mount ──────────────────────
+  // ── Restore wizard state from sessionStorage on mount (URL preselection wins) ──
+  // biome-ignore lint/correctness/useExhaustiveDependencies: runs once on mount by design
   useEffect(() => {
+    const preselected = initialSelection
+      ? services.find((s) => s._id === initialSelection.serviceId)
+      : undefined;
+    if (preselected) {
+      sessionStorage.removeItem(STORAGE_KEY);
+      if (preselected.name === "Várandósgondozás") {
+        setPendingService(preselected);
+        setPendingDate(initialSelection?.date ?? null);
+      } else {
+        applyService(preselected, initialSelection?.date ?? null);
+      }
+      // Drop the params so a reload restores the saved progress instead of re-applying them.
+      window.history.replaceState(window.history.state, "", window.location.pathname);
+      return;
+    }
+
     const saved = sessionStorage.getItem(STORAGE_KEY);
     if (saved) {
       try {
@@ -159,14 +184,14 @@ export function BookingWizard({ services, scheduleData }: BookingWizardProps) {
     setCurrentStep(next);
   }
 
-  function applyService(service: ServiceItem) {
+  function applyService(service: ServiceItem, date: string | null = null) {
     setSelections((prev) => ({
       ...prev,
       serviceId: service._id,
       serviceName: service.name ?? "",
       serviceDuration: service.appointmentDuration ?? 20,
       // slots and holds belong to the previous service
-      selectedDate: null,
+      selectedDate: date,
       selectedTime: null,
       slotLockId: null,
       heldUntil: null,
@@ -176,6 +201,7 @@ export function BookingWizard({ services, scheduleData }: BookingWizardProps) {
   function handleServiceSelect(service: ServiceItem) {
     if (service._id === selections.serviceId) return;
     if (service.name === "Várandósgondozás") {
+      setPendingDate(null);
       setPendingService(service);
       return;
     }
@@ -183,8 +209,9 @@ export function BookingWizard({ services, scheduleData }: BookingWizardProps) {
   }
 
   function handleNoticeAcknowledge() {
-    if (pendingService) applyService(pendingService);
+    if (pendingService) applyService(pendingService, pendingDate);
     setPendingService(null);
+    setPendingDate(null);
   }
 
   function handleDateSelect(date: string) {

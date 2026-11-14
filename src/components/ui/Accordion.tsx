@@ -90,6 +90,11 @@ interface AccordionProps {
   className?: string;
   itemClassName?: string;
   contentClassName?: string;
+  /** Overrides for the trigger row (padding, gap, radius) — e.g. a compact mobile variant. */
+  triggerClassName?: string;
+  titleClassName?: string;
+  subtitleClassName?: string;
+  plusClassName?: string;
   onOpenChange?: (open: string[]) => void;
 }
 
@@ -101,6 +106,10 @@ export function Accordion({
   className,
   itemClassName,
   contentClassName,
+  triggerClassName,
+  titleClassName,
+  subtitleClassName,
+  plusClassName,
   onOpenChange,
 }: AccordionProps) {
   const base = useId().replace(/:/g, "");
@@ -138,17 +147,24 @@ export function Accordion({
                 aria-expanded={isOpen}
                 aria-controls={panelId}
                 onClick={() => toggle(item.id)}
-                className="flex w-full items-center gap-[18px] rounded-panel border-0 bg-transparent px-6 py-[22px] text-left text-navy transition-colors duration-300 hover:bg-white/35"
+                className={cn(
+                  "flex w-full items-center gap-[18px] rounded-panel border-0 bg-transparent px-6 py-[22px] text-left text-navy transition-colors duration-300 hover:bg-white/35",
+                  triggerClassName,
+                )}
               >
                 {item.icon}
-                <span className="flex flex-1 flex-col gap-1">
-                  <span className="text-xl font-extrabold leading-tight">{item.title}</span>
+                <span className="flex min-w-0 flex-1 flex-col gap-1">
+                  <span className={cn("text-xl font-extrabold leading-tight", titleClassName)}>
+                    {item.title}
+                  </span>
                   {item.subtitle && (
-                    <span className="text-sm font-semibold text-muted">{item.subtitle}</span>
+                    <span className={cn("text-sm font-semibold text-muted", subtitleClassName)}>
+                      {item.subtitle}
+                    </span>
                   )}
                 </span>
                 {item.badge}
-                <PlusIcon open={isOpen} />
+                <PlusIcon open={isOpen} className={plusClassName} />
               </button>
             </Heading>
             <Collapse id={panelId} labelledBy={triggerId} open={isOpen}>

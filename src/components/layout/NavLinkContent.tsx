@@ -4,7 +4,7 @@ export function isYogaLink(href?: string) {
   return href === "/joga" || href?.startsWith("/joga/") === true;
 }
 
-function Lotus({ className }: { className?: string }) {
+export function Lotus({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className={className}>
       <path d="M12 3c1.9 2.2 2.9 4.6 2.9 7.2 0 2.2-1 4.2-2.9 5.8-1.9-1.6-2.9-3.6-2.9-5.8C9.1 7.6 10.1 5.2 12 3z" />

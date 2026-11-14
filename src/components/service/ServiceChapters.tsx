@@ -1,6 +1,7 @@
 "use client";
 
-import { type MouseEvent, useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
+import { jumpTo, useScrollSpy } from "@/hooks/useScrollSpy";
 import { cn } from "@/lib/cn";
 import { twoDigit } from "@/lib/service-page";
 
@@ -8,58 +9,6 @@ export interface Chapter {
   id: string;
   label: string;
   short: string;
-}
-
-/**
- * Index of the last chapter whose top has passed `offset` px from the viewport top, and the
- * page scroll progress (0–100). rAF-throttled, passive listener.
- */
-function useScrollSpy(ids: readonly string[], offset: number) {
-  const [state, setState] = useState({ active: -1, progress: 0 });
-  const key = ids.join("|");
-
-  useEffect(() => {
-    const list = key.split("|");
-    let frame = 0;
-    const measure = () => {
-      frame = 0;
-      let active = -1;
-      list.forEach((id, i) => {
-        const el = document.getElementById(id);
-        if (el && el.getBoundingClientRect().top <= offset) active = i;
-      });
-      const max = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
-      const progress = Math.min(100, Math.max(0, Math.round((window.scrollY / max) * 100)));
-      setState((prev) =>
-        prev.active === active && prev.progress === progress ? prev : { active, progress },
-      );
-    };
-    const onScroll = () => {
-      if (!frame) frame = requestAnimationFrame(measure);
-    };
-    measure();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-      if (frame) cancelAnimationFrame(frame);
-    };
-  }, [key, offset]);
-
-  return state;
-}
-
-function jumpTo(event: MouseEvent<HTMLAnchorElement>, id: string) {
-  const target = document.getElementById(id);
-  if (!target) return;
-  event.preventDefault();
-  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  target.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
-  window.history.replaceState(null, "", `#${id}`);
-  // Move focus for keyboard / screen-reader users without a second scroll jump.
-  if (!target.hasAttribute("tabindex")) target.setAttribute("tabindex", "-1");
-  target.focus({ preventScroll: true });
 }
 
 /** Desktop sticky "Tartalom" list; the current chapter is highlighted as you scroll. */

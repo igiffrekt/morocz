@@ -5,6 +5,8 @@ import { cn } from "@/lib/cn";
 
 export interface Crumb {
   label: string;
+  /** Shorter label for phones (keeps the breadcrumb pill on one line). */
+  shortLabel?: string;
   /** Omit for the current page. */
   href?: string;
 }
@@ -42,9 +44,19 @@ export function HeroBreadcrumb({ crumbs }: { crumbs: readonly Crumb[] }) {
                 >
                   {crumb.label}
                 </Link>
+              ) : middle ? (
+                // Section label without a page of its own (e.g. "Jogi információk").
+                <span className="px-1 py-0.5">{crumb.label}</span>
               ) : (
                 <span aria-current="page" className="px-1 py-0.5 font-extrabold text-white">
-                  {crumb.label}
+                  {crumb.shortLabel ? (
+                    <>
+                      <span className="sm:hidden">{crumb.shortLabel}</span>
+                      <span className="max-sm:hidden">{crumb.label}</span>
+                    </>
+                  ) : (
+                    crumb.label
+                  )}
                 </span>
               )}
             </li>

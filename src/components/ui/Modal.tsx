@@ -26,6 +26,14 @@ export interface ModalProps {
   initialFocus?: RefObject<HTMLElement | null>;
   /** Hide the round close button (provide your own close control then). */
   hideClose?: boolean;
+  /**
+   * Custom header rendered above the scrolling body instead of the default title
+   * row (e.g. a full-bleed coloured header). Provide its close control and an
+   * accessible name (`ariaLabel` or `labelledBy`) yourself.
+   */
+  header?: ReactNode;
+  /** id of the element inside `header` that names the dialog. */
+  labelledBy?: string;
   className?: string;
 }
 
@@ -64,6 +72,8 @@ export function Modal({
   size = "md",
   initialFocus,
   hideClose = false,
+  header,
+  labelledBy,
   className,
 }: ModalProps) {
   const [mounted, setMounted] = useState(false);
@@ -103,8 +113,8 @@ export function Modal({
             ref={panelRef}
             role="dialog"
             aria-modal="true"
-            aria-labelledby={title ? titleId : undefined}
-            aria-label={title ? undefined : ariaLabel}
+            aria-labelledby={title ? titleId : labelledBy}
+            aria-label={title || labelledBy ? undefined : ariaLabel}
             aria-describedby={description ? descId : undefined}
             tabIndex={-1}
             className={cn(
@@ -123,10 +133,14 @@ export function Modal({
             {isSheet && (
               <span
                 aria-hidden="true"
-                className="mx-auto mt-3 block h-1.5 w-11 shrink-0 rounded-full bg-line sm:hidden"
+                className={cn(
+                  "mx-auto mt-3 block h-1.5 w-11 shrink-0 rounded-full bg-line sm:hidden",
+                  header && "absolute top-0 left-1/2 z-10 -translate-x-1/2 bg-white/70",
+                )}
               />
             )}
-            {(title || !hideClose) && (
+            {header}
+            {!header && (title || !hideClose) && (
               <div className="flex items-start gap-4 px-6 pt-5 sm:px-8 sm:pt-7">
                 <div className="flex min-w-0 flex-1 flex-col gap-1.5">
                   {title && (

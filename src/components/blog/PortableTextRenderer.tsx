@@ -7,7 +7,7 @@ import type { SanityImageCrop, SanityImageHotspot } from "../../../sanity.types"
 // Type definitions for Portable Text blocks
 type PortableTextBlock = {
   children?: Array<{
-    marks?: Array<string>;
+    marks?: string[];
     text?: string;
     _type: "span";
     _key: string;
@@ -47,7 +47,7 @@ type PortableTextStyledTable = {
     rows?: Array<{
       _type: "tableRow";
       _key: string;
-      cells?: Array<string>;
+      cells?: string[];
     }>;
   };
 };
@@ -56,7 +56,8 @@ interface PortableTextRendererProps {
   body: Array<PortableTextBlock | BlogPostBodyImage | PortableTextStyledTable>;
 }
 
-const components: Partial<PortableTextReactComponents> = {
+/** Also reused by the blog article layout (image + styledTable renderers). */
+export const components: Partial<PortableTextReactComponents> = {
   block: {
     h2: ({ children }) => <h2 className="text-2xl font-bold text-primary mt-8 mb-4">{children}</h2>,
     h3: ({ children }) => (
@@ -132,16 +133,23 @@ const components: Partial<PortableTextReactComponents> = {
               {rows.map((row, rowIndex) => {
                 const isHeaderRow = value.headerRow && rowIndex === 0;
                 const isStriped =
-                  value.zebraStripes && !isHeaderRow && (rowIndex - (value.headerRow ? 1 : 0)) % 2 === 1;
+                  value.zebraStripes &&
+                  !isHeaderRow &&
+                  (rowIndex - (value.headerRow ? 1 : 0)) % 2 === 1;
                 return (
                   <tr
                     key={row._key}
                     className={
-                      isHeaderRow ? "bg-primary/10 font-semibold" : isStriped ? "bg-gray-50" : undefined
+                      isHeaderRow
+                        ? "bg-primary/10 font-semibold"
+                        : isStriped
+                          ? "bg-gray-50"
+                          : undefined
                     }
                   >
                     {(row.cells ?? []).map((cell, i) => (
                       <td
+                        // biome-ignore lint/suspicious/noArrayIndexKey: table cells have no stable id
                         key={i}
                         className={`border border-gray-300 px-3 py-2 align-top ${alignClass}`}
                       >

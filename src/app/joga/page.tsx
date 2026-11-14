@@ -1,53 +1,79 @@
-import { Metadata } from "next";
-import { Suspense } from "react";
+import type { Metadata } from "next";
+import { LelekzoJoga } from "@/components/joga/LelekzoJoga";
+import { buildYogaTimetable, linkLabel } from "@/lib/yoga";
 import { sanityFetch } from "@/sanity/lib/fetch";
-import { yogaPageQuery, yogaScheduleQuery, yogaInstructorsQuery } from "@/sanity/lib/queries";
-import { YogaScheduleSection } from "@/components/sections/YogaScheduleSection";
-import { YogaInstructorsSection } from "@/components/sections/YogaInstructorsSection";
+import { urlFor } from "@/sanity/lib/image";
+import { yogaPageQuery, yogaScheduleQuery } from "@/sanity/lib/queries";
+import { type YogaInstructorDoc, yogaInstructorsWithLinksQuery } from "@/sanity/lib/yoga-queries";
+import type { YogaPageQueryResult, YogaScheduleQueryResult } from "../../../sanity.types";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 30;
 
 export async function generateMetadata(): Promise<Metadata> {
-  const page = await sanityFetch<any>({
-    query: yogaPageQuery,
-    tags: ["yogaPage"],
-  });
-
+  const page = await sanityFetch<YogaPageQueryResult>({ query: yogaPageQuery, tags: ["yogaPage"] });
+  const title = page?.heroHeadline || "Lélekző";
+  const description =
+    page?.metaDescription || "Fedezd fel jógaóráinkat és csatlakozz heti foglalkozásainkhoz.";
   return {
-    title: page?.heroHeadline || "Lélekző",
-    description: page?.metaDescription || "Fedezd fel jógaóráinkat és csatlakozz heti foglalkozásainkhoz.",
-    openGraph: {
-      title: page?.heroHeadline || "Lélekző",
-      description: page?.metaDescription || "Fedezd fel jógaóráinkat.",
-    },
+    title,
+    description,
+    openGraph: { title, description },
+    alternates: { canonical: "/joga" },
   };
 }
 
 export default async function JogaPage() {
   const [page, schedule, instructors] = await Promise.all([
-    sanityFetch<any>({ query: yogaPageQuery, tags: ["yogaPage"] }),
-    sanityFetch<any[]>({ query: yogaScheduleQuery, tags: ["yogaSchedule"] }),
-    sanityFetch<any[]>({ query: yogaInstructorsQuery, tags: ["yogaInstructor"] }),
+    sanityFetch<YogaPageQueryResult>({ query: yogaPageQuery, tags: ["yogaPage"] }),
+    sanityFetch<YogaScheduleQueryResult | null>({
+      query: yogaScheduleQuery,
+      tags: ["yogaSchedule"],
+    }),
+    sanityFetch<YogaInstructorDoc[] | null>({
+      query: yogaInstructorsWithLinksQuery,
+      tags: ["yogaInstructor"],
+    }),
   ]);
 
+  const timetable = buildYogaTimetable(
+    (schedule ?? []).map((s) => ({
+      _id: s._id,
+      className: s.yogaClass?.name ?? null,
+      classColor: s.yogaClass?.color ?? null,
+      description: s.yogaClass?.description ?? null,
+      instructorName: s.instructor?.name ?? null,
+      dayOfWeek: s.dayOfWeek,
+      startTime: s.startTime,
+      endTime: s.endTime,
+      recurrence: s.recurrence,
+      location: s.location,
+      notes: s.notes,
+    })),
+    (instructors ?? []).map((i) => ({
+      _id: i._id,
+      name: i.name,
+      slug: i.slug,
+      photoUrl: i.photo?.asset ? urlFor(i.photo).width(640).height(640).fit("crop").url() : null,
+      avatarUrl: i.photo?.asset ? urlFor(i.photo).width(168).height(168).fit("crop").url() : null,
+      bio: i.bio,
+      phone: i.phone,
+      email: i.email,
+      color: i.color,
+      links: (i.links ?? [])
+        .filter((l): l is { label: string | null; url: string } => Boolean(l.url))
+        .map((l) => ({ label: linkLabel(l.label, l.url), url: l.url })),
+    })),
+  );
+
+  const heroImageUrl = page?.heroImage?.asset
+    ? urlFor(page.heroImage).width(1600).fit("max").url()
+    : null;
+
   return (
-    <div className="min-h-screen">
-      {/* Spacing for header */}
-      <div className="h-4 md:h-6" />
-
-      {/* Schedule Section */}
-      <Suspense fallback={<div className="min-h-[400px]" />}>
-        <YogaScheduleSection
-          schedule={schedule || []}
-          pageTitle={page?.heroHeadline || "Lélekző"}
-          bannerImage={page?.heroImage}
-        />
-      </Suspense>
-
-      {/* Instructors Section */}
-      {instructors && instructors.length > 0 && (
-        <YogaInstructorsSection instructors={instructors} />
-      )}
-    </div>
+    <LelekzoJoga
+      headline={page?.heroHeadline || "Lélekző"}
+      heroImageUrl={heroImageUrl}
+      timetable={timetable}
+    />
   );
 }

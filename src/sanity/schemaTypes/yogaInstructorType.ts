@@ -41,12 +41,39 @@ export const yogaInstructorType = defineType({
       type: "string",
     }),
     defineField({
+      name: "links",
+      title: "Linkek",
+      description:
+        "Pl. Facebook-oldal vagy saját weboldal — a bemutatkozó ablak Kapcsolat részében jelenik meg.",
+      type: "array",
+      of: [
+        {
+          type: "object",
+          name: "instructorLink",
+          fields: [
+            defineField({
+              name: "label",
+              title: "Felirat",
+              type: "string",
+              description: "Üresen hagyva a cím alapján (pl. Facebook)",
+            }),
+            defineField({
+              name: "url",
+              title: "URL",
+              type: "url",
+              validation: (Rule) => Rule.required(),
+            }),
+          ],
+          preview: { select: { title: "label", subtitle: "url" } },
+        },
+      ],
+    }),
+    defineField({
       name: "color",
       title: "Szín (órarenden)",
       type: "string",
       description: "Hex kód, pl. #99CEB7",
-      validation: (Rule) =>
-        Rule.regex(/^#[0-9A-Fa-f]{6}$/, { name: "hex color" }),
+      validation: (Rule) => Rule.regex(/^#[0-9A-Fa-f]{6}$/, { name: "hex color" }),
     }),
     defineField({
       name: "isActive",

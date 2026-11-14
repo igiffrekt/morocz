@@ -95,6 +95,11 @@ interface AccordionProps {
   titleClassName?: string;
   subtitleClassName?: string;
   plusClassName?: string;
+  /**
+   * Controlled open ids — lets several accordions share one single-open state
+   * (pair with `onOpenChange`). Uncontrolled when omitted.
+   */
+  open?: readonly string[];
   onOpenChange?: (open: string[]) => void;
 }
 
@@ -110,12 +115,14 @@ export function Accordion({
   titleClassName,
   subtitleClassName,
   plusClassName,
+  open: controlledOpen,
   onOpenChange,
 }: AccordionProps) {
   const base = useId().replace(/:/g, "");
-  const [open, setOpen] = useState<string[]>(() =>
+  const [uncontrolledOpen, setOpen] = useState<string[]>(() =>
     multiple ? [...defaultOpen] : defaultOpen.slice(0, 1),
   );
+  const open = controlledOpen ?? uncontrolledOpen;
 
   const toggle = (id: string) => {
     const isOpen = open.includes(id);

@@ -1,6 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useState } from "react";
+import { MonthCalendar } from "@/components/booking/MonthCalendar";
+import { EmptyWell, SlotGrid, SlotSkeleton } from "@/components/booking/SlotGrid";
+import { Chip } from "@/components/ui/Chip";
+import { Notice } from "@/components/ui/Notice";
+import { ArrowIcon, pillClassName } from "@/components/ui/PillButton";
+import { formatHuDate } from "@/lib/quick-booking";
 import type { ScheduleForAvailability } from "@/lib/slots";
 import { getAvailableDatesInRange } from "@/lib/slots";
 
@@ -22,21 +28,8 @@ interface ReschedulePanelProps {
   onCancel: () => void;
 }
 
-// Hungarian weekday abbreviations, Monday-first
-const HU_WEEKDAYS = ["H", "K", "Sze", "Cs", "P", "Szo", "V"];
-
-function formatMonthYear(year: number, month: number): string {
-  const date = new Date(year, month, 1);
-  return date.toLocaleDateString("hu-HU", { year: "numeric", month: "long" });
-}
-
 function getDaysInMonth(year: number, month: number): number {
   return new Date(year, month + 1, 0).getDate();
-}
-
-function getFirstDayMondayIndex(year: number, month: number): number {
-  const dow = new Date(year, month, 1).getDay();
-  return (dow + 6) % 7;
 }
 
 function toDateString(year: number, month: number, day: number): string {
@@ -71,6 +64,7 @@ export function ReschedulePanel({
   onRescheduled,
   onCancel,
 }: ReschedulePanelProps) {
+  const slotHeadingId = `rslots-${useId().replace(/:/g, "")}`;
   const today = new Date();
   const [viewYear, setViewYear] = useState(today.getFullYear());
   const [viewMonth, setViewMonth] = useState(today.getMonth());
@@ -219,250 +213,120 @@ export function ReschedulePanel({
     }
   }
 
-  const daysInMonth = getDaysInMonth(viewYear, viewMonth);
-  const firstDayIndex = getFirstDayMondayIndex(viewYear, viewMonth);
-
-  const calendarCells: Array<{ day: number; dateStr: string } | null> = [
-    ...Array.from<null>({ length: firstDayIndex }).fill(null),
-    ...Array.from({ length: daysInMonth }, (_, i) => {
-      const day = i + 1;
-      return { day, dateStr: toDateString(viewYear, viewMonth, day) };
-    }),
-  ];
-  while (calendarCells.length % 7 !== 0) {
-    calendarCells.push(null);
-  }
+  const canConfirm = Boolean(selectedDate && selectedTime) && !submitting;
+  const newSlotText =
+    selectedDate && selectedTime ? `${formatHuDate(selectedDate, true)} ${selectedTime}` : "";
 
   return (
-    <div className="mt-4 rounded-xl border border-[#99CEB7]/40 bg-[#F8FBFA] p-6">
-      <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-base font-bold text-[#23264F]">Új időpont kiválasztása</h3>
-        <button
-          type="button"
-          onClick={onCancel}
-          className="text-sm text-gray-500 hover:text-gray-700 underline"
-          disabled={submitting}
-        >
-          Mégsem
-        </button>
+    <div className="flex flex-col gap-[18px] border-t border-line-soft pt-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h3 className="m-0 text-xl font-extrabold text-navy">Új időpont kiválasztása</h3>
+        <Chip tone="sage" className="text-teal-ink">
+          A foglalási díj átvezetésre kerül
+        </Chip>
       </div>
 
       {/* Error banner */}
       {submitError && (
-        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
-          <p className="text-sm text-red-700">{submitError}</p>
-        </div>
+        <Notice tone="error" role="alert">
+          {submitError}
+        </Notice>
       )}
 
-      <div className="flex flex-col gap-4 sm:flex-row">
-        {/* Calendar — left column */}
-        <div className="rounded-2xl bg-white p-4 sm:w-[65%]">
-          {/* Month navigation */}
-          <div className="mb-4 flex items-center justify-between">
-            <button
-              type="button"
-              onClick={prevMonth}
-              disabled={!canGoPrev}
-              className="flex h-9 w-9 items-center justify-center rounded-xl text-gray-600 transition-all hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-30"
-              aria-label="Előző hónap"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                className="h-4 w-4"
-                aria-hidden="true"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </button>
+      <div className="flex flex-wrap items-start gap-5">
+        <MonthCalendar
+          compact
+          showLegend={false}
+          className="flex-[1_1_340px]"
+          viewYear={viewYear}
+          viewMonth={viewMonth}
+          canPrev={canGoPrev}
+          canNext={canGoNext}
+          onPrev={prevMonth}
+          onNext={nextMonth}
+          todayStr={todayStr}
+          selectedDate={selectedDate}
+          isBookable={(d) => availableDatesSet.has(d) && d >= todayStr && d <= maxDateStr}
+          onSelect={handleDayClick}
+        />
 
-            <h4 className="text-sm font-bold capitalize text-gray-800">
-              {formatMonthYear(viewYear, viewMonth)}
-            </h4>
-
-            <button
-              type="button"
-              onClick={nextMonth}
-              disabled={!canGoNext}
-              className="flex h-9 w-9 items-center justify-center rounded-xl text-gray-600 transition-all hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-30"
-              aria-label="Következő hónap"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                className="h-4 w-4"
-                aria-hidden="true"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 1 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </button>
-          </div>
-
-          {/* Weekday headers */}
-          <div className="mb-1 grid grid-cols-7">
-            {HU_WEEKDAYS.map((day) => (
-              <div key={day} className="py-1 text-center text-xs font-semibold text-gray-500">
-                {day}
-              </div>
-            ))}
-          </div>
-
-          {/* Calendar day grid */}
-          <div className="grid grid-cols-7 gap-0.5">
-            {calendarCells.map((cell, idx) => {
-              if (cell === null) {
-                // biome-ignore lint/suspicious/noArrayIndexKey: empty padding cells have no stable key
-                return <div key={`empty-${idx}`} className="h-9" aria-hidden="true" />;
-              }
-
-              const { day, dateStr } = cell;
-              const isAvailable = availableDatesSet.has(dateStr);
-              const isToday = dateStr === todayStr;
-              const isSelected = dateStr === selectedDate;
-              const isPast = dateStr < todayStr;
-              const isBeyondMax = dateStr > maxDateStr;
-              const isClickable = isAvailable && !isPast && !isBeyondMax;
-
-              return (
-                <button
-                  key={dateStr}
-                  type="button"
-                  onClick={() => handleDayClick(dateStr)}
-                  disabled={!isClickable}
-                  className={[
-                    "flex h-9 w-full items-center justify-center rounded-lg text-sm font-medium transition-all duration-150",
-                    isSelected
-                      ? "bg-[#23264F] text-white shadow-md"
-                      : isClickable
-                        ? "bg-gray-50 text-gray-800 hover:bg-[#99CEB7]/20 hover:text-[#23264F] cursor-pointer"
-                        : "cursor-not-allowed text-gray-300",
-                    isToday && !isSelected ? "ring-1 ring-[#23264F]/30" : "",
-                  ]
-                    .join(" ")
-                    .trim()}
-                  aria-label={`${day}. nap${isClickable ? " (szabad)" : " (nem elérhető)"}`}
-                  aria-pressed={isSelected}
-                  aria-current={isToday ? "date" : undefined}
-                >
-                  {day}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Time slots — right column */}
-        <div className="sm:w-[35%]">
+        <div className="flex min-w-0 flex-[1_1_260px] flex-col gap-3">
           {!selectedDate && (
-            <div className="flex h-full items-center justify-center rounded-2xl bg-white px-4 py-8">
-              <p className="text-center text-sm text-gray-400">Válasszon egy napot a naptárból</p>
-            </div>
+            <EmptyWell className="min-h-[200px] text-sm">Válasszon egy napot a naptárból</EmptyWell>
           )}
 
           {selectedDate && (
-            <div className="rounded-2xl bg-white p-4">
-              <h4 className="mb-1 text-sm font-semibold text-gray-700">Elérhető időpontok</h4>
-              <p className="mb-3 text-xs capitalize text-gray-500">
-                {formatSelectedDate(selectedDate)}
-              </p>
+            <>
+              <div className="flex flex-col gap-0.5">
+                <h4 id={slotHeadingId} className="m-0 text-[15px] font-extrabold text-navy">
+                  Elérhető időpontok
+                </h4>
+                <span className="text-[13px] font-semibold text-muted first-letter:uppercase">
+                  {formatSelectedDate(selectedDate)}
+                </span>
+              </div>
 
-              {/* Loading skeleton */}
-              {slotsLoading && (
-                <div aria-busy="true" className="grid grid-cols-2 gap-2">
-                  {["s0", "s1", "s2", "s3", "s4", "s5"].map((k) => (
-                    <div
-                      key={k}
-                      className="h-9 animate-pulse rounded-lg bg-gray-200"
-                      aria-hidden="true"
-                    />
-                  ))}
-                </div>
-              )}
+              {slotsLoading && <SlotSkeleton compact count={6} />}
 
-              {/* Error state */}
               {slotsError && !slotsLoading && (
-                <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3">
-                  <p className="text-sm text-red-600">{slotsError}</p>
+                <Notice tone="error" role="alert">
+                  <span>{slotsError}</span>
                   <button
                     type="button"
                     onClick={() => void fetchSlots(selectedDate)}
-                    className="mt-2 text-xs text-red-700 underline hover:no-underline"
+                    className="link-grow self-start py-0.5 font-extrabold text-navy"
                   >
                     Újra megpróbál
                   </button>
-                </div>
+                </Notice>
               )}
 
-              {/* No slots */}
               {!slotsLoading && !slotsError && slots.length === 0 && (
-                <div className="py-4 text-center">
-                  <p className="text-sm text-gray-500">Ezen a napon nincs szabad időpont.</p>
-                </div>
+                <EmptyWell className="min-h-[100px] text-sm font-semibold">
+                  Ezen a napon nincs szabad időpont.
+                </EmptyWell>
               )}
 
-              {/* Slots grid */}
               {!slotsLoading && !slotsError && slots.length > 0 && (
-                <div className="grid max-h-56 grid-cols-2 gap-2 overflow-y-auto">
-                  {slots.map((time) => {
-                    const isTimeSelected = time === selectedTime;
-                    return (
-                      <button
-                        key={time}
-                        type="button"
-                        onClick={() => setSelectedTime(time)}
-                        className={[
-                          "h-9 rounded-lg text-sm font-semibold transition-all duration-150",
-                          isTimeSelected
-                            ? "bg-[#23264F] text-white shadow-md"
-                            : "border border-gray-200 bg-white text-gray-700 hover:border-[#99CEB7] hover:text-[#23264F] shadow-sm",
-                        ].join(" ")}
-                        aria-pressed={isTimeSelected}
-                      >
-                        {time}
-                      </button>
-                    );
-                  })}
-                </div>
+                <SlotGrid
+                  compact
+                  labelledBy={slotHeadingId}
+                  slots={slots}
+                  selectedTime={selectedTime}
+                  onSelect={setSelectedTime}
+                />
               )}
-            </div>
+            </>
           )}
         </div>
       </div>
 
       {/* Confirm section */}
-      {selectedDate && selectedTime && (
-        <div className="mt-4 rounded-xl border border-[#99CEB7] bg-white p-4">
-          <p className="mb-3 text-sm text-gray-600">
-            Új időpont:{" "}
-            <span className="font-semibold text-[#23264F]">
-              {formatSelectedDate(selectedDate)}, {selectedTime}
-            </span>
-          </p>
-          <button
-            type="button"
-            onClick={() => void handleConfirm()}
-            disabled={submitting}
-            className={[
-              "w-full rounded-lg px-5 py-2.5 text-sm font-semibold transition-all",
-              submitting
-                ? "cursor-not-allowed bg-gray-200 text-gray-400"
-                : "bg-[#23264F] text-white hover:bg-[#1a1d3b]",
-            ].join(" ")}
-          >
-            {submitting ? "Folyamatban..." : "Megerősítés"}
-          </button>
-        </div>
-      )}
+      <div className="flex flex-wrap-reverse justify-end gap-3">
+        <button
+          type="button"
+          onClick={onCancel}
+          disabled={submitting}
+          className={pillClassName({ variant: "outline", className: "h-[52px] max-sm:w-full" })}
+        >
+          Mégsem
+        </button>
+        <button
+          type="button"
+          onClick={() => void handleConfirm()}
+          disabled={!canConfirm}
+          className={pillClassName({
+            variant: "navy",
+            className: "h-[52px] px-7 max-sm:w-full",
+          })}
+        >
+          {submitting ? "Folyamatban..." : "Megerősítés"}
+          {newSlotText && !submitting && (
+            <span className="font-semibold text-mint-light">· {newSlotText}</span>
+          )}
+          {!submitting && <ArrowIcon />}
+        </button>
+      </div>
     </div>
   );
 }

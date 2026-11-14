@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
+import { BookingHero } from "@/components/booking/BookingHero";
 import { BookingManagementCard } from "@/components/management/BookingManagementCard";
+import { ManageRulesAside } from "@/components/management/ManageRulesAside";
+import { PillLink } from "@/components/ui/PillButton";
+import { formatLongDate } from "@/lib/booking-dates";
 import { getWriteClient } from "@/lib/sanity-write-client";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import { blockedDatesQuery, weeklyScheduleQuery } from "@/sanity/lib/queries";
@@ -84,15 +88,90 @@ export default async function FoglalasTokenPage({
     return false;
   }
 
-  // Shared layout wrapper
+  // Shared layout: navy hero, the state card on the left, the "Jó tudni" rules on the right.
   function PageWrapper({ children }: { children: React.ReactNode }) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#F0F2F5] px-4 py-12">
-        <div className="w-full max-w-2xl">
-          <p className="mb-6 text-center text-sm font-semibold uppercase tracking-widest text-[#23264F]">
-            Mórocz Medical
-          </p>
-          {children}
+      <div className="flex flex-col gap-3 lg:gap-4">
+        <BookingHero
+          crumbs={[{ label: "Foglalás kezelése" }]}
+          eyebrow="Foglalás kezelése"
+          title="Időpont módosítása vagy lemondása"
+          lead="A lefoglalt időpont díjmentesen áthelyezhető egy másik szabad időpontra, legkésőbb a foglalt időpontot megelőző 24 óráig."
+          disc="bottom-left"
+        />
+        <div className="flex flex-col gap-3 lg:grid lg:grid-cols-[minmax(0,3fr)_minmax(340px,1fr)] lg:items-start lg:gap-4">
+          <div className="min-w-0">{children}</div>
+          <ManageRulesAside />
+        </div>
+      </div>
+    );
+  }
+
+  /** Card for the inactive states (invalid link / cancelled / past). */
+  function StateCard({
+    icon,
+    iconClassName,
+    title,
+    text,
+    appointment,
+    struck = false,
+  }: {
+    icon: string;
+    iconClassName: string;
+    title: string;
+    text: string;
+    appointment?: { service: string; when: string };
+    struck?: boolean;
+  }) {
+    return (
+      <div className="fade-up flex flex-col items-start gap-[18px] rounded-[32px] bg-white p-6 sm:rounded-[36px] sm:p-[clamp(24px,4vw,48px)]">
+        <span
+          className={`inline-flex h-[76px] w-[76px] items-center justify-center rounded-full ${iconClassName}`}
+        >
+          <svg
+            width="32"
+            height="32"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d={icon} />
+          </svg>
+        </span>
+        <h2 className="m-0 text-[28px] font-extrabold tracking-[-0.02em] text-navy sm:text-[34px]">
+          {title}
+        </h2>
+        <p className="m-0 max-w-[560px] text-base leading-relaxed text-muted">{text}</p>
+        {appointment && (
+          <dl
+            className={`m-0 flex max-w-full flex-wrap gap-x-7 gap-y-2 rounded-[28px] bg-canvas px-[22px] py-3.5 text-[15px] ${struck ? "text-muted line-through" : "text-navy"}`}
+          >
+            <div className="flex gap-1.5">
+              <dt className="font-semibold text-muted">Szolgáltatás:</dt>
+              <dd className="m-0 font-extrabold">{appointment.service}</dd>
+            </div>
+            <div className="flex gap-1.5">
+              <dt className="font-semibold text-muted">Időpont:</dt>
+              <dd className="m-0 font-extrabold">{appointment.when}</dd>
+            </div>
+          </dl>
+        )}
+        <div className="flex w-full flex-wrap gap-3">
+          <PillLink
+            href="/idopontfoglalas"
+            variant="mint"
+            arrow
+            className="bg-mint hover:bg-mint max-sm:w-full"
+          >
+            Új időpont foglalása
+          </PillLink>
+          <PillLink href="/" variant="outline" className="max-sm:w-full">
+            Vissza a főoldalra
+          </PillLink>
         </div>
       </div>
     );
@@ -102,116 +181,48 @@ export default async function FoglalasTokenPage({
   if (!booking) {
     return (
       <PageWrapper>
-        <div className="rounded-xl bg-white p-8 shadow-md text-center">
-          <div className="mb-4 flex justify-center">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
-              <svg
-                className="h-6 w-6 text-gray-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"
-                />
-              </svg>
-            </div>
-          </div>
-          <h1 className="mb-3 text-xl font-bold text-[#23264F]">
-            Érvénytelen vagy lejárt hivatkozás
-          </h1>
-          <p className="mb-6 text-gray-600">
-            Ez a hivatkozás nem érvényes vagy már nem használható. Ha új időpontot szeretne
-            foglalni, kattintson az alábbi gombra.
-          </p>
-          <a
-            href="/idopontfoglalas"
-            className="inline-block rounded-lg bg-[#23264F] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#1a1d3b]"
-          >
-            Új időpont foglalása
-          </a>
-        </div>
+        <StateCard
+          icon="M12 9v4m0 4h.01M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z"
+          iconClassName="bg-sun-soft text-navy"
+          title="Érvénytelen vagy lejárt hivatkozás"
+          text="Ez a hivatkozás nem érvényes vagy már nem használható. Ha új időpontot szeretne foglalni, kattintson az alábbi gombra."
+        />
       </PageWrapper>
     );
   }
 
+  const appointment = {
+    service: booking.service?.name ?? "Foglalt szolgáltatás",
+    when: `${formatLongDate(booking.slotDate)}, ${booking.slotTime}`,
+  };
+
   // ── State 2: Cancelled booking ─────────────────────────────────────────────
   if (booking.status === "cancelled") {
-    const formattedDate = new Date(booking.slotDate).toLocaleDateString("hu-HU", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      weekday: "long",
-    });
-
     return (
       <PageWrapper>
-        <div className="rounded-xl bg-white p-8 shadow-md">
-          <h1 className="mb-3 text-xl font-bold text-[#23264F]">
-            Ez az időpont már le lett mondva
-          </h1>
-          <p className="mb-6 text-gray-600">
-            Az alábbi időpontja korábban lemondásra került. Ha új időpontot szeretne foglalni,
-            kattintson a gombra.
-          </p>
-          <div className="mb-6 rounded-lg border-l-4 border-gray-200 bg-gray-50 p-4 text-sm">
-            <p className="mb-1 font-medium text-gray-500">Szolgáltatás</p>
-            <p className="mb-3 font-semibold text-gray-400 line-through">
-              {booking.service?.name ?? "Foglalt szolgáltatás"}
-            </p>
-            <p className="mb-1 font-medium text-gray-500">Időpont</p>
-            <p className="font-semibold text-gray-400 line-through">
-              {formattedDate}, {booking.slotTime}
-            </p>
-          </div>
-          <a
-            href="/idopontfoglalas"
-            className="inline-block rounded-lg bg-[#76c8b6] px-6 py-3 text-sm font-semibold text-[#23264F] transition hover:bg-[#80bea6]"
-          >
-            Új időpont foglalása
-          </a>
-        </div>
+        <StateCard
+          icon="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM15 9l-6 6M9 9l6 6"
+          iconClassName="bg-coral-soft text-danger"
+          title="Ez az időpont már le lett mondva"
+          text="Az alábbi időpontja korábban lemondásra került. Ha új időpontot szeretne foglalni, kattintson a gombra."
+          appointment={appointment}
+          struck
+        />
       </PageWrapper>
     );
   }
 
   // ── State 3: Past appointment ──────────────────────────────────────────────
   if (isPastAppointment(booking.slotDate, booking.slotTime)) {
-    const formattedDate = new Date(booking.slotDate).toLocaleDateString("hu-HU", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      weekday: "long",
-    });
-
     return (
       <PageWrapper>
-        <div className="rounded-xl bg-white p-8 shadow-md">
-          <h1 className="mb-3 text-xl font-bold text-[#23264F]">Ez az időpont már lezajlott</h1>
-          <p className="mb-6 text-gray-600">
-            A foglalt időpontja már elmúlt. Ha új időpontot szeretne foglalni, kattintson az alábbi
-            gombra.
-          </p>
-          <div className="mb-6 rounded-lg border-l-4 border-[#76c8b6] bg-gray-50 p-4 text-sm">
-            <p className="mb-1 font-medium text-gray-500">Szolgáltatás</p>
-            <p className="mb-3 font-semibold text-[#23264F]">
-              {booking.service?.name ?? "Foglalt szolgáltatás"}
-            </p>
-            <p className="mb-1 font-medium text-gray-500">Időpont</p>
-            <p className="font-semibold text-[#23264F]">
-              {formattedDate}, {booking.slotTime}
-            </p>
-          </div>
-          <a
-            href="/idopontfoglalas"
-            className="inline-block rounded-lg bg-[#23264F] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#1a1d3b]"
-          >
-            Új időpont foglalása
-          </a>
-        </div>
+        <StateCard
+          icon="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 6v6l4 2"
+          iconClassName="bg-sage text-teal-ink"
+          title="Ez az időpont már lezajlott"
+          text="A foglalt időpontja már elmúlt. Ha új időpontot szeretne foglalni, kattintson az alábbi gombra."
+          appointment={appointment}
+        />
       </PageWrapper>
     );
   }

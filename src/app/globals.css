@@ -40,6 +40,11 @@
   --color-muted: #4b5563;
   --color-muted-strong: #374151;
   --color-line: #d7dbe8;
+  --color-line-soft: #eceef4; /* hairlines inside white cards */
+  --color-field: #F7F8FB; /* input / calendar well */
+  --color-danger: #b42318;
+  --color-danger-ink: #8a2c0d; /* text on coral-soft */
+  --color-disabled-ink: #9ca1b5;
 
   /* Easing */
   --ease-bento: cubic-bezier(.2, .8, .2, 1);
@@ -101,11 +106,15 @@
     transform: translateY(0) scale(.97);
     transition-duration: .12s;
   }
-  .btn-lift .arrow {
+  .btn-lift .arrow,
+  .btn-lift .arrow-back {
     transition: transform .35s var(--ease-bento);
   }
   .btn-lift:hover .arrow {
     transform: translateX(4px);
+  }
+  .btn-lift:hover .arrow-back {
+    transform: translateX(-4px);
   }
 
   /* Touch target press (mobile tiles, round icon buttons) */
@@ -203,6 +212,19 @@
     animation-delay: calc(var(--i, 0) * 70ms);
   }
 
+  /* Pop-in (selected calendar day, success ticks) */
+  .pop-in {
+    animation: bento-pop .45s var(--ease-bento) both;
+  }
+  .pop-in-slow {
+    animation: bento-pop .7s var(--ease-bento) both;
+  }
+
+  /* Slow float (decorative badges) */
+  .float-y {
+    animation: bento-float 6s ease-in-out infinite;
+  }
+
   /* Image zoom inside a clipped frame */
   .zoom-frame {
     overflow: hidden;
@@ -240,11 +262,39 @@
   }
 }
 
+@keyframes bento-pop {
+  0% {
+    transform: scale(.6);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes bento-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
 /* Pages that render <MobileActionBar /> extend the footer so the bar floats over
    navy (as in MobilFooldal) instead of covering the legal links. */
 @media (max-width: 1023.98px) {
   body[data-mobile-action-bar] .site-footer {
     padding-bottom: 120px;
+  }
+  /* Booking wizard step 1: the summary bottom sheet is taller than the action bar. */
+  body[data-booking-sheet] .site-footer {
+    padding-bottom: 260px;
   }
 }
 

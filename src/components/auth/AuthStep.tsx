@@ -1,12 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
+import { OrDivider, PasswordField, TextField } from "@/components/ui/Field";
+import { Notice } from "@/components/ui/Notice";
+import { ArrowIcon, pillClassName } from "@/components/ui/PillButton";
+import { TabList, TabPanel } from "@/components/ui/Tabs";
 import { signIn, signUp, useSession } from "@/lib/auth-client";
+import { cn } from "@/lib/cn";
 import ForgotPassword from "./ForgotPassword";
 
 interface AuthStepProps {
   onSuccess: () => void;
   defaultTab?: "belepes" | "regisztracio";
+  className?: string;
 }
 
 type Tab = "belepes" | "regisztracio";
@@ -50,7 +56,8 @@ function GoogleIcon() {
   );
 }
 
-export default function AuthStep({ onSuccess, defaultTab = "belepes" }: AuthStepProps) {
+export default function AuthStep({ onSuccess, defaultTab = "belepes", className }: AuthStepProps) {
+  const idBase = `auth-${useId().replace(/:/g, "")}`;
   const { data: session, isPending } = useSession();
   const [tab, setTab] = useState<Tab>(defaultTab);
   const [belepesStep, setBelepesStep] = useState<"email" | "password" | "ghost">("email");
@@ -71,9 +78,22 @@ export default function AuthStep({ onSuccess, defaultTab = "belepes" }: AuthStep
     if (!isPending && session) onSuccess();
   }, [session, isPending, onSuccess]);
 
+  // The password step opens with its field focused.
+  useEffect(() => {
+    if (belepesStep === "password") document.getElementById("auth-password")?.focus();
+  }, [belepesStep]);
+
   if (isPending) return null;
   if (session) return null;
-  if (showForgotPassword) return <ForgotPassword onBack={() => setShowForgotPassword(false)} />;
+  if (showForgotPassword) {
+    return (
+      <ForgotPassword
+        onBack={() => setShowForgotPassword(false)}
+        initialEmail={email}
+        className={className}
+      />
+    );
+  }
 
   function resetBelepes() {
     setBelepesStep("email");
@@ -276,307 +296,243 @@ export default function AuthStep({ onSuccess, defaultTab = "belepes" }: AuthStep
     }
   }
 
-  const inputCx = (hasError: boolean) =>
-    `w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors ${
-      hasError ? "border-red-400" : "border-gray-300"
-    }`;
+  const busyLabel = "Folyamatban...";
+  const submitClass = pillClassName({
+    variant: "navy",
+    size: "lg",
+    fullWidth: true,
+    className: "mt-1 h-[58px]",
+  });
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[40vh] py-8 px-4">
-      <p className="text-center text-sm text-gray-600 mb-6 max-w-md">
-        Az időpontfoglalás véglegesítéséhez kérjük, jelentkezzen be vagy hozzon létre egy fiókot.
-      </p>
+    <div className={cn("flex flex-col gap-5", className)}>
+      <TabList
+        idBase={idBase}
+        label="Fiók"
+        tone="light"
+        value={tab}
+        items={[
+          { value: "belepes", label: "Belépés" },
+          { value: "regisztracio", label: "Regisztráció" },
+        ]}
+        onChange={(next) => {
+          setTab(next);
+          if (next === "belepes") {
+            resetBelepes();
+          } else {
+            setErrors({});
+            setGlobalError("");
+          }
+        }}
+        className="max-w-[460px] [&_[role=tab]]:h-[50px] [&_[role=tab]]:text-[15px]"
+      />
 
-      <div className="w-full max-w-md mx-auto p-8 bg-white rounded-2xl shadow-lg">
-        <div className="flex border-b border-gray-200 mb-6">
-          <button
-            type="button"
-            onClick={() => {
-              setTab("belepes");
-              resetBelepes();
-            }}
-            className={`flex-1 pb-3 text-sm font-medium transition-colors ${
-              tab === "belepes"
-                ? "text-primary border-b-2 border-primary"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
-          >
-            Belépés
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setTab("regisztracio");
-              setErrors({});
-              setGlobalError("");
-            }}
-            className={`flex-1 pb-3 text-sm font-medium transition-colors ${
-              tab === "regisztracio"
-                ? "text-primary border-b-2 border-primary"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
-          >
-            Regisztráció
-          </button>
-        </div>
-
+      <TabPanel idBase={idBase} value={tab} className="flex flex-col gap-[18px]">
         <button
           type="button"
           onClick={handleGoogleSignIn}
           disabled={loading}
-          className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 rounded-xl bg-white hover:bg-gray-50 text-gray-700 font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+          className={pillClassName({
+            variant: "outline",
+            fullWidth: true,
+            className: "h-[54px] gap-3 text-[15px] font-bold",
+          })}
         >
           <GoogleIcon />
           Folytatás Google-fiókkal
         </button>
 
-        <div className="flex items-center gap-4 my-5">
-          <div className="flex-1 border-t border-gray-200" />
-          <span className="text-xs text-gray-400 font-medium">vagy</span>
-          <div className="flex-1 border-t border-gray-200" />
-        </div>
+        <OrDivider />
 
         {globalError && (
-          <div
-            role="alert"
-            aria-live="polite"
-            className="mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-lg"
-          >
-            <p className="text-sm text-red-600">{globalError}</p>
-          </div>
+          <Notice tone="error" shape="pill" role="alert" aria-live="polite">
+            {globalError}
+          </Notice>
         )}
 
         {tab === "belepes" && belepesStep === "email" && (
-          <form onSubmit={handleEmailContinue} noValidate className="space-y-4">
-            <div>
-              <label htmlFor="auth-email" className="block text-sm font-medium text-gray-700 mb-1">
-                E-mail cím
-              </label>
-              <input
-                id="auth-email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="pelda@email.hu"
-                autoComplete="email"
-                className={inputCx(!!errors.email)}
-              />
-              {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email}</p>}
-            </div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 px-4 bg-primary text-white rounded-xl font-medium text-sm hover:bg-primary/90 disabled:opacity-50"
-            >
-              {loading ? "Folyamatban..." : "Tovább"}
+          <form onSubmit={handleEmailContinue} noValidate className="flex flex-col gap-[18px]">
+            <TextField
+              id="auth-email"
+              type="email"
+              label="E-mail cím"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="pelda@email.hu"
+              autoComplete="email"
+              error={errors.email}
+            />
+            <button type="submit" disabled={loading} className={submitClass}>
+              {loading ? busyLabel : "Tovább"}
+              {!loading && <ArrowIcon />}
             </button>
           </form>
         )}
 
         {tab === "belepes" && belepesStep === "password" && (
-          <form onSubmit={handlePasswordSubmit} noValidate className="space-y-4">
-            <div className="text-sm text-gray-600">
-              <span>{email}</span>{" "}
-              <button type="button" onClick={resetBelepes} className="text-primary hover:underline">
-                (változtatás)
-              </button>
-            </div>
-            <div>
-              <label
-                htmlFor="auth-password"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Jelszó
-              </label>
-              <input
-                id="auth-password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                autoComplete="current-password"
-                className={inputCx(!!errors.password)}
-                autoFocus
-              />
-              {errors.password && <p className="mt-1 text-xs text-red-600">{errors.password}</p>}
-            </div>
-            <div className="flex justify-end">
-              <button
-                type="button"
-                onClick={() => setShowForgotPassword(true)}
-                className="text-xs text-primary hover:underline"
-              >
-                Elfelejtett jelszó?
-              </button>
-            </div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 px-4 bg-primary text-white rounded-xl font-medium text-sm hover:bg-primary/90 disabled:opacity-50"
-            >
-              {loading ? "Folyamatban..." : "Belépés"}
+          <form onSubmit={handlePasswordSubmit} noValidate className="flex flex-col gap-[18px]">
+            <EmailChip email={email} onChange={resetBelepes} />
+            <PasswordField
+              id="auth-password"
+              label="Jelszó"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="current-password"
+              placeholder="Legalább 6 karakter"
+              error={errors.password}
+              labelAside={
+                <button
+                  type="button"
+                  onClick={() => setShowForgotPassword(true)}
+                  className="link-grow border-0 bg-transparent px-0 py-0.5 text-[13px] font-bold text-teal-ink"
+                >
+                  Elfelejtett jelszó?
+                </button>
+              }
+            />
+            <button type="submit" disabled={loading} className={submitClass}>
+              {loading ? busyLabel : "Belépés"}
+              {!loading && <ArrowIcon />}
             </button>
           </form>
         )}
 
         {tab === "belepes" && belepesStep === "ghost" && (
-          <div className="space-y-4">
-            <div className="text-sm text-gray-600">
-              <span>{email}</span>{" "}
-              <button type="button" onClick={resetBelepes} className="text-primary hover:underline">
-                (változtatás)
-              </button>
-            </div>
-            <p className="text-sm text-gray-700">
+          <div className="flex flex-col gap-[18px]">
+            <EmailChip email={email} onChange={resetBelepes} />
+            <p className="m-0 text-[15px] leading-relaxed text-muted-strong">
               Rendszerünkben szerepel egy foglalási fiók ezzel az e-mail címmel, de még nincs
               aktiválva. Válasszon az alábbi lehetőségek közül:
             </p>
             {claimEmailSent ? (
-              <div className="px-4 py-3 bg-green-50 border border-green-200 rounded-lg">
-                <p className="text-sm text-green-700">
-                  Elküldtük az aktiváló linket. Kérjük, ellenőrizze a postafiókját.
-                </p>
-              </div>
+              <Notice tone="success" role="status">
+                Elküldtük az aktiváló linket. Kérjük, ellenőrizze a postafiókját.
+              </Notice>
             ) : (
               <button
                 type="button"
                 onClick={handleClaimStart}
                 disabled={loading}
-                className="w-full py-3 px-4 bg-primary text-white rounded-xl font-medium text-sm hover:bg-primary/90 disabled:opacity-50"
+                className={submitClass}
               >
-                {loading ? "Folyamatban..." : "Aktiváló link kérése e-mailben"}
+                {loading ? busyLabel : "Aktiváló link kérése e-mailben"}
               </button>
             )}
           </div>
         )}
 
         {tab === "regisztracio" && (
-          <form onSubmit={handleRegisztracioSubmit} noValidate className="space-y-4">
-            <div>
-              <label htmlFor="auth-name" className="block text-sm font-medium text-gray-700 mb-1">
-                Teljes név
-              </label>
-              <input
+          <form
+            onSubmit={handleRegisztracioSubmit}
+            noValidate
+            className="fade-up flex flex-col gap-4"
+          >
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,240px),1fr))] gap-4">
+              <TextField
                 id="auth-name"
-                type="text"
+                label="Teljes név"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Kovács János"
                 autoComplete="name"
-                className={inputCx(!!errors.name)}
+                error={errors.name}
               />
-              {errors.name && <p className="mt-1 text-xs text-red-600">{errors.name}</p>}
-            </div>
-            <div>
-              <label htmlFor="auth-phone" className="block text-sm font-medium text-gray-700 mb-1">
-                Telefonszám
-              </label>
-              <input
+              <TextField
                 id="auth-phone"
                 type="tel"
+                label="Telefonszám"
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 placeholder="+36 70 000 0000"
                 autoComplete="tel"
-                className={inputCx(!!errors.phoneNumber)}
+                error={errors.phoneNumber}
               />
-              {errors.phoneNumber && (
-                <p className="mt-1 text-xs text-red-600">{errors.phoneNumber}</p>
-              )}
             </div>
-            <div>
-              <label
-                htmlFor="auth-email-reg"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                E-mail cím
-              </label>
-              <input
-                id="auth-email-reg"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="pelda@email.hu"
-                autoComplete="email"
-                className={inputCx(!!errors.email)}
-              />
-              {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email}</p>}
-            </div>
-            <div>
-              <label
-                htmlFor="auth-password-reg"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Jelszó
-              </label>
-              <input
-                id="auth-password-reg"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Legalább 6 karakter"
-                autoComplete="new-password"
-                className={inputCx(!!errors.password)}
-              />
-              {errors.password && <p className="mt-1 text-xs text-red-600">{errors.password}</p>}
-            </div>
-            <div>
-              <label htmlFor="auth-postal" className="block text-sm font-medium text-gray-700 mb-1">
-                Irányítószám
-              </label>
-              <input
-                id="auth-postal"
-                type="text"
-                inputMode="numeric"
-                maxLength={4}
-                value={postalCode}
-                onChange={(e) => setPostalCode(e.target.value.replace(/\D/g, ""))}
-                autoComplete="postal-code"
-                className={inputCx(!!errors.postalCode)}
-              />
-              {errors.postalCode && (
-                <p className="mt-1 text-xs text-red-600">{errors.postalCode}</p>
-              )}
-            </div>
-            <div>
-              <label htmlFor="auth-city" className="block text-sm font-medium text-gray-700 mb-1">
-                Település
-              </label>
-              <input
-                id="auth-city"
-                type="text"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                autoComplete="address-level2"
-                className={inputCx(!!errors.city)}
-              />
-              {errors.city && <p className="mt-1 text-xs text-red-600">{errors.city}</p>}
-            </div>
-            <div>
-              <label htmlFor="auth-street" className="block text-sm font-medium text-gray-700 mb-1">
-                Utca, házszám
-              </label>
-              <input
-                id="auth-street"
-                type="text"
-                value={streetAddress}
-                onChange={(e) => setStreetAddress(e.target.value)}
-                autoComplete="street-address"
-                className={inputCx(!!errors.streetAddress)}
-              />
-              {errors.streetAddress && (
-                <p className="mt-1 text-xs text-red-600">{errors.streetAddress}</p>
-              )}
-            </div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 px-4 bg-primary text-white rounded-xl font-medium text-sm hover:bg-primary/90 disabled:opacity-50"
-            >
-              {loading ? "Folyamatban..." : "Regisztráció"}
+            <TextField
+              id="auth-email-reg"
+              type="email"
+              label="E-mail cím"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="pelda@email.hu"
+              autoComplete="email"
+              error={errors.email}
+            />
+            <PasswordField
+              id="auth-password-reg"
+              label="Jelszó"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Legalább 6 karakter"
+              autoComplete="new-password"
+              hint="Legalább 6 karakter"
+              error={errors.password}
+            />
+            <fieldset className="m-0 flex flex-col gap-3 rounded-[28px] border-0 bg-field p-4 sm:p-5">
+              <legend className="float-left mb-1 p-0 text-[13px] font-extrabold tracking-[.08em] text-muted uppercase">
+                Számlázási cím
+              </legend>
+              <div className="clear-both grid grid-cols-6 gap-3.5">
+                <TextField
+                  id="auth-postal"
+                  label="Irányítószám"
+                  inputMode="numeric"
+                  maxLength={4}
+                  value={postalCode}
+                  onChange={(e) => setPostalCode(e.target.value.replace(/\D/g, ""))}
+                  autoComplete="postal-code"
+                  placeholder="Irsz."
+                  tone="white"
+                  error={errors.postalCode}
+                  className="col-span-6 sm:col-span-2"
+                />
+                <TextField
+                  id="auth-city"
+                  label="Település"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  autoComplete="address-level2"
+                  placeholder="Település"
+                  tone="white"
+                  error={errors.city}
+                  className="col-span-6 sm:col-span-4"
+                />
+                <TextField
+                  id="auth-street"
+                  label="Utca, házszám"
+                  value={streetAddress}
+                  onChange={(e) => setStreetAddress(e.target.value)}
+                  autoComplete="street-address"
+                  placeholder="Utca, házszám"
+                  tone="white"
+                  error={errors.streetAddress}
+                  className="col-span-6"
+                />
+              </div>
+            </fieldset>
+            <button type="submit" disabled={loading} className={submitClass}>
+              {loading ? busyLabel : "Regisztráció"}
+              {!loading && <ArrowIcon />}
             </button>
           </form>
         )}
-      </div>
+      </TabPanel>
+    </div>
+  );
+}
+
+/** The e-mail being signed in with, plus a way back to the e-mail step. */
+function EmailChip({ email, onChange }: { email: string; onChange: () => void }) {
+  return (
+    <div className="flex min-w-0 items-center gap-2 self-start rounded-full bg-canvas py-1.5 pr-1.5 pl-4 text-sm font-bold text-navy">
+      <span className="min-w-0 truncate">{email}</span>
+      <button
+        type="button"
+        onClick={onChange}
+        className="tap-press inline-flex h-9 shrink-0 items-center rounded-full bg-white px-3.5 text-[13px] font-extrabold text-teal-ink hover:bg-sage"
+      >
+        változtatás
+      </button>
     </div>
   );
 }

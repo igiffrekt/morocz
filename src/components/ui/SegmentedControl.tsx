@@ -11,7 +11,8 @@ export interface SegmentedOption<T extends string> {
 
 interface SegmentedControlProps<T extends string> {
   options: readonly SegmentedOption<T>[];
-  value: T;
+  /** `null` = nothing chosen yet: the indicator stays hidden until the first pick. */
+  value: T | null;
   onChange: (value: T) => void;
   /** Accessible name — pass either this or `labelledBy`. */
   label?: string;
@@ -38,10 +39,9 @@ export function SegmentedControl<T extends string>({
 }: SegmentedControlProps<T>) {
   const refs = useRef<Array<HTMLButtonElement | null>>([]);
   const count = Math.max(options.length, 1);
-  const selected = Math.max(
-    options.findIndex((o) => o.value === value),
-    0,
-  );
+  const found = options.findIndex((o) => o.value === value);
+  const hasValue = found >= 0;
+  const selected = Math.max(found, 0);
 
   const move = (from: number, step: number) => {
     for (let i = 1; i <= options.length; i++) {
@@ -80,14 +80,20 @@ export function SegmentedControl<T extends string>({
     >
       <span
         aria-hidden="true"
-        className="slide-indicator absolute top-[5px] bottom-[5px] left-[5px] rounded-full bg-navy shadow-indicator"
+        className={cn(
+          "slide-indicator absolute top-[5px] bottom-[5px] left-[5px] rounded-full bg-navy shadow-indicator",
+          "transition-[transform,opacity] duration-[550ms]",
+          !hasValue && "opacity-0",
+        )}
         style={{
           width: `calc((100% - 10px) / ${count})`,
           transform: `translateX(${selected * 100}%)`,
         }}
       />
       {options.map((option, index) => {
-        const isOn = index === selected;
+        const isOn = hasValue && index === selected;
+        // Roving tab stop: the chosen option, or the first one while nothing is chosen.
+        const isTabStop = index === selected;
         return (
           // biome-ignore lint/a11y/useSemanticElements: design-drawn radio (no native inputs, see PLAN.md)
           <button
@@ -99,7 +105,7 @@ export function SegmentedControl<T extends string>({
             role="radio"
             aria-checked={isOn}
             disabled={option.disabled}
-            tabIndex={isOn ? 0 : -1}
+            tabIndex={isTabStop ? 0 : -1}
             onClick={() => onChange(option.value)}
             onKeyDown={(event) => onKeyDown(event, index)}
             className={cn(

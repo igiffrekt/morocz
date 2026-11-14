@@ -1,8 +1,16 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { type CSSProperties, useState } from "react";
+import { buildGoogleCalendarUrl } from "@/components/booking/BookingSuccess";
+import { useSiteContact } from "@/components/layout/SiteContext";
+import { Collapse } from "@/components/ui/Accordion";
+import { ArrowIcon, pillClassName } from "@/components/ui/PillButton";
+import { formatLongDate } from "@/lib/booking-dates";
+import { cn } from "@/lib/cn";
 import { hoursUntilBudapestSlot } from "@/lib/refund/slot-time";
+import { telHref } from "@/lib/site-nav";
 import type { ScheduleForAvailability } from "@/lib/slots";
 import { CancelDialog } from "./CancelDialog";
 import { ReschedulePanel } from "./ReschedulePanel";
@@ -31,8 +39,67 @@ interface BookingManagementCardProps {
 
 type CardState = "idle" | "cancel-confirm" | "cancelled" | "rescheduled";
 
+const FALLBACK_PHONE = "+36 70 639 5239";
+
+const ICON = {
+  svc: "M22 12h-4l-3 9L9 3l-3 9H2",
+  cal: "M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z",
+  user: "M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z",
+  hash: "M4 9h16M4 15h16M10 3 8 21M16 3l-2 18",
+  move: "M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM10 15l2 2 4-4",
+  x: "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM15 9l-6 6M9 9l6 6",
+  lock: "M5 11h14v10H5zM8 11V7a4 4 0 0 1 8 0v4",
+  tick: "M20 6 9 17l-5-5",
+  calPlus:
+    "M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM12 14v4M10 16h4",
+};
+
+const TILE_TONES = ["bg-sage", "bg-lavender", "bg-sun-soft", "bg-blush-soft"];
+
+const STATUS_LABEL: Record<string, string> = {
+  confirmed: "Visszaigazolt foglalás",
+  rescheduled: "Átütemezett foglalás",
+};
+
+function Svg({
+  d,
+  size = 18,
+  strokeWidth = 2,
+}: {
+  d: string;
+  size?: number;
+  strokeWidth?: number;
+}) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={strokeWidth}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d={d} />
+    </svg>
+  );
+}
+
+/** White result card with a popping round icon (cancelled / rescheduled). */
+function ResultCard({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="fade-up flex flex-col items-start gap-[18px] rounded-[32px] bg-white p-6 sm:rounded-[36px] sm:p-[clamp(24px,4vw,48px)]">
+      {children}
+    </div>
+  );
+}
+
 export function BookingManagementCard({ booking, scheduleData }: BookingManagementCardProps) {
   const router = useRouter();
+  const contact = useSiteContact();
+  const phone = contact?.phone || FALLBACK_PHONE;
   const [cardState, setCardState] = useState<CardState>("idle");
   const [showReschedule, setShowReschedule] = useState(false);
   const [rescheduledTo, setRescheduledTo] = useState<{ date: string; time: string } | null>(null);
@@ -41,201 +108,268 @@ export function BookingManagementCard({ booking, scheduleData }: BookingManageme
   // dialog + server own the 48h refund-vs-no-refund decision).
   const within24h = hoursUntilBudapestSlot(booking.slotDate, booking.slotTime, new Date()) < 24;
 
-  const formattedDate = new Date(booking.slotDate).toLocaleDateString("hu-HU", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    weekday: "long",
-  });
+  const serviceName = booking.service?.name ?? "Foglalt szolgáltatás";
+  const when = `${formatLongDate(booking.slotDate)}, ${booking.slotTime}`;
 
   if (cardState === "cancelled") {
     return (
-      <div className="rounded-xl bg-white p-8 shadow-md">
-        <div className="mb-4 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#99CEB7]">
-            <svg
-              className="h-5 w-5 text-white"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-              stroke="currentColor"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-            </svg>
-          </div>
-          <h2 className="text-xl font-bold text-[#23264F]">Időpont sikeresen lemondva</h2>
-        </div>
-        <p className="mb-6 text-gray-600">
+      <ResultCard>
+        <span className="pop-in-slow inline-flex h-[76px] w-[76px] items-center justify-center rounded-full bg-sage text-teal-ink">
+          <Svg d={ICON.tick} size={34} strokeWidth={2.6} />
+        </span>
+        {/* biome-ignore lint/a11y/useSemanticElements: <output> cannot hold a heading; the heading itself is the status message */}
+        <h2
+          role="status"
+          className="m-0 text-[28px] font-extrabold tracking-[-0.02em] text-navy sm:text-[34px]"
+        >
+          Időpont sikeresen lemondva
+        </h2>
+        <p className="m-0 max-w-[560px] text-base leading-relaxed text-muted">
           Megkaptuk a lemondási kérelmét. Hamarosan visszaigazoló e-mailt küldünk.
         </p>
-        <a
-          href="/idopontfoglalas"
-          className="inline-block rounded-lg bg-[#99CEB7] px-6 py-3 text-sm font-semibold text-[#23264F] transition hover:bg-[#80bea6]"
-        >
-          Új időpont foglalása
-        </a>
-      </div>
+        <div className="max-w-full rounded-[28px] bg-canvas px-[22px] py-3 text-[15px] text-muted line-through">
+          {serviceName} · {when}
+        </div>
+        <div className="flex w-full flex-wrap gap-3">
+          <Link
+            href="/idopontfoglalas"
+            className={pillClassName({
+              variant: "mint",
+              className: "bg-mint hover:bg-mint max-sm:w-full",
+            })}
+          >
+            Új időpont foglalása
+            <ArrowIcon />
+          </Link>
+          <Link
+            href="/"
+            className={pillClassName({ variant: "outline", className: "max-sm:w-full" })}
+          >
+            Vissza a főoldalra
+          </Link>
+        </div>
+      </ResultCard>
     );
   }
 
   if (cardState === "rescheduled" && rescheduledTo) {
-    const newFormattedDate = new Date(rescheduledTo.date).toLocaleDateString("hu-HU", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      weekday: "long",
-    });
+    const newWhen = `${formatLongDate(rescheduledTo.date)}, ${rescheduledTo.time}`;
+    const calendarUrl = buildGoogleCalendarUrl(
+      `${serviceName} — Mórocz Medical`,
+      rescheduledTo.date,
+      rescheduledTo.time,
+      booking.service?.appointmentDuration ?? 20,
+      `Foglalási szám: ${booking.reservationNumber}`,
+      contact?.address || undefined,
+    );
 
     return (
-      <div className="rounded-xl bg-white p-8 shadow-md">
-        <div className="mb-4 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#99CEB7]">
-            <svg
-              className="h-5 w-5 text-white"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-              stroke="currentColor"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-            </svg>
-          </div>
-          <h2 className="text-xl font-bold text-[#23264F]">Időpont sikeresen áthelyezve</h2>
-        </div>
-        <div className="mb-6 rounded-lg border-l-4 border-[#99CEB7] bg-gray-50 p-5">
-          <p className="mb-1 text-xs font-bold uppercase tracking-wider text-gray-500">
-            Új időpont
-          </p>
-          <p className="text-base font-semibold text-[#23264F]">
-            {newFormattedDate}, {rescheduledTo.time}
-          </p>
-        </div>
-        <p className="mb-6 text-gray-600">Visszaigazoló e-mailt küldtünk az új időpontról.</p>
-        <button
-          onClick={() => {
-            console.log("[BookingManagementCard] Refresh clicked");
-            router.refresh();
-          }}
-          className="inline-block rounded-lg bg-[#99CEB7] px-6 py-3 text-sm font-semibold text-[#23264F] transition hover:bg-[#80bea6]"
+      <ResultCard>
+        <span className="pop-in-slow inline-flex h-[76px] w-[76px] items-center justify-center rounded-full bg-mint text-navy shadow-[0_0_0_10px_var(--color-mint-pale)]">
+          <Svg d={ICON.tick} size={34} strokeWidth={2.6} />
+        </span>
+        {/* biome-ignore lint/a11y/useSemanticElements: <output> cannot hold a heading; the heading itself is the status message */}
+        <h2
+          role="status"
+          className="m-0 text-[28px] font-extrabold tracking-[-0.02em] text-navy sm:text-[34px]"
         >
-          Foglalás megtekintése
-        </button>
-      </div>
+          Időpont sikeresen áthelyezve
+        </h2>
+        <div className="flex max-w-full flex-wrap items-center gap-2.5">
+          <span className="rounded-[28px] bg-canvas px-5 py-3 text-sm text-muted line-through">
+            {when}
+          </span>
+          <span aria-hidden="true" className="text-teal-ink">
+            <ArrowIcon />
+          </span>
+          <span className="rounded-[28px] bg-navy px-[22px] py-3 text-[15px] font-extrabold text-white">
+            <span className="font-bold text-mint-light">Új időpont:</span> {newWhen}
+          </span>
+        </div>
+        <p className="m-0 text-base leading-relaxed text-muted">
+          Visszaigazoló e-mailt küldtünk az új időpontról.
+        </p>
+        <div className="flex w-full flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={() => router.refresh()}
+            className={pillClassName({ variant: "navy", className: "max-sm:w-full" })}
+          >
+            Foglalás megtekintése
+            <ArrowIcon />
+          </button>
+          <a
+            href={calendarUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={pillClassName({
+              variant: "outline",
+              className: "border-navy max-sm:w-full",
+            })}
+          >
+            <Svg d={ICON.calPlus} />
+            Mentés Google Naptárba
+          </a>
+        </div>
+      </ResultCard>
     );
   }
 
+  const cancelOpen = cardState === "cancel-confirm";
+  const rescheduleOpen = showReschedule && cardState === "idle" && !within24h;
+  const statusLabel = STATUS_LABEL[booking.status];
+  const details = [
+    { k: "Foglalt szolgáltatás", v: serviceName, icon: ICON.svc },
+    { k: "Időpont", v: when, icon: ICON.cal },
+    { k: "Páciens", v: booking.patientName, icon: ICON.user },
+    { k: "Foglalási szám", v: booking.reservationNumber, icon: ICON.hash, mono: true },
+  ];
+
   return (
-    <div className="rounded-xl bg-white p-8 shadow-md">
-      <h2 className="mb-6 text-xl font-bold text-[#23264F]">Az Ön időpontja</h2>
-
-      {/* Appointment details */}
-      <div className="mb-6 rounded-lg border-l-4 border-[#99CEB7] bg-gray-50 p-5">
-        <div className="mb-4">
-          <p className="mb-1 text-xs font-bold uppercase tracking-wider text-gray-500">
-            Szolgáltatás
-          </p>
-          <p className="text-base font-semibold text-[#23264F]">
-            {booking.service?.name ?? "Foglalt szolgáltatás"}
-          </p>
-        </div>
-
-        <div className="mb-4">
-          <p className="mb-1 text-xs font-bold uppercase tracking-wider text-gray-500">Időpont</p>
-          <p className="text-base font-semibold text-[#23264F]">
-            {formattedDate}, {booking.slotTime}
-          </p>
-        </div>
-
-        <div className="mb-4">
-          <p className="mb-1 text-xs font-bold uppercase tracking-wider text-gray-500">Páciens</p>
-          <p className="text-base font-semibold text-[#23264F]">{booking.patientName}</p>
-        </div>
-
-        <div>
-          <p className="mb-1 text-xs font-bold uppercase tracking-wider text-gray-500">
-            Foglalási szám
-          </p>
-          <p className="font-mono text-base font-semibold text-[#23264F]">
-            {booking.reservationNumber}
-          </p>
-        </div>
-      </div>
-
-      {/* Action buttons — cancellation is always available; rescheduling is blocked within 24h. */}
-      <div className="flex gap-3">
-        <button
-          type="button"
-          onClick={() => {
-            setCardState("cancel-confirm");
-            setShowReschedule(false);
-          }}
-          className="rounded-lg border border-red-300 bg-white px-5 py-2.5 text-sm font-semibold text-red-600 transition hover:bg-red-50"
-        >
-          Lemondás
-        </button>
-        {!within24h && (
-          <button
-            type="button"
-            onClick={() => {
-              setShowReschedule((prev) => !prev);
-              setCardState("idle");
-            }}
-            className={[
-              "rounded-lg border px-5 py-2.5 text-sm font-semibold transition",
-              showReschedule
-                ? "border-[#23264F] bg-[#23264F] text-white hover:bg-[#1a1d3b]"
-                : "border-[#23264F] bg-white text-[#23264F] hover:bg-gray-50",
-            ].join(" ")}
-          >
-            Átütemezés
-          </button>
+    <div className="fade-up flex flex-col gap-6 rounded-[32px] bg-white p-4 sm:rounded-[36px] sm:p-[clamp(20px,3vw,36px)]">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h2 className="m-0 text-[26px] font-extrabold tracking-[-0.02em] text-navy sm:text-[28px]">
+          Az Ön időpontja
+        </h2>
+        {statusLabel && (
+          <span className="inline-flex items-center gap-2 rounded-full bg-mint-pale px-4 py-2 text-[13px] font-extrabold whitespace-nowrap text-navy">
+            <span aria-hidden="true" className="h-2 w-2 rounded-full bg-teal-ink" />
+            {statusLabel}
+          </span>
         )}
       </div>
 
+      <dl className="m-0 grid grid-cols-1 gap-3 sm:grid-cols-2">
+        {details.map((d, i) => (
+          <div
+            key={d.k}
+            className={cn(
+              "fade-up flex items-center gap-3.5 rounded-[28px] px-[18px] py-4",
+              TILE_TONES[i],
+            )}
+            style={{ "--i": i } as CSSProperties}
+          >
+            <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-teal-ink">
+              <Svg d={d.icon} />
+            </span>
+            <div className="flex min-w-0 flex-col gap-1">
+              <dt className="text-xs font-bold tracking-[.08em] text-muted uppercase">{d.k}</dt>
+              <dd
+                className={cn(
+                  "m-0 text-[17px] leading-snug font-extrabold break-words text-navy first-letter:uppercase",
+                  d.mono && "tracking-wider",
+                )}
+              >
+                {d.v}
+              </dd>
+            </div>
+          </div>
+        ))}
+      </dl>
+
+      {/* Actions — cancellation is always available; rescheduling is blocked within 24h. */}
+      <div className="flex flex-wrap gap-3">
+        <button
+          type="button"
+          aria-expanded={rescheduleOpen}
+          aria-controls="reschedule-panel"
+          aria-disabled={within24h || undefined}
+          aria-describedby={within24h ? "reschedule-lock" : undefined}
+          onClick={() => {
+            if (within24h) return;
+            setShowReschedule((prev) => !prev);
+            setCardState("idle");
+          }}
+          className={pillClassName({
+            variant: rescheduleOpen ? "navy" : "outline",
+            className: cn(
+              "h-[54px] px-[26px] text-[15px] max-sm:w-full",
+              !rescheduleOpen && "border-navy",
+              within24h && "cursor-not-allowed opacity-[.42] hover:translate-y-0 hover:shadow-none",
+            ),
+          })}
+        >
+          <Svg d={ICON.move} />
+          Időpont módosítása
+        </button>
+        <button
+          type="button"
+          aria-expanded={cancelOpen}
+          aria-controls="cancel-panel"
+          onClick={() => {
+            setCardState(cancelOpen ? "idle" : "cancel-confirm");
+            setShowReschedule(false);
+          }}
+          className={pillClassName({
+            variant: "outline",
+            className: cn(
+              "h-[54px] px-[26px] text-[15px] max-sm:w-full",
+              cancelOpen
+                ? "border-danger bg-danger text-white hover:border-danger hover:text-white"
+                : "border-[#e3b4ae] text-danger hover:border-danger hover:text-danger",
+            ),
+          })}
+        >
+          <Svg d={ICON.x} />
+          Lemondás
+        </button>
+      </div>
+
       {within24h && (
-        <div className="mt-3 rounded-lg bg-gray-50 border border-gray-200 p-3 text-sm text-gray-600">
-          <p>
-            Az időpont átütemezése már nem lehetséges (kevesebb mint 24 óra van hátra). Kérdés
-            esetén hívjon minket:{" "}
+        <div
+          id="reschedule-lock"
+          role="note"
+          className="flex items-start gap-3.5 rounded-[28px] bg-canvas px-[22px] py-[18px]"
+        >
+          <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-navy text-white">
+            <Svg d={ICON.lock} size={16} />
+          </span>
+          <span className="text-[15px] leading-relaxed text-muted-strong">
+            <strong className="text-navy">
+              Az időpont már nem módosítható (kevesebb mint 24 óra van hátra).
+            </strong>{" "}
+            Kérdés esetén hívjon minket:{" "}
             <a
-              href="tel:+36706395239"
-              className="font-semibold text-[#23264F] underline hover:no-underline"
+              href={telHref(phone)}
+              className="link-grow font-extrabold whitespace-nowrap text-navy"
             >
-              +36 70 639 5239
+              {phone}
             </a>
-          </p>
+          </span>
         </div>
       )}
 
-      {/* Cancel confirmation inline panel */}
-      {cardState === "cancel-confirm" && (
+      {/* Reschedule picker */}
+      {!within24h && (
+        <Collapse id="reschedule-panel" open={rescheduleOpen}>
+          <ReschedulePanel
+            booking={{
+              _id: booking._id,
+              service: booking.service,
+              slotDate: booking.slotDate,
+              slotTime: booking.slotTime,
+              managementToken: booking.managementToken,
+              serviceId: booking.serviceId,
+            }}
+            scheduleData={scheduleData}
+            onRescheduled={(newDate, newTime) => {
+              setShowReschedule(false);
+              setRescheduledTo({ date: newDate, time: newTime });
+              setCardState("rescheduled");
+            }}
+            onCancel={() => setShowReschedule(false)}
+          />
+        </Collapse>
+      )}
+
+      {/* Cancel confirmation — in-page panel */}
+      <Collapse id="cancel-panel" open={cancelOpen}>
         <CancelDialog
           booking={booking}
           onCancelled={() => setCardState("cancelled")}
           onClose={() => setCardState("idle")}
         />
-      )}
-
-      {/* Reschedule picker */}
-      {showReschedule && cardState === "idle" && (
-        <ReschedulePanel
-          booking={{
-            _id: booking._id,
-            service: booking.service,
-            slotDate: booking.slotDate,
-            slotTime: booking.slotTime,
-            managementToken: booking.managementToken,
-            serviceId: booking.serviceId,
-          }}
-          scheduleData={scheduleData}
-          onRescheduled={(newDate, newTime) => {
-            setShowReschedule(false);
-            setRescheduledTo({ date: newDate, time: newTime });
-            setCardState("rescheduled");
-          }}
-          onCancel={() => setShowReschedule(false)}
-        />
-      )}
+      </Collapse>
     </div>
   );
 }

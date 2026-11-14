@@ -2,8 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { z } from "zod";
-
-import { useSession, signOut } from "@/lib/auth-client";
+import { Collapse } from "@/components/ui/Accordion";
+import { TextField } from "@/components/ui/Field";
+import { Modal } from "@/components/ui/Modal";
+import { Notice } from "@/components/ui/Notice";
+import { pillClassName } from "@/components/ui/PillButton";
+import { CheckboxPill, CheckboxRow } from "@/components/ui/PillCheckbox";
+import { signOut, useSession } from "@/lib/auth-client";
 import {
   BOOKING_POLICY_LABEL,
   BOOKING_POLICY_LINK_TEXT,
@@ -15,6 +20,7 @@ import {
   TERMS_OF_SERVICE_URL,
 } from "@/lib/consent-text";
 import { isValidHungarianTaxNumber } from "@/lib/szamlazz/tax-number";
+import { BackArrowIcon, StepCard } from "./StepCard";
 
 interface Step4Props {
   selections: {
@@ -44,23 +50,20 @@ const BookingFormSchema = z.object({
 type BookingFormData = z.infer<typeof BookingFormSchema>;
 type FormErrors = Partial<Record<keyof BookingFormData, string>>;
 
-function formatDateHungarian(dateStr: string): string {
-  const [year, month, day] = dateStr.split("-").map(Number);
-  const date = new Date(year ?? 0, (month ?? 1) - 1, day ?? 1);
-  return date.toLocaleDateString("hu-HU", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    weekday: "long",
-  });
-}
-
-export function Step4Confirm({ selections, onBack, onSuccess, onConflict }: Step4Props) {
+// onSuccess is kept in the props for the in-wizard success screen; payment now always
+// redirects to Stripe Checkout, so it is not called here.
+export function Step4Confirm({
+  selections,
+  onBack,
+  onSuccess: _onSuccess,
+  onConflict,
+}: Step4Props) {
   const { data: session } = useSession();
 
   const [patientName, setPatientName] = useState("");
   const [patientEmail, setPatientEmail] = useState("");
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: prefill once per session change only
   useEffect(() => {
     if (session?.user?.name && !patientName) setPatientName(session.user.name);
     if (session?.user?.email && !patientEmail) setPatientEmail(session.user.email);
@@ -85,7 +88,9 @@ export function Step4Confirm({ selections, onBack, onSuccess, onConflict }: Step
   const [policyChecked, setPolicyChecked] = useState(false);
   const [policyError, setPolicyError] = useState<string | null>(null);
   const [errors, setErrors] = useState<FormErrors>({});
-  const [businessErrors, setBusinessErrors] = useState<{ taxNumber?: string; company?: string }>({});
+  const [businessErrors, setBusinessErrors] = useState<{ taxNumber?: string; company?: string }>(
+    {},
+  );
   const [submitting, setSubmitting] = useState(false);
   const [globalError, setGlobalError] = useState<string | null>(null);
   const [wantsBusinessInvoice, setWantsBusinessInvoice] = useState(false);
@@ -95,8 +100,6 @@ export function Step4Confirm({ selections, onBack, onSuccess, onConflict }: Step
   const [companyZip, setCompanyZip] = useState("");
   const [companyCity, setCompanyCity] = useState("");
   const [companyAddress, setCompanyAddress] = useState("");
-
-  const formattedDate = formatDateHungarian(selections.selectedDate);
 
   function validate(): boolean {
     const result = BookingFormSchema.safeParse({ patientName, patientEmail, patientPhone });
@@ -121,11 +124,10 @@ export function Step4Confirm({ selections, onBack, onSuccess, onConflict }: Step
 
     // Check if phone is required but empty (Google Sign-Up users)
     if (!patientPhone || patientPhone.length < 7) {
-      if (true) { // phoneNumber is stored separately
-        // Google Sign-Up user without phone - show modal
-        setShowPhoneModal(true);
-        return;
-      }
+      // phoneNumber is stored separately
+      // Google Sign-Up user without phone - show modal
+      setShowPhoneModal(true);
+      return;
     }
 
     if (!validate()) return;
@@ -220,366 +222,347 @@ export function Step4Confirm({ selections, onBack, onSuccess, onConflict }: Step
     }
   }
 
+  const linkClass = "link-grow font-bold text-navy";
+  const policyErrorId = "confirm-policy-error";
+  const consentErrorId = "confirm-consent-error";
+
   return (
-    <div>
-      {/* Phone Modal for Google Sign-Up users */}
-      {showPhoneModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
-            <h3 className="text-lg font-bold text-[var(--color-primary)] mb-2">
-              Telefonszám megadása
-            </h3>
-            <p className="text-sm text-gray-600 mb-4">
-              Az időpontfoglalás véglegesítéséhez szükséges a telefonszáma.
-            </p>
-            <div className="mb-4">
-              <input
-                type="tel"
-                value={patientPhone}
-                onChange={(e) => setPatientPhone(e.target.value)}
-                placeholder="+36 70 000 0000"
-                autoComplete="tel"
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30 focus:border-[var(--color-primary)] transition-colors"
-              />
-              {patientPhone.length < 10 && patientPhone.length > 0 && (
-                <p className="mt-1 text-xs text-red-600">Legalább 10 szám szükséges</p>
-              )}
-            </div>
-            <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={() => setShowPhoneModal(false)}
-                className="flex-1 px-4 py-3 text-sm font-medium text-gray-700 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
-              >
-                Mégsem
-              </button>
-              <button
-                type="button"
-                onClick={async () => {
-                  if (patientPhone.length >= 10) {
-                    // Save phone to user profile
-                    try {
-                      await fetch("/api/user/phone", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ phoneNumber: patientPhone }),
-                      });
-                    } catch (err) {
-                      console.error("Failed to save phone number:", err);
-                      // Non-critical — continue anyway
-                    }
-                    setShowPhoneModal(false);
+    <StepCard className="gap-[22px]">
+      {/* Phone dialog for Google Sign-Up users */}
+      <Modal
+        open={showPhoneModal}
+        onClose={() => setShowPhoneModal(false)}
+        title="Telefonszám megadása"
+        description="Az időpontfoglalás véglegesítéséhez szükséges a telefonszáma."
+        size="sm"
+        variant="sheet"
+      >
+        <div className="flex flex-col gap-5">
+          <TextField
+            id="confirm-phone-modal"
+            type="tel"
+            label="Telefonszám"
+            value={patientPhone}
+            onChange={(e) => setPatientPhone(e.target.value)}
+            placeholder="+36 70 000 0000"
+            autoComplete="tel"
+            error={
+              patientPhone.length < 10 && patientPhone.length > 0
+                ? "Legalább 10 szám szükséges"
+                : undefined
+            }
+          />
+          <div className="flex flex-wrap-reverse gap-3">
+            <button
+              type="button"
+              onClick={() => setShowPhoneModal(false)}
+              className={pillClassName({ variant: "outline", className: "flex-1" })}
+            >
+              Mégsem
+            </button>
+            <button
+              type="button"
+              onClick={async () => {
+                if (patientPhone.length >= 10) {
+                  // Save phone to user profile
+                  try {
+                    await fetch("/api/user/phone", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ phoneNumber: patientPhone }),
+                    });
+                  } catch (err) {
+                    console.error("Failed to save phone number:", err);
+                    // Non-critical — continue anyway
                   }
-                }}
-                className="flex-1 px-4 py-3 text-sm font-medium text-white bg-[var(--color-primary)] rounded-xl hover:bg-[var(--color-primary)]/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                Folytatás
-              </button>
-            </div>
+                  setShowPhoneModal(false);
+                }
+              }}
+              className={pillClassName({ variant: "navy", className: "flex-1" })}
+            >
+              Folytatás
+            </button>
           </div>
         </div>
-      )}
+      </Modal>
 
-      <h2 className="text-xl font-bold text-[var(--color-primary)] mb-6">Megerősítés</h2>
-
-      {/* Booking summary card */}
-      <div className="bg-[var(--color-accent)]/10 rounded-2xl p-4 mb-6 space-y-2">
-        <div className="flex items-start gap-2">
-          <span className="text-xs text-gray-500 w-24 shrink-0 pt-0.5">Szolgáltatás:</span>
-          <span className="text-sm font-semibold text-[var(--color-primary)]">
-            {selections.serviceName}
-          </span>
-        </div>
-        <div className="flex items-start gap-2">
-          <span className="text-xs text-gray-500 w-24 shrink-0 pt-0.5">Dátum:</span>
-          <span className="text-sm font-medium text-gray-800 capitalize">{formattedDate}</span>
-        </div>
-        <div className="flex items-start gap-2">
-          <span className="text-xs text-gray-500 w-24 shrink-0 pt-0.5">Időpont:</span>
-          <span className="text-sm font-semibold text-[var(--color-primary)]">
-            {selections.selectedTime}
-          </span>
-        </div>
-        <div className="flex items-start gap-2 pt-2 border-t border-gray-200">
-          <span className="text-xs text-gray-500 w-24 shrink-0 pt-0.5">Foglalási díj:</span>
-          <span className="text-sm font-bold text-[var(--color-primary)]">10 000 Ft</span>
-        </div>
-        <p className="text-xs text-gray-500 mt-1">
-          A foglalási díj a vizsgálat árába beszámít. Online bankkártyás fizetés a Stripe rendszerén keresztül.
+      <div className="flex flex-col gap-2">
+        <h2 className="m-0 text-[26px] font-extrabold tracking-[-0.02em] text-navy sm:text-[28px]">
+          Megerősítés
+        </h2>
+        <p className="m-0 text-[15px] leading-relaxed text-muted sm:text-base">
+          Ellenőrizze adatait, majd a foglalási díj megfizetésével véglegesítse az időpontot.
         </p>
       </div>
 
       {/* Global error */}
       {globalError && (
-        <div className="mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-xl">
-          <p className="text-sm text-red-600">{globalError}</p>
+        <Notice tone="error" role="alert">
+          <span>{globalError}</span>
           <button
             type="button"
             onClick={() => setGlobalError(null)}
-            className="mt-1 text-xs text-red-700 underline hover:no-underline"
+            className="link-grow self-start py-0.5 text-[13px] font-bold text-navy"
           >
             Bezárás
           </button>
-        </div>
+        </Notice>
       )}
 
       {/* Patient details form */}
-      <form onSubmit={handleSubmit} noValidate className="space-y-4">
-        {/* Full name */}
-        <div>
-          <label htmlFor="confirm-name" className="block text-sm font-medium text-gray-700 mb-1">
-            Teljes név
-          </label>
-          <input
+      <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-[22px]">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <TextField
             id="confirm-name"
-            type="text"
+            label="Teljes név"
             value={patientName}
             onChange={(e) => setPatientName(e.target.value)}
             placeholder="Kovács János"
             autoComplete="name"
-            className={`w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30 focus:border-[var(--color-primary)] transition-colors ${
-              errors.patientName ? "border-red-400" : "border-gray-300"
-            }`}
+            error={errors.patientName}
+            className="col-span-full"
           />
-          {errors.patientName && <p className="mt-1 text-xs text-red-600">{errors.patientName}</p>}
-        </div>
-
-        {/* Email */}
-        <div>
-          <label htmlFor="confirm-email" className="block text-sm font-medium text-gray-700 mb-1">
-            E-mail cím
-          </label>
-          <input
-            id="confirm-email"
-            type="email"
-            value={patientEmail}
-            onChange={(e) => setPatientEmail(e.target.value)}
-            placeholder="pelda@email.hu"
-            autoComplete="email"
-            className={`w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30 focus:border-[var(--color-primary)] transition-colors ${
-              errors.patientEmail ? "border-red-400" : "border-gray-300"
-            }`}
-          />
-          {errors.patientEmail && (
-            <p className="mt-1 text-xs text-red-600">{errors.patientEmail}</p>
-          )}
-          <p className="mt-2 text-xs text-gray-600">
-            Ez nem a te email címed?{" "}
-            <button
-              type="button"
-              onClick={async () => {
-                sessionStorage.clear();
-                await signOut();
-                window.location.reload();
-              }}
-              className="text-[var(--color-primary)] underline hover:no-underline"
-            >
-              Jelentkezz be a fiókoddal
-            </button>
-          </p>
-        </div>
-
-        {/* Phone */}
-        <div>
-          <label htmlFor="confirm-phone" className="block text-sm font-medium text-gray-700 mb-1">
-            Telefonszám
-          </label>
-          <input
+          <div className="flex min-w-0 flex-col gap-2">
+            <TextField
+              id="confirm-email"
+              type="email"
+              label="E-mail cím"
+              value={patientEmail}
+              onChange={(e) => setPatientEmail(e.target.value)}
+              placeholder="pelda@email.hu"
+              autoComplete="email"
+              error={errors.patientEmail}
+            />
+            <p className="m-0 pl-[22px] text-[13px] text-muted">
+              Ez nem a te email címed?{" "}
+              <button
+                type="button"
+                onClick={async () => {
+                  sessionStorage.clear();
+                  await signOut();
+                  window.location.reload();
+                }}
+                className="link-grow border-0 bg-transparent p-0 font-bold text-navy"
+              >
+                Jelentkezz be a fiókoddal
+              </button>
+            </p>
+          </div>
+          <TextField
             id="confirm-phone"
             type="tel"
+            label="Telefonszám"
             value={patientPhone}
             onChange={(e) => setPatientPhone(e.target.value)}
             placeholder="+36 70 000 0000"
             autoComplete="tel"
-            className={`w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30 focus:border-[var(--color-primary)] transition-colors ${
-              errors.patientPhone ? "border-red-400" : "border-gray-300"
-            }`}
+            error={errors.patientPhone}
           />
-          {errors.patientPhone && (
-            <p className="mt-1 text-xs text-red-600">{errors.patientPhone}</p>
-          )}
         </div>
 
         {/* Business invoice opt-in */}
-        <div className="rounded-xl border border-gray-200 p-3">
-          <label className="flex items-start gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={wantsBusinessInvoice}
-              onChange={(e) => setWantsBusinessInvoice(e.target.checked)}
-              className="mt-0.5 h-4 w-4 rounded border-gray-300 text-[var(--color-primary)] focus:ring-[var(--color-primary)]/30"
-            />
-            <span className="text-sm font-medium text-gray-700">Céges számlát kérek</span>
-          </label>
+        <div className="flex flex-col gap-0">
+          <CheckboxPill
+            checked={wantsBusinessInvoice}
+            onChange={setWantsBusinessInvoice}
+            controls="confirm-company-panel"
+          >
+            Céges számlát kérek
+          </CheckboxPill>
+          <Collapse id="confirm-company-panel" open={wantsBusinessInvoice}>
+            <div className="mt-4 flex flex-col gap-3.5 rounded-[28px] bg-field p-4 sm:p-5">
+              <TextField
+                id="tax-number"
+                label="Adószám"
+                inputMode="numeric"
+                value={taxNumber}
+                onChange={(e) => setTaxNumber(e.target.value)}
+                placeholder="12345678-1-23"
+                tone="white"
+                error={businessErrors.taxNumber}
+              />
 
-          {wantsBusinessInvoice && (
-            <div className="mt-3 space-y-3">
-              <div>
-                <label htmlFor="tax-number" className="block text-xs font-medium text-gray-700 mb-1">
-                  Adószám
-                </label>
-                <input
-                  id="tax-number"
-                  type="text"
-                  value={taxNumber}
-                  onChange={(e) => setTaxNumber(e.target.value)}
-                  placeholder="12345678-1-23"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30 focus:border-[var(--color-primary)] transition-colors"
-                />
-                {businessErrors.taxNumber && (
-                  <p className="mt-1 text-xs text-red-600">{businessErrors.taxNumber}</p>
-                )}
-              </div>
+              <CheckboxRow
+                id="company-same"
+                size="sm"
+                checked={companySameAsPersonal}
+                onChange={setCompanySameAsPersonal}
+              >
+                A céges adatok megegyeznek a személyes adatokkal (pl. EV)
+              </CheckboxRow>
 
-              <label className="flex items-start gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={companySameAsPersonal}
-                  onChange={(e) => setCompanySameAsPersonal(e.target.checked)}
-                  className="mt-0.5 h-4 w-4 rounded border-gray-300 text-[var(--color-primary)] focus:ring-[var(--color-primary)]/30"
-                />
-                <span className="text-xs text-gray-600">
-                  A céges adatok megegyeznek a személyes adatokkal (pl. EV)
-                </span>
-              </label>
-
-              {!companySameAsPersonal && (
-                <div className="space-y-3">
-                  <input
-                    type="text"
+              <Collapse open={!companySameAsPersonal}>
+                <div className="grid grid-cols-6 gap-3.5 pt-1">
+                  <TextField
+                    id="company-name"
+                    label="Cégnév"
                     value={companyName}
                     onChange={(e) => setCompanyName(e.target.value)}
                     placeholder="Cégnév"
-                    aria-label="Cégnév"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30 focus:border-[var(--color-primary)] transition-colors"
+                    autoComplete="organization"
+                    tone="white"
+                    className="col-span-6"
                   />
-                  <div className="flex gap-3">
-                    <input
-                      type="text"
-                      value={companyZip}
-                      onChange={(e) => setCompanyZip(e.target.value)}
-                      placeholder="Irsz."
-                      aria-label="Irányítószám"
-                      className="w-28 px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30 focus:border-[var(--color-primary)] transition-colors"
-                    />
-                    <input
-                      type="text"
-                      value={companyCity}
-                      onChange={(e) => setCompanyCity(e.target.value)}
-                      placeholder="Település"
-                      aria-label="Település"
-                      className="flex-1 px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30 focus:border-[var(--color-primary)] transition-colors"
-                    />
-                  </div>
-                  <input
-                    type="text"
+                  <TextField
+                    id="company-zip"
+                    label="Irányítószám"
+                    inputMode="numeric"
+                    value={companyZip}
+                    onChange={(e) => setCompanyZip(e.target.value)}
+                    placeholder="Irsz."
+                    autoComplete="postal-code"
+                    tone="white"
+                    className="col-span-6 sm:col-span-2"
+                  />
+                  <TextField
+                    id="company-city"
+                    label="Település"
+                    value={companyCity}
+                    onChange={(e) => setCompanyCity(e.target.value)}
+                    placeholder="Település"
+                    autoComplete="address-level2"
+                    tone="white"
+                    className="col-span-6 sm:col-span-4"
+                  />
+                  <TextField
+                    id="company-address"
+                    label="Cím (utca, házszám)"
                     value={companyAddress}
                     onChange={(e) => setCompanyAddress(e.target.value)}
                     placeholder="Cím (utca, házszám)"
-                    aria-label="Cím"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30 focus:border-[var(--color-primary)] transition-colors"
+                    autoComplete="street-address"
+                    tone="white"
+                    className="col-span-6"
                   />
                   {businessErrors.company && (
-                    <p className="mt-1 text-xs text-red-600">{businessErrors.company}</p>
+                    <span
+                      role="alert"
+                      className="col-span-6 pl-[22px] text-[13px] font-bold text-danger"
+                    >
+                      {businessErrors.company}
+                    </span>
                   )}
                 </div>
-              )}
+              </Collapse>
 
-              <p className="text-xs text-gray-500">
-                A számla hibás adószám esetén nem állítható ki. A részletes ellenőrzést a
-                fizetés indításakor végezzük.
+              <p className="m-0 px-1 text-[13px] leading-relaxed text-muted">
+                A számla hibás adószám esetén nem állítható ki. A részletes ellenőrzést a fizetés
+                indításakor végezzük.
               </p>
+            </div>
+          </Collapse>
+        </div>
+
+        {/* Consents */}
+        <div className="flex flex-col gap-3 border-t border-line-soft pt-5">
+          <CheckboxRow
+            id="confirm-consent"
+            required
+            checked={consentChecked}
+            invalid={!!consentError}
+            errorId={consentErrorId}
+            onChange={(next) => {
+              setConsentChecked(next);
+              if (next) setConsentError(null);
+            }}
+          >
+            {CONSENT_LABEL} —{" "}
+            <a
+              href={PRIVACY_POLICY_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={linkClass}
+            >
+              {CONSENT_LINK_TEXT}
+            </a>
+          </CheckboxRow>
+
+          {/* Booking & cancellation policy */}
+          <CheckboxRow
+            id="confirm-policy"
+            required
+            checked={policyChecked}
+            invalid={!!policyError}
+            errorId={policyErrorId}
+            onChange={(next) => {
+              setPolicyChecked(next);
+              if (next) setPolicyError(null);
+            }}
+          >
+            {BOOKING_POLICY_LABEL}{" "}
+            <a
+              href={BOOKING_POLICY_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={linkClass}
+            >
+              {BOOKING_POLICY_LINK_TEXT}
+            </a>{" "}
+            és a{" "}
+            <a
+              href={TERMS_OF_SERVICE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={linkClass}
+            >
+              {TERMS_OF_SERVICE_LINK_TEXT}
+            </a>
+            . Tudomásul veszem, hogy a 10.000 Ft foglalási díj a foglalt időpontot megelőző 48 órán
+            belüli lemondás vagy meg nem jelenés esetén nem jár vissza.
+          </CheckboxRow>
+
+          {(consentError || policyError) && (
+            <div
+              role="alert"
+              className="fade-up flex flex-col gap-1 rounded-3xl bg-coral-soft px-5 py-3.5 text-sm font-bold text-danger-ink"
+            >
+              {consentError && <span id={consentErrorId}>{consentError}</span>}
+              {policyError && <span id={policyErrorId}>{policyError}</span>}
             </div>
           )}
         </div>
 
-        {/* Consent checkbox */}
-        <div>
-          <label className="flex items-start gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={consentChecked}
-              onChange={(e) => {
-                setConsentChecked(e.target.checked);
-                if (e.target.checked) setConsentError(null);
-              }}
-              className="mt-0.5 h-4 w-4 rounded border-gray-300 text-[var(--color-primary)] focus:ring-[var(--color-primary)]/30"
-            />
-            <span className="text-xs text-gray-600">
-              {CONSENT_LABEL} —{" "}
-              <a
-                href={PRIVACY_POLICY_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[var(--color-primary)] underline hover:no-underline"
-              >
-                {CONSENT_LINK_TEXT}
-              </a>
-            </span>
-          </label>
-          {consentError && <p className="mt-1 text-xs text-red-600">{consentError}</p>}
-        </div>
-
-        {/* Booking & cancellation policy checkbox */}
-        <div>
-          <label className="flex items-start gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={policyChecked}
-              onChange={(e) => {
-                setPolicyChecked(e.target.checked);
-                if (e.target.checked) setPolicyError(null);
-              }}
-              className="mt-0.5 h-4 w-4 rounded border-gray-300 text-[var(--color-primary)] focus:ring-[var(--color-primary)]/30"
-            />
-            <span className="text-xs text-gray-600">
-              {BOOKING_POLICY_LABEL}{" "}
-              <a
-                href={BOOKING_POLICY_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[var(--color-primary)] underline hover:no-underline"
-              >
-                {BOOKING_POLICY_LINK_TEXT}
-              </a>{" "}
-              és a{" "}
-              <a
-                href={TERMS_OF_SERVICE_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[var(--color-primary)] underline hover:no-underline"
-              >
-                {TERMS_OF_SERVICE_LINK_TEXT}
-              </a>
-              . Tudomásul veszem, hogy a 10.000 Ft foglalási díj a foglalt időpontot megelőző 48
-              órán belüli lemondás vagy meg nem jelenés esetén nem jár vissza.
-            </span>
-          </label>
-          {policyError && <p className="mt-1 text-xs text-red-600">{policyError}</p>}
-        </div>
-
         {/* Navigation buttons */}
-        <div className="flex items-center justify-between pt-2">
+        <div className="flex flex-wrap-reverse items-center justify-between gap-3">
           <button
             type="button"
             onClick={onBack}
             disabled={submitting}
-            className="px-6 py-3 text-sm font-medium text-gray-600 border border-gray-300 rounded-xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className={pillClassName({
+              variant: "outline",
+              className: "h-14 px-6 max-sm:w-full",
+            })}
           >
+            <BackArrowIcon />
             Vissza
           </button>
 
           <button
             type="submit"
             disabled={submitting}
-            className="px-8 py-3 bg-[var(--color-primary)] text-white rounded-xl font-semibold text-sm hover:bg-[var(--color-primary)]/90 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg transition-all duration-200"
+            className={pillClassName({
+              variant: "navy",
+              size: "lg",
+              className: "h-[60px] px-8 max-sm:w-full max-sm:px-5",
+            })}
           >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M5 11h14v10H5zM8 11V7a4 4 0 0 1 8 0v4" />
+            </svg>
             {submitting ? "Átirányítás a fizetéshez..." : "Foglalás és fizetés (10 000 Ft)"}
           </button>
         </div>
       </form>
-    </div>
+    </StepCard>
   );
 }
-
-

@@ -27,7 +27,11 @@ export const metadata: Metadata = {
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
-export default async function IdopontfoglalasPage({ searchParams }: { searchParams: SearchParams }) {
+export default async function IdopontfoglalasPage({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) {
   // Optional preselection from the homepage quick booking: ?szolgaltatas=…&datum=YYYY-MM-DD
   const params = await searchParams;
   const slugParam = params[BOOKING_QUERY.service];
@@ -104,18 +108,14 @@ export default async function IdopontfoglalasPage({ searchParams }: { searchPara
         ? prenatalService
         : undefined;
 
+  // The wizard renders its own hero (step indicator), main column and summary aside.
   return (
-    <div className="max-w-4xl mx-auto px-4 py-12">
-      <h1 className="text-3xl md:text-4xl font-bold text-[var(--color-primary)] mb-8">
-        Időpontfoglalás
-      </h1>
-      <BookingWizard
-        services={bookingServices}
-        scheduleData={scheduleData}
-        initialSelection={
-          preselectService ? { serviceId: preselectService._id, date: preselectDate } : null
-        }
-      />
-    </div>
+    <BookingWizard
+      services={bookingServices}
+      scheduleData={scheduleData}
+      initialSelection={
+        preselectService ? { serviceId: preselectService._id, date: preselectDate } : null
+      }
+    />
   );
 }

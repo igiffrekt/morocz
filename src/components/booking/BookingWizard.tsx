@@ -672,6 +672,7 @@ export function BookingWizard({ services, scheduleData, initialSelection }: Book
               serviceDuration: selections.serviceDuration ?? 20,
               selectedDate: selections.selectedDate ?? "",
               selectedTime: selections.selectedTime ?? "",
+              slotLockId: selections.slotLockId ?? null,
             }}
             onBack={() => goToStep(2)}
             onSuccess={handleBookingSuccess}

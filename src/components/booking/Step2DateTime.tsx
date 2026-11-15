@@ -278,7 +278,6 @@ export function Step2DateTime({
   const windowNote =
     `Online a következő ${scheduleData.bookingWindowDays} napra foglalhat (${lastDayLabel}-ig)` +
     (pendingMonths === 0 ? ` · ${bookableList.length} foglalható nap` : "");
-  const slotMinutes = scheduleData.schedule.defaultSlotDuration;
 
   return (
     <div className="flex flex-wrap items-start gap-5">
@@ -360,9 +359,6 @@ export function Step2DateTime({
                   onSelect={(time) => void handleTimeSelect(time)}
                   busyTime={holdingSlot}
                 />
-                <span className="text-xs font-semibold text-muted">
-                  {slotMinutes ? `${slotMinutes} perces időpontok · ` : ""}24 órás formátum
-                </span>
               </>
             )}
           </>

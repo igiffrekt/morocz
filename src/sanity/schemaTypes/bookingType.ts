@@ -146,7 +146,7 @@ export const bookingType = defineType({
       name: "creditInvoiceNumber",
       title: "Helyesbítő számla száma",
       type: "string",
-      description: "A −10.000 Ft-os helyesbítő számla száma (Számlázz.hu).",
+      description: "A −10 000 Ft-os helyesbítő számla száma (Számlázz.hu).",
       readOnly: true,
     }),
     defineField({

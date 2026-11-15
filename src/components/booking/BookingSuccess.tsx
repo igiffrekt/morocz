@@ -227,7 +227,7 @@ export function BookingSuccessPanel({
           <strong className="text-[15px] text-navy">Időpontfoglalás lemondása</strong>
           <span>
             A foglalt időpontot bármikor lemondhatja a visszaigazoló e-mailben található linkre
-            kattintva. Legalább 48 órával az időpont előtt lemondva a 10.000 Ft foglalási díjat
+            kattintva. Legalább 48 órával az időpont előtt lemondva a 10 000 Ft foglalási díjat
             visszatérítjük; a 48 órán belüli lemondás esetén a foglalási díj nem kerül
             visszatérítésre.{" "}
             <Link href={BOOKING_POLICY_URL} className="link-grow font-bold text-navy">

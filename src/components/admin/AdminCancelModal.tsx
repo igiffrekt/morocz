@@ -208,7 +208,7 @@ export default function AdminCancelModal({
                 disabled={isSubmitting}
                 onChange={(e) => setRefund(e.target.checked)}
               />
-              Foglalási díj visszatérítése (−10.000 Ft jóváírás)
+              Foglalási díj visszatérítése (−10 000 Ft jóváírás)
             </label>
           )}
         </div>

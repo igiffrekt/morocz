@@ -996,7 +996,7 @@ export function buildInvoiceFailedEmail(params: {
   <body style="font-family: Arial, sans-serif; color: #1A1D2D; line-height: 1.6;">
     <p>Tisztelt Recepció,</p>
     <p>
-      ${patientName} páciens részére visszatérítettük a 10.000 Ft-os foglalási díjat,
+      ${patientName} páciens részére visszatérítettük a 10 000 Ft-os foglalási díjat,
       azonban az erről szóló helyesbítő számla rendszerhiba miatt meghiúsult.
     </p>
     <ul>

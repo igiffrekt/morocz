@@ -115,7 +115,7 @@ export function CancelDialog({ booking, onCancelled, onClose }: CancelDialogProp
           </strong>
           <span>
             Ha a lemondás a foglalt időpontot megelőzően{" "}
-            <strong className="text-navy">legalább 48 órával</strong> megtörténik, a teljes 10.000
+            <strong className="text-navy">legalább 48 órával</strong> megtörténik, a teljes 10 000
             Ft foglalási díjat visszatérítjük.
           </span>
           <span>
@@ -134,12 +134,12 @@ export function CancelDialog({ booking, onCancelled, onClose }: CancelDialogProp
 
       {willRefund && (
         <Notice tone="success" shape="pill" role="status">
-          A 10.000 Ft foglalási díj a lemondás után visszatérítésre kerül.
+          A 10 000 Ft foglalási díj a lemondás után visszatérítésre kerül.
         </Notice>
       )}
       {noRefund && (
         <Notice tone="warning" role="alert" plain className="font-semibold">
-          Kedves Páciensünk! 48 órán belüli lemondás esetén a 10.000 Ft-os foglalási díj NEM kerül
+          Kedves Páciensünk! 48 órán belüli lemondás esetén a 10 000 Ft-os foglalási díj NEM kerül
           visszatérítésre. Amennyiben ennek tudatában is le kívánja mondani az időpontot, kérjük
           kattintson a gombra.
         </Notice>

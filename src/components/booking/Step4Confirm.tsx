@@ -507,7 +507,7 @@ export function Step4Confirm({
             >
               {TERMS_OF_SERVICE_LINK_TEXT}
             </a>
-            . Tudomásul veszem, hogy a 10.000 Ft foglalási díj a foglalt időpontot megelőző 48 órán
+            . Tudomásul veszem, hogy a 10 000 Ft foglalási díj a foglalt időpontot megelőző 48 órán
             belüli lemondás vagy meg nem jelenés esetén nem jár vissza.
           </CheckboxRow>
 

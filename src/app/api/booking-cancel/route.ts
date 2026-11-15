@@ -83,7 +83,7 @@ export async function POST(request: Request): Promise<Response> {
         {
           requiresConfirmation: true,
           warning:
-            "Kedves Páciensünk! 48 órán belüli lemondás esetén a 10.000 Ft-os foglalási díj NEM kerül visszatérítésre. Amennyiben ennek tudatában is le kívánja mondani az időpontot, kérjük kattintson a gombra.",
+            "Kedves Páciensünk! 48 órán belüli lemondás esetén a 10 000 Ft-os foglalási díj NEM kerül visszatérítésre. Amennyiben ennek tudatában is le kívánja mondani az időpontot, kérjük kattintson a gombra.",
         },
         { status: 409 },
       );

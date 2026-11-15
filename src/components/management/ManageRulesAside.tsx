@@ -11,7 +11,7 @@ const RULES = [
   },
   {
     t: "Lemondás",
-    b: "Bármikor, határidő nélkül lemondható. Legalább 48 órával előtte a teljes 10.000 Ft foglalási díjat visszatérítjük.",
+    b: "Bármikor, határidő nélkül lemondható. Legalább 48 órával előtte a teljes 10 000 Ft foglalási díjat visszatérítjük.",
     icon: "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM15 9l-6 6M9 9l6 6",
   },
   {

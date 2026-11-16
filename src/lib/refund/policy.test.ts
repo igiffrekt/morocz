@@ -54,4 +54,14 @@ describe("resolveRefund", () => {
     const r = resolveRefund({ ...apptIn(72), paymentStatus: "pending", confirmNoRefund: false });
     expect(r).toEqual({ eligible: false, requiresConfirmation: false, reason: "not_paid" });
   });
+
+  it("fee-waived booking is never refunded, even >48h ahead", () => {
+    const r = resolveRefund({ ...apptIn(72), paymentStatus: "waived", confirmNoRefund: false });
+    expect(r).toEqual({ eligible: false, requiresConfirmation: false, reason: "waived" });
+  });
+
+  it("fee-waived booking within 48h needs no forfeited-fee confirmation", () => {
+    const r = resolveRefund({ ...apptIn(10), paymentStatus: "waived", confirmNoRefund: false });
+    expect(r).toEqual({ eligible: false, requiresConfirmation: false, reason: "waived" });
+  });
 });

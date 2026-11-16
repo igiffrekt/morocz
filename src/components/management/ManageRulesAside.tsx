@@ -21,8 +21,25 @@ const RULES = [
   },
 ];
 
+/** Same rules without any booking-fee / refund wording, for a fee-waived booking. */
+const RULES_FEE_WAIVED = [
+  {
+    ...RULES[0],
+    b: "Díjmentesen, legkésőbb a foglalt időpontot megelőző 24 óráig.",
+  },
+  {
+    ...RULES[1],
+    b: "Bármikor, határidő nélkül lemondható. Az Ön foglalása díjmentes, így foglalási díj nem került felszámításra.",
+  },
+  {
+    ...RULES[2],
+    b: "24 órán belül online áthelyezés már nem lehetséges – kérjük, hívja a rendelőt.",
+  },
+];
+
 /** "Jó tudni" navy card (IdopontKezelese): reschedule / cancel / 48 h rules + call pill. */
-export function ManageRulesAside() {
+export function ManageRulesAside({ feeWaived = false }: { feeWaived?: boolean }) {
+  const rules = feeWaived ? RULES_FEE_WAIVED : RULES;
   return (
     <aside
       aria-label="Szabályok röviden"
@@ -32,7 +49,7 @@ export function ManageRulesAside() {
         <span className="text-[13px] font-extrabold tracking-[.12em] text-mint-light uppercase">
           Jó tudni
         </span>
-        {RULES.map((rule) => (
+        {rules.map((rule) => (
           <div key={rule.t} className="flex items-start gap-3.5 border-b border-white/10 pb-3.5">
             <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/8 text-mint-light">
               <svg

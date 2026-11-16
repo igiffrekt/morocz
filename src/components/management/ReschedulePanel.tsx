@@ -18,6 +18,8 @@ interface ReschedulePanelProps {
     slotTime: string;
     managementToken: string;
     serviceId: string;
+    /** Fee-waived booking: there is no booking fee to carry over. */
+    feeWaived?: boolean;
   };
   scheduleData: {
     schedule: ScheduleForAvailability;
@@ -221,9 +223,11 @@ export function ReschedulePanel({
     <div className="flex flex-col gap-[18px] border-t border-line-soft pt-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h3 className="m-0 text-xl font-extrabold text-navy">Új időpont kiválasztása</h3>
-        <Chip tone="sage" className="text-teal-ink">
-          A foglalási díj átvezetésre kerül
-        </Chip>
+        {!booking.feeWaived && (
+          <Chip tone="sage" className="text-teal-ink">
+            A foglalási díj átvezetésre kerül
+          </Chip>
+        )}
       </div>
 
       {/* Error banner */}

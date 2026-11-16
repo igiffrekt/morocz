@@ -295,7 +295,7 @@ export type Booking = {
   status?: "confirmed" | "cancelled" | "rescheduled" | "completed" | "no-show";
   stripeSessionId?: string;
   stripePaymentIntentId?: string;
-  paymentStatus?: "pending" | "paid" | "failed";
+  paymentStatus?: "pending" | "paid" | "failed" | "waived";
   paymentAmount?: number;
   refundStatus?: "none" | "refunded" | "no_refund" | "invoice_failed";
   stripeRefundId?: string;

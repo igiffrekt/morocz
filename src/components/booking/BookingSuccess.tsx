@@ -75,6 +75,8 @@ export interface BookingSuccessPanelProps {
   patientEmail: string;
   /** Paid via Stripe (the /foglalas/sikeres page). */
   paid?: boolean;
+  /** Booked without the booking fee (allowlisted account): no fee, no refund wording. */
+  waived?: boolean;
   /** In-wizard restart; without it the link opens a fresh wizard. */
   onNewBooking?: () => void;
 }
@@ -90,6 +92,7 @@ export function BookingSuccessPanel({
   patientName,
   patientEmail,
   paid = false,
+  waived = false,
   onNewBooking,
 }: BookingSuccessPanelProps) {
   const contact = useSiteContact();
@@ -111,6 +114,7 @@ export function BookingSuccessPanel({
     { k: "Szolgáltatás", v: serviceName },
     { k: "Dátum", v: date },
     { k: "Időpont", v: time },
+    { k: "Foglalási díj", v: waived ? "Díjmentes" : "" },
   ].filter((r) => r.v);
 
   const newBookingClass =
@@ -134,6 +138,7 @@ export function BookingSuccessPanel({
             Kedves <strong className="text-navy">{patientName}</strong>, időpontja sikeresen
             rögzítésre került.
             {paid && " A foglalási díj (10 000 Ft) befizetése megtörtént."}
+            {waived && " A foglalás díjmentes, foglalási díjat nem kell fizetnie."}
           </p>
           <p className="m-0">
             Visszaigazoló e-mailt küldtünk a(z){" "}
@@ -227,9 +232,15 @@ export function BookingSuccessPanel({
           <strong className="text-[15px] text-navy">Időpontfoglalás lemondása</strong>
           <span>
             A foglalt időpontot bármikor lemondhatja a visszaigazoló e-mailben található linkre
-            kattintva. Legalább 48 órával az időpont előtt lemondva a 10 000 Ft foglalási díjat
-            visszatérítjük; a 48 órán belüli lemondás esetén a foglalási díj nem kerül
-            visszatérítésre.{" "}
+            kattintva.
+            {!waived && (
+              <>
+                {" "}
+                Legalább 48 órával az időpont előtt lemondva a 10 000 Ft foglalási díjat
+                visszatérítjük; a 48 órán belüli lemondás esetén a foglalási díj nem kerül
+                visszatérítésre.
+              </>
+            )}{" "}
             <Link href={BOOKING_POLICY_URL} className="link-grow font-bold text-navy">
               Foglalási és Lemondási Szabályzat
             </Link>
@@ -245,12 +256,14 @@ interface SuccessProps extends Omit<BookingSuccessPanelProps, "paid" | "onNewBoo
 }
 
 export function BookingSuccess(props: SuccessProps) {
-  const { reservationNumber, patientEmail } = props;
+  const { reservationNumber, patientEmail, waived = false } = props;
 
   // Signal a completed booking to GTM (Google Ads conversion fires on this event).
   // Guarded per reservation so a remount / StrictMode double-render can't double-count.
+  // A fee-waived booking (allowlisted account, typically staff/testing) is not an ad
+  // conversion, so it is not reported.
   useEffect(() => {
-    if (!reservationNumber) return;
+    if (!reservationNumber || waived) return;
     const key = `conv_foglalas_${reservationNumber}`;
     if (sessionStorage.getItem(key)) return;
     sessionStorage.setItem(key, "1");
@@ -263,7 +276,7 @@ export function BookingSuccess(props: SuccessProps) {
     }
     window.dataLayer = window.dataLayer || [];
     window.dataLayer.push({ event: "foglalas_sikeres", reservation_number: reservationNumber });
-  }, [reservationNumber, patientEmail]);
+  }, [reservationNumber, patientEmail, waived]);
 
   return <BookingSuccessPanel {...props} />;
 }

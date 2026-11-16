@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { AdminBooking } from "@/components/admin/AdminDashboard";
+import { isFeeWaived } from "@/lib/payment-status";
 
 // ─── Props ─────────────────────────────────────────────────────────────────────
 
@@ -442,26 +443,34 @@ export default function AdminDayPanel({
                               ? "rgba(22,163,74,0.14)"
                               : booking.paymentStatus === "failed"
                                 ? "rgba(239,68,68,0.1)"
-                                : "rgba(245,158,11,0.1)",
+                                : isFeeWaived(booking.paymentStatus)
+                                  ? "rgba(36,42,95,0.08)"
+                                  : "rgba(245,158,11,0.1)",
                           color:
                             booking.paymentStatus === "paid"
                               ? "#15803d"
                               : booking.paymentStatus === "failed"
                                 ? "#b91c1c"
-                                : "#b45309",
+                                : isFeeWaived(booking.paymentStatus)
+                                  ? "#242a5f"
+                                  : "#b45309",
                           border:
                             booking.paymentStatus === "paid"
                               ? "1px solid rgba(22,163,74,0.32)"
                               : booking.paymentStatus === "failed"
                                 ? "1px solid rgba(239,68,68,0.25)"
-                                : "1px solid rgba(245,158,11,0.25)",
+                                : isFeeWaived(booking.paymentStatus)
+                                  ? "1px solid rgba(36,42,95,0.22)"
+                                  : "1px solid rgba(245,158,11,0.25)",
                         }}
                       >
                         {booking.paymentStatus === "paid"
                           ? "✓ Fizetve"
                           : booking.paymentStatus === "failed"
                             ? "Sikertelen"
-                            : "Fizetetlen"}
+                            : isFeeWaived(booking.paymentStatus)
+                              ? "Díjmentes"
+                              : "Fizetetlen"}
                       </span>
                     )}
 

@@ -9,6 +9,7 @@ import { Collapse } from "@/components/ui/Accordion";
 import { ArrowIcon, pillClassName } from "@/components/ui/PillButton";
 import { formatLongDate } from "@/lib/booking-dates";
 import { cn } from "@/lib/cn";
+import { isFeeWaived } from "@/lib/payment-status";
 import { hoursUntilBudapestSlot } from "@/lib/refund/slot-time";
 import { telHref } from "@/lib/site-nav";
 import type { ScheduleForAvailability } from "@/lib/slots";
@@ -350,6 +351,7 @@ export function BookingManagementCard({ booking, scheduleData }: BookingManageme
               slotTime: booking.slotTime,
               managementToken: booking.managementToken,
               serviceId: booking.serviceId,
+              feeWaived: isFeeWaived(booking.paymentStatus),
             }}
             scheduleData={scheduleData}
             onRescheduled={(newDate, newTime) => {

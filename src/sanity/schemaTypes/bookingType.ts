@@ -109,15 +109,18 @@ export const bookingType = defineType({
           { title: "Fizetésre vár", value: "pending" },
           { title: "Fizetve", value: "paid" },
           { title: "Sikertelen", value: "failed" },
+          { title: "Díjmentes", value: "waived" },
         ],
       },
+      description:
+        "Díjmentes: a foglalás a FEE_EXEMPT_EMAILS listán szereplő fiókkal, foglalási díj nélkül jött létre — nincs mögötte fizetés, nem visszatéríthető.",
       initialValue: "pending",
     }),
     defineField({
       name: "paymentAmount",
       title: "Foglalási díj (Ft)",
       type: "number",
-      description: "A Stripe-on keresztül befizetett foglalási díj",
+      description: "A Stripe-on keresztül befizetett foglalási díj (díjmentes foglalásnál 0)",
     }),
     defineField({
       name: "refundStatus",

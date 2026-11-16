@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { isFeeWaived } from "@/lib/payment-status";
 
 interface AdminCancelModalProps {
   bookingId: string;
@@ -191,6 +192,17 @@ export default function AdminCancelModal({
               Ez az információ el lesz küldve a páciensnek az értesítő e-mailben.
             </p>
           </div>
+          {isFeeWaived(paymentStatus) && (
+            <p
+              style={{
+                margin: "1rem 0 0",
+                fontSize: "0.8125rem",
+                color: "#64748b",
+              }}
+            >
+              Díjmentes foglalás — nincs visszatérítendő foglalási díj.
+            </p>
+          )}
           {paymentStatus === "paid" && (
             <label
               style={{

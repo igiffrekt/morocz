@@ -4,9 +4,12 @@ import { z } from "zod";
 import { eq } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { getAvailableSlotsForDate } from "@/lib/availability";
+import { runBookingConfirmedSideEffects } from "@/lib/booking-confirmed";
 import { assertDayStillOpen } from "@/lib/booking-guards";
 import { db } from "@/lib/db";
 import { user } from "@/lib/db/schema";
+import { isFeeExemptUser } from "@/lib/fee-exemption";
+import { PAYMENT_STATUS_WAIVED } from "@/lib/payment-status";
 import { getWriteClient } from "@/lib/sanity-write-client";
 import { generateAvailableSlots } from "@/lib/slots";
 import { stripe, BOOKING_FEE_HUF } from "@/lib/stripe";
@@ -89,11 +92,15 @@ export async function POST(request: Request): Promise<Response> {
       businessInvoice,
     } = parsed.data;
 
+    // Booking-fee allowlist (FEE_EXEMPT_EMAILS), decided from the authenticated
+    // session only. A waived booking has no payment, so no invoice of any kind.
+    const feeWaived = isFeeExemptUser(session.user);
+
     // Resolve a business invoice up front: a 400 here must not leave an orphan
     // booking/slot lock behind. piMetadata stays null for the ordinary
     // (magánszemély) path, which then sends exactly what it sends today.
     let piMetadata: BusinessInvoiceMetadata | null = null;
-    if (businessInvoice) {
+    if (businessInvoice && !feeWaived) {
       const profile = await db.query.user.findFirst({
         where: eq(user.id, session.user.id),
         columns: { postalCode: true, city: true, streetAddress: true },
@@ -202,7 +209,7 @@ export async function POST(request: Request): Promise<Response> {
       );
     }
 
-    // ── Create pending booking ──────────────────────────────────────────────
+    // ── Create the booking (pending payment, or final when fee-waived) ──────
     const reservationNumber = generateReservationNumber();
     const managementToken = crypto.randomUUID();
     const booking = await getWriteClient().create({
@@ -217,8 +224,8 @@ export async function POST(request: Request): Promise<Response> {
       patientPhone,
       userId: session.user.id,
       status: "confirmed",
-      paymentStatus: "pending",
-      paymentAmount: BOOKING_FEE_HUF,
+      paymentStatus: feeWaived ? PAYMENT_STATUS_WAIVED : "pending",
+      paymentAmount: feeWaived ? 0 : BOOKING_FEE_HUF,
       ...(piMetadata && {
         businessInvoiceRequested: true,
         businessTaxNumber: piMetadata.tax_number,
@@ -234,6 +241,31 @@ export async function POST(request: Request): Promise<Response> {
       .patch(slotLock._id)
       .set({ bookingRef: { _type: "reference", _ref: booking._id } })
       .commit();
+
+    // ── Fee-waived: finalize now, exactly as a completed payment would ──────
+    // No Stripe session, no payment intent (so no Számlázz invoice either).
+    if (feeWaived) {
+      console.log(`[api/checkout] Booking fee waived for booking ${booking._id}`);
+      await runBookingConfirmedSideEffects(
+        {
+          bookingId: booking._id,
+          reservationNumber,
+          managementToken,
+          serviceId,
+          slotDate,
+          slotTime,
+          patientName,
+          patientEmail,
+          patientPhone,
+          feeWaived: true,
+        },
+        "[api/checkout]",
+      );
+      return Response.json(
+        { waived: true, bookingId: booking._id, reservationNumber },
+        { status: 201 },
+      );
+    }
 
     // ── Create Stripe Checkout session ──────────────────────────────────────
     const service = await sanityFetch<{ name: string; appointmentDuration: number; price: number | null } | null>({

@@ -1,6 +1,7 @@
 import { headers } from "next/headers";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
+import { isFeeWaived } from "@/lib/payment-status";
 import { getWriteClient } from "@/lib/sanity-write-client";
 import { releaseSlotLock } from "@/lib/slot-lock";
 
@@ -48,6 +49,11 @@ export async function POST(request: Request): Promise<Response> {
 
     if (booking.paymentStatus === "paid") {
       return Response.json({ error: "Already paid" }, { status: 400 });
+    }
+    // A fee-waived booking is already final (no checkout to abandon); it is
+    // cancelled through /api/booking-cancel like any confirmed booking.
+    if (isFeeWaived(booking.paymentStatus)) {
+      return Response.json({ error: "Already confirmed" }, { status: 400 });
     }
 
     await getWriteClient()

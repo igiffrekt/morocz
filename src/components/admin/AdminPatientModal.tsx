@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import type { AdminBooking } from "@/components/admin/AdminDashboard";
 import AdminPatientHistory from "@/components/admin/AdminPatientHistory";
 import AdminRescheduleModal from "@/components/admin/AdminRescheduleModal";
+import { isFeeWaived } from "@/lib/payment-status";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -1216,7 +1217,9 @@ export default function AdminPatientModal({
             <p style={{ margin: "0 0 0.875rem", fontSize: "0.8125rem", color: "#64748b" }}>
               {booking.paymentStatus === "paid"
                 ? "A foglalási díj (10 000 Ft) bevételként kerül rögzítésre."
-                : "Ez a foglalás nem tartalmazott előre fizetett foglalási díjat — nem kerül bevétel rögzítésre."}
+                : isFeeWaived(booking.paymentStatus)
+                  ? "Díjmentes foglalás (foglalási díj nélkül) — nem kerül bevétel rögzítésre."
+                  : "Ez a foglalás nem tartalmazott előre fizetett foglalási díjat — nem kerül bevétel rögzítésre."}
             </p>
 
             <div style={{ display: "flex", gap: "0.5rem" }}>

@@ -31,12 +31,18 @@ interface Step4Props {
     selectedTime: string;
     slotLockId?: string | null;
   };
+  /**
+   * The signed-in account books without the booking fee (from /api/user/profile).
+   * Only changes the copy; /api/checkout decides the waiver itself from the session.
+   */
+  feeExempt?: boolean;
   onBack: () => void;
   onSuccess: (
     bookingId: string,
     reservationNumber: string,
     patientName: string,
     patientEmail: string,
+    waived: boolean,
   ) => void;
   onConflict: (alternatives: string[]) => void;
 }
@@ -50,12 +56,14 @@ const BookingFormSchema = z.object({
 type BookingFormData = z.infer<typeof BookingFormSchema>;
 type FormErrors = Partial<Record<keyof BookingFormData, string>>;
 
-// onSuccess is kept in the props for the in-wizard success screen; payment now always
-// redirects to Stripe Checkout, so it is not called here.
+// A paid booking redirects to Stripe Checkout (its success page is /foglalas/sikeres);
+// onSuccess shows the in-wizard success screen for a fee-waived booking, which the
+// server finalizes immediately.
 export function Step4Confirm({
   selections,
+  feeExempt = false,
   onBack,
-  onSuccess: _onSuccess,
+  onSuccess,
   onConflict,
 }: Step4Props) {
   const { data: session } = useSession();
@@ -132,7 +140,8 @@ export function Step4Confirm({
 
     if (!validate()) return;
 
-    if (wantsBusinessInvoice) {
+    const sendBusinessInvoice = wantsBusinessInvoice && !feeExempt;
+    if (sendBusinessInvoice) {
       const be: { taxNumber?: string; company?: string } = {};
       if (!isValidHungarianTaxNumber(taxNumber)) {
         be.taxNumber = "Érvénytelen adószám. A helyes formátum: 12345678-1-23.";
@@ -176,7 +185,7 @@ export function Step4Confirm({
           patientEmail,
           patientPhone,
           ...(selections.slotLockId && { slotLockId: selections.slotLockId }),
-          ...(wantsBusinessInvoice && {
+          ...(sendBusinessInvoice && {
             businessInvoice: {
               taxNumber,
               sameAsPersonal: companySameAsPersonal,
@@ -193,11 +202,18 @@ export function Step4Confirm({
 
       const data = (await res.json()) as {
         checkoutUrl?: string;
+        waived?: boolean;
         bookingId?: string;
         reservationNumber?: string;
         error?: string;
         alternatives?: string[];
       };
+
+      // Fee waived server-side: the booking is already final — no Stripe step.
+      if (res.status === 201 && data.waived && data.bookingId) {
+        onSuccess(data.bookingId, data.reservationNumber ?? "", patientName, patientEmail, true);
+        return;
+      }
 
       if (res.status === 201 && data.checkoutUrl) {
         window.location.href = data.checkoutUrl;
@@ -291,7 +307,9 @@ export function Step4Confirm({
           Megerősítés
         </h2>
         <p className="m-0 text-[15px] leading-relaxed text-muted sm:text-base">
-          Ellenőrizze adatait, majd a foglalási díj megfizetésével véglegesítse az időpontot.
+          {feeExempt
+            ? "Ellenőrizze adatait, majd véglegesítse az időpontot. Az Ön fiókjával a foglalás díjmentes."
+            : "Ellenőrizze adatait, majd a foglalási díj megfizetésével véglegesítse az időpontot."}
         </p>
       </div>
 
@@ -360,8 +378,8 @@ export function Step4Confirm({
           />
         </div>
 
-        {/* Business invoice opt-in */}
-        <div className="flex flex-col gap-0">
+        {/* Business invoice opt-in (no invoice for a fee-waived booking) */}
+        <div className={feeExempt ? "hidden" : "flex flex-col gap-0"}>
           <CheckboxPill
             checked={wantsBusinessInvoice}
             onChange={setWantsBusinessInvoice}
@@ -507,8 +525,9 @@ export function Step4Confirm({
             >
               {TERMS_OF_SERVICE_LINK_TEXT}
             </a>
-            . Tudomásul veszem, hogy a 10 000 Ft foglalási díj a foglalt időpontot megelőző 48 órán
-            belüli lemondás vagy meg nem jelenés esetén nem jár vissza.
+            .
+            {!feeExempt &&
+              " Tudomásul veszem, hogy a 10 000 Ft foglalási díj a foglalt időpontot megelőző 48 órán belüli lemondás vagy meg nem jelenés esetén nem jár vissza."}
           </CheckboxRow>
 
           {(consentError || policyError) && (
@@ -559,7 +578,13 @@ export function Step4Confirm({
             >
               <path d="M5 11h14v10H5zM8 11V7a4 4 0 0 1 8 0v4" />
             </svg>
-            {submitting ? "Átirányítás a fizetéshez..." : "Foglalás és fizetés (10 000 Ft)"}
+            {feeExempt
+              ? submitting
+                ? "Foglalás rögzítése..."
+                : "Foglalás véglegesítése"
+              : submitting
+                ? "Átirányítás a fizetéshez..."
+                : "Foglalás és fizetés (10 000 Ft)"}
           </button>
         </div>
       </form>

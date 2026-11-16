@@ -1,4 +1,5 @@
 import { auth } from "@/lib/auth";
+import { isFeeExemptUser } from "@/lib/fee-exemption";
 import { headers } from "next/headers";
 
 export async function GET(request: Request) {
@@ -21,6 +22,9 @@ export async function GET(request: Request) {
         email: session.user.email,
         image: session.user.image,
       },
+      // Server-decided booking-fee waiver for this account (display only — the
+      // checkout re-decides it from the session and never trusts the client).
+      feeExempt: isFeeExemptUser(session.user),
     });
   } catch (error) {
     console.error("Error fetching user profile:", error);

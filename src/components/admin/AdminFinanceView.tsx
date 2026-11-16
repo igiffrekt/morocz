@@ -14,6 +14,7 @@ import {
   YAxis,
 } from "recharts";
 import type { FinanceResponse } from "@/app/api/admin/finance/route";
+import { isFeeWaived } from "@/lib/payment-status";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -1371,6 +1372,19 @@ function TransactionsCard({ data }: { data: FinanceData }) {
                 >
                   {t.patientName}
                 </span>
+                {isFeeWaived(t.paymentStatus) && (
+                  <span
+                    title="Díjmentes foglalás — foglalási díj nélkül, nem része a díjbevételnek"
+                    style={{
+                      fontSize: "0.6875rem",
+                      fontWeight: 600,
+                      color: COLORS.muted,
+                      flexShrink: 0,
+                    }}
+                  >
+                    díjmentes
+                  </span>
+                )}
               </div>
               <span
                 className="fin-txn-service"

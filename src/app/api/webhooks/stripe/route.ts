@@ -1,7 +1,6 @@
 import { eq, sql } from "drizzle-orm";
-import { defineQuery } from "next-sanity";
+import { runBookingConfirmedSideEffects } from "@/lib/booking-confirmed";
 import {
-  buildConfirmationEmail,
   buildInvoiceFailedEmail,
   buildInvoiceResolvedEmail,
   INVOICE_FAILED_SUBJECT,
@@ -10,7 +9,6 @@ import {
 import { db } from "@/lib/db";
 import { user } from "@/lib/db/schema";
 import { isEmailConfigured, sendEmail } from "@/lib/email";
-import { createCalendarEvent } from "@/lib/google-calendar";
 import { processRefund, type RefundBooking } from "@/lib/refund/process-refund";
 import { resolveLatestRefundId } from "@/lib/refund/resolve-latest-refund";
 import { getWriteClient } from "@/lib/sanity-write-client";
@@ -18,13 +16,8 @@ import { releaseSlotLock } from "@/lib/slot-lock";
 import { stripe } from "@/lib/stripe";
 import { creditInvoiceExternalId } from "@/lib/szamlazz/build-credit-invoice-xml";
 import { findCreditInvoiceByExternalId, issueCreditInvoice } from "@/lib/szamlazz/client";
-import { sanityFetch } from "@/sanity/lib/fetch";
 
 export const dynamic = "force-dynamic";
-
-const serviceForEmailQuery = defineQuery(
-  `*[_type == "service" && _id == $serviceId][0]{name, appointmentDuration}`,
-);
 
 const RECEPTION_EMAIL = "recepcio@drmoroczangela.hu";
 
@@ -65,88 +58,22 @@ export async function POST(request: Request): Promise<Response> {
         })
         .commit();
 
-      // Fire-and-forget: Google Calendar + email
-      const {
-        reservationNumber,
-        managementToken,
-        serviceId,
-        slotDate,
-        slotTime,
-        patientName,
-        patientEmail,
-        patientPhone,
-      } = metadata;
-
-      void (async () => {
-        try {
-          const svc = await getWriteClient().fetch<{
-            name: string;
-            appointmentDuration: number;
-          } | null>(`*[_type == "service" && _id == $id][0]{name, appointmentDuration}`, {
-            id: serviceId,
-          });
-          const eventId = await createCalendarEvent({
-            summary: `${svc?.name ?? "Foglalás"} — ${patientName}`,
-            description: `Páciens: ${patientName}\nE-mail: ${patientEmail}\nTelefon: ${patientPhone}\nFoglalási szám: ${reservationNumber}`,
-            date: slotDate!,
-            startTime: slotTime!,
-            durationMinutes: svc?.appointmentDuration ?? 20,
-          });
-          if (eventId) {
-            await getWriteClient()
-              .patch(bookingId)
-              .set({ googleCalendarEventId: eventId })
-              .commit();
-            console.log(`[stripe-webhook] Google Calendar event created: ${eventId}`);
-          }
-        } catch (err) {
-          console.error("[stripe-webhook] Google Calendar sync failed:", err);
-        }
-      })();
-
-      if (isEmailConfigured() && patientEmail) {
-        void (async () => {
-          try {
-            const service = await sanityFetch<{ name: string } | null>({
-              query: serviceForEmailQuery,
-              params: { serviceId },
-              tags: ["service"],
-            });
-
-            const formattedDate = new Date(slotDate!).toLocaleDateString("hu-HU", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-              weekday: "long",
-            });
-
-            const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://drmoroczangela.hu";
-            const manageUrl = `${appUrl}/foglalas/${managementToken}`;
-
-            const html = buildConfirmationEmail({
-              patientName: patientName!,
-              serviceName: service?.name?.startsWith("Nőgyógyász")
-                ? "Nőgyógyászati vizsgálat"
-                : (service?.name ?? "Foglalt szolgáltatás"),
-              reservationNumber: reservationNumber!,
-              date: formattedDate,
-              time: slotTime!,
-              manageUrl,
-              clinicPhone: "+36 70 639 5239",
-              clinicAddress: "2500 Esztergom, Martsa Alajos utca 6/c.",
-            });
-
-            await sendEmail({
-              to: patientEmail,
-              subject: "Időpontfoglalás visszaigazolása — Mórocz Medical",
-              html,
-            });
-            console.log(`[stripe-webhook] Confirmation email sent to ${patientEmail}`);
-          } catch (err) {
-            console.error("[stripe-webhook] Failed to send confirmation email:", err);
-          }
-        })();
-      }
+      // Fire-and-forget: Google Calendar + confirmation email (shared with the
+      // fee-waived checkout path, see src/lib/booking-confirmed.ts).
+      void runBookingConfirmedSideEffects(
+        {
+          bookingId,
+          reservationNumber: metadata.reservationNumber ?? "",
+          managementToken: metadata.managementToken ?? "",
+          serviceId: metadata.serviceId ?? "",
+          slotDate: metadata.slotDate ?? "",
+          slotTime: metadata.slotTime ?? "",
+          patientName: metadata.patientName ?? "",
+          patientEmail: metadata.patientEmail ?? "",
+          patientPhone: metadata.patientPhone ?? "",
+        },
+        "[stripe-webhook]",
+      );
     } catch (err) {
       console.error("[stripe-webhook] Failed to update booking:", err);
       return Response.json({ error: "Failed to process" }, { status: 500 });

@@ -96,6 +96,9 @@ function pctChange(current: number, previous: number): number | null {
 }
 
 // ── Revenue calculation ────────────────────────────────────────────────────────
+// Only paymentStatus "paid" counts as booking-fee revenue (deposit). A fee-waived
+// booking ("waived") has no deposit, so it is treated like a booking without an
+// online fee: its service price is expected on site, never as fee revenue.
 
 function getBookingRevenue(b: FinanceBooking): number {
   if (b.status === "no-show") {

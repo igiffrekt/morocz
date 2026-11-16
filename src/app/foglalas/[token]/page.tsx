@@ -4,6 +4,7 @@ import { BookingManagementCard } from "@/components/management/BookingManagement
 import { ManageRulesAside } from "@/components/management/ManageRulesAside";
 import { PillLink } from "@/components/ui/PillButton";
 import { formatLongDate } from "@/lib/booking-dates";
+import { isFeeWaived } from "@/lib/payment-status";
 import { getWriteClient } from "@/lib/sanity-write-client";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import { blockedDatesQuery, weeklyScheduleQuery } from "@/sanity/lib/queries";
@@ -101,7 +102,7 @@ export default async function FoglalasTokenPage({
         />
         <div className="flex flex-col gap-3 lg:grid lg:grid-cols-[minmax(0,3fr)_minmax(340px,1fr)] lg:items-start lg:gap-4">
           <div className="min-w-0">{children}</div>
-          <ManageRulesAside />
+          <ManageRulesAside feeWaived={isFeeWaived(booking?.paymentStatus)} />
         </div>
       </div>
     );

@@ -5,6 +5,7 @@ import { type ReactNode, useEffect, useRef, useState } from "react";
 import { Collapse } from "@/components/ui/Accordion";
 import { Notice } from "@/components/ui/Notice";
 import { ArrowIcon, pillClassName } from "@/components/ui/PillButton";
+import { useSession } from "@/lib/auth-client";
 import { formatLongDate } from "@/lib/booking-dates";
 import { cn } from "@/lib/cn";
 import type { ScheduleForAvailability } from "@/lib/slots";
@@ -41,6 +42,8 @@ interface BookingResult {
   reservationNumber: string;
   patientName: string;
   patientEmail: string;
+  /** Booked without the booking fee (server-decided, allowlisted account). */
+  waived: boolean;
 }
 
 interface ScheduleData {
@@ -72,6 +75,7 @@ const STEP_LABELS = ["Időpont", "Bejelentkezés", "Megerősítés"];
 const STORAGE_KEY = "morocz-booking-wizard-v2";
 const PRENATAL_NAME = "Várandósgondozás";
 const BOOKING_FEE = "10 000 Ft";
+const BOOKING_FEE_WAIVED = "Díjmentes";
 
 const slideVariants = {
   enter: (dir: number) => ({ x: dir > 0 ? 28 : -28, opacity: 0 }),
@@ -156,6 +160,31 @@ export function BookingWizard({ services, scheduleData, initialSelection }: Book
 
   // Hold expiration check
   const [holdExpired, setHoldExpired] = useState(false);
+
+  // Booking-fee waiver for the signed-in account. Display only: the server decides
+  // it again in /api/checkout from the session and never trusts this flag.
+  const { data: session } = useSession();
+  const sessionUserId = session?.user?.id ?? null;
+  const [feeExempt, setFeeExempt] = useState(false);
+  useEffect(() => {
+    if (!sessionUserId) {
+      setFeeExempt(false);
+      return;
+    }
+    let cancelled = false;
+    fetch("/api/user/profile")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: { feeExempt?: boolean } | null) => {
+        if (!cancelled) setFeeExempt(data?.feeExempt === true);
+      })
+      .catch(() => {
+        // Non-critical: the fee is shown and the server still decides at checkout.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [sessionUserId]);
+  const feeText = feeExempt ? BOOKING_FEE_WAIVED : BOOKING_FEE;
 
   // ── Restore wizard state from sessionStorage on mount (URL preselection wins) ──
   // biome-ignore lint/correctness/useExhaustiveDependencies: runs once on mount by design
@@ -311,9 +340,10 @@ export function BookingWizard({ services, scheduleData, initialSelection }: Book
     reservationNumber: string,
     patientName: string,
     patientEmail: string,
+    waived: boolean,
   ) {
     sessionStorage.removeItem(STORAGE_KEY);
-    setBookingResult({ bookingId, reservationNumber, patientName, patientEmail });
+    setBookingResult({ bookingId, reservationNumber, patientName, patientEmail, waived });
     setCurrentStep(4); // Show success
   }
 
@@ -417,6 +447,7 @@ export function BookingWizard({ services, scheduleData, initialSelection }: Book
           reservationNumber={bookingResult.reservationNumber}
           patientName={bookingResult.patientName}
           patientEmail={bookingResult.patientEmail}
+          waived={bookingResult.waived}
           onNewBooking={resetWizard}
         />
       ) : (
@@ -548,13 +579,14 @@ export function BookingWizard({ services, scheduleData, initialSelection }: Book
                     <span className={SUMMARY_LABEL}>Foglalási díj</span>
                   </dt>
                   <dd className="col-start-2 m-0 self-start text-xl font-extrabold text-mint-light">
-                    {BOOKING_FEE}
+                    {feeText}
                   </dd>
                 </div>
               </dl>
               <p className="m-0 text-[13px] leading-relaxed text-navy-soft">
-                A foglalási díj a vizsgálat árába beszámít. Online bankkártyás fizetés a Stripe
-                rendszerén keresztül.
+                {feeExempt
+                  ? "Az Ön fiókjával a foglalás díjmentes, online fizetésre nincs szükség."
+                  : "A foglalási díj a vizsgálat árába beszámít. Online bankkártyás fizetés a Stripe rendszerén keresztül."}
               </p>
               {currentStep === 1 ? (
                 <>
@@ -597,7 +629,7 @@ export function BookingWizard({ services, scheduleData, initialSelection }: Book
           hint={nextHint}
           rows={[
             ...summaryRows.filter((r) => r.v),
-            { k: "Foglalási díj", v: BOOKING_FEE, icon: ICONS.card },
+            { k: "Foglalási díj", v: feeText, icon: ICONS.card },
           ]}
           onNext={() => goToStep(2)}
         />
@@ -674,6 +706,7 @@ export function BookingWizard({ services, scheduleData, initialSelection }: Book
               selectedTime: selections.selectedTime ?? "",
               slotLockId: selections.slotLockId ?? null,
             }}
+            feeExempt={feeExempt}
             onBack={() => goToStep(2)}
             onSuccess={handleBookingSuccess}
             onConflict={handleConflict}
